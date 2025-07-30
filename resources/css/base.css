@@ -1,0 +1,128 @@
+/* Google Fonts - Technical Typography */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base Styles */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #ffffff;
+    color: #1a1a1a;
+    opacity: 0;
+    transition: opacity 0.5s ease-in;
+  }
+  
+  body.loaded { 
+    opacity: 1; 
+  }
+}
+
+/* Design System */
+@layer components {
+  /* Container */
+  .container { 
+    @apply max-w-7xl mx-auto px-6; 
+  }
+  
+  /* Typography */
+  .text-heading {
+    @apply text-4xl md:text-5xl font-bold text-gray-900;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  
+  .text-subheading {
+    @apply text-lg text-gray-600;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+  }
+  
+  .text-body {
+    @apply text-base leading-relaxed;
+    line-height: 1.7;
+    letter-spacing: -0.01em;
+  }
+  
+  /* Colors */
+  .color-primary { @apply text-gray-900; }
+  .color-secondary { @apply text-gray-600; }
+  .color-accent { @apply text-blue-600; }
+  
+  /* Backgrounds */
+  .bg-primary { @apply bg-white; }
+  .bg-secondary { @apply bg-gray-50; }
+  .bg-accent { @apply bg-blue-50; }
+  
+  /* Spacing */
+  .section-padding { @apply py-24; }
+  .section-padding-sm { @apply py-12; }
+  
+  /* Grid */
+  .grid-responsive {
+    @apply grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6;
+  }
+  
+  /* Buttons */
+  .btn {
+    @apply inline-flex items-center justify-center px-6 py-3 font-semibold rounded-lg transition-all duration-300;
+  }
+  
+  .btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700 transform hover:scale-105;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-100 text-gray-900 hover:bg-gray-200;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white;
+  }
+  
+  /* Cards */
+  .card {
+    @apply bg-white rounded-lg border border-gray-200 overflow-hidden transition-all duration-300;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+  
+  .card:hover {
+    @apply shadow-lg transform -translate-y-1;
+  }
+  
+  /* Forms */
+  .form-input {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200;
+  }
+  
+  .form-label {
+    @apply block text-sm font-semibold text-gray-900 mb-2;
+  }
+  
+  /* Animations */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Utilities */
+  .sticky-top {
+    @apply sticky top-24;
+  }
+  
+  .backdrop-blur {
+    @apply bg-white/95 backdrop-blur-sm;
+  }
+} 

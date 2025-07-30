@@ -1,0 +1,58 @@
+/* Sidebar Layout */
+@layer components {
+  /* Catalog Layout */
+  .catalog-layout {
+    @apply grid grid-cols-1 lg:grid-cols-4 gap-8;
+  }
+  
+  /* Main Content Area */
+  .main-content {
+    @apply lg:col-span-3;
+  }
+  
+  /* Results Header */
+  .results-header {
+    @apply flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-6 border-b border-gray-200;
+  }
+  
+  .results-info {
+    @apply mb-4 md:mb-0;
+  }
+  
+  .results-title {
+    @apply text-2xl font-bold text-gray-900 mb-1;
+  }
+  
+  .results-subtitle {
+    @apply text-gray-600;
+  }
+  
+  /* Sort Options */
+  .sort-options {
+    @apply flex items-center space-x-3;
+  }
+  
+  .sort-label {
+    @apply text-sm font-medium text-gray-700;
+  }
+  
+  .sort-select {
+    @apply form-input w-auto;
+  }
+  
+  /* Pagination */
+  .pagination {
+    @apply mt-12 flex justify-center;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 1023px) {
+    .catalog-layout {
+      @apply grid-cols-1;
+    }
+    
+    .main-content {
+      @apply col-span-1;
+    }
+  }
+} 

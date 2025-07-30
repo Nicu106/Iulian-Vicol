@@ -1,0 +1,242 @@
+/* Vehicle Cards Component */
+@layer components {
+  /* Cards Grid */
+  .cards-grid {
+    @apply grid-responsive;
+  }
+  
+  /* Vehicle Card */
+  .vehicle-card {
+    @apply card;
+    height: 380px;
+  }
+  
+  .vehicle-card:hover {
+    @apply shadow-xl transform -translate-y-2;
+  }
+  
+  /* Card Image */
+  .card-image {
+    @apply h-40 bg-gray-100 relative overflow-hidden;
+  }
+  
+  .card-img {
+    @apply w-full h-full object-cover transition-transform duration-500;
+  }
+  
+  .vehicle-card:hover .card-img {
+    transform: scale(1.05);
+  }
+  
+  .card-placeholder {
+    @apply w-full h-full flex items-center justify-center text-3xl;
+  }
+  
+  /* Card Content */
+  .card-content {
+    @apply p-4 space-y-3;
+  }
+  
+  /* Card Title */
+  .card-title {
+    @apply space-y-1;
+  }
+  
+  .card-brand {
+    @apply text-lg font-bold text-gray-900;
+  }
+  
+  .card-model {
+    @apply text-base font-semibold text-gray-700;
+  }
+  
+  /* Card Info */
+  .card-info {
+    @apply flex items-center text-sm text-gray-600;
+  }
+  
+  .card-year {
+    @apply font-medium;
+  }
+  
+  .card-separator {
+    @apply mx-2;
+  }
+  
+  .card-mileage {
+    @apply font-medium;
+  }
+  
+  /* Card Specs */
+  .card-specs {
+    @apply flex flex-wrap gap-2;
+  }
+  
+  .spec-tag {
+    @apply px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded;
+  }
+  
+  /* Card Price */
+  .card-price {
+    @apply pt-2;
+  }
+  
+  .price-amount {
+    @apply text-xl font-bold text-gray-900;
+  }
+  
+  /* Card Button */
+  .card-button {
+    @apply pt-2;
+  }
+  
+  .card-btn {
+    @apply block w-full text-center py-2 px-4 bg-blue-600 text-white font-medium rounded transition-colors duration-200;
+  }
+  
+  .card-btn:hover {
+    @apply bg-blue-700;
+  }
+  
+  /* Car Card (Original) */
+  .car-card {
+    @apply bg-white border border-gray-200 rounded-lg overflow-hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    height: 380px;
+  }
+
+  .car-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+
+  /* Image Section */
+  .car-image {
+    @apply h-40 bg-gray-100 relative;
+  }
+
+  .car-img {
+    @apply w-full h-full object-cover;
+  }
+
+  .car-placeholder {
+    @apply w-full h-full flex items-center justify-center text-3xl;
+  }
+
+  /* Content Section */
+  .car-content {
+    @apply p-4 space-y-3;
+  }
+
+  /* Title */
+  .car-title {
+    @apply space-y-1;
+  }
+
+  .car-brand {
+    @apply text-lg font-bold text-gray-900;
+  }
+
+  .car-model {
+    @apply text-base font-semibold text-gray-700;
+  }
+
+  /* Basic Info */
+  .car-info {
+    @apply flex items-center text-sm text-gray-600;
+  }
+
+  .car-year {
+    @apply font-medium;
+  }
+
+  .car-separator {
+    @apply mx-2;
+  }
+
+  .car-mileage {
+    @apply font-medium;
+  }
+
+  /* Specs */
+  .car-specs {
+    @apply flex flex-wrap gap-2;
+  }
+
+  .spec {
+    @apply px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded;
+  }
+
+  /* Price */
+  .car-price {
+    @apply pt-2;
+  }
+
+  .price {
+    @apply text-xl font-bold text-gray-900;
+  }
+
+  /* Button */
+  .car-button {
+    @apply pt-2;
+  }
+
+  .btn-details {
+    @apply block w-full text-center py-2 px-4 bg-blue-600 text-white font-medium rounded transition-colors duration-200;
+  }
+
+  .btn-details:hover {
+    @apply bg-blue-700;
+  }
+  
+  /* Related Cards */
+  .related-card {
+    @apply card;
+  }
+  
+  .related-image {
+    @apply h-48 bg-gray-100 flex items-center justify-center;
+  }
+  
+  .related-content {
+    @apply p-6;
+  }
+  
+  .related-title {
+    @apply text-lg font-bold text-gray-900 mb-2;
+  }
+  
+  .related-subtitle {
+    @apply text-gray-600 text-sm mb-4;
+  }
+  
+  .related-price {
+    @apply text-xl font-bold text-gray-900 mb-4;
+  }
+  
+  .related-button {
+    @apply block w-full text-center py-3 bg-gray-900 text-white font-semibold rounded-lg transition-all duration-300 hover:bg-gray-800 transform hover:scale-105;
+  }
+  
+  /* No Results Card */
+  .no-results {
+    @apply col-span-full text-center py-16;
+  }
+  
+  .no-results-icon {
+    @apply text-6xl mb-6;
+  }
+  
+  .no-results-title {
+    @apply text-xl font-bold text-gray-900 mb-4;
+  }
+  
+  .no-results-text {
+    @apply text-gray-600 mb-6;
+  }
+  
+  .no-results-button {
+    @apply btn btn-primary;
+  }
+} 

@@ -1,0 +1,387 @@
+
+<!DOCTYPE html>
+<html lang="ro" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prestige Motors - O Experiență Unică</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Toate stilurile CSS sunt aici -->
+    <style>
+        :root {
+            --bg-light: #F8F9FA;
+            --text-light: #212529;
+            --card-light: #FFFFFF;
+            --border-light: #E2E8F0;
+
+            --bg-dark: #121212;
+            --text-dark: #EAEAEA;
+            --card-dark: #1E1E1E;
+            --border-dark: #2D2D2D;
+        }
+
+        /* Light Mode (default) */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            opacity: 0;
+            transition: opacity 0.5s ease-in, background-color 0.4s ease, color 0.4s ease;
+        }
+        .bg-card { background-color: var(--card-light); }
+        .border-custom { border-color: var(--border-light); }
+        .text-main { color: var(--text-light); }
+        .text-secondary { color: #6C757D; }
+        .header-scrolled {
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        /* Dark Mode */
+        html.dark body {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+        html.dark .bg-card { background-color: var(--card-dark); }
+        html.dark .border-custom { border-color: var(--border-dark); }
+        html.dark .text-main { color: var(--text-dark); }
+        html.dark .text-secondary { color: #A0A0A0; }
+        html.dark .header-scrolled {
+            background-color: rgba(18, 18, 18, 0.8);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        html.dark .logo-span { color: #A0A0A0 !important; }
+
+        body.loaded { opacity: 1; }
+        .header-sticky { position: sticky; top: 0; z-index: 50; transition: background-color 0.3s, box-shadow 0.3s; }
+        
+        /* Preloader */
+        #preloader { position: fixed; inset: 0; background-color: #111111; z-index: 100; display: flex; align-items: center; justify-content: center; }
+        .preloader-logo { font-weight: 700; font-size: 2rem; color: white; }
+
+        /* Ascundere elemente pentru animații */
+        .hero-content h1, .hero-content p, .hero-content a { opacity: 0; }
+
+        /* Secțiune Scroll Orizontal */
+        #catalog-section { overflow: hidden; }
+        #horizontal-track {
+            display: flex;
+            width: max-content; /* Lățime calculată de numărul de carduri */
+        }
+        .car-card-horizontal {
+            width: 30vw; /* Lățime card relativă la viewport */
+            flex-shrink: 0;
+            margin-right: 2.5rem; /* 40px */
+        }
+        @media (max-width: 1024px) { .car-card-horizontal { width: 40vw; } }
+        @media (max-width: 768px) { .car-card-horizontal { width: 80vw; } }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- ===== Preloader ===== -->
+    <div id="preloader">
+        <div class="preloader-logo">PRESTIGE<span class="font-light text-gray-400">MOTORS</span></div>
+    </div>
+
+    <!-- ===== Header & Navigație ===== -->
+    <header id="main-header" class="header-sticky">
+        <nav class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <a href="#hero" class="text-2xl font-bold text-main">PRESTIGE<span class="text-gray-500 logo-span">MOTORS</span></a>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#catalog" class="text-secondary hover:text-main transition-colors">Catalog</a>
+                    <a href="#flagship" class="text-secondary hover:text-main transition-colors">Flagship</a>
+                    <a href="#contact" class="text-secondary hover:text-main transition-colors">Contact</a>
+                    <button id="theme-toggle" class="w-6 h-6 text-secondary hover:text-main transition-colors">
+                        <!-- Iconița se va schimba cu JS -->
+                        <svg id="theme-toggle-dark-icon" class="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                        <svg id="theme-toggle-light-icon" class="w-full h-full hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    </button>
+                </div>
+                 <div class="md:hidden">
+                    <button class="text-main focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- ===== Secțiune Hero ===== -->
+        <section id="hero" class="relative h-screen w-full overflow-hidden">
+            <div class="absolute inset-0 bg-black opacity-40 z-10"></div>
+            <img id="hero-bg" src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=2070&auto=format&fit=crop" alt="Mașină sport galbenă" class="w-full h-full object-cover">
+            <div class="hero-content absolute inset-0 z-20 flex flex-col items-center justify-center text-white text-center p-6">
+                <h1 class="text-4xl md:text-6xl lg:text-8xl font-black uppercase tracking-wider">Eleganță. Putere. Pasiune.</h1>
+                <p class="mt-4 max-w-2xl text-lg md:text-xl text-gray-200">O colecție curatoriată pentru cunoscători.</p>
+                <a href="#catalog" class="mt-8 px-10 py-4 bg-white text-black font-bold rounded-lg hover:bg-gray-200 transition-transform transform hover:scale-105">
+                    Explorează Colecția
+                </a>
+            </div>
+        </section>
+
+        <!-- ===== Secțiune Catalog Orizontal ===== -->
+        <section id="catalog" class="relative py-24">
+            <div class="container mx-auto px-6">
+                 <div class="text-left mb-16">
+                    <h2 class="text-5xl font-bold text-main anim-title">Descoperă Colecția</h2>
+                    <p class="text-secondary mt-2 anim-subtitle">Fiecare model, o declarație de stil și performanță.</p>
+                </div>
+            </div>
+            <div id="horizontal-track-container" class="pl-[5vw]">
+                <div id="horizontal-track">
+                    <!-- Carduri Mașini -->
+                    <div class="car-card-horizontal bg-card border border-custom rounded-lg overflow-hidden shadow-sm">
+                         <img src="https://placehold.co/600x400/1E1E1E/EAEAEA?text=Audi+RS6" alt="Audi RS6" class="w-full h-56 object-cover" loading="lazy">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold text-main">Audi RS6 Avant</h3>
+                            <p class="text-secondary mt-1">2023</p>
+                            <p class="text-3xl font-black mt-4 text-main">125.000 €</p>
+                        </div>
+                    </div>
+                    <div class="car-card-horizontal bg-card border border-custom rounded-lg overflow-hidden shadow-sm">
+                         <img src="https://placehold.co/600x400/1E1E1E/EAEAEA?text=BMW+M4" alt="BMW M4" class="w-full h-56 object-cover" loading="lazy">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold text-main">BMW M4 Competition</h3>
+                            <p class="text-secondary mt-1">2024</p>
+                            <p class="text-3xl font-black mt-4 text-main">110.000 €</p>
+                        </div>
+                    </div>
+                    <div class="car-card-horizontal bg-card border border-custom rounded-lg overflow-hidden shadow-sm">
+                         <img src="https://placehold.co/600x400/1E1E1E/EAEAEA?text=Mercedes+AMG" alt="Mercedes AMG GT" class="w-full h-56 object-cover" loading="lazy">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold text-main">Mercedes-AMG GT</h3>
+                            <p class="text-secondary mt-1">2023</p>
+                            <p class="text-3xl font-black mt-4 text-main">150.000 €</p>
+                        </div>
+                    </div>
+                    <div class="car-card-horizontal bg-card border border-custom rounded-lg overflow-hidden shadow-sm">
+                         <img src="https://placehold.co/600x400/1E1E1E/EAEAEA?text=Porsche+911" alt="Porsche 911" class="w-full h-56 object-cover" loading="lazy">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold text-main">Porsche 911 Carrera</h3>
+                            <p class="text-secondary mt-1">2024</p>
+                            <p class="text-3xl font-black mt-4 text-main">180.000 €</p>
+                        </div>
+                    </div>
+                    <div class="car-card-horizontal bg-card border border-custom rounded-lg overflow-hidden shadow-sm">
+                         <img src="https://placehold.co/600x400/1E1E1E/EAEAEA?text=Ferrari+296" alt="Ferrari 296 GTB" class="w-full h-56 object-cover" loading="lazy">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold text-main">Ferrari 296 GTB</h3>
+                            <p class="text-secondary mt-1">2024</p>
+                            <p class="text-3xl font-black mt-4 text-main">280.000 €</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Secțiune Flagship Model ===== -->
+        <section id="flagship" class="py-24 overflow-hidden">
+            <div class="container mx-auto px-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="flagship-text text-left">
+                        <h2 class="text-sm uppercase text-secondary tracking-widest">Modelul Anului</h2>
+                        <p class="text-4xl md:text-6xl font-black mt-2 text-main">Porsche 911 GT3 RS</p>
+                        <p class="mt-6 text-secondary leading-relaxed">
+                            O capodoperă a ingineriei germane, creată pentru circuit, dar legală pe stradă. Fiecare componentă este optimizată pentru performanță maximă.
+                        </p>
+                        <a href="#" class="mt-8 inline-block px-8 py-3 border border-custom rounded-lg hover:bg-main hover:text-bg-light transition-colors text-main">Explorează Modelul</a>
+                    </div>
+                    <div class="flagship-image-wrapper">
+                        <img src="https://images.unsplash.com/photo-1617051025750-1595aff34a5d?q=80&w=1974&auto=format&fit=crop" alt="Porsche 911 GT3 RS" class="rounded-lg shadow-2xl w-full">
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- ===== Secțiune Contact ===== -->
+        <section id="contact" class="py-24 bg-card">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-5xl font-bold text-main">Contactează-ne</h2>
+                <p class="text-secondary mt-2 max-w-xl mx-auto">Ai o întrebare sau dorești să programezi un test-drive? Suntem aici pentru tine.</p>
+                <a href="mailto:contact@prestigemotors.ro" class="mt-8 inline-block px-12 py-4 bg-main text-bg-light font-bold rounded-lg hover:opacity-90 transition-opacity text-lg">
+                    Trimite un Email
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ===== Footer ===== -->
+    <footer class="py-8">
+        <div class="container mx-auto px-6 text-center text-secondary text-sm">
+             <p>&copy; 2024 Prestige Motors. O experiență digitală unică.</p>
+        </div>
+    </footer>
+
+    <!-- GSAP Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <!-- Tot codul JavaScript este aici -->
+    <script>
+        /**
+         * Logica pentru site-ul one-page Prestige Motors cu GSAP.
+         * - Preloader & Dark Mode
+         * - Animații la încărcare
+         * - Scroll Orizontal pentru Catalog
+         * - Animații la scroll pentru secțiuni
+         */
+
+        document.addEventListener('DOMContentLoaded', function() {
+            gsap.registerPlugin(ScrollTrigger);
+
+            const body = document.body;
+            const preloader = document.getElementById('preloader');
+            const themeToggle = document.getElementById('theme-toggle');
+            const darkIcon = document.getElementById('theme-toggle-dark-icon');
+            const lightIcon = document.getElementById('theme-toggle-light-icon');
+
+            // ===== 1. Dark Mode Logic =====
+            // Verifică preferința salvată sau a sistemului
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                if(lightIcon && darkIcon) {
+                    lightIcon.classList.remove('hidden');
+                    darkIcon.classList.add('hidden');
+                }
+            }
+
+            if(themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    document.documentElement.classList.toggle('dark');
+                    const isDark = document.documentElement.classList.contains('dark');
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    if(lightIcon && darkIcon) {
+                        lightIcon.classList.toggle('hidden', !isDark);
+                        darkIcon.classList.toggle('hidden', isDark);
+                    }
+                });
+            }
+
+            // ===== 2. Preloader & Animații de intrare =====
+            window.onload = () => {
+                if(preloader) {
+                    gsap.to(preloader, { opacity: 0, visibility: 'hidden', duration: 0.8, ease: 'power3.inOut' });
+                }
+                body.classList.add('loaded');
+                initIntroAnimations();
+                initScrollAnimations();
+            };
+            
+            // ===== 3. Navigație Smooth Scroll =====
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if(targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+
+            function initIntroAnimations() {
+                // Animație Hero
+                const tlHero = gsap.timeline({ defaults: { ease: 'power3.out' } });
+                tlHero
+                    .fromTo('.hero-content h1', { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2 }, "+=0.3")
+                    .fromTo('.hero-content p', { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 1 }, "-=0.8")
+                    .fromTo('.hero-content a', { scale: 0.9, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.8 }, "-=0.7");
+
+                // Parallax Hero Background
+                gsap.to("#hero-bg", {
+                    scrollTrigger: { trigger: "#hero", start: "top top", end: "bottom top", scrub: true },
+                    y: "25%",
+                    ease: "none"
+                });
+            }
+
+            function initScrollAnimations() {
+                // ===== Animație Scroll Orizontal pentru Catalog =====
+                const horizontalSection = document.getElementById('catalog');
+                const track = document.getElementById('horizontal-track');
+                
+                if(horizontalSection && track) {
+                    let mm = gsap.matchMedia();
+                    mm.add("(min-width: 769px)", () => {
+                        let trackWidth = track.offsetWidth;
+                        let containerWidth = horizontalSection.offsetWidth;
+
+                        gsap.to(track, {
+                            x: () => -(trackWidth - containerWidth + (window.innerWidth * 0.1)), // Deplasare orizontală
+                            ease: "none",
+                            scrollTrigger: {
+                                trigger: horizontalSection,
+                                start: "top top",
+                                end: () => "+=" + (trackWidth - containerWidth),
+                                pin: true,
+                                scrub: 1,
+                                invalidateOnRefresh: true
+                            }
+                        });
+                    });
+                    
+                    mm.add("(max-width: 768px)", () => {
+                        // Pe mobil, cardurile apar cu un simplu fade-in la scroll
+                        gsap.from(".car-card-horizontal", {
+                            scrollTrigger: {
+                                trigger: horizontalSection,
+                                start: "top 70%",
+                                toggleActions: 'play none none none',
+                            },
+                            y: 60,
+                            opacity: 0,
+                            duration: 0.8,
+                            stagger: 0.2,
+                            ease: 'power3.out'
+                        });
+                    });
+                }
+
+                // ===== Animații pentru celelalte secțiuni =====
+                // Titluri
+                gsap.utils.toArray('.anim-title').forEach(title => {
+                    gsap.from(title, {
+                        scrollTrigger: { trigger: title, start: 'top 85%', toggleActions: 'play none none none' },
+                        y: 50, opacity: 0, duration: 1, ease: 'power3.out'
+                    });
+                });
+
+                // Secțiunea Flagship
+                const flagshipSection = document.getElementById('flagship');
+                if(flagshipSection) {
+                    const tlFlagship = gsap.timeline({
+                        scrollTrigger: { trigger: flagshipSection, start: 'top 50%' }
+                    });
+                    tlFlagship
+                        .from('.flagship-image-wrapper', { xPercent: 100, opacity: 0, duration: 1.2, ease: 'power3.out' })
+                        .from('.flagship-text > *', { xPercent: -20, opacity: 0, duration: 1, stagger: 0.2, ease: 'power3.out' }, "-=0.8");
+                }
+
+                // Secțiunea Contact
+                const contactSection = document.getElementById('contact');
+                if(contactSection) {
+                    gsap.from("#contact > *", {
+                        scrollTrigger: { trigger: contactSection, start: 'top 70%' },
+                        y: 50,
+                        opacity: 0,
+                        duration: 1,
+                        stagger: 0.2,
+                        ease: 'power3.out'
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>

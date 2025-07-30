@@ -1,0 +1,152 @@
+/* Filters Component */
+@layer components {
+  /* Filters Sidebar */
+  .filters-sidebar {
+    @apply lg:col-span-1 bg-white rounded-lg border border-gray-200 p-6 sticky-top;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+  }
+  
+  /* Mobile Filters */
+  @media (max-width: 1023px) {
+    .filters-sidebar {
+      @apply col-span-full mb-6 max-h-none sticky top-0 z-40 bg-white border-b border-gray-200 rounded-none;
+    }
+    
+    .filters-form {
+      @apply hidden;
+    }
+    
+    .filters-form.active {
+      @apply block;
+    }
+    
+    .filters-header {
+      @apply cursor-pointer;
+    }
+  }
+  
+  /* Filters Header */
+  .filters-header {
+    @apply flex items-center justify-between mb-6 pb-4 border-b border-gray-200;
+  }
+  
+  .filters-title {
+    @apply text-lg font-bold text-gray-900;
+  }
+  
+  .clear-filters {
+    @apply text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200;
+  }
+  
+  /* Filters Form */
+  .filters-form {
+    @apply space-y-6;
+  }
+  
+  /* Filter Section */
+  .filter-section {
+    @apply space-y-3;
+  }
+  
+  .filter-label {
+    @apply form-label;
+  }
+  
+  /* Filter Options */
+  .filter-options {
+    @apply space-y-2 max-h-32 overflow-y-auto;
+  }
+  
+  /* Checkbox Items */
+  .checkbox-item {
+    @apply flex items-center space-x-3 cursor-pointer p-2 rounded transition-colors duration-200;
+    min-height: 44px;
+  }
+  
+  .checkbox-item:hover {
+    @apply bg-gray-50;
+  }
+  
+  .checkbox-item input[type="checkbox"] {
+    @apply sr-only;
+  }
+  
+  .checkbox-custom {
+    @apply w-4 h-4 border-2 border-gray-300 rounded transition-all duration-200 relative;
+  }
+  
+  .checkbox-item input[type="checkbox"]:checked + .checkbox-custom {
+    @apply bg-blue-600 border-blue-600;
+  }
+  
+  .checkbox-custom::after {
+    content: '✓';
+    @apply text-white text-xs font-bold absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200;
+  }
+  
+  .checkbox-item input[type="checkbox"]:checked + .checkbox-custom::after {
+    @apply opacity-100;
+  }
+  
+  .checkbox-text {
+    @apply text-sm text-gray-700;
+  }
+  
+  /* Price and Mileage Inputs */
+  .price-inputs,
+  .mileage-inputs {
+    @apply flex items-center space-x-2;
+  }
+  
+  .price-input,
+  .mileage-input {
+    @apply flex-1 form-input;
+  }
+  
+  .price-separator,
+  .mileage-separator {
+    @apply text-gray-500 font-medium;
+  }
+  
+  /* Year Inputs */
+  .year-inputs {
+    @apply grid grid-cols-2 gap-2;
+  }
+  
+  .year-select {
+    @apply form-input;
+  }
+  
+  /* Apply Filters Button */
+  .apply-filters {
+    @apply w-full btn btn-primary;
+  }
+  
+  /* Scrollbar Styling */
+  .filters-sidebar::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .filters-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .filters-sidebar::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    border-radius: 2px;
+  }
+  
+  .filter-options::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .filter-options::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .filter-options::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    border-radius: 2px;
+  }
+} 

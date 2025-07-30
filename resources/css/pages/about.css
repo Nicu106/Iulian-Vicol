@@ -1,0 +1,324 @@
+/* About Page */
+@layer components {
+  /* About Hero */
+  .about-hero {
+    @apply relative py-20 overflow-hidden;
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #1e40af 100%);
+  }
+  
+  .about-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    opacity: 0.3;
+  }
+  
+  .about-hero-content {
+    @apply relative z-10 text-center text-white max-w-4xl mx-auto;
+  }
+  
+  .about-hero-title {
+    @apply text-4xl md:text-6xl font-black leading-tight mb-6;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  
+  .about-hero-subtitle {
+    @apply text-xl md:text-2xl text-blue-100 font-light;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
+
+  /* Story Section */
+  .story-section {
+    @apply section-padding bg-white;
+  }
+  
+  .story-content {
+    @apply grid grid-cols-1 lg:grid-cols-2 gap-12 items-center;
+  }
+  
+  .story-text {
+    @apply space-y-6;
+  }
+  
+  .story-title {
+    @apply text-3xl md:text-4xl font-bold text-gray-900 mb-6;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  
+  .story-paragraph {
+    @apply text-lg text-gray-700 leading-relaxed;
+    line-height: 1.8;
+    letter-spacing: -0.01em;
+  }
+  
+  .story-stats {
+    @apply bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8;
+    box-shadow: 0 20px 40px rgba(59, 130, 246, 0.1);
+  }
+  
+  .stats-grid {
+    @apply grid grid-cols-2 gap-6;
+  }
+  
+  .stat-item {
+    @apply text-center;
+  }
+  
+  .stat-number {
+    @apply text-3xl md:text-4xl font-black text-blue-600 mb-2;
+  }
+  
+  .stat-label {
+    @apply text-sm font-medium text-gray-600;
+  }
+
+  /* Values Section */
+  .values-section {
+    @apply section-padding bg-gradient-to-br from-gray-50 to-blue-50;
+  }
+  
+  .values-header {
+    @apply text-center mb-16;
+  }
+  
+  .values-title {
+    @apply text-3xl md:text-4xl font-bold text-gray-900 mb-4;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  
+  .values-subtitle {
+    @apply text-lg text-gray-600 max-w-2xl mx-auto;
+    line-height: 1.6;
+  }
+  
+  .values-grid {
+    @apply grid grid-cols-1 md:grid-cols-3 gap-8;
+  }
+  
+  .value-card {
+    @apply card p-8 text-center transition-all duration-500;
+    transform: translateY(0);
+  }
+  
+  .value-card:hover {
+    @apply shadow-xl transform -translate-y-2;
+  }
+  
+  .value-icon {
+    @apply w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6;
+    transition: all 0.3s ease;
+  }
+  
+  .value-card:hover .value-icon {
+    @apply bg-blue-200 transform scale-110;
+  }
+  
+  .value-title {
+    @apply text-xl font-bold text-gray-900 mb-4;
+  }
+  
+  .value-description {
+    @apply text-gray-600 leading-relaxed;
+    line-height: 1.6;
+  }
+
+  /* Team Section */
+  .team-section {
+    @apply section-padding bg-white;
+  }
+  
+  .team-header {
+    @apply text-center mb-16;
+  }
+  
+  .team-title {
+    @apply text-3xl md:text-4xl font-bold text-gray-900 mb-4;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  
+  .team-subtitle {
+    @apply text-lg text-gray-600 max-w-2xl mx-auto;
+    line-height: 1.6;
+  }
+  
+  .team-grid {
+    @apply grid grid-cols-1 md:grid-cols-3 gap-8;
+  }
+  
+  .team-member {
+    @apply text-center transition-all duration-500;
+    transform: translateY(0);
+  }
+  
+  .team-member:hover {
+    transform: translateY(-8px);
+  }
+  
+  .member-avatar {
+    @apply w-32 h-32 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6;
+    transition: all 0.3s ease;
+  }
+  
+  .team-member:hover .member-avatar {
+    @apply shadow-lg transform scale-105;
+  }
+  
+  .member-name {
+    @apply text-xl font-bold text-gray-900 mb-2;
+  }
+  
+  .member-position {
+    @apply text-blue-600 font-medium mb-2;
+  }
+  
+  .member-experience {
+    @apply text-sm text-gray-500;
+  }
+
+  /* About CTA */
+  .about-cta {
+    @apply section-padding;
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #1e40af 100%);
+  }
+  
+  .cta-content {
+    @apply text-center text-white;
+  }
+  
+  .cta-title {
+    @apply text-3xl md:text-4xl font-bold mb-6;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .cta-subtitle {
+    @apply text-xl text-blue-100 mb-8 max-w-2xl mx-auto;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .cta-buttons {
+    @apply flex flex-col sm:flex-row gap-4 justify-center;
+  }
+  
+  .cta-primary {
+    @apply btn btn-primary text-lg px-8 py-4;
+  }
+  
+  .cta-secondary {
+    @apply btn btn-outline text-lg px-8 py-4 border-white text-white hover:bg-white hover:text-blue-600;
+  }
+
+  /* Timeline */
+  .timeline {
+    @apply relative py-16;
+  }
+  
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #3b82f6, #1e40af);
+    transform: translateX(-50%);
+  }
+  
+  .timeline-item {
+    @apply relative mb-12;
+  }
+  
+  .timeline-content {
+    @apply bg-white rounded-lg p-6 shadow-lg;
+    width: calc(50% - 30px);
+  }
+  
+  .timeline-item:nth-child(odd) .timeline-content {
+    @apply ml-auto;
+  }
+  
+  .timeline-item:nth-child(even) .timeline-content {
+    @apply mr-auto;
+  }
+  
+  .timeline-dot {
+    @apply absolute w-4 h-4 bg-blue-600 rounded-full border-4 border-white;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  .timeline-item:nth-child(odd) .timeline-dot {
+    left: -8px;
+  }
+  
+  .timeline-item:nth-child(even) .timeline-dot {
+    right: -8px;
+  }
+  
+  .timeline-year {
+    @apply text-2xl font-bold text-blue-600 mb-2;
+  }
+  
+  .timeline-title {
+    @apply text-lg font-semibold text-gray-900 mb-2;
+  }
+  
+  .timeline-description {
+    @apply text-gray-600;
+  }
+
+  /* Animation Classes */
+  .fade-in-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .fade-in-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .slide-in-left {
+    opacity: 0;
+    transform: translateX(-50px);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .slide-in-left.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  
+  .slide-in-right {
+    opacity: 0;
+    transform: translateX(50px);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .slide-in-right.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  
+  .scale-in {
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .scale-in.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+} 
