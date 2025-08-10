@@ -1,0 +1,799 @@
+/* Vehicle Cards Component - Modern Professional Design */
+@layer components {
+  /* Cards Grid */
+  .cards-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
+  }
+  
+  /* Vehicle Card - Modern Design */
+  .vehicle-card {
+    @apply bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 380px;
+    max-height: 420px;
+    position: relative;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .vehicle-card:hover {
+    @apply shadow-2xl transform -translate-y-1;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    transform: translateY(-4px) scale(1.02);
+  }
+  
+  .vehicle-card:active {
+    transform: translateY(-2px) scale(1.01);
+  }
+  
+  /* Card Image Section */
+  .card-image {
+    @apply h-40 bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden;
+    position: relative;
+    flex-shrink: 0;
+  }
+  
+  .card-img {
+    @apply w-full h-full object-cover transition-transform duration-700;
+    filter: brightness(0.98);
+    transform: scale(1.01);
+  }
+  
+  .vehicle-card:hover .card-img {
+    transform: scale(1.08);
+    filter: brightness(1.02);
+  }
+  
+  .card-placeholder {
+    @apply w-full h-full flex items-center justify-center;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  }
+  
+  /* Status Badge */
+  .card-badge {
+    @apply absolute top-3 left-3 z-10;
+    animation: fadeInUp 0.6s ease-out;
+  }
+  
+  .badge-text {
+    @apply px-3 py-1 bg-green-400 text-white text-xs font-semibold rounded-full;
+    box-shadow: 0 2px 8px rgba(74, 222, 128, 0.25);
+    transition: all 0.3s ease;
+  }
+  
+  .badge-text:hover {
+    @apply bg-green-500;
+    box-shadow: 0 4px 12px rgba(74, 222, 128, 0.35);
+  }
+  
+  /* Quick Actions */
+  .card-actions {
+    @apply absolute top-3 right-3 z-10;
+    animation: fadeInDown 0.6s ease-out;
+  }
+  
+  .action-btn {
+    @apply w-8 h-8 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transform: scale(0.9);
+  }
+  
+  .action-btn:hover {
+    @apply bg-white transform scale-110;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  }
+  
+  .action-btn:active {
+    transform: scale(0.95);
+  }
+  
+  .favorite-btn {
+    @apply text-gray-500 hover:text-red-400;
+    transition: color 0.3s ease;
+  }
+  
+  /* Card Content */
+  .card-content {
+    @apply p-4 flex flex-col h-full;
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+    gap: 0.75rem;
+  }
+  
+  /* Card Header */
+  .card-header {
+    @apply flex items-start justify-between;
+  }
+  
+  .card-title {
+    @apply flex-1;
+  }
+  
+  .card-brand {
+    @apply text-base font-bold text-gray-800 leading-tight;
+    font-family: 'Inter', sans-serif;
+    transition: color 0.3s ease;
+  }
+  
+  .vehicle-card:hover .card-brand {
+    @apply text-gray-900;
+  }
+  
+  .card-model {
+    @apply text-xs font-medium text-gray-600 leading-tight;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .card-year-badge {
+    @apply flex-shrink-0;
+    animation: pulse 2s infinite;
+  }
+  
+  .year-text {
+    @apply px-2 py-1 bg-blue-50 text-blue-600 text-xs font-semibold rounded-md;
+    transition: all 0.3s ease;
+  }
+  
+  .vehicle-card:hover .year-text {
+    @apply bg-blue-100 text-blue-700;
+  }
+  
+  /* Key Specifications */
+  .card-specs {
+    @apply grid grid-cols-3 gap-1.5;
+  }
+  
+  .spec-item {
+    @apply flex items-center gap-1.5 px-2 py-1 bg-gray-50 rounded-lg;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(0);
+  }
+  
+  .spec-item:hover {
+    @apply bg-gray-100;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+  }
+  
+  .spec-text {
+    @apply text-xs font-medium text-gray-600;
+    transition: color 0.3s ease;
+  }
+  
+  .spec-item:hover .spec-text {
+    @apply text-gray-700;
+  }
+  
+  /* Mileage Info */
+  .card-mileage {
+    @apply flex items-center gap-2 px-2.5 py-1.5 bg-blue-50 rounded-lg;
+    transition: all 0.3s ease;
+  }
+  
+  .vehicle-card:hover .card-mileage {
+    @apply bg-blue-100;
+    transform: translateX(4px);
+  }
+  
+  .mileage-text {
+    @apply text-sm font-semibold text-blue-600;
+    transition: color 0.3s ease;
+  }
+  
+  .vehicle-card:hover .mileage-text {
+    @apply text-blue-700;
+  }
+  
+  /* Price Section */
+  .card-price-section {
+    @apply space-y-0.5;
+    animation: fadeInUp 1s ease-out 0.4s both;
+  }
+  
+  .price-info {
+    @apply flex items-baseline gap-2;
+  }
+  
+  .price-amount {
+    @apply text-lg font-bold text-gray-800;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+  }
+  
+  .vehicle-card:hover .price-amount {
+    @apply text-gray-900;
+    transform: scale(1.05);
+  }
+  
+  .price-label {
+    @apply text-xs font-medium text-gray-500;
+  }
+  
+  .price-details {
+    @apply flex items-center;
+  }
+  
+  .price-note {
+    @apply text-xs text-green-500 font-medium;
+    transition: color 0.3s ease;
+  }
+  
+  .vehicle-card:hover .price-note {
+    @apply text-green-600;
+  }
+  
+  /* Action Buttons */
+  .card-buttons {
+    @apply pt-2 flex gap-2 mt-auto;
+    animation: fadeInUp 1.2s ease-out 0.6s both;
+  }
+  
+  .card-btn-details {
+    @apply flex-1 flex items-center justify-center gap-2 py-2.5 px-3 bg-blue-50 text-blue-700 font-semibold rounded-xl transition-all duration-300 border border-blue-200;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .card-btn-details::before {
+    content: '';
+    @apply absolute inset-0 bg-blue-100 opacity-0 transition-opacity duration-300;
+  }
+  
+  .card-btn-details:hover {
+    @apply bg-blue-100 text-blue-800 transform translate-y-[-1px] border-blue-300;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+  }
+  
+  .card-btn-details:hover::before {
+    @apply opacity-100;
+  }
+  
+  .card-btn-details:active {
+    @apply transform translate-y-0;
+  }
+  
+  .card-btn-details svg {
+    transition: transform 0.3s ease;
+  }
+  
+  .card-btn-details:hover svg {
+    transform: scale(1.1);
+  }
+  
+  .card-btn-purchase {
+    @apply flex-1 flex items-center justify-center gap-2 py-2.5 px-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-xl transition-all duration-300;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .card-btn-purchase::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-green-600 to-green-700 opacity-0 transition-opacity duration-300;
+  }
+  
+  .card-btn-purchase:hover {
+    @apply from-green-600 to-green-700 transform translate-y-[-1px];
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.35);
+  }
+  
+  .card-btn-purchase:hover::before {
+    @apply opacity-100;
+  }
+  
+  .card-btn-purchase:active {
+    @apply transform translate-y-0;
+  }
+  
+  .card-btn-purchase svg {
+    transition: transform 0.3s ease;
+  }
+  
+  .card-btn-purchase:hover svg {
+    transform: scale(1.1);
+  }
+  
+  /* Small Vehicle Card - Compact Design */
+  .vehicle-card-small {
+    @apply bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 280px;
+    position: relative;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+  
+  .vehicle-card-small:hover {
+    @apply shadow-lg transform -translate-y-1;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px) scale(1.02);
+  }
+  
+  .vehicle-card-small:active {
+    transform: translateY(-1px) scale(1.01);
+  }
+  
+  /* Small Card Image */
+  .small-card-image {
+    @apply h-32 bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden;
+  }
+  
+  .small-card-img {
+    @apply w-full h-full object-cover transition-transform duration-500;
+    filter: brightness(0.98);
+    transform: scale(1.01);
+  }
+  
+  .vehicle-card-small:hover .small-card-img {
+    transform: scale(1.05);
+    filter: brightness(1.02);
+  }
+  
+  .small-card-placeholder {
+    @apply w-full h-full flex items-center justify-center;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  }
+  
+  /* Small Card Badge */
+  .small-card-badge {
+    @apply absolute top-2 left-2 z-10;
+    animation: fadeInUp 0.5s ease-out;
+  }
+  
+  .small-badge-text {
+    @apply px-2 py-0.5 bg-green-400 text-white text-xs font-semibold rounded-full;
+    box-shadow: 0 1px 4px rgba(74, 222, 128, 0.25);
+    transition: all 0.3s ease;
+  }
+  
+  .small-badge-text:hover {
+    @apply bg-green-500;
+    box-shadow: 0 2px 8px rgba(74, 222, 128, 0.35);
+  }
+  
+  /* Small Card Content */
+  .small-card-content {
+    @apply p-3 space-y-2;
+    animation: fadeInUp 0.6s ease-out 0.1s both;
+  }
+  
+  /* Small Card Header */
+  .small-card-header {
+    @apply flex items-start justify-between;
+  }
+  
+  .small-card-title {
+    @apply flex-1;
+  }
+  
+  .small-card-brand {
+    @apply text-sm font-bold text-gray-800 leading-tight;
+    font-family: 'Inter', sans-serif;
+    transition: color 0.3s ease;
+  }
+  
+  .vehicle-card-small:hover .small-card-brand {
+    @apply text-gray-900;
+  }
+  
+  .small-card-model {
+    @apply text-xs font-medium text-gray-600 leading-tight;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .small-card-year {
+    @apply flex-shrink-0;
+  }
+  
+  .small-year-text {
+    @apply px-1.5 py-0.5 bg-blue-50 text-blue-600 text-xs font-semibold rounded;
+    transition: all 0.3s ease;
+  }
+  
+  .vehicle-card-small:hover .small-year-text {
+    @apply bg-blue-100 text-blue-700;
+  }
+  
+  /* Small Card Specs */
+  .small-card-specs {
+    @apply grid grid-cols-2 gap-1;
+  }
+  
+  .small-spec-item {
+    @apply flex items-center gap-1 px-1.5 py-1 bg-gray-50 rounded;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(0);
+  }
+  
+  .small-spec-item:hover {
+    @apply bg-gray-100;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  }
+  
+  .small-spec-text {
+    @apply text-xs font-medium text-gray-600;
+    transition: color 0.3s ease;
+  }
+  
+  .small-spec-item:hover .small-spec-text {
+    @apply text-gray-700;
+  }
+  
+  /* Small Card Mileage */
+  .small-card-mileage {
+    @apply flex items-center gap-1 px-2 py-1 bg-blue-50 rounded;
+    transition: all 0.3s ease;
+  }
+  
+  .vehicle-card-small:hover .small-card-mileage {
+    @apply bg-blue-100;
+    transform: translateX(2px);
+  }
+  
+  .small-mileage-text {
+    @apply text-xs font-semibold text-blue-600;
+    transition: color 0.3s ease;
+  }
+  
+  .vehicle-card-small:hover .small-mileage-text {
+    @apply text-blue-700;
+  }
+  
+  /* Small Card Price */
+  .small-card-price {
+    @apply pt-1;
+    animation: fadeInUp 0.8s ease-out 0.3s both;
+  }
+  
+  .small-price-amount {
+    @apply text-lg font-bold text-gray-800;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+  }
+  
+  .vehicle-card-small:hover .small-price-amount {
+    @apply text-gray-900;
+    transform: scale(1.03);
+  }
+  
+  /* Small Card Button */
+  .small-card-button {
+    @apply pt-1;
+    animation: fadeInUp 1s ease-out 0.4s both;
+  }
+  
+  .small-card-btn {
+    @apply w-full flex items-center justify-center gap-1 py-2 px-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded-lg transition-all duration-200;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .small-card-btn::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-700 opacity-0 transition-opacity duration-200;
+  }
+  
+  .small-card-btn:hover {
+    @apply from-blue-600 to-blue-700 transform translate-y-[-1px];
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+  }
+  
+  .small-card-btn:hover::before {
+    @apply opacity-100;
+  }
+  
+  /* Small Card Buttons */
+  .small-card-buttons {
+    @apply pt-1 flex gap-1;
+    animation: fadeInUp 1s ease-out 0.4s both;
+  }
+  
+  .small-card-btn-details {
+    @apply flex-1 flex items-center justify-center gap-1 py-2 px-2 bg-gray-100 text-gray-700 text-xs font-semibold rounded-lg transition-all duration-200;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .small-card-btn-details::before {
+    content: '';
+    @apply absolute inset-0 bg-gray-200 opacity-0 transition-opacity duration-200;
+  }
+  
+  .small-card-btn-details:hover {
+    @apply bg-gray-200 text-gray-800 transform translate-y-[-1px];
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+  }
+  
+  .small-card-btn-details:hover::before {
+    @apply opacity-100;
+  }
+  
+  .small-card-btn-details:active {
+    @apply transform translate-y-0;
+  }
+  
+  .small-card-btn-details svg {
+    transition: transform 0.2s ease;
+  }
+  
+  .small-card-btn-details:hover svg {
+    transform: scale(1.1);
+  }
+  
+  .small-card-btn-purchase {
+    @apply flex-1 flex items-center justify-center gap-1 py-2 px-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded-lg transition-all duration-200;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.25);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .small-card-btn-purchase::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-700 opacity-0 transition-opacity duration-200;
+  }
+  
+  .small-card-btn-purchase:hover {
+    @apply from-blue-600 to-blue-700 transform translate-y-[-1px];
+    box-shadow: 0 3px 10px rgba(59, 130, 246, 0.35);
+  }
+  
+  .small-card-btn-purchase:hover::before {
+    @apply opacity-100;
+  }
+  
+  .small-card-btn-purchase:active {
+    @apply transform translate-y-0;
+  }
+  
+  .small-card-btn-purchase svg {
+    transition: transform 0.2s ease;
+  }
+  
+  .small-card-btn-purchase:hover svg {
+    transform: scale(1.1);
+  }
+  
+  /* Related Cards */
+  .related-card {
+    @apply bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .related-card:hover {
+    @apply shadow-2xl transform -translate-y-1;
+  }
+  
+  .related-image {
+    @apply h-48 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center;
+  }
+  
+  .related-content {
+    @apply p-6 space-y-4;
+  }
+  
+  .related-title {
+    @apply text-lg font-bold text-gray-800 mb-2;
+  }
+  
+  .related-subtitle {
+    @apply text-gray-600 text-sm mb-4;
+  }
+  
+  .related-price {
+    @apply text-xl font-bold text-gray-800 mb-4;
+  }
+  
+  .related-button {
+    @apply block w-full text-center py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl transition-all duration-300 hover:bg-gray-200 transform hover:scale-105;
+  }
+  
+  /* No Results Card */
+  .no-results {
+    @apply col-span-full text-center py-16;
+  }
+  
+  .no-results-icon {
+    @apply text-6xl mb-6;
+  }
+  
+  .no-results-title {
+    @apply text-xl font-bold text-gray-800 mb-4;
+  }
+  
+  .no-results-text {
+    @apply text-gray-600 mb-6;
+  }
+  
+  .no-results-button {
+    @apply inline-flex items-center px-6 py-3 bg-blue-500 text-white font-semibold rounded-xl hover:bg-blue-600 transition-colors duration-200;
+  }
+  
+  /* Modern Pagination */
+  .pagination {
+    @apply flex justify-center items-center space-x-2 mt-8;
+  }
+  
+  .pagination .page-item {
+    @apply inline-flex;
+  }
+  
+  .pagination .page-link {
+    @apply px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg transition-all duration-200;
+    min-width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .pagination .page-link:hover {
+    @apply text-gray-800 bg-gray-50 border-gray-300;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+  
+  .pagination .page-item.active .page-link {
+    @apply text-white bg-blue-500 border-blue-500;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+  }
+  
+  .pagination .page-item.active .page-link:hover {
+    @apply bg-blue-600 border-blue-600;
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35);
+  }
+  
+  .pagination .page-item.disabled .page-link {
+    @apply text-gray-400 bg-gray-50 border-gray-100 cursor-not-allowed;
+  }
+  
+  .pagination .page-item.disabled .page-link:hover {
+    @apply text-gray-400 bg-gray-50 border-gray-100;
+    transform: none;
+    box-shadow: none;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 640px) {
+    .cards-grid {
+      @apply grid-cols-1 gap-4;
+    }
+    
+    .vehicle-card {
+      height: 380px;
+    }
+    
+    .vehicle-card-small {
+      height: 260px;
+    }
+    
+    .card-image {
+      @apply h-40;
+    }
+    
+    .small-card-image {
+      @apply h-28;
+    }
+    
+    .card-content {
+      @apply p-4 space-y-3;
+    }
+    
+    .small-card-content {
+      @apply p-2.5 space-y-1.5;
+    }
+    
+    .price-amount {
+      @apply text-xl;
+    }
+    
+    .small-price-amount {
+      @apply text-base;
+    }
+    
+    .pagination {
+      @apply space-x-1;
+    }
+    
+    .pagination .page-link {
+      @apply px-3 py-2 text-xs;
+      min-width: 36px;
+      height: 36px;
+    }
+  }
+  
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .cards-grid {
+      @apply grid-cols-2 gap-5;
+    }
+  }
+  
+  /* Loading States */
+  .vehicle-card.loading {
+    @apply animate-pulse;
+  }
+  
+  .vehicle-card.loading .card-image {
+    @apply bg-gray-200;
+  }
+  
+  .vehicle-card.loading .card-content > * {
+    @apply bg-gray-200 rounded;
+  }
+  
+  .vehicle-card-small.loading {
+    @apply animate-pulse;
+  }
+  
+  .vehicle-card-small.loading .small-card-image {
+    @apply bg-gray-200;
+  }
+  
+  .vehicle-card-small.loading .small-card-content > * {
+    @apply bg-gray-200 rounded;
+  }
+  
+  /* Focus States for Accessibility */
+  .card-btn:focus {
+    @apply outline-none ring-2 ring-blue-400 ring-offset-2;
+  }
+  
+  .small-card-btn:focus {
+    @apply outline-none ring-2 ring-blue-400 ring-offset-2;
+  }
+  
+  .action-btn:focus {
+    @apply outline-none ring-2 ring-blue-400 ring-offset-2;
+  }
+  
+  .pagination .page-link:focus {
+    @apply outline-none ring-2 ring-blue-400 ring-offset-2;
+  }
+  
+  /* Custom Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+  
+  /* Stagger Animation for Cards */
+  .cards-grid .vehicle-card:nth-child(1) { animation-delay: 0.1s; }
+  .cards-grid .vehicle-card:nth-child(2) { animation-delay: 0.2s; }
+  .cards-grid .vehicle-card:nth-child(3) { animation-delay: 0.3s; }
+  .cards-grid .vehicle-card:nth-child(4) { animation-delay: 0.4s; }
+  .cards-grid .vehicle-card:nth-child(5) { animation-delay: 0.5s; }
+  .cards-grid .vehicle-card:nth-child(6) { animation-delay: 0.6s; }
+  .cards-grid .vehicle-card:nth-child(7) { animation-delay: 0.7s; }
+  .cards-grid .vehicle-card:nth-child(8) { animation-delay: 0.8s; }
+} 

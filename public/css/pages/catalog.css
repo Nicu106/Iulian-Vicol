@@ -1,0 +1,141 @@
+/* Catalog page specific styles */
+.catalog-page { padding-top: 0; }
+.catalog-hero { background: linear-gradient(180deg, rgba(2,6,23,.65), rgba(2,6,23,.65)), url('https://images.unsplash.com/photo-1552705710-6142a7900fca?q=80&w=1920&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') center/cover no-repeat; border-radius: 0 0 24px 24px; box-shadow: 0 10px 30px rgba(2,6,23,.18) inset; margin-top: calc(var(--nav-height) * -1 - 8px); padding-top: calc(var(--nav-height) + 16px); }
+.catalog-sidebar { align-self: flex-start; }
+.catalog-filters.sticky-lg-top { top: calc(var(--nav-height) + 12px); }
+.catalog-filters { max-height: calc(100vh - var(--nav-height) - 24px); overflow: auto; }
+.catalog-filters .card-body { padding: 1rem; }
+.vehicle-card img { height: 190px; object-fit: cover; border-top-left-radius: 16px; border-top-right-radius: 16px; }
+.filters-form { overflow: auto; padding-right: 2px; }
+.filters-form::-webkit-scrollbar { width: 6px; }
+.filters-form::-webkit-scrollbar-thumb { background: rgba(0,0,0,.15); border-radius: 4px; }
+.js-clear-filters { border-radius: 10px; }
+
+/* Mobile toolbar */
+.catalog-mobile-bar .btn { border-radius: 12px; }
+.catalog-mobile-bar .form-control { border-radius: 10px; }
+
+/* Pagination polish */
+.catalog-pagination {
+  gap: 8px;
+  margin-bottom: 2rem;
+}
+
+.catalog-pagination .page-item {
+  margin: 0;
+}
+
+.catalog-pagination .page-link {
+  border-radius: 12px !important;
+  padding: 0.65rem 1rem;
+  min-width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #4a5568;
+  background-color: #fff;
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(2,6,23,.06);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+  margin: 0 2px;
+}
+
+.catalog-pagination .page-link:hover {
+  color: #0d6efd;
+  background-color: #f8faff;
+  border-color: #bdd7ff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+}
+
+.catalog-pagination .page-item.active .page-link {
+  background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+  border-color: #0b5ed7;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(13, 110, 253, 0.4);
+  transform: translateY(-1px);
+}
+
+.catalog-pagination .page-item.active .page-link:hover {
+  background: linear-gradient(135deg, #0b5ed7 0%, #084298 100%);
+  color: #fff;
+}
+
+.catalog-pagination .page-item.disabled .page-link {
+  color: #a0aec0;
+  background-color: #f7fafc;
+  border-color: #e2e8f0;
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.catalog-pagination .page-item.disabled .page-link:hover {
+  color: #a0aec0;
+  background-color: #f7fafc;
+  border-color: #e2e8f0;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Special styling for prev/next */
+.catalog-pagination .page-item:first-child .page-link,
+.catalog-pagination .page-item:last-child .page-link {
+  padding: 0.65rem 1.2rem;
+  font-weight: 600;
+}
+
+/* Mobile responsive */
+@media (max-width: 576px) {
+  .catalog-pagination .page-link {
+    min-width: 40px;
+    height: 40px;
+    padding: 0.5rem 0.8rem;
+    font-size: 0.85rem;
+  }
+  
+  .catalog-pagination .page-item:first-child .page-link,
+  .catalog-pagination .page-item:last-child .page-link {
+    padding: 0.5rem 1rem;
+  }
+}
+
+/* Results info styling */
+.catalog-page .text-muted.small {
+  font-weight: 500;
+  color: #6b7280 !important;
+}
+
+.catalog-page .badge.bg-primary {
+  background: linear-gradient(135deg, #0d6efd, #0b5ed7) !important;
+  border-radius: 8px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Sort dropdown styling */
+.catalog-page .form-select {
+  border-radius: 10px;
+  border: 2px solid #e2e8f0;
+  padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.catalog-page .form-select:focus {
+  border-color: #bdd7ff;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+/* Header actions */
+.catalog-page .form-control { border-radius: 12px; }
+.catalog-page .btn { border-radius: 12px; }
+

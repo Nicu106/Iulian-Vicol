@@ -1,0 +1,66 @@
+/* Design tokens: colors, radii, spacing, shadows, z-index, breakpoints */
+:root {
+  /* Colors */
+  --primary-color: #0052FF;
+  --primary-dark: #0045CC;
+  --secondary-color: #6C757D;
+  --success-color: #28A745;
+  --warning-color: #FFC107;
+  --danger-color: #DC3545;
+  --dark-color: #1A1A1A;
+  --light-color: #F8F9FA;
+  --white: #FFFFFF;
+  --black: #000000;
+  --gray-100: #F8F9FA;
+  --gray-200: #E9ECEF;
+  --gray-300: #DEE2E6;
+  --gray-400: #CED4DA;
+  --gray-500: #ADB5BD;
+  --gray-600: #6C757D;
+  --gray-700: #495057;
+  --gray-800: #343A40;
+  --gray-900: #212529;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #0052FF 0%, #0045CC 100%);
+  --gradient-success: linear-gradient(135deg, #28A745 0%, #20C997 100%);
+  --gradient-secondary: linear-gradient(135deg, #6C757D 0%, #495057 100%);
+
+  /* Radii */
+  --border-radius-sm: 8px;
+  --border-radius: 12px;
+  --border-radius-lg: 16px;
+
+  /* Shadows */
+  --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  --box-shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.15);
+
+  /* Spacing scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-8: 3rem;
+
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Transitions */
+  --transition: all 0.3s ease;
+
+  /* Breakpoints */
+  --bp-sm: 576px;
+  --bp-md: 768px;
+  --bp-lg: 992px;
+  --bp-xl: 1200px;
+
+  /* Z-index */
+  --z-navbar: 1000;
+  --z-overlay: 1100;
+
+  /* Layout sizes */
+  --nav-height: 96px;
+}
+

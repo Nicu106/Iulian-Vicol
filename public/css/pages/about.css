@@ -1,0 +1,20 @@
+/* About page specific styles */
+.about-page { padding-top: 0; }
+
+.about-stats .display-4 { letter-spacing: -0.5px; }
+.about-stats .card { transition: transform .2s ease, box-shadow .2s ease; }
+.about-stats .card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,.12); }
+
+.about-roadmap .card { transition: transform .2s ease; }
+.about-roadmap .card:hover { transform: translateY(-6px); }
+
+/* Section headings */
+.about-page h1.display-5 { letter-spacing: -0.8px; }
+.about-page h2.h3 { letter-spacing: -0.4px; }
+
+/* Media polish */
+.about-page .ratio { box-shadow: 0 12px 28px rgba(0,0,0,.12); border-radius: 16px; }
+
+/* CTA card */
+.about-page .card.bg-light { border-radius: 16px; }
+

@@ -1,0 +1,19 @@
+/* Contact page specific styles */
+.contact-page { padding-top: 0; }
+
+.contact-quick .btn { text-transform: none; }
+.contact-quick .btn i { vertical-align: -2px; }
+/* Contact page scoped styles */
+body.page-contact .contact-header { background: linear-gradient(to bottom right, #eff6ff, #e0e7ff); }
+body.page-contact .contact-form .form-input,
+body.page-contact .contact-form .form-textarea,
+body.page-contact .contact-form .form-select { width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: var(--border-radius); }
+body.page-contact .submit-button { display: inline-flex; align-items: center; padding: 0.75rem 1.25rem; border-radius: var(--border-radius); background: var(--gradient-primary); color: var(--white); border: none; }
+body.page-contact .info-card { display: flex; gap: 1rem; background: #fff; border-radius: var(--border-radius); padding: 1rem; box-shadow: var(--box-shadow); }
+body.page-contact .card-title { font-weight: 700; }
+
+/* Form cards */
+.contact-page .card { border-radius: 16px; }
+.contact-page .form-control, .contact-page .form-select, .contact-page textarea { border-radius: 12px; }
+.contact-page .btn { border-radius: 12px; }
+

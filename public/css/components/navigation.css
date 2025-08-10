@@ -1,0 +1,119 @@
+/* Auto Premium - Navigation Styles (Bootstrap-safe prefixed classes) */
+
+/* ===== NAVIGATION STYLES ===== */
+.ap-mobile-menu { display: none; }
+.ap-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(17, 24, 39, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  padding: 1rem 0;
+}
+
+.ap-navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.navbar-brand span {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.navbar-brand .ap {
+  color: var(--white);
+}
+
+.navbar-brand .tech {
+  color: var(--primary-color);
+}
+
+.ap-nav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.ap-nav-link {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.ap-nav-link:hover,
+.ap-nav-link.active {
+  color: var(--primary-color);
+}
+
+.ap-nav-cta {
+  background-color: var(--primary-color);
+  color: var(--white);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.ap-nav-cta:hover {
+  background-color: #0045CC;
+  transform: translateY(-2px);
+}
+
+/* ===== MOBILE MENU ===== */
+.ap-mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--white);
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .ap-nav {
+    display: none;
+  }
+
+  .ap-mobile-menu-btn {
+    display: block;
+  }
+
+  .ap-mobile-menu {
+    display: none;
+    position: fixed;
+    top: 72px;
+    left: 0;
+    right: 0;
+    background: rgba(17, 24, 39, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 1rem;
+  }
+
+  .ap-mobile-menu.active {
+    display: block;
+  }
+
+  .ap-mobile-menu .ap-nav-link {
+    display: block;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .ap-mobile-menu .ap-nav-cta {
+    display: block;
+    text-align: center;
+    margin-top: 1rem;
+  }
+}

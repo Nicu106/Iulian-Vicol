@@ -1,0 +1,22 @@
+/* Vehicle detail page specific styles */
+.vehicle-page { padding-top: 0; }
+
+.vehicle-gallery .ratio { background: #f8f9fa; }
+.vehicle-specs table th { width: 25%; }
+
+/* Gallery polish */
+.vehicle-page .ratio { border-radius: 16px; overflow: hidden; box-shadow: 0 12px 28px rgba(0,0,0,.12); }
+.vehicle-page .badge { border-radius: 999px; }
+.vehicle-page .card { border-radius: 16px; }
+.vehicle-page .btn-lg { border-radius: 14px; }
+
+/* Interactive gallery */
+.cursor-pointer {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.cursor-pointer:hover {
+  transform: scale(1.05);
+}
+

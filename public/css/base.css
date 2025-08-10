@@ -1,0 +1,13 @@
+/* Minimal base (no component/page classes). Tokens in tokens.css; reset in reset.css */
+body {
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  color: var(--gray-800);
+  background-color: var(--white);
+}
+h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.2; }
+p { margin: 0 0 1rem; }
+.container { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 1rem; }
+
+/* Basic focus styles */
+a:focus, button:focus, input:focus, select:focus, textarea:focus { outline: 2px solid var(--primary-color); outline-offset: 2px; }

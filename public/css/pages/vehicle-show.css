@@ -1,0 +1,12 @@
+/* Vehicle Detail scoped styles */
+body.page-vehicle-show .card { background: var(--white); border-radius: var(--border-radius); box-shadow: var(--box-shadow); }
+body.page-vehicle-show .btn-primary { background: var(--gradient-primary); color: var(--white); border: none; padding: 0.75rem 1rem; border-radius: var(--border-radius); }
+body.page-vehicle-show .btn-secondary { background: var(--gray-200); color: var(--gray-800); border: none; padding: 0.75rem 1rem; border-radius: var(--border-radius); }
+body.page-vehicle-show .sticky { position: sticky; }
+/* Sticky CTA bar (mobile) */
+body.page-vehicle-show .sticky-cta { position: fixed; bottom: 0; left: 0; right: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; background: rgba(255,255,255,.95); padding: .5rem; box-shadow: 0 -6px 16px rgba(0,0,0,.08); z-index: var(--z-navbar); }
+body.page-vehicle-show .sticky-cta .cta-item { text-align: center; padding: .75rem .5rem; border-radius: var(--border-radius); font-weight: 600; }
+body.page-vehicle-show .sticky-cta .cta-item.call, body.page-vehicle-show .sticky-cta .cta-item.reserve { background: var(--gradient-primary); color: #fff; }
+body.page-vehicle-show .sticky-cta .cta-item.wa, body.page-vehicle-show .sticky-cta .cta-item.test { background: var(--gray-200); color: var(--gray-800); }
+@media (min-width: 768px){ body.page-vehicle-show .sticky-cta { display: none; } }
+

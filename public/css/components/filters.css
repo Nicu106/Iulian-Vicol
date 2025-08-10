@@ -1,0 +1,411 @@
+/* Filters Component - Modern Professional Design */
+@layer components {
+  /* Filters Sidebar */
+  .filters-sidebar {
+    @apply lg:col-span-1 bg-white rounded-2xl border border-gray-100 p-6 sticky-top shadow-sm;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    transition: all 0.3s ease;
+  }
+  
+  .filters-sidebar:hover {
+    @apply shadow-md;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  }
+  
+  /* Mobile Filters */
+  @media (max-width: 1023px) {
+    .filters-sidebar {
+      @apply col-span-full mb-6 max-h-none sticky top-0 z-40 bg-white border-b border-gray-200 rounded-none;
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.95);
+    }
+    
+    .filters-form {
+      @apply hidden;
+      animation: slideDown 0.3s ease-out;
+    }
+    
+    .filters-form.active {
+      @apply block;
+    }
+    
+    .filters-header {
+      @apply cursor-pointer;
+    }
+  }
+  
+  /* Filters Header */
+  .filters-header {
+    @apply flex items-center justify-between mb-6 pb-4 border-b border-gray-200;
+    transition: all 0.3s ease;
+  }
+  
+  .filters-header:hover {
+    @apply border-gray-300;
+  }
+  
+  .filters-title {
+    @apply text-lg font-bold text-gray-800;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .clear-filters {
+    @apply text-sm text-blue-500 hover:text-blue-600 font-medium transition-all duration-200 px-3 py-1 rounded-lg;
+  }
+  
+  .clear-filters:hover {
+    @apply bg-blue-50;
+    transform: translateY(-1px);
+  }
+  
+  /* Filters Form */
+  .filters-form {
+    @apply space-y-6;
+  }
+  
+  /* Filter Section */
+  .filter-section {
+    @apply space-y-3;
+    animation: fadeInUp 0.6s ease-out;
+  }
+  
+  .filter-section:nth-child(1) { animation-delay: 0.1s; }
+  .filter-section:nth-child(2) { animation-delay: 0.2s; }
+  .filter-section:nth-child(3) { animation-delay: 0.3s; }
+  .filter-section:nth-child(4) { animation-delay: 0.4s; }
+  .filter-section:nth-child(5) { animation-delay: 0.5s; }
+  
+  .filter-label {
+    @apply text-sm font-semibold text-gray-800 mb-2 block;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  /* Filter Options - Dropdown Style */
+  .filter-options {
+    @apply space-y-2;
+    max-height: 120px;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+  }
+  
+  .filter-options.expanded {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  
+  .filter-options-wrapper {
+    @apply space-y-2 w-full;
+    padding-top: 8px;
+    max-height: 250px;
+    overflow-y: auto;
+  }
+  
+  /* Dropdown Toggle */
+  .filter-dropdown-toggle {
+    @apply w-full flex items-center justify-between px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 transition-all duration-200 cursor-pointer;
+    min-height: 44px;
+  }
+  
+  .filter-dropdown-toggle:hover {
+    @apply bg-gray-100 border-gray-300;
+  }
+  
+  .filter-dropdown-toggle.expanded {
+    @apply bg-blue-50 border-blue-200 text-blue-700;
+  }
+  
+  .filter-dropdown-toggle .toggle-icon {
+    @apply transition-transform duration-200 flex-shrink-0;
+  }
+  
+  .filter-dropdown-toggle.expanded .toggle-icon {
+    transform: rotate(180deg);
+  }
+  
+  /* Checkbox Items */
+  .checkbox-item {
+    @apply flex items-center space-x-3 cursor-pointer p-2 rounded-lg transition-all duration-200 w-full;
+    min-height: 44px;
+    border: 1px solid transparent;
+  }
+  
+  .checkbox-item:hover {
+    @apply bg-blue-50 border-blue-200;
+    transform: translateX(4px);
+  }
+  
+  .checkbox-item input[type="checkbox"] {
+    @apply sr-only;
+  }
+  
+  .checkbox-custom {
+    @apply w-5 h-5 border-2 border-gray-300 rounded-md transition-all duration-200 relative flex-shrink-0;
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  }
+  
+  .checkbox-item:hover .checkbox-custom {
+    @apply border-blue-400;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+  }
+  
+  .checkbox-item input[type="checkbox"]:checked + .checkbox-custom {
+    @apply bg-gradient-to-r from-blue-500 to-blue-600 border-blue-500;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+  }
+  
+  .checkbox-custom::after {
+    content: '✓';
+    @apply text-white text-xs font-bold absolute inset-0 flex items-center justify-center opacity-0 transition-all duration-200;
+    transform: scale(0.8);
+  }
+  
+  .checkbox-item input[type="checkbox"]:checked + .checkbox-custom::after {
+    @apply opacity-100;
+    transform: scale(1);
+  }
+  
+  .checkbox-text {
+    @apply text-sm text-gray-600 font-medium flex-1;
+    transition: color 0.3s ease;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  .checkbox-item:hover .checkbox-text {
+    @apply text-gray-700;
+  }
+  
+  .checkbox-item input[type="checkbox"]:checked ~ .checkbox-text {
+    @apply text-blue-600 font-semibold;
+  }
+  
+  /* Price and Mileage Inputs */
+  .price-inputs,
+  .mileage-inputs {
+    @apply flex items-center space-x-2 w-full;
+  }
+  
+  .price-input,
+  .mileage-input {
+    @apply flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm transition-all duration-200 min-w-0;
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  }
+  
+  .price-input:focus,
+  .mileage-input:focus {
+    @apply outline-none border-blue-500 ring-2 ring-blue-500 ring-opacity-20;
+    background: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+  }
+  
+  .price-separator,
+  .mileage-separator {
+    @apply text-gray-500 font-medium text-sm flex-shrink-0;
+  }
+  
+  /* Year Inputs */
+  .year-inputs {
+    @apply grid grid-cols-2 gap-2 w-full;
+  }
+  
+  .year-select {
+    @apply px-3 py-2 border border-gray-300 rounded-lg text-sm transition-all duration-200 w-full;
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  }
+  
+  .year-select:focus {
+    @apply outline-none border-blue-500 ring-2 ring-blue-500 ring-opacity-20;
+    background: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+  }
+  
+  /* Apply Filters Button */
+  .apply-filters {
+    @apply w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl transition-all duration-300;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+  }
+  
+  .apply-filters:hover {
+    @apply from-blue-600 to-blue-700 transform translate-y-[-1px];
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35);
+  }
+  
+  .apply-filters:active {
+    @apply transform translate-y-0;
+  }
+  
+  /* Sort Options */
+  .sort-options {
+    @apply flex items-center gap-3 mb-6 w-full;
+  }
+  
+  .sort-label {
+    @apply text-sm font-medium text-gray-600 flex-shrink-0;
+  }
+  
+  .sort-select {
+    @apply px-3 py-2 border border-gray-300 rounded-lg text-sm transition-all duration-200 flex-1;
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  }
+  
+  .sort-select:focus {
+    @apply outline-none border-blue-500 ring-2 ring-blue-500 ring-opacity-20;
+    background: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+  }
+  
+  /* Results Count */
+  .results-count {
+    @apply text-sm text-gray-600 mb-4;
+    animation: fadeInUp 0.8s ease-out;
+  }
+  
+  /* Scrollbar Styling */
+  .filters-sidebar::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .filters-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .filters-sidebar::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+    border-radius: 3px;
+  }
+  
+  .filters-sidebar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%);
+  }
+  
+  /* Dropdown Scrollbar */
+  .filter-options-wrapper::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .filter-options-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .filter-options-wrapper::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+    border-radius: 2px;
+  }
+  
+  .filter-options-wrapper::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%);
+  }
+  
+  /* Custom Animations */
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Loading States */
+  .filters-sidebar.loading {
+    @apply animate-pulse;
+  }
+  
+  .filters-sidebar.loading .filter-section {
+    @apply bg-gray-200 rounded-lg;
+    height: 60px;
+  }
+  
+  /* Focus States for Accessibility */
+  .checkbox-item:focus-within {
+    @apply ring-2 ring-blue-400 ring-opacity-20;
+  }
+  
+  .price-input:focus,
+  .mileage-input:focus,
+  .year-select:focus,
+  .sort-select:focus {
+    @apply outline-none ring-2 ring-blue-400 ring-opacity-20;
+  }
+  
+  .filter-dropdown-toggle:focus {
+    @apply outline-none ring-2 ring-blue-400 ring-opacity-20;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 640px) {
+    .filters-sidebar {
+      @apply p-4;
+    }
+    
+    .filter-options {
+      max-height: 100px;
+    }
+    
+    .filter-options.expanded {
+      max-height: 250px;
+    }
+    
+    .price-inputs,
+    .mileage-inputs {
+      @apply flex-col space-x-0 space-y-2;
+    }
+    
+    .year-inputs {
+      @apply grid-cols-1 gap-2;
+    }
+    
+    .sort-options {
+      @apply flex-col items-start gap-2;
+    }
+    
+    .sort-select {
+      @apply w-full;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .filters-sidebar {
+      @apply p-3;
+    }
+    
+    .filter-section {
+      @apply space-y-2;
+    }
+    
+    .checkbox-item {
+      @apply p-1.5;
+      min-height: 40px;
+    }
+    
+    .checkbox-text {
+      @apply text-xs;
+    }
+    
+    .price-input,
+    .mileage-input,
+    .year-select,
+    .sort-select {
+      @apply px-2 py-1.5 text-xs;
+    }
+    
+    .filter-options.expanded {
+      max-height: 200px;
+    }
+  }
+} 

@@ -1,0 +1,114 @@
+/* App custom styles */
+@import url('./tokens.css');
+@import url('./reset.css');
+@import url('./base.css');
+
+html { scroll-behavior: smooth; }
+
+/* Keep sticky filters below navbar */
+.catalog-filters.sticky-lg-top { top: calc(var(--nav-height) + 12px); }
+
+@media (min-width: 992px) {
+  /* Limit filter card height on desktop and enable internal scroll */
+  .catalog-page { position: relative; padding-top: 84px; }
+  .catalog-sidebar { align-self: flex-start; }
+  .catalog-filters { max-height: calc(100vh - 92px); overflow: auto; }
+}
+
+/* Consistent card image heights */
+.vehicle-card img { height: 170px; object-fit: cover; border-top-left-radius: 16px; border-top-right-radius: 16px; }
+@media (min-width: 768px) { .vehicle-card img { height: 190px; } }
+@media (min-width: 1200px) { .vehicle-card img { height: 200px; } }
+
+/* Navbar modern look */
+header.bg-dark {
+  background: rgba(17, 24, 39, 0.9) !important;
+  backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 6px 24px rgba(0,0,0,.25);
+  min-height: var(--nav-height);
+  display: flex; align-items: center;
+}
+header .navbar .nav-link { position: relative; color: #e5e7eb; }
+header .navbar .nav-link:hover { color: #ffffff; }
+header .navbar .nav-link.active { color: #ffffff; }
+/* Animated underline that "loads" left-to-right on hover */
+header .navbar .nav-link::after {
+  content: '';
+  position: absolute; left: 0; bottom: -6px;
+  width: 100%; height: 2px; border-radius: 2px;
+  background: linear-gradient(90deg, #60a5fa, #2563eb, #0ea5e9);
+  transform: scaleX(0); transform-origin: 0 50%;
+  transition: transform .35s cubic-bezier(.22,.61,.36,1);
+  opacity: .95;
+}
+header .navbar .nav-link:hover::after,
+header .navbar .nav-link:focus::after,
+header .navbar .nav-link.active::after { transform: scaleX(1); }
+
+/* Navbar brand gradient */
+.navbar-brand .text-primary {
+  background: linear-gradient(135deg, #60a5fa 0%, #0ea5e9 50%, #0d6efd 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent !important;
+  filter: drop-shadow(0 2px 8px rgba(13,110,253,.3));
+}
+.navbar-brand .text-light { color: #f8fafc !important; opacity: .95; }
+
+/* Navbar toggler */
+.navbar-dark .navbar-toggler { border: 1px solid rgba(255,255,255,.2); border-radius: 12px; }
+.navbar-dark .navbar-toggler:focus { box-shadow: 0 0 0 .2rem rgba(13,110,253,.3); }
+.navbar-dark .navbar-toggler:hover { background: rgba(255,255,255,.06); }
+
+/* Buttons - gradient primary and soft outline */
+.btn { border-radius: 12px; transition: all 0.25s ease; }
+.btn-lg { border-radius: 14px; }
+.btn-primary {
+  background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+  border: none;
+  box-shadow: 0 6px 16px rgba(13, 110, 253, 0.28);
+}
+.btn-primary:hover { filter: brightness(1.05); transform: translateY(-1px); box-shadow: 0 10px 24px rgba(13,110,253,.35); }
+.btn-primary:active { transform: translateY(0); box-shadow: 0 6px 16px rgba(13,110,253,.28); }
+
+.btn-outline-primary { border-color: rgba(13,110,253,.5); color: #0d6efd; background: rgba(13,110,253,.06); }
+.btn-outline-primary:hover { background: rgba(13,110,253,.12); border-color: #0d6efd; }
+
+.btn-outline-light { color: #f3f4f6; border-color: rgba(255,255,255,.35); background: rgba(255,255,255,.06); }
+.btn-outline-light:hover { background: rgba(255,255,255,.12); border-color: #fff; }
+
+/* Cards - larger radius and hover */
+.card { border-radius: 16px; transition: all 0.3s ease; overflow: hidden; }
+.card:hover { transform: translateY(-6px); box-shadow: 0 14px 32px rgba(0,0,0,.18) !important; }
+.card .card-title { letter-spacing: -0.2px; }
+.card .bi { transition: transform 0.3s ease; }
+.card:hover .bi { transform: scale(1.08); }
+
+/* Accordion - soft glassy */
+.accordion-button { border-radius: 12px !important; }
+.accordion-button:not(.collapsed) { background: rgba(13,110,253,.08); color: #0b5ed7; }
+.accordion-item { border: none; margin-bottom: .5rem; border-radius: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.06); overflow: hidden; }
+
+/* Footer polish */
+footer.bg-dark { background: linear-gradient(135deg, #111827 0%, #0b1220 100%) !important; }
+footer .link-light { opacity: .9; }
+footer .link-light:hover { opacity: 1; color: #fff; }
+
+/* Utilities */
+.shadow-hover { transition: box-shadow .25s ease, transform .25s ease; }
+.shadow-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,.16); }
+
+/* Page section entrance animations */
+.home-page,
+.about-page,
+.contact-page,
+.catalog-page,
+.vehicle-page { animation: ap-fade-up .6s ease both; }
+
+@keyframes ap-fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Ensure content starts below fixed navbar */
+main { padding-top: calc(var(--nav-height) + 8px); }
+
