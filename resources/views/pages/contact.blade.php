@@ -29,7 +29,7 @@
                   </div>
                   <div>
                     <h6 class="mb-1">Teléfono</h6>
-                    <a href="tel:+40123456789" class="text-decoration-none text-primary fw-semibold">+40 123 456 789</a>
+                    <a href="tel:614753187" class="text-decoration-none text-primary fw-semibold">614 753 187</a>
                   </div>
                 </div>
                 <div class="d-flex align-items-center mb-3">
@@ -38,7 +38,7 @@
                   </div>
                   <div>
                     <h6 class="mb-1">WhatsApp</h6>
-                    <a href="https://wa.me/40123456789" target="_blank" class="text-decoration-none text-success fw-semibold">Enviar mensaje</a>
+                    <a href="https://wa.me/34614753187" target="_blank" class="text-decoration-none text-success fw-semibold">Enviar mensaje</a>
                   </div>
                 </div>
                 <div class="d-flex align-items-center mb-3">
@@ -47,7 +47,7 @@
                   </div>
                   <div>
                     <h6 class="mb-1">Email</h6>
-                    <a href="mailto:contact@autopremium.ro" class="text-decoration-none text-info fw-semibold">contact@autopremium.ro</a>
+                    <a href="mailto:jvmotorclass@gmail.com" class="text-decoration-none text-info fw-semibold">jvmotorclass@gmail.com</a>
                   </div>
                 </div>
                 <div class="d-flex align-items-center">
@@ -56,7 +56,7 @@
                   </div>
                   <div>
                     <h6 class="mb-1">Dirección</h6>
-                    <p class="text-secondary mb-0">Șoseaua Kiseleff nr. 15<br/>Bucuresti, Sector 1, 011347</p>
+                    <p class="text-secondary mb-0">Centro Comercial El Alisal<br/>Santander, España</p>
                   </div>
                 </div>
               </div>
@@ -68,29 +68,14 @@
             <div class="card border-0 shadow-sm h-100">
               <div class="card-body p-4">
                 <h5 class="card-title mb-3">Horario de trabajo</h5>
-                <div class="row g-3 small">
-                  <div class="col-6">
-                    <div class="d-flex justify-content-between">
-                      <span class="text-secondary">Lunes-Viernes:</span>
-                      <span class="fw-semibold">09:00 - 18:00</span>
+                <div class="text-center">
+                  <div class="d-flex align-items-center justify-content-center mb-2">
+                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                      <i class="bi bi-clock"></i>
                     </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="d-flex justify-content-between">
-                      <span class="text-secondary">Sábado:</span>
-                      <span class="fw-semibold">10:00 - 16:00</span>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="d-flex justify-content-between">
-                      <span class="text-secondary">Domingo:</span>
-                      <span class="text-warning fw-semibold">Cerrado</span>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="d-flex justify-content-between">
-                      <span class="text-secondary">Emergencias:</span>
-                      <span class="text-success fw-semibold">24/7</span>
+                    <div>
+                      <h6 class="mb-1 text-success">Abierto cada día</h6>
+                      <p class="text-secondary mb-0 small">Consultar disponibilidad</p>
                     </div>
                   </div>
                 </div>

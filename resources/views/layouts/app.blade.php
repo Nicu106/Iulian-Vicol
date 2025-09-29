@@ -88,14 +88,15 @@
           <div class="col-md-3">
             <h6 class="fw-semibold">Contacto</h6>
             <ul class="list-unstyled small">
-              <li>Teléfono: <a href="tel:+40123456789" class="link-light text-decoration-none">+40 123 456 789</a></li>
-              <li>Email: <a href="mailto:contact@aptech.ro" class="link-light text-decoration-none">contact@aptech.ro</a></li>
-              <li>Dirección: București, România</li>
+              <li>Teléfono: <a href="tel:614753187" class="link-light text-decoration-none">614 753 187</a></li>
+              <li>WhatsApp: <a href="https://wa.me/34614753187" class="link-light text-decoration-none" target="_blank">Enviar mensaje</a></li>
+              <li>Email: <a href="mailto:jvmotorclass@gmail.com" class="link-light text-decoration-none">jvmotorclass@gmail.com</a></li>
+              <li>Dirección: Centro Comercial El Alisal<br/>Santander, España</li>
             </ul>
           </div>
           <div class="col-md-3">
             <h6 class="fw-semibold">Horario</h6>
-            <p class="small mb-0">Lunes–Viernes: 09:00–18:00<br/>Sábado: 10:00–16:00</p>
+            <p class="small mb-0">Abierto cada día<br/><span class="text-success">Consultar disponibilidad</span></p>
           </div>
         </div>
         <hr class="border-secondary my-4" />
