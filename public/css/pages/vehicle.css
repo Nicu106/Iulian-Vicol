@@ -20,3 +20,203 @@
   transform: scale(1.05);
 }
 
+/* Enhanced Gallery Styles */
+.vehicle-gallery {
+  position: relative;
+}
+
+.main-media-container {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+}
+
+.thumbnails-container {
+  margin-top: 1rem;
+}
+
+.thumbnail-item {
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 3px solid transparent;
+}
+
+.thumbnail-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.thumbnail-item.active {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
+}
+
+.thumbnail-item .ratio {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.video-thumbnail {
+  position: relative;
+}
+
+.video-play-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 2rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  transition: all 0.3s ease;
+}
+
+.video-thumbnail:hover .video-play-overlay {
+  color: #0d6efd;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.image-thumbnail img {
+  transition: all 0.3s ease;
+}
+
+.image-thumbnail:hover img {
+  transform: scale(1.05);
+}
+
+/* Price header styling */
+.price-header { align-items: flex-end; }
+.price-card {
+  background: linear-gradient(135deg, #eef5ff 0%, #ffffff 100%);
+  border: 1px solid #d7e3ff;
+  border-radius: 16px;
+  padding: 12px 16px;
+  box-shadow: 0 6px 18px rgba(13, 110, 253, 0.12);
+}
+.price-card .price-label {
+  color: #0d6efd;
+  font-weight: 600;
+  letter-spacing: .02em;
+  margin-bottom: 2px;
+}
+.price-card .price-value {
+  color: #0d6efd;
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 800;
+  line-height: 1.1;
+}
+.price-card .price-estimate {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #495057;
+}
+
+.financing-badge {
+  background: #d1f7d6;
+  color: #0a7b2f;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-weight: 700;
+}
+
+/* Gallery responsive adjustments */
+@media (max-width: 768px) {
+  .thumbnail-item {
+    margin-bottom: 0.5rem;
+  }
+  
+  .video-play-overlay {
+    font-size: 1.5rem;
+  }
+}
+
+/* Pricing and Offers Section */
+.pricing-card {
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.pricing-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.price-comparison {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.price-badge {
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.offer-alert {
+  border-left: 4px solid #ffc107;
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+}
+
+.discount-progress {
+  height: 8px;
+  border-radius: 999px;
+  background: #e9ecef;
+  overflow: hidden;
+}
+
+.discount-progress .progress-bar {
+  background: linear-gradient(90deg, #dc3545 0%, #fd7e14 100%);
+  border-radius: 999px;
+}
+
+/* Similar vehicles comparison */
+.hover-shadow {
+  transition: all 0.3s ease;
+}
+
+.hover-shadow:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+}
+
+.price-difference {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+}
+
+.price-difference.text-danger {
+  background: rgba(220, 53, 69, 0.1);
+}
+
+.price-difference.text-success {
+  background: rgba(25, 135, 84, 0.1);
+}
+
+.price-difference.text-muted {
+  background: rgba(108, 117, 125, 0.1);
+}
+
+/* Responsive pricing display */
+@media (max-width: 768px) {
+  .pricing-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .price-comparison .row {
+    flex-direction: column;
+  }
+  
+  .price-comparison .col-md-6 {
+    width: 100%;
+  }
+}
+

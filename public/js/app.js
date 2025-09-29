@@ -128,28 +128,57 @@ class SimpleAnimations {
     }
     
     setupNavEffects() {
-        // Nav scroll effect
-        const nav = document.querySelector('.tech-nav');
-        if (nav) {
+        // Enhanced Nav scroll effect for Bootstrap navbar
+        const header = document.querySelector('header.bg-dark');
+        if (header) {
+            let lastScrollTop = 0;
             window.addEventListener('scroll', () => {
-                if (window.scrollY > 50) {
-                    nav.classList.add('scrolled');
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                if (scrollTop > 50) {
+                    header.classList.add('scrolled');
                 } else {
-                    nav.classList.remove('scrolled');
+                    header.classList.remove('scrolled');
                 }
+                
+                // Hide/show navbar on scroll (optional effect)
+                if (scrollTop > lastScrollTop && scrollTop > 100) {
+                    // Scrolling down
+                    header.style.transform = 'translateY(-100%)';
+                } else {
+                    // Scrolling up
+                    header.style.transform = 'translateY(0)';
+                }
+                
+                lastScrollTop = scrollTop;
             });
         }
         
-        // Nav link hover effects
-        const navLinks = document.querySelectorAll('.tech-nav-link');
+        // Enhanced nav link hover effects
+        const navLinks = document.querySelectorAll('header .navbar .nav-link');
         
         navLinks.forEach(link => {
             link.addEventListener('mouseenter', () => {
-                link.style.color = '#3b82f6';
+                link.style.transform = 'translateY(-2px) scale(1.02)';
             });
             
             link.addEventListener('mouseleave', () => {
-                link.style.color = '#1a1a1a';
+                link.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+        
+        // Enhanced button hover effects
+        const navButtons = document.querySelectorAll('header .navbar .btn');
+        
+        navButtons.forEach(button => {
+            button.addEventListener('mouseenter', () => {
+                button.style.transform = 'translateY(-2px) scale(1.05)';
+                button.style.boxShadow = '0 8px 25px rgba(13, 110, 253, 0.4)';
+            });
+            
+            button.addEventListener('mouseleave', () => {
+                button.style.transform = 'translateY(0) scale(1)';
+                button.style.boxShadow = '';
             });
         });
     }

@@ -1,0 +1,283 @@
+/* Pricing and Offers Styling */
+
+/* Price Display Components */
+.price-display {
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.price-current {
+  font-size: 1.25rem;
+  color: #2563eb;
+  font-weight: 700;
+}
+
+.price-original {
+  text-decoration: line-through;
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-top: 2px;
+}
+
+.price-offer {
+  color: #dc2626;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.price-discount {
+  background: #dcfce7;
+  color: #166534;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 4px;
+}
+
+/* Offer Badges */
+.offer-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.offer-flash {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+  border: 1px solid #f59e0b;
+}
+
+.offer-seasonal {
+  background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%);
+  color: #1e40af;
+  border: 1px solid #3b82f6;
+}
+
+.offer-clearance {
+  background: linear-gradient(135deg, #fee2e2 0%, #fca5a5 100%);
+  color: #991b1b;
+  border: 1px solid #ef4444;
+}
+
+.offer-negotiable {
+  background: linear-gradient(135deg, #dcfce7 0%, #86efac 100%);
+  color: #166534;
+  border: 1px solid #22c55e;
+}
+
+.offer-standard {
+  background: linear-gradient(135deg, #f3f4f6 0%, #d1d5db 100%);
+  color: #374151;
+  border: 1px solid #6b7280;
+}
+
+/* Pricing Statistics Cards */
+.pricing-stats {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.pricing-stats .card-body {
+  padding: 1.5rem;
+}
+
+.pricing-stats .stats-number {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.pricing-stats .stats-label {
+  font-size: 0.875rem;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Price Range Indicators */
+.price-range-indicator {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.price-range-budget { background: #10b981; }
+.price-range-mid { background: #f59e0b; }
+.price-range-premium { background: #ef4444; }
+.price-range-luxury { background: #8b5cf6; }
+
+/* Bulk Pricing Actions */
+.bulk-pricing-form {
+  background: #f8fafc;
+  border: 2px dashed #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.bulk-pricing-form .form-label {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.bulk-pricing-form .form-control,
+.bulk-pricing-form .form-select {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.bulk-pricing-form .form-control:focus,
+.bulk-pricing-form .form-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Pricing History Table */
+.pricing-history-table {
+  font-size: 0.875rem;
+}
+
+.pricing-history-table th {
+  background: #f9fafb;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.pricing-history-table td {
+  vertical-align: middle;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+/* Price Trend Indicators */
+.price-trend {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.price-trend.up {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.price-trend.down {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.price-trend.stable {
+  background: #f9fafb;
+  color: #6b7280;
+}
+
+.price-trend i {
+  margin-right: 4px;
+}
+
+/* Offer Countdown */
+.offer-countdown {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  padding: 0.75rem;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.offer-countdown .countdown-title {
+  font-weight: 600;
+  color: #92400e;
+  margin-bottom: 0.5rem;
+}
+
+.offer-countdown .countdown-timer {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #92400e;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .pricing-stats .stats-number {
+    font-size: 2rem;
+  }
+  
+  .bulk-pricing-form {
+    padding: 1rem;
+  }
+  
+  .offer-badge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+}
+
+/* Animation Effects */
+.price-display {
+  transition: all 0.3s ease;
+}
+
+.price-display:hover {
+  transform: translateY(-2px);
+}
+
+.offer-badge {
+  transition: all 0.2s ease;
+}
+
+.offer-badge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Loading States */
+.pricing-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #6b7280;
+}
+
+.pricing-loading .spinner-border {
+  margin-right: 0.5rem;
+}
+
+/* Empty States */
+.pricing-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #6b7280;
+}
+
+.pricing-empty i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.pricing-empty h5 {
+  margin-bottom: 0.5rem;
+  color: #374151;
+}
+
+.pricing-empty p {
+  margin-bottom: 1rem;
+  opacity: 0.7;
+}

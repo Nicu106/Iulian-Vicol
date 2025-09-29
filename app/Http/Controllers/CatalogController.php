@@ -11,8 +11,13 @@ class CatalogController extends Controller
     {
         $query = Vehicle::query();
         
-        // Only show available vehicles on public catalog
-        $query->where('status', 'available');
+        // Status filter (default to available)
+        $status = $request->get('status');
+        if ($status) {
+            $query->where('status', $status);
+        } else {
+            $query->where('status', 'available');
+        }
         
         // Search functionality
         $q = trim((string) $request->get('q'));
@@ -70,9 +75,17 @@ class CatalogController extends Controller
             $query->where('mileage', '<=', $request->get('mileage_max'));
         }
         
+        // Filter by featured
+        if ($request->filled('featured')) {
+            $query->where('featured', (bool) $request->get('featured'));
+        }
+
         // Filter by fuel type
         if ($request->filled('fuel') && $request->get('fuel') !== 'Toate') {
-            $query->where('fuel', $request->get('fuel'));
+            $query->where(function($sub) use ($request) {
+                $sub->where('fuel', $request->get('fuel'))
+                    ->orWhere('fuel_type', $request->get('fuel'));
+            });
         }
         
         // Filter by transmission
@@ -80,11 +93,12 @@ class CatalogController extends Controller
             $query->where('transmission', $request->get('transmission'));
         }
         
-        // Filter by body type (assuming we store this in description or features)
+        // Filter by body type
         if ($request->filled('body_type') && $request->get('body_type') !== 'Toate') {
             $bodyType = $request->get('body_type');
             $query->where(function ($sub) use ($bodyType) {
-                $sub->where('description', 'like', "%$bodyType%")
+                $sub->where('body_type', $bodyType)
+                    ->orWhere('description', 'like', "%$bodyType%")
                     ->orWhereJsonContains('features', $bodyType);
             });
         }
@@ -144,8 +158,9 @@ class CatalogController extends Controller
         
         // Get unique fuel types for filter dropdown
         $fuelTypes = Vehicle::where('status', 'available')
+            ->selectRaw('COALESCE(fuel, fuel_type) as fuel_type')
             ->distinct()
-            ->pluck('fuel')
+            ->pluck('fuel_type')
             ->filter()
             ->sort()
             ->values();
@@ -166,12 +181,22 @@ class CatalogController extends Controller
             ->sort()
             ->values();
         
+        // Get unique body types for filter dropdown
+        $bodyTypes = Vehicle::where('status', 'available')
+            ->whereNotNull('body_type')
+            ->distinct()
+            ->pluck('body_type')
+            ->filter()
+            ->sort()
+            ->values();
+        
         return view('pages.catalog', compact(
             'vehicles',
             'brands',
             'fuelTypes',
             'transmissions',
             'colors',
+            'bodyTypes',
             'q'
         ));
     }

@@ -12,11 +12,12 @@ class Vehicle extends Model
 
     protected $fillable = [
         'slug','brand','model','title','year','price','original_price','offer_price','has_offer','offer_expires_at',
-        'status','sold_date','buyer_name','buyer_phone','featured','priority','badges',
+        'offer_type','offer_description','pricing_history','status','sold_date','buyer_name','buyer_phone','featured','priority','badges',
         'mileage','fuel','transmission','engine','power','drivetrain','color','vin','condition',
         'description','features','video_url','cover_image','gallery_images',
         'purchase_price','internal_notes','views_count','inquiries_count',
-        'location','availability_schedule','meta_title','meta_description','tags'
+        'location','availability_schedule','meta_title','meta_description','tags',
+        'fuel_type','body_type','engine_capacity','images','seller_name','seller_phone','seller_email'
     ];
 
     protected $casts = [
@@ -25,7 +26,11 @@ class Vehicle extends Model
         'badges' => 'array',
         'availability_schedule' => 'array',
         'tags' => 'array',
+        'pricing_history' => 'array',
+        'images' => 'array',
         'year' => 'integer',
+        'mileage' => 'integer',
+        'price' => 'decimal:2',
         'original_price' => 'decimal:2',
         'offer_price' => 'decimal:2',
         'purchase_price' => 'decimal:2',
@@ -64,6 +69,21 @@ class Vehicle extends Model
     }
 
     // Accessors & Mutators
+    public function getPriceAttribute($value): ?float
+    {
+        return $value ? (float) $value : null;
+    }
+    
+    public function getOfferPriceAttribute($value): ?float
+    {
+        return $value ? (float) $value : null;
+    }
+    
+    public function getOriginalPriceAttribute($value): ?float
+    {
+        return $value ? (float) $value : null;
+    }
+    
     public function getDisplayPriceAttribute(): ?float
     {
         if ($this->has_offer && $this->offer_price && (!$this->offer_expires_at || $this->offer_expires_at >= now())) {

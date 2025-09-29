@@ -4,45 +4,42 @@ namespace Database\Factories;
 
 use App\Models\Vehicle;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
-/** @extends Factory<\App\Models\Vehicle> */
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Vehicle>
+ */
 class VehicleFactory extends Factory
 {
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
     protected $model = Vehicle::class;
 
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
     public function definition(): array
     {
-        $brand = fake()->randomElement(['BMW','Audi','Mercedes','Volkswagen','Volvo','Toyota']);
-        $model = fake()->randomElement(['X5','A4','C-Class','Tiguan','XC60','Corolla']);
-        $year = fake()->numberBetween(2015, (int) date('Y'));
-        $slug = Str::slug($brand.' '.$model.' '.$year.' '.Str::random(5));
         return [
-            'slug' => $slug,
-            'brand' => $brand,
-            'model' => $model,
-            'year' => $year,
-            'price' => '€ '.fake()->numberBetween(9000, 69900),
-            'mileage' => fake()->numberBetween(10000, 120000).' km',
-            'fuel' => fake()->randomElement(['Benzină','Diesel','Hibrid','Electric']),
-            'transmission' => fake()->randomElement(['Automată','Manuală']),
-            'engine' => fake()->randomElement(['2.0L','3.0L','1.5L','2.5L']),
-            'power' => fake()->numberBetween(100, 450).' CP',
-            'drivetrain' => fake()->randomElement(['FWD','RWD','4x4']),
-            'color' => fake()->safeColorName(),
-            'vin' => Str::upper(Str::random(6)).'123456',
-            'condition' => fake()->randomElement(['Excelentă','Foarte bună','Bună']),
-            'description' => fake()->sentence(12),
-            'features' => ['LED','Panoramic','Senzori parcare','Pachet sport'],
-            'video_url' => null,
-            'cover_image' => 'https://picsum.photos/seed/'.Str::random(6).'/800/500',
-            'gallery_images' => [
-                'https://picsum.photos/seed/'.Str::random(6).'/1200/800',
-                'https://picsum.photos/seed/'.Str::random(6).'/1200/800',
-                'https://picsum.photos/seed/'.Str::random(6).'/1200/800',
-            ],
+            'title' => $this->faker->sentence(3),
+            'brand' => $this->faker->randomElement(['BMW', 'Audi', 'Mercedes', 'Volkswagen', 'Toyota', 'Honda', 'Ford', 'Nissan']),
+            'model' => $this->faker->word(),
+            'year' => $this->faker->numberBetween(2015, 2024),
+            'price' => $this->faker->numberBetween(15000, 80000),
+            'mileage' => $this->faker->numberBetween(1000, 200000),
+            'fuel_type' => $this->faker->randomElement(['Benzină', 'Diesel', 'Hibrid', 'Electric']),
+            'transmission' => $this->faker->randomElement(['Manuală', 'Automată']),
+            'body_type' => $this->faker->randomElement(['Sedan', 'SUV', 'Hatchback', 'Coupe', 'Convertible']),
+            'color' => $this->faker->colorName(),
+            'engine_capacity' => $this->faker->numberBetween(1000, 5000),
+            'power' => $this->faker->numberBetween(100, 500),
+            'description' => $this->faker->paragraph(3),
+            'is_featured' => $this->faker->boolean(20),
+            'offer_type' => $this->faker->randomElement(['Vânzare', 'Închiriere', 'Leasing']),
         ];
     }
 }
-
-

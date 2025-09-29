@@ -1,0 +1,138 @@
+/* Saved Vehicles minimalist UI */
+.saved-vehicles-page .card { border: 1px solid #e9ecef; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,.04); }
+.saved-vehicles-page .saved-vehicle-card { transition: transform .15s ease, box-shadow .15s ease; border-radius: 16px; overflow: hidden; }
+.saved-vehicles-page .saved-vehicle-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,.08); }
+.saved-vehicles-page .card-img-top { height: 160px; object-fit: cover; }
+.saved-vehicles-page .price { font-weight: 800; color: #0d6efd; font-size: 1.05rem; }
+.saved-vehicles-page .btn-edit { background: #eef2ff; color: #3b82f6; }
+.saved-vehicles-page .btn-remove { background: #fee2e2; color: #ef4444; }
+.saved-vehicles-page .btn-edit:hover { background: #e0e7ff; }
+.saved-vehicles-page .btn-remove:hover { background: #fecaca; }
+.saved-vehicles-page .card-actions { display: flex; justify-content: space-between; align-items: center; margin-top: .5rem; }
+.saved-vehicles-page .input-group input { border-radius: 8px 0 0 8px; }
+.saved-vehicles-page .input-group .btn { border-radius: 0 8px 8px 0; }
+.saved-vehicles-page {
+  min-height: 100vh;
+  padding-top: 80px;
+}
+
+.saved-vehicle-card {
+  transition: all 0.3s ease;
+  border: 1px solid #dee2e6;
+}
+
+.saved-vehicle-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.saved-vehicle-card .card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+
+.saved-vehicle-card .card-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.saved-vehicle-card .card-actions {
+  margin-top: auto;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.saved-vehicle-card .price {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #0d6efd;
+}
+
+.saved-vehicle-card .vehicle-info {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.saved-vehicle-card .badge {
+  font-size: 0.75rem;
+}
+
+.saved-vehicle-card .btn-remove {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.saved-vehicle-card .btn-remove:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+.saved-vehicle-card .btn-edit {
+  color: #198754;
+  border-color: #198754;
+}
+
+.saved-vehicle-card .btn-edit:hover {
+  background-color: #198754;
+  color: white;
+}
+
+.saved-vehicle-card .btn-save {
+  color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.saved-vehicle-card .btn-save.saved {
+  background-color: #0d6efd;
+  color: white;
+}
+
+.saved-vehicle-card .btn-save.saved:hover {
+  background-color: #0b5ed7;
+  border-color: #0b5ed7;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .saved-vehicle-card .card-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .saved-vehicle-card .card-actions .btn {
+    width: 100%;
+  }
+}
+
+/* Animation for adding/removing vehicles */
+.saved-vehicle-card.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+.saved-vehicle-card.fade-out {
+  animation: fadeOut 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}

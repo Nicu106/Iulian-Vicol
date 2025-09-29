@@ -9,10 +9,6 @@
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    # Handle X-XSRF-Token Header
-    RewriteCond %{HTTP:x-xsrf-token} .
-    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
-
     # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
@@ -23,3 +19,31 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# PHP Settings for file uploads - NO LIMITS
+<IfModule mod_php.c>
+    php_value upload_max_filesize 0
+    php_value post_max_size 0
+    php_value max_file_uploads 100
+    php_value memory_limit 512M
+    php_value max_execution_time 0
+    php_value max_input_time -1
+</IfModule>
+
+# Alternative PHP settings
+<IfModule mod_php7.c>
+    php_value upload_max_filesize 0
+    php_value post_max_size 0
+    php_value max_file_uploads 100
+    php_value memory_limit 512M
+    php_value max_execution_time 0
+    php_value max_input_time -1
+</IfModule>
+
+# Force PHP settings
+php_value upload_max_filesize 0
+php_value post_max_size 0
+php_value max_file_uploads 100
+php_value memory_limit 512M
+php_value max_execution_time 0
+php_value max_input_time -1

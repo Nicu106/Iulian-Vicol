@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -44,5 +45,21 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Relația cu mașinile salvate
+     */
+    public function savedVehicles(): HasMany
+    {
+        return $this->hasMany(SavedVehicle::class);
+    }
+
+    /**
+     * Verifică dacă o mașină este salvată de utilizator
+     */
+    public function hasSavedVehicle($vehicleId): bool
+    {
+        return $this->savedVehicles()->where('vehicle_id', $vehicleId)->exists();
     }
 }

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->date('offer_expires_at')->nullable()->after('has_offer');
             
             // Status Management
-            $table->enum('status', ['available', 'reserved', 'sold', 'maintenance', 'draft'])->default('available')->after('offer_expires_at');
+            $table->enum('status', ['available', 'reserved', 'sold', 'maintenance', 'draft', 'clearance'])->default('available')->after('offer_expires_at');
             $table->date('sold_date')->nullable()->after('status');
             $table->string('buyer_name')->nullable()->after('sold_date');
             $table->string('buyer_phone')->nullable()->after('buyer_name');

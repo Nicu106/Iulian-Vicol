@@ -40,32 +40,33 @@
         <!-- Basic Information -->
         <div class="card admin-card shadow-sm mb-3">
           <div class="card-body">
-            <div class="form-section-title">Informații de bază</div>
+            <div class="form-section-title">Información básica</div>
             <div class="row g-3">
               <div class="col-md-4">
-                <label class="form-label">Marcă *</label>
+                <label class="form-label">Marca *</label>
                 <input class="form-control" name="brand" required value="{{ old('brand') }}">
                 @error('brand')<div class="text-danger small">{{ $message }}</div>@enderror
               </div>
               <div class="col-md-5">
-                <label class="form-label">Model *</label>
+                <label class="form-label">Modelo *</label>
                 <input class="form-control" name="model" required value="{{ old('model') }}">
                 @error('model')<div class="text-danger small">{{ $message }}</div>@enderror
               </div>
               <div class="col-md-3">
-                <label class="form-label">An *</label>
+                <label class="form-label">Año *</label>
                 <input type="number" class="form-control" name="year" required min="1900" max="{{ date('Y') }}" value="{{ old('year', date('Y')) }}">
                 @error('year')<div class="text-danger small">{{ $message }}</div>@enderror
               </div>
               <div class="col-md-4">
-                <label class="form-label">Preț *</label>
+                <label class="form-label">Precio *</label>
                 <input type="number" step="0.01" class="form-control" name="price" placeholder="49900" required value="{{ old('price') }}">
-                <div class="hint">În EUR (fără simbolul €)</div>
+                <div class="hint">En EUR (sin símbolo €)</div>
                 @error('price')<div class="text-danger small">{{ $message }}</div>@enderror
               </div>
               <div class="col-md-4">
                 <label class="form-label">Kilometraj</label>
-                <input class="form-control" name="mileage" placeholder="35.000 km" value="{{ old('mileage') }}">
+                <input type="number" class="form-control" name="mileage" placeholder="35000" min="0" step="1" value="{{ old('mileage') }}">
+                @error('mileage')<div class="text-danger small">{{ $message }}</div>@enderror
               </div>
               <div class="col-md-4">
                 <label class="form-label">Culoare</label>
@@ -93,8 +94,25 @@
                 </div>
                 <div class="col-12">
                   <label class="form-label">Data expirării ofertei</label>
-                  <input type="date" class="form-control" name="offer_expires_at" min="{{ date('Y-m-d', strtotime('+1 day')) }}" value="{{ old('offer_expires_at') }}">
+                  <input type="date" class="form-control" name="offer_expires_at" min="{{ date('Y-m-d') }}" value="{{ old('offer_expires_at') }}">
                   <div class="hint">Lasă gol pentru ofertă permanentă</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Tip ofertă</label>
+                  <select class="form-control" name="offer_type">
+                    <option value="">Fără ofertă</option>
+                    <option value="flash_sale" {{ old('offer_type') == 'flash_sale' ? 'selected' : '' }}>Flash Sale</option>
+                    <option value="seasonal" {{ old('offer_type') == 'seasonal' ? 'selected' : '' }}>Ofertă sezonieră</option>
+                    <option value="clearance" {{ old('offer_type') == 'clearance' ? 'selected' : '' }}>Lichidare stoc</option>
+                    <option value="negotiable" {{ old('offer_type') == 'negotiable' ? 'selected' : '' }}>Preț negociabil</option>
+                    <option value="promotion" {{ old('offer_type') == 'promotion' ? 'selected' : '' }}>Promoție</option>
+                  </select>
+                  <div class="hint">Tipul ofertei pentru marketing</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Descriere ofertă</label>
+                  <textarea class="form-control" name="offer_description" rows="2" placeholder="Descrie oferta (opțional)">{{ old('offer_description') }}</textarea>
+                  <div class="hint">Ex: "Reducere 15% pentru achiziții în această lună"</div>
                 </div>
               </div>
             </div>
@@ -252,6 +270,7 @@
                 <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Draft</option>
                 <option value="reserved" {{ old('status') == 'reserved' ? 'selected' : '' }}>Rezervat</option>
                 <option value="maintenance" {{ old('status') == 'maintenance' ? 'selected' : '' }}>În service</option>
+                <option value="clearance" {{ old('status') == 'clearance' ? 'selected' : '' }}>Reducere (Clearance)</option>
               </select>
             </div>
 
@@ -262,7 +281,7 @@
             </div>
 
             <div class="form-check">
-              <input class="form-check-input" type="checkbox" name="featured" id="featured" {{ old('featured') ? 'checked' : '' }}>
+              <input class="form-check-input" type="checkbox" name="featured" id="featured" value="1" {{ old('featured') ? 'checked' : '' }}>
               <label class="form-check-label" for="featured">
                 <strong>Vehicul recomandat</strong>
               </label>
@@ -290,7 +309,9 @@
 
 @push('scripts')
 <script>
-// Prevent double form submission
+// TEMPORARY: Disable double-submit prevention for debugging
+console.log('Upload debugging mode - double submit prevention disabled');
+/*
 let isSubmitting = false;
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.querySelector('form[method="post"]');
@@ -302,10 +323,10 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       isSubmitting = true;
       
-      // Re-enable after 3 seconds (in case of validation errors)
+      // Re-enable after 5 seconds (in case of validation errors)
       setTimeout(() => {
         isSubmitting = false;
-      }, 3000);
+      }, 5000);
       
       // Disable submit button
       const submitBtn = form.querySelector('button[type="submit"]');
@@ -316,6 +337,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+*/
 
 function previewImage(input, previewId) {
   const preview = document.getElementById(previewId);

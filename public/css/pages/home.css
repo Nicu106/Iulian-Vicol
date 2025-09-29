@@ -3,7 +3,7 @@
 
 .home-hero {
   background: linear-gradient(180deg, rgba(0,0,0,.75), rgba(0,0,0,.6)),
-              url('https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat;
+              url('https://images.unsplash.com/photo-1514316454349-750a7fd3da3a?q=80&w=1920&auto=format&fit=crop&ixlib=rb-4.1.0') center/cover no-repeat;
 }
 
 .trust-badges .fw-semibold { font-size: 1rem; }
@@ -11,7 +11,7 @@
 
 .final-cta {
   background: linear-gradient(180deg, rgba(0,0,0,.85), rgba(0,0,0,.7)),
-              url('https://images.unsplash.com/photo-1471478331149-c72f17e33c73?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat;
+              url('https://images.unsplash.com/photo-1514316454349-750a7fd3da3a?q=80&w=1920&auto=format&fit=crop&ixlib=rb-4.1.0') center/cover no-repeat;
 }
 
 /* Hero search + CTAs */
@@ -71,4 +71,135 @@
 .category-card:hover { transform: translateY(-8px); box-shadow: 0 24px 48px rgba(2,6,23,.12); }
 .category-cta { border-radius: 12px; box-shadow: 0 6px 14px rgba(37,99,235,.25); }
 .category-cta:hover { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(37,99,235,.32); }
+
+/* Testimonials carousel */
+#testimonialsCarousel .carousel-control-prev,
+#testimonialsCarousel .carousel-control-next {
+  width: 50px;
+  height: 50px;
+  background: rgba(37, 99, 235, 0.1);
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 2px solid rgba(37, 99, 235, 0.2);
+  transition: all 0.3s ease;
+}
+
+#testimonialsCarousel .carousel-control-prev:hover,
+#testimonialsCarousel .carousel-control-next:hover {
+  background: rgba(37, 99, 235, 0.2);
+  border-color: rgba(37, 99, 235, 0.4);
+}
+
+#testimonialsCarousel .carousel-control-prev {
+  left: -25px;
+}
+
+#testimonialsCarousel .carousel-control-next {
+  right: -25px;
+}
+
+#testimonialsCarousel .carousel-indicators {
+  bottom: -50px;
+}
+
+#testimonialsCarousel .carousel-indicators button {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: rgba(37, 99, 235, 0.3);
+  border: none;
+  margin: 0 5px;
+  transition: all 0.3s ease;
+}
+
+#testimonialsCarousel .carousel-indicators button.active {
+  background-color: #2563eb;
+  transform: scale(1.2);
+}
+
+#testimonialsCarousel .card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#testimonialsCarousel .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(2,6,23,.1);
+}
+
+/* Testimonial cards cu imagini mari și text overlay */
+.testimonial-card {
+  height: 400px;
+  border-radius: 20px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.testimonial-bg-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.testimonial-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.5));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.testimonial-content {
+  max-width: 100%;
+}
+
+.testimonial-text {
+  font-size: 1.1rem;
+  font-weight: 500;
+  line-height: 1.6;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+  margin-bottom: 1rem;
+}
+
+.testimonial-author {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .testimonial-card {
+    height: 300px;
+  }
+  
+  .testimonial-text {
+    font-size: 1rem;
+  }
+  
+  .testimonial-overlay {
+    padding: 1.5rem;
+  }
+
+  /* Pe mobil arătăm câte 1 card per slide (al doilea și al treilea ascunse prin d-none d-md-block) */
+  #testimonialsCarousel .carousel-control-prev { left: 0; }
+  #testimonialsCarousel .carousel-control-next { right: 0; }
+  #testimonialsCarousel .carousel-indicators { bottom: -30px; }
+
+  /* Safari fixes */
+  .testimonial-bg-image { object-fit: cover; width: 100%; height: 100%; }
+  .testimonial-overlay { display: -webkit-box; display: -webkit-flex; display: flex; }
+}
 

@@ -33,38 +33,38 @@
 
     <form action="{{ route('admin.vehicles.update', $vehicle['slug']) }}" method="post" enctype="multipart/form-data" class="row g-4">
       @csrf
-      @method('PATCH')
-      
+
       <div class="col-lg-8">
         <!-- Basic Information -->
         <div class="card admin-card shadow-sm mb-3">
           <div class="card-body">
-            <div class="form-section-title">Informații de bază</div>
+            <div class="form-section-title">Información básica</div>
             <div class="row g-3">
               <div class="col-md-4">
-                <label class="form-label">Marcă *</label>
+                <label class="form-label">Marca *</label>
                 <input class="form-control" name="brand" required value="{{ old('brand', $vehicle['brand']) }}">
                 @error('brand')<div class="text-danger small">{{ $message }}</div>@enderror
               </div>
               <div class="col-md-5">
-                <label class="form-label">Model *</label>
+                <label class="form-label">Modelo *</label>
                 <input class="form-control" name="model" required value="{{ old('model', $vehicle['model']) }}">
                 @error('model')<div class="text-danger small">{{ $message }}</div>@enderror
               </div>
               <div class="col-md-3">
-                <label class="form-label">An *</label>
+                <label class="form-label">Año *</label>
                 <input type="number" class="form-control" name="year" required min="1900" max="{{ date('Y') }}" value="{{ old('year', $vehicle['year']) }}">
                 @error('year')<div class="text-danger small">{{ $message }}</div>@enderror
               </div>
               <div class="col-md-4">
-                <label class="form-label">Preț *</label>
+                <label class="form-label">Precio *</label>
                 <input type="number" step="0.01" class="form-control" name="price" placeholder="49900" required value="{{ old('price', $vehicle['price']) }}">
-                <div class="hint">În EUR (fără simbolul €)</div>
+                <div class="hint">En EUR (sin símbolo €)</div>
                 @error('price')<div class="text-danger small">{{ $message }}</div>@enderror
               </div>
               <div class="col-md-4">
                 <label class="form-label">Kilometraj</label>
-                <input class="form-control" name="mileage" placeholder="35.000 km" value="{{ old('mileage', $vehicle['mileage']) }}">
+                <input type="number" class="form-control" name="mileage" placeholder="35000" value="{{ old('mileage', $vehicle['mileage']) }}">
+                <div class="hint">Doar numărul de km (fără separatori)</div>
               </div>
               <div class="col-md-4">
                 <label class="form-label">Culoare</label>
@@ -78,6 +78,42 @@
         <div class="card admin-card shadow-sm mb-3">
           <div class="card-body">
             <div class="form-section-title">Prețuri și oferte</div>
+            
+            <!-- Current Pricing Display -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <div class="card bg-light">
+                  <div class="card-body text-center">
+                    <div class="h6 text-muted">Preț curent</div>
+                    <div class="h4 text-primary">€{{ number_format($vehicle['price'] ?? 0, 0, ',', '.') }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card bg-light">
+                  <div class="card-body text-center">
+                    <div class="h6 text-muted">Preț original</div>
+                    <div class="h4 text-secondary">€{{ number_format($vehicle['original_price'] ?? $vehicle['price'] ?? 0, 0, ',', '.') }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card bg-light">
+                  <div class="card-body text-center">
+                    <div class="h6 text-muted">Discount</div>
+                    @php
+                      $originalPrice = $vehicle['original_price'] ?? $vehicle['price'] ?? 0;
+                      $currentPrice = $vehicle['price'] ?? 0;
+                      $discount = $originalPrice > 0 ? (($originalPrice - $currentPrice) / $originalPrice) * 100 : 0;
+                    @endphp
+                    <div class="h4 {{ $discount > 0 ? 'text-success' : 'text-muted' }}">
+                      {{ $discount > 0 ? '-' . number_format($discount, 1) . '%' : '0%' }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="offer-section">
               <div class="row g-3">
                 <div class="col-md-6">
@@ -90,13 +126,58 @@
                   <input type="number" step="0.01" class="form-control" name="offer_price" value="{{ old('offer_price', $vehicle['offer_price']) }}">
                   <div class="hint">Prețul redus (dacă există)</div>
                 </div>
-                <div class="col-12">
+                <div class="col-md-6">
                   <label class="form-label">Data expirării ofertei</label>
                   <input type="date" class="form-control" name="offer_expires_at" min="{{ date('Y-m-d', strtotime('+1 day')) }}" value="{{ old('offer_expires_at', $vehicle['offer_expires_at']) }}">
                   <div class="hint">Lasă gol pentru ofertă permanentă</div>
                 </div>
+                <div class="col-md-6">
+                  <label class="form-label">Tip ofertă</label>
+                  <select class="form-control" name="offer_type">
+                    <option value="">Fără ofertă</option>
+                    <option value="flash_sale" {{ old('offer_type', $vehicle['offer_type'] ?? '') == 'flash_sale' ? 'selected' : '' }}>Flash Sale</option>
+                    <option value="seasonal" {{ old('offer_type', $vehicle['offer_type'] ?? '') == 'seasonal' ? 'selected' : '' }}>Ofertă sezonieră</option>
+                    <option value="clearance" {{ old('offer_type', $vehicle['offer_type'] ?? '') == 'clearance' ? 'selected' : '' }}>Lichidare stoc</option>
+                    <option value="negotiable" {{ old('offer_type', $vehicle['offer_type'] ?? '') == 'negotiable' ? 'selected' : '' }}>Preț negociabil</option>
+                    <option value="promotion" {{ old('offer_type', $vehicle['offer_type'] ?? '') == 'promotion' ? 'selected' : '' }}>Promoție</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Descriere ofertă</label>
+                  <textarea class="form-control" name="offer_description" rows="2" placeholder="Descrie oferta (opțional)">{{ old('offer_description', $vehicle['offer_description'] ?? '') }}</textarea>
+                  <div class="hint">Ex: "Reducere 15% pentru achiziții în această lună"</div>
+                </div>
               </div>
             </div>
+
+            <!-- Pricing History -->
+            @if(isset($vehicle['pricing_history']) && is_array($vehicle['pricing_history']))
+            <div class="mt-3">
+              <div class="h6">Istoric prețuri:</div>
+              <div class="table-responsive">
+                <table class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>Data</th>
+                      <th>Preț</th>
+                      <th>Tip</th>
+                      <th>Motiv</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @foreach($vehicle['pricing_history'] as $history)
+                    <tr>
+                      <td>{{ \Carbon\Carbon::parse($history['date'])->format('d.m.Y') }}</td>
+                      <td>€{{ number_format($history['price'], 0, ',', '.') }}</td>
+                      <td>{{ $history['type'] }}</td>
+                      <td>{{ $history['reason'] }}</td>
+                    </tr>
+                    @endforeach
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            @endif
           </div>
         </div>
 
@@ -175,7 +256,7 @@
                 <label class="form-label">Dotări (separate prin virgulă)</label>
                 <input class="form-control" name="features" placeholder="LED Matrix, Pachet M, Panoramic, Senzori parcare" value="{{ old('features', is_array($vehicle['features'] ?? null) ? implode(', ', $vehicle['features']) : $vehicle['features']) }}">
               </div>
-              
+
               <!-- Current Images Display -->
               @if(!empty($vehicle['cover_image']))
                 <div class="col-12">
@@ -185,7 +266,24 @@
                   </div>
                 </div>
               @endif
-              
+
+              @if(!empty($vehicle['gallery_images']))
+              <div class="col-12">
+                <label class="form-label">Imagini existente în galerie</label>
+                <div id="existing_gallery" class="d-flex flex-wrap gap-2">
+                  @foreach($vehicle['gallery_images'] as $img)
+                    <div class="position-relative" data-url="{{ $img }}">
+                      <img src="{{ $img }}" style="width: 100px; height: 75px; object-fit: cover; border-radius: 6px; border: 1px solid #e5e7eb;">
+                      <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1" onclick="removeExistingGalleryItem(this, '{{ $img }}')">
+                        <i class="bi bi-x"></i>
+                      </button>
+                    </div>
+                  @endforeach
+                </div>
+                <input type="hidden" name="removed_gallery_images" id="removed_gallery_images" />
+              </div>
+              @endif
+
               <div class="col-md-6">
                 <label class="form-label">{{ !empty($vehicle['cover_image']) ? 'Înlocuiește' : 'Adaugă' }} imagine principală</label>
                 <input type="file" name="cover_image" accept="image/*" class="form-control" id="cover_image" onchange="previewImage(this, 'cover_preview')">
@@ -254,7 +352,7 @@
               <button type="submit" class="btn btn-primary btn-lg">Actualizează vehicul</button>
               <a href="{{ route('admin.vehicles.index') }}" class="btn btn-outline-secondary">Anulează</a>
             </div>
-            
+
             <div class="mb-3">
               <label class="form-label">Status vehicul</label>
               <select class="form-control" name="status">
@@ -304,7 +402,7 @@
 
 @push('scripts')
 <script>
-// Prevent double form submission
+// Prevent double submit for better performance
 let isSubmitting = false;
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.querySelector('form[method="post"]');
@@ -316,10 +414,10 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       isSubmitting = true;
       
-      // Re-enable after 3 seconds (in case of validation errors)
+      // Re-enable after 10 seconds (in case of validation errors)
       setTimeout(() => {
         isSubmitting = false;
-      }, 3000);
+      }, 10000);
       
       // Disable submit button
       const submitBtn = form.querySelector('button[type="submit"]');
@@ -334,7 +432,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function previewImage(input, previewId) {
   const preview = document.getElementById(previewId);
   const img = preview.querySelector('img');
-  
+
   if (input.files && input.files[0]) {
     const reader = new FileReader();
     reader.onload = function(e) {
@@ -350,7 +448,7 @@ function previewImage(input, previewId) {
 function previewGallery(input, previewId) {
   const preview = document.getElementById(previewId);
   preview.innerHTML = '';
-  
+
   if (input.files) {
     Array.from(input.files).forEach((file, index) => {
       if (file.type.startsWith('image/')) {
@@ -363,6 +461,22 @@ function previewGallery(input, previewId) {
         reader.readAsDataURL(file);
       }
     });
+  }
+}
+
+// Remove existing gallery item
+let removedGalleryList = [];
+function removeExistingGalleryItem(button, url) {
+  if (!removedGalleryList.includes(url)) {
+    removedGalleryList.push(url);
+  }
+  const hidden = document.getElementById('removed_gallery_images');
+  if (hidden) {
+    hidden.value = JSON.stringify(removedGalleryList);
+  }
+  const wrapper = button.closest('[data-url]');
+  if (wrapper) {
+    wrapper.remove();
   }
 }
 </script>
