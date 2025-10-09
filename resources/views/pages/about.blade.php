@@ -18,8 +18,8 @@
       </div>
       <div class="col-lg-6">
         <div class="ratio ratio-16x9 rounded overflow-hidden shadow">
-          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13333315.892943129!2d-17.576527996018655!3d35.325753487332875!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xc42e3783261bc8b%3A0xa6ec2c940768a3ec!2sSpain!5e0!3m2!1sen!2s!4v1758042385615!5m2!1sen!2s" 
-                  style="border:0;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Harta showroom Auto Premium"></iframe>
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13330657.024701731!2d-17.598073622580067!3d35.341871956064345!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xc42e3783261bc8b%3A0xa6ec2c940768a3ec!2sSpain!5e0!3m2!1sen!2s!4v1760020369448!5m2!1sen!2s" 
+                  width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Harta showroom MOTORCLASS - Spania"></iframe>
         </div>
       </div>
     </div>
