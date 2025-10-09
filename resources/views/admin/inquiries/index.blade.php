@@ -389,7 +389,10 @@ function viewInquiry(inquiryId) {
       updateInquiryStatus(inquiry.id, 'contacted');
     };
     
-    const modal = new bootstrap.Modal(document.getElementById('inquiryModal'));
+    const modal = new bootstrap.Modal(document.getElementById('inquiryModal'), {
+      backdrop: false,
+      keyboard: true
+    });
     modal.show();
     
     // Debug: Log modal events
@@ -399,6 +402,20 @@ function viewInquiry(inquiryId) {
     
     document.getElementById('inquiryModal').addEventListener('hidden.bs.modal', function () {
       console.log('Inquiry modal hidden');
+    });
+    
+    // Force close modal when clicking outside
+    document.getElementById('inquiryModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        modal.hide();
+      }
+    });
+    
+    // Force close modal with ESC key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && document.getElementById('inquiryModal').classList.contains('show')) {
+        modal.hide();
+      }
     });
   }
 }

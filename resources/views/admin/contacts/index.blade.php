@@ -316,7 +316,10 @@ function viewMessage(messageId) {
       window.location.href = `mailto:${message.email}?subject=Re: ${message.subject || 'Consulta'}`;
     };
     
-    const modal = new bootstrap.Modal(document.getElementById('messageModal'));
+    const modal = new bootstrap.Modal(document.getElementById('messageModal'), {
+      backdrop: false,
+      keyboard: true
+    });
     modal.show();
     
     // Debug: Log modal events
@@ -326,6 +329,20 @@ function viewMessage(messageId) {
     
     document.getElementById('messageModal').addEventListener('hidden.bs.modal', function () {
       console.log('Message modal hidden');
+    });
+    
+    // Force close modal when clicking outside
+    document.getElementById('messageModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        modal.hide();
+      }
+    });
+    
+    // Force close modal with ESC key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && document.getElementById('messageModal').classList.contains('show')) {
+        modal.hide();
+      }
     });
   }
 }

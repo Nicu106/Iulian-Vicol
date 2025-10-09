@@ -113,6 +113,36 @@
   z-index: 1055 !important;
 }
 
+/* Fix modal backdrop blocking clicks */
+.modal-backdrop.show {
+  pointer-events: none !important;
+}
+
+/* Ensure modal content is clickable */
+.modal-dialog {
+  pointer-events: auto !important;
+}
+
+.modal-content {
+  pointer-events: auto !important;
+}
+
+/* Fix modal centering */
+.modal-dialog {
+  margin: 1.75rem auto !important;
+  max-width: 90% !important;
+}
+
+/* Modal without backdrop styling */
+.modal:not(.show) {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.modal-content {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  border: none !important;
+}
+
 /* Ensure navbar stays visible */
 .navbar {
   z-index: 1041 !important;
