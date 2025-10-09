@@ -149,8 +149,8 @@ echo '';
 echo '✓ Deployment completed successfully!';
 "
 
-# Execute deployment via SSH
-if ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "$DEPLOY_COMMANDS"; then
+# Execute deployment via SSH with password authentication
+if sshpass -p "iulianiulianiuliansrv1" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "$DEPLOY_COMMANDS"; then
     echo ""
     log "Deployment completed successfully!"
     echo ""
