@@ -158,6 +158,13 @@
   z-index: 10000 !important;
 }
 
+/* For larger screens, move modal down a bit to avoid navbar */
+@media (min-width: 768px) {
+  .modal.show .modal-dialog {
+    top: 60% !important; /* Move down from 50% to 60% */
+  }
+}
+
 /* Force modal content above everything */
 .modal.show .modal-content {
   z-index: 10001 !important;
