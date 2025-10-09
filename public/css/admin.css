@@ -104,6 +104,15 @@
   z-index: 1049 !important;
 }
 
+/* Fix modal z-index conflicts */
+.modal {
+  z-index: 1060 !important;
+}
+
+.modal-backdrop {
+  z-index: 1055 !important;
+}
+
 /* Ensure navbar stays visible */
 .navbar {
   z-index: 1041 !important;

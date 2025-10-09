@@ -267,6 +267,12 @@
 <script>
 // Mobile-friendly message viewing
 function viewMessage(messageId) {
+  // Debug: Check if Bootstrap is loaded
+  if (typeof bootstrap === 'undefined') {
+    console.error('Bootstrap is not loaded!');
+    alert('Bootstrap nu este încărcat. Te rog reîmprospătează pagina.');
+    return;
+  }
   // Find the message data from the current page
   const messages = @json($messages->items());
   const message = messages.find(m => m.id === messageId);
@@ -312,6 +318,15 @@ function viewMessage(messageId) {
     
     const modal = new bootstrap.Modal(document.getElementById('messageModal'));
     modal.show();
+    
+    // Debug: Log modal events
+    document.getElementById('messageModal').addEventListener('shown.bs.modal', function () {
+      console.log('Message modal shown');
+    });
+    
+    document.getElementById('messageModal').addEventListener('hidden.bs.modal', function () {
+      console.log('Message modal hidden');
+    });
   }
 }
 

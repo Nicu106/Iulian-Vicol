@@ -334,6 +334,12 @@
 <script>
 // Mobile-friendly inquiry viewing
 function viewInquiry(inquiryId) {
+  // Debug: Check if Bootstrap is loaded
+  if (typeof bootstrap === 'undefined') {
+    console.error('Bootstrap is not loaded!');
+    alert('Bootstrap nu este încărcat. Te rog reîmprospătează pagina.');
+    return;
+  }
   // Find the inquiry data from the current page
   const inquiries = @json($inquiries->items());
   const inquiry = inquiries.find(i => i.id === inquiryId);
@@ -385,6 +391,15 @@ function viewInquiry(inquiryId) {
     
     const modal = new bootstrap.Modal(document.getElementById('inquiryModal'));
     modal.show();
+    
+    // Debug: Log modal events
+    document.getElementById('inquiryModal').addEventListener('shown.bs.modal', function () {
+      console.log('Inquiry modal shown');
+    });
+    
+    document.getElementById('inquiryModal').addEventListener('hidden.bs.modal', function () {
+      console.log('Inquiry modal hidden');
+    });
   }
 }
 
