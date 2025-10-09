@@ -1,131 +1,174 @@
 #!/bin/bash
 
-# Script de deployment pentru Auto Ecommerce
-# Rulează ca root sau cu sudo
+# Auto Ecommerce Deployment Script
+# Automates git commit, push, and server deployment
 
-echo "🚀 Deployment Auto Ecommerce - Pagină de Maintenance"
-echo "=================================================="
+# Server configuration
+SERVER_HOST="213.199.39.241"
+SERVER_USER="root"
+PROJECT_PATH="/var/www/motorclass"
+BRANCH="main"
 
-# Variabile - Modifică după nevoie
-PROJECT_DIR="/var/www/auto-ecommerce"
-NGINX_SITES="/etc/nginx/sites-available"
-NGINX_ENABLED="/etc/nginx/sites-enabled"
-DOMAIN="auto-ecommerce.ro"
-
-# Culori pentru output
+# Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Funcție pentru logging
+# Logging functions
 log() {
-    echo -e "${GREEN}[INFO]${NC} $1"
+    echo -e "${GREEN}[✓]${NC} $1"
+}
+
+info() {
+    echo -e "${BLUE}[→]${NC} $1"
 }
 
 warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
+    echo -e "${YELLOW}[!]${NC} $1"
 }
 
 error() {
-    echo -e "${RED}[ERROR]${NC} $1"
+    echo -e "${RED}[✗]${NC} $1"
 }
 
-# Verifică dacă rulează ca root
-if [[ $EUID -ne 0 ]]; then
-   error "Acest script trebuie rulat ca root (sudo)"
-   exit 1
-fi
+# Banner
+echo ""
+echo "╔═══════════════════════════════════════╗"
+echo "║  Auto Ecommerce Deployment Script    ║"
+echo "╚═══════════════════════════════════════╝"
+echo ""
 
-# 1. Actualizează sistemul
-log "Actualizez sistemul..."
-apt update && apt upgrade -y
-
-# 2. Instalează Nginx și PHP-FPM
-log "Instalez Nginx și PHP-FPM..."
-apt install -y nginx php8.2-fpm php8.2-cli php8.2-common php8.2-mysql php8.2-zip php8.2-gd php8.2-mbstring php8.2-curl php8.2-xml php8.2-bcmath
-
-# 3. Creează directorul proiectului
-log "Creez directorul proiectului..."
-mkdir -p $PROJECT_DIR
-chown -R www-data:www-data $PROJECT_DIR
-
-# 4. Copiază fișierele
-log "Copiez fișierele proiectului..."
-# Presupunând că rulezi din directorul proiectului
-cp -r * $PROJECT_DIR/
-chown -R www-data:www-data $PROJECT_DIR
-
-# 5. Configurează Nginx
-log "Configurez Nginx..."
-cp nginx.conf $NGINX_SITES/$DOMAIN
-
-# Modifică configurația cu path-urile corecte
-sed -i "s|/var/www/auto-ecommerce|$PROJECT_DIR|g" $NGINX_SITES/$DOMAIN
-
-# Activează site-ul
-ln -sf $NGINX_SITES/$DOMAIN $NGINX_ENABLED/
-
-# Dezactivează site-ul default dacă există
-if [ -f "$NGINX_ENABLED/default" ]; then
-    rm $NGINX_ENABLED/default
-    log "Site-ul default Nginx a fost dezactivat"
-fi
-
-# 6. Testează configurația Nginx
-log "Testez configurația Nginx..."
-nginx -t
-
-if [ $? -eq 0 ]; then
-    log "Configurația Nginx este validă"
-    systemctl reload nginx
-    log "Nginx a fost reîncărcat"
-else
-    error "Configurația Nginx are erori!"
+# Check for commit message argument
+COMMIT_MESSAGE="$1"
+if [ -z "$COMMIT_MESSAGE" ]; then
+    error "Please provide a commit message"
+    echo "Usage: ./deploy.sh \"Your commit message\""
     exit 1
 fi
 
-# 7. Pornește serviciile
-log "Pornesc serviciile..."
-systemctl enable nginx php8.2-fpm
-systemctl start nginx php8.2-fpm
+# Step 1: Check git status
+info "Checking git status..."
+if [ -n "$(git status --porcelain)" ]; then
+    log "Changes detected"
+else
+    warning "No changes to commit"
+    read -p "Continue with deployment anyway? (y/n) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        exit 0
+    fi
+fi
 
-# 8. Configurează firewall-ul
-log "Configurez firewall-ul..."
-ufw allow 'Nginx Full'
+# Step 2: Check if package.json has changed
+PACKAGE_CHANGED=false
+if git diff --name-only | grep -q "package.json"; then
+    PACKAGE_CHANGED=true
+    warning "package.json has changes - npm install will run on server"
+elif git diff --cached --name-only | grep -q "package.json"; then
+    PACKAGE_CHANGED=true
+    warning "package.json has staged changes - npm install will run on server"
+fi
 
-# 9. Setează permisiunile corecte
-log "Setez permisiunile..."
-find $PROJECT_DIR -type f -exec chmod 644 {} \;
-find $PROJECT_DIR -type d -exec chmod 755 {} \;
-chmod -R 775 $PROJECT_DIR/storage
-chmod -R 775 $PROJECT_DIR/bootstrap/cache
+# Step 3: Add all changes
+info "Staging all changes..."
+git add .
+log "Changes staged"
 
-# 10. Verifică statusul serviciilor
-log "Verific statusul serviciilor..."
-systemctl status nginx --no-pager -l
-systemctl status php8.2-fpm --no-pager -l
+# Step 4: Commit changes
+info "Committing changes with message: '$COMMIT_MESSAGE'"
+if git commit -m "$COMMIT_MESSAGE"; then
+    log "Changes committed successfully"
+else
+    # Check if commit failed because there were no changes
+    if [ $? -eq 1 ]; then
+        warning "Nothing to commit (working tree clean)"
+    else
+        error "Commit failed"
+        exit 1
+    fi
+fi
 
-# 11. Afișează informații finale
+# Step 5: Push to GitHub
+info "Pushing to GitHub ($BRANCH branch)..."
+if git push origin $BRANCH; then
+    log "Successfully pushed to GitHub"
+else
+    error "Failed to push to GitHub"
+    exit 1
+fi
+
 echo ""
-echo "🎉 Deployment finalizat cu succes!"
-echo "=================================="
-echo "📁 Proiect instalat în: $PROJECT_DIR"
-echo "🌐 Domain configurat: $DOMAIN"
-echo "🔧 Configurație Nginx: $NGINX_SITES/$DOMAIN"
-echo ""
-echo "📝 Pași următori:"
-echo "1. Configurează DNS-ul să pointeze către acest server"
-echo "2. Pentru SSL: sudo certbot --nginx -d $DOMAIN"
-echo "3. Pentru a activa aplicația Laravel, șterge /maintenance.html"
-echo ""
-echo "🔍 Verifică site-ul la: http://$DOMAIN"
+echo "╔═══════════════════════════════════════╗"
+echo "║      Deploying to Server...           ║"
+echo "╚═══════════════════════════════════════╝"
 echo ""
 
-# Afișează IP-ul serverului
-EXTERNAL_IP=$(curl -s ifconfig.me)
-echo "📡 IP extern al serverului: $EXTERNAL_IP"
-echo "💡 Dacă nu ai DNS configurat, poți testa la: http://$EXTERNAL_IP"
+# Step 6: SSH into server and deploy
+info "Connecting to server $SERVER_HOST..."
 
+# Create deployment commands
+DEPLOY_COMMANDS="
+cd $PROJECT_PATH || exit 1;
+echo '→ Pulling latest changes...';
+sudo -u www-data git pull origin $BRANCH;
+if [ \$? -eq 0 ]; then
+    echo '✓ Git pull successful';
+else
+    echo '✗ Git pull failed' >&2;
+    exit 1;
+fi;
+"
 
+# Add npm install if package.json changed
+if [ "$PACKAGE_CHANGED" = true ]; then
+    DEPLOY_COMMANDS+="
+echo '→ Running npm install...';
+sudo -u www-data npm install;
+if [ \$? -eq 0 ]; then
+    echo '✓ npm install successful';
+else
+    echo '✗ npm install failed' >&2;
+    exit 1;
+fi;
+"
+fi
 
+# Add nginx restart
+DEPLOY_COMMANDS+="
+echo '→ Restarting nginx...';
+sudo systemctl restart nginx;
+if [ \$? -eq 0 ]; then
+    echo '✓ Nginx restarted successfully';
+else
+    echo '✗ Nginx restart failed' >&2;
+    exit 1;
+fi;
+echo '';
+echo '✓ Deployment completed successfully!';
+"
+
+# Execute deployment via SSH
+if ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" "$DEPLOY_COMMANDS"; then
+    echo ""
+    log "Deployment completed successfully!"
+    echo ""
+    echo "╔═══════════════════════════════════════╗"
+    echo "║      Deployment Summary               ║"
+    echo "╚═══════════════════════════════════════╝"
+    echo "✓ Committed: $COMMIT_MESSAGE"
+    echo "✓ Pushed to: GitHub ($BRANCH)"
+    echo "✓ Deployed to: $SERVER_HOST"
+    echo "✓ Project path: $PROJECT_PATH"
+    if [ "$PACKAGE_CHANGED" = true ]; then
+        echo "✓ npm packages updated"
+    fi
+    echo "✓ Nginx restarted"
+    echo ""
+else
+    echo ""
+    error "Deployment to server failed!"
+    echo "Please check server connection and permissions"
+    exit 1
+fi
