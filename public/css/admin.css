@@ -106,11 +106,11 @@
 
 /* Fix modal z-index conflicts */
 .modal {
-  z-index: 1060 !important;
+  z-index: 9999 !important;
 }
 
 .modal-backdrop {
-  z-index: 1055 !important;
+  z-index: 9998 !important;
 }
 
 /* Fix modal backdrop blocking clicks */
@@ -139,7 +139,11 @@
 
 /* Ensure modal appears above navbar */
 .modal {
-  z-index: 1070 !important;
+  z-index: 9999 !important;
+}
+
+.modal-backdrop {
+  z-index: 9998 !important;
 }
 
 /* Perfect modal centering */
@@ -151,6 +155,13 @@
   margin: 0 !important;
   max-height: calc(100vh - 56px) !important;
   overflow-y: auto !important;
+  z-index: 10000 !important;
+}
+
+/* Force modal content above everything */
+.modal.show .modal-content {
+  z-index: 10001 !important;
+  position: relative !important;
 }
 
 /* Modal without backdrop styling */
