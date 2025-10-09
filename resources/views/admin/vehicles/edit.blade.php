@@ -33,6 +33,7 @@
 
     <form action="{{ route('admin.vehicles.update', $vehicle['slug']) }}" method="post" enctype="multipart/form-data" class="row g-4">
       @csrf
+      <input type="hidden" name="redirect_to" value="{{ route('admin.vehicles.index') }}">
 
       <div class="col-lg-8">
         <!-- Basic Information -->

@@ -6,6 +6,16 @@
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <title>@yield('title', 'MOTORCLASS')</title>
     <meta name="description" content="@yield('description', 'MOTORCLASS - Vehículos premium')" />
+    <!-- Open Graph / Twitter placeholders -->
+    <meta property="og:title" content="@yield('og:title', View::yieldContent('title', 'MOTORCLASS'))">
+    <meta property="og:description" content="@yield('og:description', View::yieldContent('description', 'MOTORCLASS - Vehículos premium'))">
+    <meta property="og:type" content="@yield('og:type', 'website')">
+    <meta property="og:url" content="@yield('og:url', url()->current())">
+    <meta property="og:image" content="@yield('og:image', asset('images/logo-motorclass.png'))">
+    <meta name="twitter:card" content="@yield('twitter:card', 'summary_large_image')">
+    <meta name="twitter:title" content="@yield('twitter:title', View::yieldContent('title', 'MOTORCLASS'))">
+    <meta name="twitter:description" content="@yield('twitter:description', View::yieldContent('description', 'MOTORCLASS - Vehículos premium'))">
+    <meta name="twitter:image" content="@yield('twitter:image', asset('images/logo-motorclass.png'))">
 
     <!-- Bootstrap only (no Vite) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">

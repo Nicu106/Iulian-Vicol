@@ -4,6 +4,7 @@
 
 @push('styles')
 <style>
+  /* Mobile-first responsive styles */
   .admin-card { border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
   .status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
   .status-available { background: #dcfce7; color: #166534; }
@@ -20,27 +21,52 @@
   .price-offer { color: #dc2626; }
   .price-original { text-decoration: line-through; color: #6b7280; font-size: 0.9rem; }
   .stats-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; }
-  .stats-number { font-size: 2.5rem; font-weight: 700; }
-  .quick-actions { background: #f8fafc; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
-  .filter-section { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .stats-number { font-size: 2rem; font-weight: 700; }
+  .quick-actions { background: #f8fafc; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; }
+  .filter-section { background: white; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
   .table-container { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  
+  /* Mobile vehicle cards */
+  .vehicle-mobile-card {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .vehicle-mobile-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  }
+  
+  /* Mobile responsive adjustments */
+  @media (max-width: 767.98px) {
+    .stats-number { font-size: 1.5rem; }
+    .quick-actions { padding: 0.75rem; }
+    .filter-section { padding: 0.75rem; }
+    .admin-content { padding-top: 0.5rem; }
+  }
+  
+  /* Tablet adjustments */
+  @media (min-width: 768px) and (max-width: 991.98px) {
+    .stats-number { font-size: 1.75rem; }
+  }
 </style>
 @endpush
 
 @section('content')
-<section class="py-4">
-  <div class="container-fluid">
+<section class="py-2 py-md-4">
+  <div class="container-fluid px-2 px-md-3">
     <!-- Header Section -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <div>
-        <h1 class="h3 mb-1 fw-bold">Gestión de Vehículos</h1>
-        <p class="text-muted mb-0">Administra tu inventario de vehículos de forma eficiente</p>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3 mb-md-4">
+      <div class="mb-2 mb-md-0">
+        <h1 class="h4 h-md-3 mb-1 fw-bold">Gestión de Vehículos</h1>
+        <p class="text-muted mb-0 small">Administra tu inventario de vehículos de forma eficiente</p>
       </div>
-      <div class="d-flex gap-2">
-        <a href="{{ route('admin.vehicles.create') }}" class="btn btn-primary">
+      <div class="d-flex flex-column flex-sm-row gap-2 w-100 w-md-auto">
+        <a href="{{ route('admin.vehicles.create') }}" class="btn btn-primary btn-sm">
           <i class="bi bi-plus-circle me-2"></i>Añadir Vehículo
         </a>
-        <a href="{{ route('home') }}" class="btn btn-outline-secondary">
+        <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-sm">
           <i class="bi bi-eye me-2"></i>Ver Sitio
         </a>
       </div>
@@ -54,36 +80,36 @@
     @endif
 
     <!-- Quick Stats -->
-    <div class="row g-3 mb-4">
-      <div class="col-md-3">
+    <div class="row g-2 g-md-3 mb-3 mb-md-4">
+      <div class="col-6 col-md-3">
         <div class="card stats-card text-center">
-          <div class="card-body">
+          <div class="card-body p-2 p-md-3">
             <div class="stats-number">{{ collect($items)->count() }}</div>
-            <div class="fw-medium">Total Vehículos</div>
+            <div class="fw-medium small">Total Vehículos</div>
           </div>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-6 col-md-3">
         <div class="card stats-card text-center">
-          <div class="card-body">
+          <div class="card-body p-2 p-md-3">
             <div class="stats-number">{{ collect($items)->where('status', 'available')->count() }}</div>
-            <div class="fw-medium">Disponibles</div>
+            <div class="fw-medium small">Disponibles</div>
           </div>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-6 col-md-3">
         <div class="card stats-card text-center">
-          <div class="card-body">
+          <div class="card-body p-2 p-md-3">
             <div class="stats-number">{{ collect($items)->where('featured', true)->count() }}</div>
-            <div class="fw-medium">Destacados</div>
+            <div class="fw-medium small">Destacados</div>
           </div>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-6 col-md-3">
         <div class="card stats-card text-center">
-          <div class="card-body">
+          <div class="card-body p-2 p-md-3">
             <div class="stats-number">{{ collect($items)->where('status', 'sold')->count() }}</div>
-            <div class="fw-medium">Vendidos</div>
+            <div class="fw-medium small">Vendidos</div>
           </div>
         </div>
       </div>
@@ -91,95 +117,96 @@
 
     <!-- Quick Actions -->
     <div class="quick-actions">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="mb-0 fw-bold">Acciones Rápidas</h5>
-        <div class="d-flex gap-2">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-2 mb-md-3">
+        <h6 class="mb-2 mb-md-0 fw-bold">Acciones Rápidas</h6>
+        <div class="d-flex flex-wrap gap-2">
           <button class="btn btn-sm btn-outline-primary" onclick="exportData()">
             <i class="bi bi-download me-1"></i>Exportar
           </button>
           <button class="btn btn-sm btn-outline-info" onclick="showAnalytics()">
-            <i class="bi bi-graph-up me-1"></i>Análisis
+            <i class="bi bi-graph-up me-1"></i>Analíticas
           </button>
         </div>
       </div>
-      <div class="row g-2">
-        <div class="col-auto">
-          <button class="btn btn-sm btn-success" onclick="bulkAction('available')">
-            <i class="bi bi-check-circle me-1"></i>Marcar Disponibles
-          </button>
-        </div>
-        <div class="col-auto">
-          <button class="btn btn-sm btn-warning" onclick="bulkAction('feature')">
-            <i class="bi bi-star me-1"></i>Destacar Seleccionados
-          </button>
-        </div>
-        <div class="col-auto">
-          <button class="btn btn-sm btn-secondary" onclick="bulkAction('draft')">
-            <i class="bi bi-file-earmark me-1"></i>Marcar como Borrador
-          </button>
+      
+      <!-- Bulk Actions -->
+      <div id="bulk-actions" class="d-none">
+        <div class="alert alert-info d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+          <span class="mb-2 mb-md-0"><span id="selected-count">0</span> vehículos seleccionados</span>
+          <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-sm btn-outline-primary" onclick="bulkAction('feature')">
+              <i class="bi bi-star me-1"></i>Destacar
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="bulkAction('unfeature')">
+              <i class="bi bi-star me-1"></i>Quitar destacado
+            </button>
+            <button class="btn btn-sm btn-outline-success" onclick="bulkAction('available')">
+              <i class="bi bi-check-circle me-1"></i>Disponible
+            </button>
+            <button class="btn btn-sm btn-outline-warning" onclick="bulkAction('draft')">
+              <i class="bi bi-file-earmark me-1"></i>Borrador
+            </button>
+            <button class="btn btn-sm btn-outline-danger" onclick="bulkAction('delete')">
+              <i class="bi bi-trash me-1"></i>Eliminar
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Filters Section -->
+    <!-- Filters -->
     <div class="filter-section">
-      <h5 class="mb-3 fw-bold">Filtros y Búsqueda</h5>
-      <form method="GET" class="row g-3">
-        <div class="col-md-4">
-          <label class="form-label fw-medium">Buscar vehículos</label>
-          <div class="input-group">
-            <span class="input-group-text"><i class="bi bi-search"></i></span>
-            <input type="text" name="q" class="form-control" placeholder="Marca, modelo, VIN..." value="{{ $q }}">
-          </div>
+      <form method="get" class="row g-2 g-md-3">
+        <div class="col-12 col-md-3">
+          <label class="form-label fw-medium small">Buscar</label>
+          <input type="text" name="q" class="form-control form-control-sm" placeholder="Marca, modelo..." value="{{ $q }}">
         </div>
-        <div class="col-md-2">
-          <label class="form-label fw-medium">Estado</label>
-          <select name="status" class="form-select">
+        <div class="col-6 col-md-2">
+          <label class="form-label fw-medium small">Estado</label>
+          <select name="status" class="form-select form-select-sm">
             <option value="">Todos</option>
-            <option value="available" {{ request('status') == 'available' ? 'selected' : '' }}>Disponibles</option>
-            <option value="reserved" {{ request('status') == 'reserved' ? 'selected' : '' }}>Reservados</option>
-            <option value="sold" {{ request('status') == 'sold' ? 'selected' : '' }}>Vendidos</option>
-              <option value="maintenance" {{ request('status') == 'maintenance' ? 'selected' : '' }}>En Servicio</option>
-              <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Borrador</option>
-              <option value="clearance" {{ request('status') == 'clearance' ? 'selected' : '' }}>En Liquidación</option>
+            <option value="available" {{ request('status') == 'available' ? 'selected' : '' }}>Disponible</option>
+            <option value="reserved" {{ request('status') == 'reserved' ? 'selected' : '' }}>Reservado</option>
+            <option value="sold" {{ request('status') == 'sold' ? 'selected' : '' }}>Vendido</option>
+            <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Borrador</option>
           </select>
         </div>
-        <div class="col-md-2">
-          <label class="form-label fw-medium">Tipo</label>
-          <select name="featured" class="form-select">
+        <div class="col-6 col-md-2">
+          <label class="form-label fw-medium small">Destacado</label>
+          <select name="featured" class="form-select form-select-sm">
             <option value="">Todos</option>
             <option value="1" {{ request('featured') == '1' ? 'selected' : '' }}>Destacados</option>
             <option value="0" {{ request('featured') == '0' ? 'selected' : '' }}>Normales</option>
           </select>
         </div>
-        <div class="col-md-2">
-          <label class="form-label fw-medium">Ordenar por</label>
-          <select name="sort" class="form-select">
+        <div class="col-6 col-md-2">
+          <label class="form-label fw-medium small">Ordenar</label>
+          <select name="sort" class="form-select form-select-sm">
             <option value="">Más recientes</option>
-            <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Precio: Menor a Mayor</option>
-            <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Precio: Mayor a Menor</option>
+            <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Precio ↑</option>
+            <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Precio ↓</option>
             <option value="views" {{ request('sort') == 'views' ? 'selected' : '' }}>Más Vistos</option>
           </select>
         </div>
-        <div class="col-md-2">
-          <label class="form-label fw-medium">Rango de Precio</label>
-          <select name="price_range" class="form-select">
-            <option value="">Todos los precios</option>
-            <option value="0-10000" {{ request('price_range') == '0-10000' ? 'selected' : '' }}>€0 - €10,000</option>
-            <option value="10000-25000" {{ request('price_range') == '10000-25000' ? 'selected' : '' }}>€10,000 - €25,000</option>
-            <option value="25000-50000" {{ request('price_range') == '25000-50000' ? 'selected' : '' }}>€25,000 - €50,000</option>
-            <option value="50000-100000" {{ request('price_range') == '50000-100000' ? 'selected' : '' }}>€50,000 - €100,000</option>
-            <option value="100000+" {{ request('price_range') == '100000+' ? 'selected' : '' }}>€100,000+</option>
+        <div class="col-6 col-md-2">
+          <label class="form-label fw-medium small">Precio</label>
+          <select name="price_range" class="form-select form-select-sm">
+            <option value="">Todos</option>
+            <option value="0-10000" {{ request('price_range') == '0-10000' ? 'selected' : '' }}>€0-10k</option>
+            <option value="10000-25000" {{ request('price_range') == '10000-25000' ? 'selected' : '' }}>€10k-25k</option>
+            <option value="25000-50000" {{ request('price_range') == '25000-50000' ? 'selected' : '' }}>€25k-50k</option>
+            <option value="50000+" {{ request('price_range') == '50000+' ? 'selected' : '' }}>€50k+</option>
           </select>
         </div>
-        <div class="col-12">
+        <div class="col-12 col-md-1">
+          <label class="form-label fw-medium small d-none d-md-block">&nbsp;</label>
           <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary">
-              <i class="bi bi-search me-2"></i>Buscar
+            <button type="submit" class="btn btn-primary btn-sm flex-fill">
+              <i class="bi bi-search me-1"></i><span class="d-none d-sm-inline">Buscar</span>
             </button>
             @if($q || request('status') || request('featured') || request('sort') || request('price_range'))
-              <a href="{{ route('admin.vehicles.index') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-clockwise me-2"></i>Limpiar Filtros
+              <a href="{{ route('admin.vehicles.index') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-clockwise"></i>
               </a>
             @endif
           </div>
@@ -187,8 +214,8 @@
       </form>
     </div>
 
-    <!-- Vehicles Table -->
-    <div class="table-container">
+    <!-- Desktop Table View -->
+    <div class="table-container d-none d-lg-block">
       <div class="table-responsive">
         <table class="table table-hover mb-0">
           <thead class="table-light">
@@ -255,9 +282,7 @@
                   <div class="price-display">
                     @if($hasOffer)
                       <div class="price-offer">€{{ number_format($extractPrice($v['offer_price']), 0, ',', '.') }}</div>
-                      @if(!empty($v['original_price']))
-                        <div class="price-original">€{{ number_format($extractPrice($v['original_price']), 0, ',', '.') }}</div>
-                      @endif
+                      <div class="price-original">€{{ number_format($extractPrice($v['price']), 0, ',', '.') }}</div>
                     @else
                       €{{ number_format($extractPrice($v['price']), 0, ',', '.') }}
                     @endif
@@ -265,50 +290,36 @@
                 </td>
                 <td>
                   <span class="status-badge status-{{ $v['status'] ?? 'available' }}">
-                    @switch($v['status'] ?? 'available')
-                      @case('available') Disponible @break
-                      @case('reserved') Reservado @break
-                      @case('sold') Vendido @break
-                        @case('maintenance') En Servicio @break
-                        @case('clearance') En Liquidación @break
-                      @case('draft') Borrador @break
-                      @default Desconocido
-                    @endswitch
+                    {{ ucfirst($v['status'] ?? 'available') }}
                   </span>
                 </td>
                 <td>
-                  <span class="fw-bold">{{ $v['views_count'] ?? 0 }}</span>
-                  @if(($v['inquiries_count'] ?? 0) > 0)
-                    <br><small class="text-success">{{ $v['inquiries_count'] }} consultas</small>
-                  @endif
+                  <span class="badge bg-info">{{ $v['views_count'] ?? 0 }}</span>
                 </td>
-                <td class="text-center">
-                  <i class="bi bi-star{{ ($v['featured'] ?? false) ? '-fill featured-star' : '' }} featured-star" 
+                <td>
+                  <i class="featured-star {{ ($v['featured'] ?? false) ? 'bi-star-fill' : 'bi-star' }}" 
                      onclick="toggleFeatured('{{ $v['slug'] }}')" 
-                     title="Toggle destacado"></i>
+                     title="Destacar vehículo"></i>
                 </td>
                 <td>
-                  <div class="small">{{ isset($v['created_at']) ? date('d.m.Y', strtotime($v['created_at'])) : 'N/A' }}</div>
-                  @if(isset($v['sold_date']))
-                    <div class="small text-success">Vendido: {{ date('d.m.Y', strtotime($v['sold_date'])) }}</div>
-                  @endif
+                  <small class="text-muted">
+                    {{ isset($v['created_at']) ? \Carbon\Carbon::parse($v['created_at'])->format('d/m/Y') : 'N/A' }}
+                  </small>
                 </td>
                 <td>
-                  <div class="btn-group btn-group-sm">
-                    <a href="{{ route('admin.vehicles.show', $v['slug']) }}" class="btn btn-outline-primary" title="Ver detalles">
+                  <div class="btn-group btn-group-sm" role="group">
+                    <a href="{{ route('admin.vehicles.show', $v['slug']) }}" class="btn btn-outline-primary btn-sm" title="Ver">
                       <i class="bi bi-eye"></i>
                     </a>
-                    <a href="{{ route('admin.vehicles.edit', $v['slug']) }}" class="btn btn-outline-warning" title="Editar">
+                    <a href="{{ route('admin.vehicles.edit', $v['slug']) }}" class="btn btn-outline-warning btn-sm" title="Editar">
                       <i class="bi bi-pencil"></i>
                     </a>
-                    <button class="btn btn-outline-danger" onclick="confirmDelete('{{ $v['slug'] }}', '{{ $v['title'] ?? ($v['brand'] . ' ' . $v['model']) }}')" title="Eliminar">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </div>
-                  <div class="mt-1">
-                    <a href="{{ route('vehicle.show', $v['slug']) }}" class="btn btn-sm btn-outline-secondary" target="_blank" title="Ver en sitio">
-                      <i class="bi bi-box-arrow-up-right"></i>
-                    </a>
+                    <form method="POST" action="{{ route('admin.vehicles.destroy', $v['slug']) }}" class="d-inline" onsubmit="return confirm('¿Estás seguro?')">
+                      @csrf @method('DELETE')
+                      <button type="submit" class="btn btn-outline-danger btn-sm" title="Eliminar">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </form>
                   </div>
                 </td>
               </tr>
@@ -316,16 +327,12 @@
               <tr>
                 <td colspan="9" class="text-center py-5">
                   <div class="text-muted">
-                    <i class="bi bi-car-front" style="font-size: 4rem; opacity: 0.3;"></i>
-                    <div class="mt-3 h5">No se encontraron vehículos</div>
-                    @if($q)
-                      <div class="small">para la búsqueda "{{ $q }}"</div>
-                    @endif
-                    <div class="mt-3">
-                      <a href="{{ route('admin.vehicles.create') }}" class="btn btn-primary">
-                        <i class="bi bi-plus-circle me-2"></i>Añadir Primer Vehículo
-                      </a>
-                    </div>
+                    <i class="bi bi-car-front fs-1 d-block mb-3"></i>
+                    <h5>No hay vehículos</h5>
+                    <p>No se encontraron vehículos con los filtros aplicados.</p>
+                    <a href="{{ route('admin.vehicles.create') }}" class="btn btn-primary">
+                      <i class="bi bi-plus-circle me-2"></i>Añadir Primer Vehículo
+                    </a>
                   </div>
                 </td>
               </tr>
@@ -335,40 +342,157 @@
       </div>
     </div>
 
-    @if(count($items) > 0)
-      <div class="mt-3 text-muted text-center">
-        <i class="bi bi-info-circle me-2"></i>Mostrando {{ count($items) }} vehículos
+    <!-- Mobile Card View -->
+    <div class="d-lg-none">
+      <!-- Mobile Bulk Actions -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="form-check">
+          <input type="checkbox" id="select-all-mobile" onchange="toggleSelectAllMobile()" class="form-check-input">
+          <label class="form-check-label small" for="select-all-mobile">
+            Seleccionar todos
+          </label>
+        </div>
+        <div id="mobile-bulk-actions" class="d-none">
+          <div class="dropdown">
+            <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              <i class="bi bi-gear me-1"></i>Acciones
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#" onclick="bulkAction('feature')">
+                <i class="bi bi-star me-2"></i>Destacar
+              </a></li>
+              <li><a class="dropdown-item" href="#" onclick="bulkAction('unfeature')">
+                <i class="bi bi-star me-2"></i>Quitar destacado
+              </a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="#" onclick="bulkAction('delete')">
+                <i class="bi bi-trash me-2"></i>Eliminar
+              </a></li>
+            </ul>
+          </div>
+        </div>
       </div>
-    @endif
+
+      <!-- Mobile Vehicle Cards -->
+      @forelse($items as $vehicle)
+        @php
+          $v = is_array($vehicle) ? $vehicle : $vehicle->toArray();
+          $hasOffer = !empty($v['offer_price']) && (!isset($v['offer_expires_at']) || $v['offer_expires_at'] >= date('Y-m-d'));
+          
+          // Helper function to extract numeric price
+          $extractPrice = function($priceStr) {
+            if (is_numeric($priceStr)) return (float) $priceStr;
+            preg_match_all('/\d+/', $priceStr ?? '0', $matches);
+            return $matches[0] ? (float) implode('', $matches[0]) : 0;
+          };
+        @endphp
+        <div class="card mb-3 vehicle-mobile-card">
+          <div class="card-body p-3">
+            <div class="row g-3">
+              <!-- Checkbox and Image -->
+              <div class="col-4">
+                <div class="form-check mb-2">
+                  <input type="checkbox" class="vehicle-checkbox-mobile form-check-input" value="{{ $v['slug'] }}" onchange="updateMobileBulkActions()">
+                </div>
+                @if(!empty($v['cover_image']))
+                  <img src="{{ $v['cover_image'] }}" 
+                       alt="{{ $v['title'] ?? ($v['brand'] . ' ' . $v['model']) }}" 
+                       class="img-fluid rounded"
+                       style="aspect-ratio: 4/3; object-fit: cover;"
+                       loading="lazy"
+                       onerror="handleImageError(this)">
+                @else
+                  <div class="bg-light rounded d-flex align-items-center justify-content-center" style="aspect-ratio: 4/3;">
+                    <i class="bi bi-car-front text-muted fs-2"></i>
+                  </div>
+                @endif
+              </div>
+              
+              <!-- Vehicle Info -->
+              <div class="col-8">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h6 class="card-title mb-0 fw-bold lh-sm">
+                    {{ $v['title'] ?? ($v['brand'] . ' ' . $v['model'] . ' ' . $v['year']) }}
+                  </h6>
+                  <i class="featured-star {{ ($v['featured'] ?? false) ? 'bi-star-fill text-warning' : 'bi-star text-muted' }}" 
+                     onclick="toggleFeatured('{{ $v['slug'] }}')" 
+                     title="Destacar vehículo"></i>
+                </div>
+                
+                <div class="small text-muted mb-2">
+                  {{ $v['year'] }} • {{ $v['mileage'] ?? 'N/A' }} km • {{ $v['fuel'] ?? 'N/A' }}
+                </div>
+                
+                <!-- Price -->
+                <div class="price-display mb-2">
+                  @if($hasOffer)
+                    <div class="price-offer fw-bold">€{{ number_format($extractPrice($v['offer_price']), 0, ',', '.') }}</div>
+                    <div class="price-original small">€{{ number_format($extractPrice($v['price']), 0, ',', '.') }}</div>
+                  @else
+                    <div class="fw-bold">€{{ number_format($extractPrice($v['price']), 0, ',', '.') }}</div>
+                  @endif
+                </div>
+                
+                <!-- Status and Stats -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <span class="status-badge status-{{ $v['status'] ?? 'available' }} me-2">
+                      {{ ucfirst($v['status'] ?? 'available') }}
+                    </span>
+                    <span class="badge bg-info">{{ $v['views_count'] ?? 0 }}</span>
+                  </div>
+                  <small class="text-muted">
+                    {{ isset($v['created_at']) ? \Carbon\Carbon::parse($v['created_at'])->format('d/m/Y') : 'N/A' }}
+                  </small>
+                </div>
+                
+                <!-- Badges -->
+                @if(!empty($v['badges']) && is_array($v['badges']))
+                  <div class="mb-3">
+                    @foreach($v['badges'] as $badge)
+                      <span class="badge bg-primary me-1">{{ $badge }}</span>
+                    @endforeach
+                  </div>
+                @endif
+                
+                <!-- Actions -->
+                <div class="d-flex gap-1">
+                  <a href="{{ route('admin.vehicles.show', $v['slug']) }}" class="btn btn-outline-primary btn-sm flex-fill">
+                    <i class="bi bi-eye me-1"></i><span class="d-none d-sm-inline">Ver</span>
+                  </a>
+                  <a href="{{ route('admin.vehicles.edit', $v['slug']) }}" class="btn btn-outline-warning btn-sm flex-fill">
+                    <i class="bi bi-pencil me-1"></i><span class="d-none d-sm-inline">Editar</span>
+                  </a>
+                  <form method="POST" action="{{ route('admin.vehicles.destroy', $v['slug']) }}" class="flex-fill" onsubmit="return confirm('¿Estás seguro?')">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+                      <i class="bi bi-trash me-1"></i><span class="d-none d-sm-inline">Eliminar</span>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      @empty
+        <div class="text-center py-5">
+          <div class="text-muted">
+            <i class="bi bi-car-front fs-1 d-block mb-3"></i>
+            <h5>No hay vehículos</h5>
+            <p>No se encontraron vehículos con los filtros aplicados.</p>
+            <a href="{{ route('admin.vehicles.create') }}" class="btn btn-primary">
+              <i class="bi bi-plus-circle me-2"></i>Añadir Primer Vehículo
+            </a>
+          </div>
+        </div>
+      @endforelse
+    </div>
   </div>
 </section>
 
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Confirmar Eliminación</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <p>¿Estás seguro de que quieres eliminar el vehículo <strong id="delete-vehicle-name"></strong>?</p>
-        <p class="text-danger small">¡Esta acción no se puede deshacer!</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <form id="delete-form" method="POST" style="display: inline;">
-          @csrf
-          @method('DELETE')
-          <button type="submit" class="btn btn-danger">Eliminar Vehículo</button>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
 @push('scripts')
 <script>
+// Enhanced mobile-friendly JavaScript
 function toggleSelectAll() {
   const selectAll = document.getElementById('select-all');
   const checkboxes = document.querySelectorAll('.vehicle-checkbox');
@@ -376,89 +500,114 @@ function toggleSelectAll() {
   updateBulkActions();
 }
 
-function updateBulkActions() {
-  const checked = document.querySelectorAll('.vehicle-checkbox:checked');
-  // Show/hide bulk action buttons based on selection
-  const bulkButtons = document.querySelectorAll('.quick-actions button[onclick*="bulkAction"]');
-  bulkButtons.forEach(btn => {
-    btn.style.opacity = checked.length > 0 ? '1' : '0.5';
-    btn.disabled = checked.length === 0;
-  });
+function toggleSelectAllMobile() {
+  const selectAll = document.getElementById('select-all-mobile');
+  const checkboxes = document.querySelectorAll('.vehicle-checkbox-mobile');
+  checkboxes.forEach(cb => cb.checked = selectAll.checked);
+  updateMobileBulkActions();
 }
 
-function confirmDelete(slug, name) {
-  document.getElementById('delete-vehicle-name').textContent = name;
-  document.getElementById('delete-form').action = `/admin/vehicles/${slug}`;
-  new bootstrap.Modal(document.getElementById('deleteModal')).show();
+function updateBulkActions() {
+  const checkboxes = document.querySelectorAll('.vehicle-checkbox:checked');
+  const bulkActions = document.getElementById('bulk-actions');
+  const selectedCount = document.getElementById('selected-count');
+  
+  if (checkboxes.length > 0) {
+    bulkActions.classList.remove('d-none');
+    selectedCount.textContent = checkboxes.length;
+  } else {
+    bulkActions.classList.add('d-none');
+  }
+}
+
+function updateMobileBulkActions() {
+  const checkboxes = document.querySelectorAll('.vehicle-checkbox-mobile:checked');
+  const bulkActions = document.getElementById('mobile-bulk-actions');
+  
+  if (checkboxes.length > 0) {
+    bulkActions.classList.remove('d-none');
+  } else {
+    bulkActions.classList.add('d-none');
+  }
 }
 
 function toggleFeatured(slug) {
   fetch(`/admin/vehicles/${slug}/toggle-featured`, {
     method: 'POST',
     headers: {
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-      'Content-Type': 'application/json'
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+      'Content-Type': 'application/json',
     }
-  }).then(response => {
-    if (response.ok) {
-      location.reload();
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      const stars = document.querySelectorAll(`[onclick="toggleFeatured('${slug}')"]`);
+      stars.forEach(star => {
+        if (data.featured) {
+          star.classList.remove('bi-star');
+          star.classList.add('bi-star-fill', 'text-warning');
+        } else {
+          star.classList.remove('bi-star-fill', 'text-warning');
+          star.classList.add('bi-star');
+        }
+      });
     }
-  });
+  })
+  .catch(error => console.error('Error:', error));
 }
 
 function bulkAction(action) {
-  const selected = Array.from(document.querySelectorAll('.vehicle-checkbox:checked')).map(cb => cb.value);
-  if (selected.length === 0) {
-    alert('Por favor selecciona al menos un vehículo');
+  const checkboxes = document.querySelectorAll('.vehicle-checkbox:checked, .vehicle-checkbox-mobile:checked');
+  const slugs = Array.from(checkboxes).map(cb => cb.value);
+  
+  if (slugs.length === 0) {
+    alert('Selecciona al menos un vehículo');
     return;
   }
   
-  if (action === 'delete' && !confirm(`¿Eliminar ${selected.length} vehículos?`)) return;
+  if (action === 'delete' && !confirm(`¿Estás seguro de eliminar ${slugs.length} vehículo(s)?`)) {
+    return;
+  }
   
   fetch('/admin/vehicles/bulk-action', {
     method: 'POST',
     headers: {
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-      'Content-Type': 'application/json'
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+      'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ action, slugs: selected })
-  }).then(response => {
-    if (response.ok) {
+    body: JSON.stringify({ action, slugs })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
       location.reload();
+    } else {
+      alert('Error al realizar la acción');
     }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Error al realizar la acción');
   });
 }
 
 function handleImageError(img) {
-  console.log('Image failed to load:', img.src);
   img.style.display = 'none';
-  const placeholder = img.parentElement.querySelector('.vehicle-thumb-placeholder');
+  const placeholder = img.parentElement.querySelector('.vehicle-thumb-placeholder') || 
+                     img.parentElement.parentElement.querySelector('.bg-light');
   if (placeholder) {
     placeholder.style.display = 'flex';
   }
 }
 
 function exportData() {
-  // Implement export functionality
-  alert('Función de exportación en desarrollo');
+  window.location.href = '/admin/vehicles/export-pricing?format=csv';
 }
 
 function showAnalytics() {
-  // Implement analytics functionality
-  alert('Función de análisis en desarrollo');
+  window.location.href = '/admin/vehicles/pricing-analytics';
 }
-
-// Initialize
-document.addEventListener('DOMContentLoaded', function() {
-  const images = document.querySelectorAll('.vehicle-thumb');
-  images.forEach(img => {
-    img.addEventListener('error', function() {
-      handleImageError(this);
-    });
-  });
-  
-  updateBulkActions();
-});
 </script>
 @endpush
 @endsection

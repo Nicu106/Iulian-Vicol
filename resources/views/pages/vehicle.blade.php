@@ -1,5 +1,30 @@
 @extends('layouts.app')
-@section('title', $vehicle->title ?? ($vehicle->brand . ' ' . $vehicle->model . ' ' . $vehicle->year))
+@php
+  $baseTitle = $vehicle->title ?? ($vehicle->brand . ' ' . $vehicle->model . ' ' . $vehicle->year);
+  $pageTitle = $vehicle->meta_title ?: $baseTitle;
+  $fallbackDescParts = [];
+  if (!empty($vehicle->year)) { $fallbackDescParts[] = (string)$vehicle->year; }
+  if (!empty($vehicle->brand)) { $fallbackDescParts[] = (string)$vehicle->brand; }
+  if (!empty($vehicle->model)) { $fallbackDescParts[] = (string)$vehicle->model; }
+  if (!empty($vehicle->mileage)) { $fallbackDescParts[] = (is_numeric($vehicle->mileage) ? number_format($vehicle->mileage) : (string)$vehicle->mileage) . ' km'; }
+  if (!empty($vehicle->fuel)) { $fallbackDescParts[] = (string)$vehicle->fuel; }
+  if (!empty($vehicle->transmission)) { $fallbackDescParts[] = (string)$vehicle->transmission; }
+  if (!empty($vehicle->location)) { $fallbackDescParts[] = 'Locație: ' . (string)$vehicle->location; }
+  $fallbackDesc = trim(implode(' • ', $fallbackDescParts));
+  $pageDescription = $vehicle->meta_description ?: ($fallbackDesc ?: 'Vehicul disponibil la MOTORCLASS.');
+  $ogImage = $vehicle->cover_image ?: (file_exists(public_path('images/logo-motorclass.png')) ? asset('images/logo-motorclass.png') : asset('favicon.ico'));
+  $canonicalUrl = route('vehicle.show', $vehicle->slug);
+@endphp
+@section('title', $pageTitle)
+@section('description', $pageDescription)
+@section('og:title', $pageTitle)
+@section('og:description', $pageDescription)
+@section('og:type', 'product')
+@section('og:url', $canonicalUrl)
+@section('og:image', $ogImage)
+@section('twitter:title', $pageTitle)
+@section('twitter:description', $pageDescription)
+@section('twitter:image', $ogImage)
 
 @php
   $extractPrice = function($priceStr) {
@@ -16,7 +41,7 @@
       return $matches[0] ? (float) implode('', $matches[0]) : 0.0;
   };
   
-  $title = $vehicle->title ?? ($vehicle->brand . ' ' . $vehicle->model . ' ' . $vehicle->year);
+  $title = $baseTitle;
   $displayPrice = $vehicle->has_active_offer ? $vehicle->offer_price : $vehicle->price;
   $originalPrice = $vehicle->has_active_offer ? $vehicle->price : null;
 @endphp
@@ -600,6 +625,31 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+</script>
+<!-- JSON-LD Vehicle Schema -->
+<script type="application/ld+json">
+{!! json_encode([
+  '@context' => 'https://schema.org',
+  '@type' => 'Vehicle',
+  'name' => $pageTitle,
+  'brand' => $vehicle->brand ?? null,
+  'model' => $vehicle->model ?? null,
+  'vehicleModelDate' => $vehicle->year ?? null,
+  'description' => $pageDescription,
+  'image' => $ogImage,
+  'mileageFromOdometer' => !empty($vehicle->mileage) ? [
+    '@type' => 'QuantitativeValue',
+    'value' => is_numeric($vehicle->mileage) ? (int)$vehicle->mileage : null,
+    'unitCode' => 'KM'
+  ] : null,
+  'offers' => [
+    '@type' => 'Offer',
+    'price' => $displayPrice ?? null,
+    'priceCurrency' => 'EUR',
+    'availability' => ($vehicle->status ?? 'available') === 'sold' ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
+    'url' => $canonicalUrl
+  ]
+], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT) !!}
 </script>
 @endpush
 @endsection

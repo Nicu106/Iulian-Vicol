@@ -4,30 +4,39 @@
 
 @push('styles')
 <style>
+  /* Mobile-first responsive dashboard styles */
   .dashboard-card { 
-    border-radius: 16px; 
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+    border-radius: 12px; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
     border: none;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin-bottom: 1rem;
   }
+  
   .dashboard-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
   }
+  
   .stats-number { 
-    font-size: 2.5rem; 
+    font-size: 1.75rem; 
     font-weight: 700; 
     line-height: 1;
   }
+  
   .stats-label {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 500;
+    opacity: 0.9;
+    margin-top: 0.25rem;
+  }
+  
+  .stats-icon {
+    font-size: 1.5rem;
     opacity: 0.8;
   }
-  .stats-icon {
-    font-size: 2rem;
-    opacity: 0.7;
-  }
+  
+  /* Gradient backgrounds */
   .card-gradient-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
   .card-gradient-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
   .card-gradient-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
@@ -38,69 +47,143 @@
   .quick-action-card {
     background: white;
     border-radius: 12px;
-    padding: 1.5rem;
+    padding: 1rem;
     text-align: center;
     transition: all 0.2s ease;
     border: 1px solid #e9ecef;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
+  
   .quick-action-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
     border-color: #007bff;
   }
+  
   .quick-action-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
     opacity: 0.8;
   }
   
   .recent-activity {
     background: white;
     border-radius: 12px;
-    padding: 1.5rem;
+    padding: 1rem;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    height: 100%;
   }
   
   .activity-item {
     padding: 0.75rem 0;
     border-bottom: 1px solid #f1f3f4;
   }
+  
   .activity-item:last-child {
     border-bottom: none;
   }
   
   .activity-icon {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  
+  /* Mobile responsive adjustments */
+  @media (max-width: 767.98px) {
+    .stats-number { 
+      font-size: 1.5rem; 
+    }
+    
+    .stats-label {
+      font-size: 0.8rem;
+    }
+    
+    .stats-icon {
+      font-size: 1.25rem;
+    }
+    
+    .quick-action-card {
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    
+    .quick-action-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .recent-activity {
+      padding: 0.75rem;
+    }
+    
+    .activity-icon {
+      width: 32px;
+      height: 32px;
+      font-size: 0.9rem;
+    }
+    
+    .dashboard-card .card-body {
+      padding: 1rem;
+    }
+  }
+  
+  /* Tablet adjustments */
+  @media (min-width: 768px) and (max-width: 991.98px) {
+    .stats-number { 
+      font-size: 1.6rem; 
+    }
+    
+    .quick-action-icon {
+      font-size: 1.75rem;
+    }
+  }
+  
+  /* Desktop adjustments */
+  @media (min-width: 992px) {
+    .stats-number { 
+      font-size: 2rem; 
+    }
+    
+    .quick-action-icon {
+      font-size: 2.25rem;
+    }
+    
+    .recent-activity {
+      padding: 1.5rem;
+    }
   }
 </style>
 @endpush
 
 @section('content')
-<section class="py-4">
-  <div class="container-fluid">
+<section class="py-2 py-md-4">
+  <div class="container-fluid px-2 px-md-3">
     <!-- Welcome Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <div>
-        <h1 class="h3 mb-1 fw-bold">¡Bienvenido al Panel de Administración!</h1>
-        <p class="text-muted mb-0">Gestiona tu concesionario de forma eficiente</p>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3 mb-md-4">
+      <div class="mb-2 mb-md-0">
+        <h1 class="h4 h-md-3 mb-1 fw-bold">¡Bienvenido al Panel de Administración!</h1>
+        <p class="text-muted mb-0 small">Gestiona tu concesionario de forma eficiente</p>
       </div>
-      <div class="text-end">
+      <div class="text-start text-md-end">
         <div class="small text-muted">Última actualización</div>
         <div class="fw-medium">{{ now()->format('d/m/Y H:i') }}</div>
       </div>
     </div>
 
     <!-- Main Statistics -->
-    <div class="row g-4 mb-4">
-      <div class="col-md-3">
+    <div class="row g-2 g-md-4 mb-3 mb-md-4">
+      <div class="col-6 col-md-3">
         <div class="card dashboard-card card-gradient-1">
-          <div class="card-body">
+          <div class="card-body p-2 p-md-3">
             <div class="d-flex justify-content-between align-items-start">
               <div>
                 <div class="stats-number">{{ $totalVehicles ?? 0 }}</div>
@@ -113,9 +196,9 @@
           </div>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-6 col-md-3">
         <div class="card dashboard-card card-gradient-2">
-          <div class="card-body">
+          <div class="card-body p-2 p-md-3">
             <div class="d-flex justify-content-between align-items-start">
               <div>
                 <div class="stats-number">{{ $availableVehicles ?? 0 }}</div>
@@ -128,9 +211,9 @@
           </div>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-6 col-md-3">
         <div class="card dashboard-card card-gradient-3">
-          <div class="card-body">
+          <div class="card-body p-2 p-md-3">
             <div class="d-flex justify-content-between align-items-start">
               <div>
                 <div class="stats-number">{{ $totalInquiries ?? 0 }}</div>
@@ -143,9 +226,9 @@
           </div>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-6 col-md-3">
         <div class="card dashboard-card card-gradient-4">
-          <div class="card-body">
+          <div class="card-body p-2 p-md-3">
             <div class="d-flex justify-content-between align-items-start">
               <div>
                 <div class="stats-number">{{ $soldVehicles ?? 0 }}</div>
@@ -161,10 +244,10 @@
     </div>
 
     <!-- Secondary Statistics -->
-    <div class="row g-4 mb-4">
-      <div class="col-md-4">
+    <div class="row g-2 g-md-4 mb-3 mb-md-4">
+      <div class="col-12 col-md-4">
         <div class="card dashboard-card card-gradient-5">
-          <div class="card-body">
+          <div class="card-body p-2 p-md-3">
             <div class="d-flex justify-content-between align-items-start">
               <div>
                 <div class="stats-number">{{ $featuredVehicles ?? 0 }}</div>
@@ -177,9 +260,9 @@
           </div>
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-12 col-md-4">
         <div class="card dashboard-card card-gradient-6">
-          <div class="card-body">
+          <div class="card-body p-2 p-md-3">
             <div class="d-flex justify-content-between align-items-start">
               <div>
                 <div class="stats-number">{{ $pendingSellCars ?? 0 }}</div>
@@ -192,9 +275,9 @@
           </div>
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-12 col-md-4">
         <div class="card dashboard-card card-gradient-1">
-          <div class="card-body">
+          <div class="card-body p-2 p-md-3">
             <div class="d-flex justify-content-between align-items-start">
               <div>
                 <div class="stats-number">{{ $totalMessages ?? 0 }}</div>
@@ -210,73 +293,73 @@
     </div>
 
     <!-- Quick Actions -->
-    <div class="row g-4 mb-4">
+    <div class="row g-2 g-md-4 mb-3 mb-md-4">
       <div class="col-12">
-        <h4 class="fw-bold mb-3">Acciones Rápidas</h4>
+        <h5 class="h6 h-md-4 fw-bold mb-2 mb-md-3">Acciones Rápidas</h5>
       </div>
-      <div class="col-md-2">
+      <div class="col-6 col-md-4 col-lg-2">
         <a href="{{ route('admin.vehicles.create') }}" class="text-decoration-none">
           <div class="quick-action-card">
             <div class="quick-action-icon text-primary">
               <i class="bi bi-plus-circle"></i>
             </div>
-            <h6 class="fw-bold">Añadir Vehículo</h6>
-            <p class="small text-muted mb-0">Agregar nuevo vehículo al inventario</p>
+            <h6 class="fw-bold small">Añadir Vehículo</h6>
+            <p class="small text-muted mb-0 d-none d-md-block">Agregar nuevo vehículo al inventario</p>
           </div>
         </a>
       </div>
-      <div class="col-md-2">
+      <div class="col-6 col-md-4 col-lg-2">
         <a href="{{ route('admin.vehicles.index') }}" class="text-decoration-none">
           <div class="quick-action-card">
             <div class="quick-action-icon text-info">
               <i class="bi bi-list-ul"></i>
             </div>
-            <h6 class="fw-bold">Gestionar Vehículos</h6>
-            <p class="small text-muted mb-0">Ver y editar inventario</p>
+            <h6 class="fw-bold small">Gestionar Vehículos</h6>
+            <p class="small text-muted mb-0 d-none d-md-block">Ver y editar inventario</p>
           </div>
         </a>
       </div>
-      <div class="col-md-2">
+      <div class="col-6 col-md-4 col-lg-2">
         <a href="{{ route('admin.sell-cars.index') }}" class="text-decoration-none">
           <div class="quick-action-card">
             <div class="quick-action-icon text-warning">
               <i class="bi bi-car-front"></i>
             </div>
-            <h6 class="fw-bold">Coches para Vender</h6>
-            <p class="small text-muted mb-0">Revisar solicitudes de venta</p>
+            <h6 class="fw-bold small">Coches para Vender</h6>
+            <p class="small text-muted mb-0 d-none d-md-block">Revisar solicitudes de venta</p>
           </div>
         </a>
       </div>
-      <div class="col-md-2">
+      <div class="col-6 col-md-4 col-lg-2">
         <a href="{{ route('admin.inquiries.index') }}" class="text-decoration-none">
           <div class="quick-action-card">
             <div class="quick-action-icon text-success">
               <i class="bi bi-chat-dots"></i>
             </div>
-            <h6 class="fw-bold">Consultas</h6>
-            <p class="small text-muted mb-0">Ver solicitudes de prueba</p>
+            <h6 class="fw-bold small">Consultas</h6>
+            <p class="small text-muted mb-0 d-none d-md-block">Ver solicitudes de prueba</p>
           </div>
         </a>
       </div>
-      <div class="col-md-2">
+      <div class="col-6 col-md-4 col-lg-2">
         <a href="{{ route('admin.contacts.index') }}" class="text-decoration-none">
           <div class="quick-action-card">
             <div class="quick-action-icon text-danger">
               <i class="bi bi-envelope-open"></i>
             </div>
-            <h6 class="fw-bold">Mensajes</h6>
-            <p class="small text-muted mb-0">Revisar mensajes de contacto</p>
+            <h6 class="fw-bold small">Mensajes</h6>
+            <p class="small text-muted mb-0 d-none d-md-block">Revisar mensajes de contacto</p>
           </div>
         </a>
       </div>
-      <div class="col-md-2">
+      <div class="col-6 col-md-4 col-lg-2">
         <a href="{{ route('home') }}" class="text-decoration-none" target="_blank">
           <div class="quick-action-card">
             <div class="quick-action-icon text-secondary">
               <i class="bi bi-eye"></i>
             </div>
-            <h6 class="fw-bold">Ver Sitio</h6>
-            <p class="small text-muted mb-0">Abrir sitio web</p>
+            <h6 class="fw-bold small">Ver Sitio</h6>
+            <p class="small text-muted mb-0 d-none d-md-block">Abrir sitio web</p>
           </div>
         </a>
       </div>

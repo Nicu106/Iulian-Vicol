@@ -518,6 +518,12 @@ class VehicleController extends BaseController
             $this->writeStore($items);
         }
 
+        // Allow explicit redirect target from form (e.g., back to list)
+        if ($request->filled('redirect_to')) {
+            return redirect($request->input('redirect_to'))
+                ->with('status', 'Vehicul actualizat cu succes');
+        }
+
         return redirect()->route('admin.vehicles.index')->with('status', 'Vehicul actualizat cu succes');
     }
 

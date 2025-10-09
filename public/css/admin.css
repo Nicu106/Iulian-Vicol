@@ -1,7 +1,183 @@
-.admin-header { min-height: 56px; }
-.admin-shell { padding-top: 56px; }
-.admin-sidebar { min-height: 100vh; position: sticky; top: 56px; }
-.admin-sidebar .nav-link { color: #111827; border-radius: 8px; padding: .5rem .75rem; display: flex; align-items: center; gap: .5rem; }
-.admin-sidebar .nav-link:hover { background: #f3f4f6; }
-.admin-content { padding-top: 1rem; }
+/* Admin Layout - Mobile First */
+.admin-header { 
+  min-height: 56px; 
+  z-index: 1040 !important;
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background-color: #212529 !important;
+}
+
+/* Safe area support for iOS notch */
+.admin-header { padding-top: constant(safe-area-inset-top); padding-top: env(safe-area-inset-top); }
+.admin-layout { padding-top: calc(56px + env(safe-area-inset-top)); }
+
+/* Remove extra top padding; body.admin-layout handles spacing for fixed header */
+.admin-shell { 
+  padding-top: 0; 
+  margin-top: 0;
+}
+
+/* Desktop Sidebar */
+.admin-sidebar { 
+  min-height: 100vh; 
+  position: sticky; 
+  top: 56px; 
+}
+
+.admin-sidebar .nav-link { 
+  color: #111827; 
+  border-radius: 8px; 
+  padding: .5rem .75rem; 
+  display: flex; 
+  align-items: center; 
+  gap: .5rem; 
+  transition: all 0.2s ease;
+}
+
+.admin-sidebar .nav-link:hover { 
+  background: #f3f4f6; 
+  color: #111827;
+}
+
+.admin-sidebar .nav-link.active {
+  background: #3b82f6;
+  color: white;
+}
+
+/* Mobile Navigation */
+.admin-mobile-nav {
+  padding: 0;
+}
+
+.admin-mobile-nav .nav-section {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1rem 0;
+}
+
+.admin-mobile-nav .nav-section:last-child {
+  border-bottom: none;
+}
+
+.admin-mobile-nav .nav-section-title {
+  color: #6b7280;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  padding: 0 1rem;
+}
+
+.admin-mobile-nav .nav-link {
+  color: #374151;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 0;
+  transition: all 0.2s ease;
+}
+
+.admin-mobile-nav .nav-link:hover {
+  background: #f9fafb;
+  color: #374151;
+}
+
+.admin-mobile-nav .nav-link.active {
+  background: #3b82f6;
+  color: white;
+}
+
+.admin-mobile-nav .nav-link i {
+  width: 20px;
+  text-align: center;
+}
+
+/* Offcanvas specific styles */
+.offcanvas {
+  z-index: 1050 !important;
+}
+
+.offcanvas-backdrop {
+  z-index: 1049 !important;
+}
+
+/* Ensure navbar stays visible */
+.navbar {
+  z-index: 1041 !important;
+}
+
+.navbar-brand {
+  z-index: 1042 !important;
+}
+
+/* Admin body top padding to account for fixed header (keeps iOS safe-area) */
+.admin-layout { padding-top: calc(56px + env(safe-area-inset-top)) !important; }
+
+.admin-shell {
+  position: relative;
+  z-index: 1;
+}
+
+/* Content Area */
+.admin-content { 
+  padding-top: 1rem; 
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 767.98px) {
+  .admin-content { padding-left: 0.5rem; padding-right: 0.5rem; padding-top: 1rem; }
+  .admin-shell { padding-left: 0; padding-right: 0; }
+  .admin-header .navbar-brand { font-size: 1rem; display: flex; align-items: center; }
+  .admin-header .btn { padding: 0.25rem 0.5rem; min-width: 40px; min-height: 40px; display: flex; align-items: center; justify-content: center; }
+  .navbar-toggler { border: none; padding: 0.5rem; min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); border-radius: 6px; transition: background 0.2s ease; }
+  .navbar-toggler:hover, .navbar-toggler:focus { background: rgba(255,255,255,0.2); box-shadow: none; }
+  /* Forms: avoid iOS zoom, larger tap targets */
+  .form-control, .form-select { font-size: 16px; }
+  .btn { min-height: 44px; }
+  /* Tables: enable horizontal scroll when needed */
+  .table-responsive { -webkit-overflow-scrolling: touch; }
+  .table-responsive > .table td, .table-responsive > .table th { white-space: nowrap; }
+
+  /* Mobile Toolbar under fixed header */
+  .admin-mobile-toolbar { 
+    position: sticky; 
+    top: 56px; 
+    z-index: 1039; 
+    background: #f8f9fa; 
+    border-bottom: 1px solid #e5e7eb; 
+    padding: .5rem .75rem; 
+  }
+  .admin-mobile-toolbar .admin-back-btn { 
+    width: 36px; height: 28px; display: inline-flex; align-items: center; justify-content: center; 
+  }
+  .admin-mobile-toolbar .admin-mobile-title { 
+    font-weight: 600; 
+  }
+}
+
+/* Tablet Adjustments */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .admin-sidebar {
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+  }
+}
+
+/* Desktop Adjustments */
+@media (min-width: 992px) {
+  .admin-content {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* Ensure top bar is always fixed and never hidden by transforms */
+.admin-header {
+  transform: none !important;
+}
 
