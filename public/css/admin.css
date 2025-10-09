@@ -131,6 +131,36 @@
 .modal-dialog {
   margin: 1.75rem auto !important;
   max-width: 90% !important;
+  min-height: calc(100vh - 3.5rem) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Fix modal positioning to account for fixed navbar */
+.modal {
+  padding-top: 56px !important; /* Height of fixed navbar */
+}
+
+/* Ensure modal doesn't overlap with navbar */
+.modal.show .modal-dialog {
+  margin-top: 28px !important; /* Half of navbar height */
+}
+
+/* Ensure modal appears above navbar */
+.modal {
+  z-index: 1060 !important;
+}
+
+/* Perfect modal centering */
+.modal.show .modal-dialog {
+  position: fixed !important;
+  top: calc(50% + 28px) !important; /* Center + half navbar height */
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+  max-height: calc(100vh - 56px) !important;
+  overflow-y: auto !important;
 }
 
 /* Modal without backdrop styling */
