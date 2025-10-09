@@ -112,7 +112,8 @@ info "Connecting to server $SERVER_HOST..."
 DEPLOY_COMMANDS="
 cd $PROJECT_PATH || exit 1;
 echo '→ Pulling latest changes...';
-sudo -u www-data git pull origin $BRANCH;
+sudo -u www-data git stash;
+sudo -u www-data GIT_SSH_COMMAND='ssh -i /var/www/.ssh/id_rsa' git pull origin $BRANCH;
 if [ \$? -eq 0 ]; then
     echo '✓ Git pull successful';
 else
