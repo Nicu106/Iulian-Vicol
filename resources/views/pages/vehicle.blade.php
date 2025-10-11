@@ -66,24 +66,22 @@
         <h1 class="h3 fw-bold mb-2">{{ $title }}</h1>
         <div class="d-flex align-items-center gap-3 flex-wrap price-header">
           @if($vehicle->has_active_offer)
-            <div class="d-flex align-items-center gap-3">
-              <div class="text-center">
-                <div class="text-decoration-line-through text-muted h6 mb-0">Preț original</div>
-                <span class="text-decoration-line-through text-muted h4">€ {{ number_format($extractPrice($originalPrice)) }}</span>
+            @php($baseOriginal = $vehicle->original_price ?: $vehicle->price)
+            <div class="price-card bg-danger-subtle border-0 p-3 rounded-4 d-flex align-items-center gap-4">
+              <div>
+                <div class="text-muted small mb-1">Preț original</div>
+                <div class="h4 text-muted text-decoration-line-through mb-0">€ {{ number_format($extractPrice($baseOriginal)) }}</div>
               </div>
-              <div class="text-center">
-                <div class="text-danger h6 mb-0">Preț ofertă</div>
-                <div class="display-5 text-danger fw-bold">€ {{ number_format($extractPrice($displayPrice)) }}</div>
-                @if($vehicle->discount_percentage)
-                  <span class="badge bg-danger fs-6">{{ $vehicle->discount_percentage }}% reducere</span>
-                @endif
+              <div>
+                <div class="text-danger small mb-1">Preț ofertă</div>
+                <div class="display-5 text-danger fw-bold mb-0">€ {{ number_format($extractPrice($vehicle->offer_price)) }}</div>
               </div>
-              <div class="d-flex flex-column align-items-center">
-                <span class="badge bg-danger fs-5 px-3 py-2">OFERTĂ SPECIALĂ</span>
-                @if($vehicle->offer_expires_at)
-                  <small class="text-danger mt-1">Expiră {{ \Carbon\Carbon::parse($vehicle->offer_expires_at)->format('d.m.Y') }}</small>
-                @endif
-              </div>
+              @if($vehicle->discount_percentage)
+                <span class="badge bg-danger rounded-pill px-3 py-2 fs-6">{{ $vehicle->discount_percentage }}% reducere</span>
+              @endif
+              @if($vehicle->offer_expires_at)
+                <small class="text-danger">Expiră {{ \Carbon\Carbon::parse($vehicle->offer_expires_at)->format('d.m.Y') }}</small>
+              @endif
             </div>
           @else
             <div class="price-card">
@@ -92,15 +90,15 @@
               <div class="price-estimate">de la ≈ € {{ number_format(max(1, round(($extractPrice($displayPrice) - 5000) / max(12, 60)))) }}/lună</div>
             </div>
           @endif
-          
+
           @if($vehicle->featured)
             <span class="badge bg-warning text-dark fs-6"><i class="bi bi-star-fill"></i> Recomandat</span>
           @endif
-          
+
           @foreach($vehicle->badges ?? [] as $badge)
             <span class="badge bg-info text-dark fs-6">{{ $badge }}</span>
           @endforeach
-          
+
           <span class="badge financing-badge"><i class="bi bi-piggy-bank me-1"></i>Finanțare disponibilă</span>
         </div>
       </div>

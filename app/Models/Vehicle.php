@@ -86,7 +86,7 @@ class Vehicle extends Model
     
     public function getDisplayPriceAttribute(): ?float
     {
-        if ($this->has_offer && $this->offer_price && (!$this->offer_expires_at || $this->offer_expires_at >= now())) {
+        if ($this->hasActiveOffer) {
             return $this->offer_price;
         }
         return $this->price;
@@ -94,17 +94,22 @@ class Vehicle extends Model
 
     public function getHasActiveOfferAttribute(): bool
     {
-        return $this->has_offer && 
-               $this->offer_price && 
-               (!$this->offer_expires_at || $this->offer_expires_at >= now());
+        $notExpired = (!$this->offer_expires_at || $this->offer_expires_at >= now());
+        $baseOriginal = $this->original_price ?: $this->price;
+        $isCheaper = $this->offer_price && $baseOriginal && ($this->offer_price < $baseOriginal);
+        return (bool) ($this->has_offer && $isCheaper && $notExpired);
     }
 
     public function getDiscountPercentageAttribute(): ?int
     {
-        if (!$this->hasActiveOffer || !$this->original_price || !$this->offer_price) {
+        if (!$this->hasActiveOffer) {
             return null;
         }
-        return round((($this->original_price - $this->offer_price) / $this->original_price) * 100);
+        $baseOriginal = $this->original_price ?: $this->price;
+        if (!$baseOriginal || !$this->offer_price || $this->offer_price >= $baseOriginal) {
+            return null;
+        }
+        return (int) round((($baseOriginal - $this->offer_price) / $baseOriginal) * 100);
     }
 
     public function getIsAvailableAttribute(): bool
