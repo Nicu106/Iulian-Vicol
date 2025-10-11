@@ -111,11 +111,11 @@
                 data-vehicle-slug="{{ $vehicle->slug }}"
                 data-vehicle-price="{{ $vehicle->has_offer && $vehicle->offer_price ? $vehicle->offer_price : $vehicle->price }}"
                 data-vehicle-image="{{ $vehicle->cover_image ?? '' }}">
-          <i class="bi bi-bookmark-heart me-2"></i><span id="saveVehicleText">Salvează mașina</span>
+          <i class="bi bi-bookmark-heart me-2"></i><span id="saveVehicleText">Guardar coche</span>
         </button>
-        <a href="tel:+40123456789" class="btn btn-primary btn-lg"><i class="bi bi-telephone me-2"></i>Sună acum</a>
+        <a href="tel:+40123456789" class="btn btn-primary btn-lg"><i class="bi bi-telephone me-2"></i>Llamar ahora</a>
         <a href="https://wa.me/40123456789" class="btn btn-outline-success btn-lg"><i class="bi bi-whatsapp me-2"></i>WhatsApp</a>
-        <a href="#testdrive" class="btn btn-outline-primary btn-lg"><i class="bi bi-calendar2-check me-2"></i>Programează test drive</a>
+        <a href="#testdrive" class="btn btn-outline-primary btn-lg"><i class="bi bi-calendar2-check me-2"></i>Programar prueba de manejo</a>
         
       </div>
     </div>
@@ -280,23 +280,23 @@
       <div class="col-lg-4 vehicle-specs">
         <div class="card shadow-sm">
           <div class="card-body">
-            <h5 class="card-title">Specificații rapide</h5>
+            <h5 class="card-title">Especificaciones rápidas</h5>
             <ul class="list-unstyled small mb-0">
-              <li class="mb-2"><strong>An:</strong> {{ $vehicle->year ?? 'N/A' }}</li>
-              <li class="mb-2"><strong>Kilometraj:</strong> {{ $vehicle->mileage ? number_format($extractMileage($vehicle->mileage)) . ' km' : 'N/A' }}</li>
-              <li class="mb-2"><strong>Combustibil:</strong> {{ $vehicle->fuel ?? 'N/A' }}</li>
-              <li class="mb-2"><strong>Transmisie:</strong> {{ $vehicle->transmission ?? 'N/A' }}</li>
+              <li class="mb-2"><strong>Año:</strong> {{ $vehicle->year ?? 'N/A' }}</li>
+              <li class="mb-2"><strong>Kilometraje:</strong> {{ $vehicle->mileage ? number_format($extractMileage($vehicle->mileage)) . ' km' : 'N/A' }}</li>
+              <li class="mb-2"><strong>Combustible:</strong> {{ $vehicle->fuel ?? 'N/A' }}</li>
+              <li class="mb-2"><strong>Transmisión:</strong> {{ $vehicle->transmission ?? 'N/A' }}</li>
               @if($vehicle->power)
-                <li class="mb-2"><strong>Putere:</strong> {{ $vehicle->power }}</li>
+                <li class="mb-2"><strong>Potencia:</strong> {{ $vehicle->power }}</li>
               @endif
               @if($vehicle->drivetrain)
-                <li class="mb-2"><strong>Tracțiune:</strong> {{ $vehicle->drivetrain }}</li>
+                <li class="mb-2"><strong>Tracción:</strong> {{ $vehicle->drivetrain }}</li>
               @endif
               @if($vehicle->engine)
                 <li class="mb-2"><strong>Motor:</strong> {{ $vehicle->engine }}</li>
               @endif
               @if($vehicle->color)
-                <li class="mb-2"><strong>Culoare:</strong> {{ $vehicle->color }}</li>
+                <li class="mb-2"><strong>Color:</strong> {{ $vehicle->color }}</li>
               @endif
               @if($vehicle->body_type)
                 <li class="mb-2"><strong>Caroserie:</strong> {{ $vehicle->body_type }}</li>
