@@ -55,9 +55,9 @@
     <div class="row g-4 align-items-start mb-3">
       <div class="col-lg-8 vehicle-gallery">
         <nav class="small text-secondary mb-2" aria-label="breadcrumb">
-          <a href="{{ route('home') }}" class="text-decoration-none">Acasă</a>
+          <a href="{{ route('home') }}" class="text-decoration-none">Inicio</a>
           <span class="mx-1">›</span>
-          <a href="{{ route('catalog') }}" class="text-decoration-none">Catalog</a>
+          <a href="{{ route('catalog') }}" class="text-decoration-none">Catálogo</a>
           <span class="mx-1">›</span>
           <a href="{{ route('catalog') }}?brand={{ $vehicle->brand }}" class="text-decoration-none">{{ $vehicle->brand }}</a>
           <span class="mx-1">›</span>
@@ -71,37 +71,37 @@
             @endphp
             <div class="price-card bg-danger-subtle border-0 p-3 rounded-4 d-flex align-items-center gap-4" style="backdrop-filter: blur(0)">
               <div>
-                <div class="text-muted small mb-1">Preț original</div>
+                <div class="text-muted small mb-1">Precio original</div>
                 <div class="h4 text-muted text-decoration-line-through mb-0">€ {{ number_format($extractPrice($baseOriginal)) }}</div>
               </div>
               <div>
-                <div class="text-danger small mb-1">Preț ofertă</div>
+                <div class="text-danger small mb-1">Precio de oferta</div>
                 <div class="display-5 text-danger fw-bold mb-0">€ {{ number_format($extractPrice($vehicle->offer_price)) }}</div>
               </div>
               @if($vehicle->discount_percentage)
-                <span class="badge bg-danger rounded-pill px-3 py-2 fs-6">{{ $vehicle->discount_percentage }}% reducere</span>
+                <span class="badge bg-danger rounded-pill px-3 py-2 fs-6">{{ $vehicle->discount_percentage }}% descuento</span>
               @endif
               @if($vehicle->offer_expires_at)
-                <small class="text-danger">Expiră {{ \Carbon\Carbon::parse($vehicle->offer_expires_at)->format('d.m.Y') }}</small>
+                <small class="text-danger">Expira {{ \Carbon\Carbon::parse($vehicle->offer_expires_at)->format('d.m.Y') }}</small>
               @endif
             </div>
           @else
             <div class="price-card">
-              <div class="price-label">Preț</div>
+              <div class="price-label">Precio</div>
               <div class="price-value">€ {{ number_format($extractPrice($displayPrice)) }}</div>
-              <div class="price-estimate">de la ≈ € {{ number_format(max(1, round(($extractPrice($displayPrice) - 5000) / max(12, 60)))) }}/lună</div>
+              <div class="price-estimate">desde ≈ € {{ number_format(max(1, round(($extractPrice($displayPrice) - 5000) / max(12, 60)))) }}/mes</div>
             </div>
           @endif
 
           @if($vehicle->featured)
-            <span class="badge bg-warning text-dark fs-6"><i class="bi bi-star-fill"></i> Recomandat</span>
+            <span class="badge bg-warning text-dark fs-6"><i class="bi bi-star-fill"></i> Recomendado</span>
           @endif
 
           @foreach($vehicle->badges ?? [] as $badge)
             <span class="badge bg-info text-dark fs-6">{{ $badge }}</span>
           @endforeach
 
-          <span class="badge financing-badge"><i class="bi bi-piggy-bank me-1"></i>Finanțare disponibilă</span>
+          <span class="badge financing-badge"><i class="bi bi-piggy-bank me-1"></i>Financiación disponible</span>
         </div>
       </div>
       <div class="col-lg-4 d-grid gap-2 gap-lg-2">
@@ -310,28 +310,28 @@
 
     <div class="row g-4">
       <div class="col-lg-8">
-        <h4>Descriere</h4>
-        <p class="text-secondary">{{ $vehicle->description ?? 'Descriere nu este disponibilă pentru acest vehicul.' }}</p>
+        <h4>Descripción</h4>
+        <p class="text-secondary">{{ $vehicle->description ?? 'Descripción no disponible para este vehículo.' }}</p>
 
-        <h4 class="mt-4">Specificații Tehnice</h4>
+        <h4 class="mt-4">Especificaciones técnicas</h4>
         <div class="table-responsive">
           <table class="table table-bordered align-middle">
             <tbody>
-              <tr><th class="w-25">Marcă</th><td>{{ $vehicle->brand ?? 'N/A' }}</td><th>Transmisie</th><td>{{ $vehicle->transmission ?? 'N/A' }}</td></tr>
-              <tr><th>Model</th><td>{{ $vehicle->model ?? 'N/A' }}</td><th>Motor</th><td>{{ $vehicle->engine ?? 'N/A' }}</td></tr>
-              <tr><th>An</th><td>{{ $vehicle->year ?? 'N/A' }}</td><th>Culoare</th><td>{{ $vehicle->color ?? 'N/A' }}</td></tr>
-              <tr><th>Kilometri</th><td>{{ $vehicle->mileage ? number_format($extractMileage($vehicle->mileage)) . ' km' : 'N/A' }}</td><th>Stare</th><td>{{ $vehicle->condition ?? 'N/A' }}</td></tr>
-              <tr><th>Combustibil</th><td>{{ $vehicle->fuel ?? 'N/A' }}</td><th>VIN</th><td>@if($vehicle->vin)<code>{{ substr($vehicle->vin,0,6) }}••••••</code>@else N/A @endif</td></tr>
+              <tr><th class="w-25">Marca</th><td>{{ $vehicle->brand ?? 'N/A' }}</td><th>Transmisión</th><td>{{ $vehicle->transmission ?? 'N/A' }}</td></tr>
+              <tr><th>Modelo</th><td>{{ $vehicle->model ?? 'N/A' }}</td><th>Motor</th><td>{{ $vehicle->engine ?? 'N/A' }}</td></tr>
+              <tr><th>Año</th><td>{{ $vehicle->year ?? 'N/A' }}</td><th>Color</th><td>{{ $vehicle->color ?? 'N/A' }}</td></tr>
+              <tr><th>Kilometraje</th><td>{{ $vehicle->mileage ? number_format($extractMileage($vehicle->mileage)) . ' km' : 'N/A' }}</td><th>Estado</th><td>{{ $vehicle->condition ?? 'N/A' }}</td></tr>
+              <tr><th>Combustible</th><td>{{ $vehicle->fuel ?? 'N/A' }}</td><th>VIN</th><td>@if($vehicle->vin)<code>{{ substr($vehicle->vin,0,6) }}••••••</code>@else N/A @endif</td></tr>
               @if($vehicle->power || $vehicle->drivetrain)
                 <tr>
-                  @if($vehicle->power)<th>Putere</th><td>{{ $vehicle->power }}</td>@else<th></th><td></td>@endif
-                  @if($vehicle->drivetrain)<th>Tracțiune</th><td>{{ $vehicle->drivetrain }}</td>@else<th></th><td></td>@endif
+                  @if($vehicle->power)<th>Potencia</th><td>{{ $vehicle->power }}</td>@else<th></th><td></td>@endif
+                  @if($vehicle->drivetrain)<th>Tracción</th><td>{{ $vehicle->drivetrain }}</td>@else<th></th><td></td>@endif
                 </tr>
               @endif
               @if($vehicle->body_type || $vehicle->location)
                 <tr>
-                  @if($vehicle->body_type)<th>Caroserie</th><td>{{ $vehicle->body_type }}</td>@else<th></th><td></td>@endif
-                  @if($vehicle->location)<th>Locație</th><td>{{ $vehicle->location }}</td>@else<th></th><td></td>@endif
+                  @if($vehicle->body_type)<th>Carrocería</th><td>{{ $vehicle->body_type }}</td>@else<th></th><td></td>@endif
+                  @if($vehicle->location)<th>Ubicación</th><td>{{ $vehicle->location }}</td>@else<th></th><td></td>@endif
                 </tr>
               @endif
             </tbody>
@@ -343,14 +343,14 @@
           <div class="card-body">
             <h4 class="card-title mb-3">
               <i class="bi bi-tag-fill text-primary me-2"></i>
-              Prețuri și oferte
+              Precios y ofertas
             </h4>
             
             <div class="row g-3">
               <div class="col-md-6">
                 <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded">
                   <div>
-                    <small class="text-muted d-block">Preț curent</small>
+                    <small class="text-muted d-block">Precio actual</small>
                     <span class="h4 fw-bold text-primary mb-0">€ {{ number_format($extractPrice($vehicle->price)) }}</span>
                   </div>
                   <i class="bi bi-currency-euro text-primary" style="font-size: 2rem;"></i>
@@ -361,10 +361,10 @@
                 <div class="col-md-6">
                   <div class="d-flex align-items-center justify-content-between p-3 bg-danger bg-opacity-10 rounded border border-danger">
                     <div>
-                      <small class="text-muted d-block">Preț ofertă</small>
+                      <small class="text-muted d-block">Precio de oferta</small>
                       <span class="h4 fw-bold text-danger mb-0">€ {{ number_format($extractPrice($vehicle->offer_price)) }}</span>
                       @if($vehicle->discount_percentage)
-                        <small class="text-danger d-block">Reducere {{ $vehicle->discount_percentage }}%</small>
+                        <small class="text-danger d-block">Descuento {{ $vehicle->discount_percentage }}%</small>
                       @endif
                     </div>
                     <i class="bi bi-tag-fill text-danger" style="font-size: 2rem;"></i>
@@ -376,7 +376,7 @@
                     <div class="alert alert-warning d-flex align-items-center" role="alert">
                       <i class="bi bi-clock me-2"></i>
                       <div>
-                        <strong>Ofertă limitată!</strong> Această ofertă expiră la {{ \Carbon\Carbon::parse($vehicle->offer_expires_at)->format('d.m.Y') }}
+                        <strong>¡Oferta limitada!</strong> Esta oferta expira el {{ \Carbon\Carbon::parse($vehicle->offer_expires_at)->format('d.m.Y') }}
                       </div>
                     </div>
                   </div>
@@ -387,7 +387,7 @@
                 <div class="col-md-6">
                   <div class="d-flex align-items-center justify-content-between p-3 bg-secondary bg-opacity-10 rounded">
                     <div>
-                      <small class="text-muted d-block">Preț original</small>
+                      <small class="text-muted d-block">Precio original</small>
                       <span class="h5 text-decoration-line-through text-muted mb-0">€ {{ number_format($extractPrice($vehicle->original_price)) }}</span>
                     </div>
                     <i class="bi bi-arrow-down-circle text-secondary" style="font-size: 2rem;"></i>
@@ -409,14 +409,14 @@
                 @php
                   $savings = $extractPrice($vehicle->price ?? 0) - $extractPrice($vehicle->offer_price ?? 0);
                 @endphp
-                <small class="text-muted">Economisești € {{ number_format($savings) }}</small>
+                <small class="text-muted">Ahorra € {{ number_format($savings) }}</small>
               </div>
             @endif
           </div>
         </div>
 
         @if(!empty($vehicle->features))
-          <h4 class="mt-4">Dotări</h4>
+          <h4 class="mt-4">Equipamiento</h4>
           <div class="row g-2">
             @foreach($vehicle->features as $feature)
               <div class="col-6 col-md-4"><span class="badge bg-light text-dark border">✓ {{ $feature }}</span></div>
@@ -425,7 +425,7 @@
         @endif
 
         @if(!empty($vehicle->tags))
-          <h4 class="mt-4">Etichete</h4>
+          <h4 class="mt-4">Etiquetas</h4>
           <div class="d-flex flex-wrap gap-1">
             @foreach($vehicle->tags as $tag)
               <span class="badge bg-secondary">{{ $tag }}</span>
@@ -437,17 +437,17 @@
       <div class="col-lg-4">
         <div class="card shadow-sm mb-3">
           <div class="card-body">
-            <h5 class="card-title">Solicită ofertă / test drive</h5>
+            <h5 class="card-title">Solicitar oferta / prueba de manejo</h5>
             <form method="POST" action="{{ route('inquiries.store') }}">
               @csrf
               <input type="hidden" name="vehicle_id" value="{{ $vehicle->id }}">
               <input type="hidden" name="vehicle_slug" value="{{ $vehicle->slug }}">
               <input type="hidden" name="vehicle_title" value="{{ $title }}">
               <input type="hidden" name="vehicle_link" value="{{ route('vehicle.show', $vehicle->slug) }}">
-              <div class="mb-2"><input type="text" class="form-control" name="name" placeholder="Nume" required></div>
-              <div class="mb-2"><input type="tel" class="form-control" name="phone" placeholder="Telefon" required></div>
-              <div class="mb-2"><textarea class="form-control" name="message" rows="3" placeholder="Mesaj"></textarea></div>
-              <button class="btn btn-primary w-100" type="submit">Trimite</button>
+              <div class="mb-2"><input type="text" class="form-control" name="name" placeholder="Nombre" required></div>
+              <div class="mb-2"><input type="tel" class="form-control" name="phone" placeholder="Teléfono" required></div>
+              <div class="mb-2"><textarea class="form-control" name="message" rows="3" placeholder="Mensaje"></textarea></div>
+              <button class="btn btn-primary w-100" type="submit">Enviar</button>
             </form>
             @if(session('status'))
               <div class="alert alert-success mt-2">{{ session('status') }}</div>
@@ -456,17 +456,17 @@
         </div>
         <div class="card shadow-sm">
           <div class="card-body">
-            <h6 class="mb-2">Calculator finanțare (estimativ)</h6>
+            <h6 class="mb-2">Calculadora de financiación (estimativa)</h6>
             <div class="row g-2 align-items-end">
               <div class="col-6">
-                <label class="form-label small">Avans (€)</label>
+                <label class="form-label small">Entrada (€)</label>
                 <input type="number" class="form-control" value="5000" min="0">
               </div>
               <div class="col-6">
-                <label class="form-label small">Luni</label>
+                <label class="form-label small">Meses</label>
                 <input type="number" class="form-control" value="60" min="12" step="6">
               </div>
-              <div class="col-12"><button class="btn btn-outline-primary w-100" type="button">Află oferta</button></div>
+              <div class="col-12"><button class="btn btn-outline-primary w-100" type="button">Obtener oferta</button></div>
             </div>
           </div>
         </div>
@@ -477,7 +477,7 @@
       <div class="mt-5">
         <h4 class="mb-4">
           <i class="bi bi-graph-up text-primary me-2"></i>
-          Vehicule similare pentru comparație
+          Vehículos similares para comparar
         </h4>
         
         <!-- Comparație prețuri -->
@@ -488,7 +488,7 @@
               <div class="col-md-6">
                 <div class="d-flex align-items-center justify-content-between p-3 bg-primary bg-opacity-10 rounded border border-primary">
                   <div>
-                    <small class="text-muted d-block">Prețul tău</small>
+                    <small class="text-muted d-block">Tu precio</small>
                     <span class="h5 fw-bold text-primary mb-0">€ {{ number_format($extractPrice($displayPrice)) }}</span>
                   </div>
                   <i class="bi bi-car-front text-primary" style="font-size: 2rem;"></i>
@@ -504,7 +504,7 @@
               <div class="col-md-6">
                 <div class="d-flex align-items-center justify-content-between p-3 bg-info bg-opacity-10 rounded border border-info">
                   <div>
-                    <small class="text-muted d-block">Media pieței</small>
+                    <small class="text-muted d-block">Media del mercado</small>
                     <span class="h5 fw-bold text-info mb-0">€ {{ number_format($extractPrice($avgPrice)) }}</span>
                     <small class="text-muted d-block">€{{ number_format($extractPrice($minPrice)) }} - €{{ number_format($extractPrice($maxPrice)) }}</small>
                   </div>
@@ -573,7 +573,7 @@
                   @else
                     <span class="fw-bold text-primary">€ {{ number_format($extractPrice($similar->price)) }}</span>
                   @endif
-                  <a href="{{ route('vehicle.show', $similar->slug) }}" class="btn btn-sm btn-primary">Detalii</a>
+                  <a href="{{ route('vehicle.show', $similar->slug) }}" class="btn btn-sm btn-primary">Detalles</a>
                 </div>
               </div>
             </div>
