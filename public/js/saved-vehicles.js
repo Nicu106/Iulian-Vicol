@@ -1,6 +1,6 @@
 /**
  * Saved Vehicles Manager
- * Gestionează salvarea, afișarea și gestionarea mașinilor salvate în localStorage
+ * Gestiona el guardado y listado de coches guardados en localStorage
  */
 class SavedVehiclesManager {
   constructor() {
@@ -10,7 +10,7 @@ class SavedVehiclesManager {
   }
 
   /**
-   * Inițializează managerul
+   * Inicializa el gestor
    */
   init() {
     this.updateUI();
@@ -19,31 +19,31 @@ class SavedVehiclesManager {
   }
 
   /**
-   * Încarcă mașinile salvate din localStorage
+   * Cargar coches guardados desde localStorage
    */
   loadFromStorage() {
     try {
       const saved = localStorage.getItem(this.storageKey);
       return saved ? JSON.parse(saved) : [];
     } catch (error) {
-      console.error('Eroare la încărcarea mașinilor salvate:', error);
+      console.error('Error al cargar coches guardados:', error);
       return [];
     }
   }
 
   /**
-   * Salvează mașinile în localStorage
+   * Guardar coches en localStorage
    */
   saveToStorage() {
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(this.savedVehicles));
     } catch (error) {
-      console.error('Eroare la salvarea mașinilor:', error);
+      console.error('Error al guardar coches:', error);
     }
   }
 
   /**
-   * Adaugă o mașină la lista de mașini salvate
+   * Añadir coche a la lista de guardados
    */
   addVehicle(vehicleData) {
     // Verifică dacă mașina există deja
@@ -64,11 +64,11 @@ class SavedVehiclesManager {
     this.saveToStorage();
     this.updateUI();
     this.updateCount();
-    this.showNotification('Mașina a fost salvată!', 'success');
+    this.showNotification('¡Coche guardado!', 'success');
   }
 
   /**
-   * Elimină o mașină din lista de mașini salvate
+   * Eliminar un coche de la lista
    */
   removeVehicle(vehicleId) {
     const index = this.savedVehicles.findIndex(v => v.id === vehicleId);
@@ -77,7 +77,7 @@ class SavedVehiclesManager {
       this.saveToStorage();
       this.updateUI();
       this.updateCount();
-      this.showNotification('Mașina a fost eliminată din lista de salvate!', 'info');
+      this.showNotification('Coche eliminado de guardados', 'info');
     }
   }
 
@@ -95,27 +95,27 @@ class SavedVehiclesManager {
   }
 
   /**
-   * Șterge toate mașinile salvate
+   * Borrar todos los coches guardados
    */
   clearAll() {
-    if (confirm('Ești sigur că vrei să ștergi toate mașinile salvate?')) {
+    if (confirm('¿Seguro que deseas borrar todos los coches guardados?')) {
       this.savedVehicles = [];
       this.saveToStorage();
       this.updateUI();
       this.updateCount();
-      this.showNotification('Toate mașinile au fost șterse!', 'info');
+      this.showNotification('¡Todos los coches han sido borrados!', 'info');
     }
   }
 
   /**
-   * Verifică dacă o mașină este salvată
+   * Verificar si un coche está guardado
    */
   isVehicleSaved(vehicleId) {
     return this.savedVehicles.some(v => v.id === vehicleId);
   }
 
   /**
-   * Actualizează interfața utilizator
+   * Actualizar la interfaz de usuario
    */
   updateUI() {
     this.updateDropdown();
@@ -124,7 +124,7 @@ class SavedVehiclesManager {
   }
 
   /**
-   * Actualizează dropdown-ul din navigație
+   * Actualizar el dropdown de navegación
    */
   updateDropdown() {
     const dropdownList = document.getElementById('savedVehiclesList');
@@ -133,7 +133,7 @@ class SavedVehiclesManager {
     if (!dropdownList || !countElement) return;
 
     if (this.savedVehicles.length === 0) {
-      dropdownList.innerHTML = '<div class="px-3 py-2 text-muted small">Nu ai mașini salvate</div>';
+      dropdownList.innerHTML = '<div class="px-3 py-2 text-muted small">No tienes coches guardados</div>';
       countElement.style.display = 'none';
     } else {
       countElement.style.display = 'inline';
@@ -157,7 +157,7 @@ class SavedVehiclesManager {
   }
 
   /**
-   * Actualizează pagina de mașini salvate
+   * Actualizar la página de coches guardados
    */
   updateSavedVehiclesPage() {
     const container = document.getElementById('savedVehiclesContainer');
@@ -174,13 +174,13 @@ class SavedVehiclesManager {
       const vehiclesHtml = this.savedVehicles.map(vehicle => this.createVehicleCard(vehicle)).join('');
       container.innerHTML = vehiclesHtml;
       
-      // Re-bind events pentru butoanele nou create
+      // Re-bind de eventos para botones creados
       this.bindCardEvents();
     }
   }
 
   /**
-   * Creează HTML-ul pentru un card de mașină salvată
+   * Crear HTML para una tarjeta de coche guardado
    */
   createVehicleCard(vehicle) {
     return `
@@ -199,15 +199,15 @@ class SavedVehiclesManager {
             <div class="card-actions">
               <div class="d-flex gap-1">
                 <button type="button" class="btn btn-sm btn-edit edit-notes-btn" 
-                        data-vehicle-id="${vehicle.id}" title="Editează notele">
+                        data-vehicle-id="${vehicle.id}" title="Editar notas">
                   <i class="bi bi-pencil"></i>
                 </button>
                 <button type="button" class="btn btn-sm btn-remove remove-vehicle-btn" 
-                        data-vehicle-id="${vehicle.id}" title="Elimină din salvate">
+                        data-vehicle-id="${vehicle.id}" title="Eliminar de guardados">
                   <i class="bi bi-trash"></i>
                 </button>
               </div>
-              <a href="/vehicles/${vehicle.slug}" class="btn btn-sm btn-primary">Detalii</a>
+              <a href="/vehicles/${vehicle.slug}" class="btn btn-sm btn-primary">Detalles</a>
             </div>
           </div>
         </div>
@@ -216,7 +216,7 @@ class SavedVehiclesManager {
   }
 
   /**
-   * Actualizează numărul de mașini salvate
+   * Actualizar número de coches guardados
    */
   updateCount() {
     const countElement = document.getElementById('savedVehiclesCount');
@@ -227,7 +227,7 @@ class SavedVehiclesManager {
   }
 
   /**
-   * Actualizează starea butoanelor de salvare
+   * Actualizar estado de botones de guardado
    */
   updateSaveButtons() {
     // Actualizează butoanele din catalog
@@ -237,12 +237,12 @@ class SavedVehiclesManager {
         btn.innerHTML = '<i class="bi bi-bookmark-heart"></i>';
         btn.classList.remove('btn-outline-primary');
         btn.classList.add('btn-primary');
-        btn.title = 'Mașina salvată';
+        btn.title = 'Coche guardado';
       } else {
         btn.innerHTML = '<i class="bi bi-bookmark-heart"></i>';
         btn.classList.remove('btn-primary');
         btn.classList.add('btn-outline-primary');
-        btn.title = 'Salvează mașina';
+        btn.title = 'Guardar coche';
       }
     });
 
@@ -251,11 +251,11 @@ class SavedVehiclesManager {
     if (saveBtn) {
       const vehicleId = saveBtn.dataset.vehicleId;
       if (this.isVehicleSaved(vehicleId)) {
-        saveBtn.innerHTML = '<i class="bi bi-bookmark-heart-fill me-2"></i><span id="saveVehicleText">Mașina salvată</span>';
+        saveBtn.innerHTML = '<i class="bi bi-bookmark-heart-fill me-2"></i><span id="saveVehicleText">Coche guardado</span>';
         saveBtn.classList.remove('btn-outline-primary');
         saveBtn.classList.add('btn-primary');
       } else {
-        saveBtn.innerHTML = '<i class="bi bi-bookmark-heart me-2"></i><span id="saveVehicleText">Salvează mașina</span>';
+        saveBtn.innerHTML = '<i class="bi bi-bookmark-heart me-2"></i><span id="saveVehicleText">Guardar coche</span>';
         saveBtn.classList.remove('btn-primary');
         saveBtn.classList.add('btn-outline-primary');
       }
@@ -263,7 +263,7 @@ class SavedVehiclesManager {
   }
 
   /**
-   * Formatează prețul
+   * Formatear precio
    */
   formatPrice(price) {
     if (typeof price === 'string') {
@@ -274,7 +274,7 @@ class SavedVehiclesManager {
   }
 
   /**
-   * Afișează o notificare
+   * Mostrar notificación
    */
   showNotification(message, type = 'info') {
     // Creează o notificare simplă
@@ -297,7 +297,7 @@ class SavedVehiclesManager {
   }
 
   /**
-   * Leagă evenimentele pentru butoane
+   * Enlazar eventos para botones
    */
   bindEvents() {
     // Butoane de salvare din catalog și paginile individuale
@@ -352,7 +352,7 @@ class SavedVehiclesManager {
       }
     });
 
-    // Link-ul "Vezi toate mașinile salvate"
+    // Enlace "Ver todos los coches guardados"
     document.addEventListener('click', (e) => {
       if (e.target.closest('#viewAllSaved')) {
         e.preventDefault();
@@ -360,7 +360,7 @@ class SavedVehiclesManager {
       }
     });
 
-    // Butonul "Șterge toate"
+    // Botón "Borrar todos"
     document.addEventListener('click', (e) => {
       if (e.target.closest('#clearAllSaved')) {
         this.clearAll();
@@ -369,7 +369,7 @@ class SavedVehiclesManager {
   }
 
   /**
-   * Leagă evenimentele pentru cardurile de mașini salvate
+   * Enlazar eventos para tarjetas de coches guardados
    */
   bindCardEvents() {
     // Butoane de eliminare
@@ -396,7 +396,7 @@ class SavedVehiclesManager {
     const vehicle = this.savedVehicles.find(v => v.id === vehicleId);
     if (!vehicle) return;
 
-    const notes = prompt('Editează notele pentru această mașină:', vehicle.notes || '');
+    const notes = prompt('Editar notas para este coche:', vehicle.notes || '');
     if (notes !== null) {
       this.updateVehicleNotes(vehicleId, notes);
     }

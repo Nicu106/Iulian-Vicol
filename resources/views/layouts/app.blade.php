@@ -56,7 +56,7 @@
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="savedVehiclesCount">0</span>
               </button>
               <ul class="dropdown-menu dropdown-menu-end" id="savedVehiclesDropdown">
-                <li><h6 class="dropdown-header">Coches Guardados</h6></li>
+              <li><h6 class="dropdown-header">Coches guardados</h6></li>
                 <li><hr class="dropdown-divider"></li>
                 <li id="savedVehiclesList">
                   <div class="px-3 py-2 text-muted small">No tienes coches guardados</div>
