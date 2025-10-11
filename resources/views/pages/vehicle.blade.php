@@ -66,8 +66,10 @@
         <h1 class="h3 fw-bold mb-2">{{ $title }}</h1>
         <div class="d-flex align-items-center gap-3 flex-wrap price-header">
           @if($vehicle->has_active_offer)
-            @php($baseOriginal = $vehicle->original_price ?: $vehicle->price)
-            <div class="price-card bg-danger-subtle border-0 p-3 rounded-4 d-flex align-items-center gap-4">
+            @php
+              $baseOriginal = $vehicle->original_price ?: $vehicle->price;
+            @endphp
+            <div class="price-card bg-danger-subtle border-0 p-3 rounded-4 d-flex align-items-center gap-4" style="backdrop-filter: blur(0)">
               <div>
                 <div class="text-muted small mb-1">Preț original</div>
                 <div class="h4 text-muted text-decoration-line-through mb-0">€ {{ number_format($extractPrice($baseOriginal)) }}</div>
