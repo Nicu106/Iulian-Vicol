@@ -306,3 +306,7 @@ footer .link-light:hover { opacity: 1; color: #fff; }
 /* Ensure content starts below fixed navbar */
 main { padding-top: calc(var(--nav-height) + 8px); }
 
+/* Ensure offcanvas overlays the fixed navbar on mobile */
+.offcanvas { z-index: 1200; }
+.offcanvas-backdrop { z-index: 1199; }
+
