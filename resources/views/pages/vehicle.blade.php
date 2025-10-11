@@ -197,7 +197,7 @@
             $thumbnails = array_slice($allMedia, 0, 6); // Max 6 thumbnails afișate
           @endphp
           
-          @if($mainMedia)
+          @isset($mainMedia)
             <div class="vehicle-gallery">
               <!-- Imaginea/Video-ul principal -->
               <div class="main-media-container mb-3">
@@ -222,7 +222,7 @@
               </div>
               
               <!-- Thumbnails -->
-              @if(count($thumbnails) > 0)
+              @if(!empty($thumbnails) && count($thumbnails) > 0)
                 <div class="thumbnails-container">
                   <div class="row g-2">
                     @foreach($thumbnails as $index => $media)
@@ -265,7 +265,7 @@
                 <p class="mt-2">Fără imagini disponibile</p>
               </div>
             </div>
-          @endif
+          @endisset
         @else
           <div class="ratio ratio-16x9 rounded overflow-hidden bg-light d-flex align-items-center justify-content-center">
             <div class="text-center text-muted">
