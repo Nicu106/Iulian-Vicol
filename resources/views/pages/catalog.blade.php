@@ -300,7 +300,7 @@
                     class="card-img-top" 
                     alt="{{ $vehicle->title ?? ($vehicle->brand . ' ' . $vehicle->model . ' ' . $vehicle->year) }}" 
                     loading="lazy" 
-                    style="height: 200px; object-fit: contain; background-color: #f8f9fa;"
+                    style="height: 200px; object-fit: cover;"
                     onerror="this.src='https://via.placeholder.com/480x320/f8f9fa/6c757d?text=Sin+imagen'"
                   />
                 @else

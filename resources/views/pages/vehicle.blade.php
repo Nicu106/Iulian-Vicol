@@ -215,7 +215,7 @@
                     </iframe>
                   @else
                     <img src="{{ $mainMedia['url'] }}" 
-                         class="w-100 h-100 object-fit-cover" 
+                         class="w-100 h-100 object-fit-contain" 
                          alt="{{ $title }}" 
                          id="main-gallery-image"
                          onerror="this.src='https://via.placeholder.com/800x450/f8f9fa/6c757d?text=Fără+imagine'" />
@@ -238,7 +238,7 @@
                         <div class="ratio ratio-16x9 rounded overflow-hidden">
                           @if($media['type'] === 'video')
                             <img src="{{ $media['thumbnail'] ?? 'https://via.placeholder.com/300x200/f8f9fa/6c757d?text=Video' }}" 
-                                 class="w-100 h-100 object-fit-cover" 
+                                 class="w-100 h-100 object-fit-contain" 
                                  alt="Video thumbnail" 
                                  loading="lazy"
                                  onerror="this.src='https://via.placeholder.com/300x200/f8f9fa/6c757d?text=Video'" />
@@ -247,7 +247,7 @@
                             </div>
                           @else
                             <img src="{{ $media['url'] }}" 
-                                 class="w-100 h-100 object-fit-cover" 
+                                 class="w-100 h-100 object-fit-contain" 
                                  alt="{{ $title }}" 
                                  loading="lazy"
                                  onerror="this.src='https://via.placeholder.com/300x200/f8f9fa/6c757d?text=Fără+imagine'" />
@@ -616,7 +616,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 mainMediaContainer.innerHTML = `
                     <img src="${mediaUrl}" 
-                         class="w-100 h-100 object-fit-cover" 
+                         class="w-100 h-100 object-fit-contain" 
                          alt="Gallery image" 
                          id="main-gallery-image"
                          onerror="this.src='https://via.placeholder.com/800x450/f8f9fa/6c757d?text=Fără+imagine'" />
