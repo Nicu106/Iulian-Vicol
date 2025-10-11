@@ -15,20 +15,10 @@
 @section('content')
 <section class="py-5 bg-light catalog-page">
   <!-- Hero Banner -->
-  <div class="catalog-hero text-light mb-4" style="--hero-image: url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1920&auto=format&fit=crop');" data-anim="reveal">
+  <div class="catalog-hero text-light mb-4" data-anim="reveal">
     <div class="container py-5">
-      <h1 class="display-4 fw-bold mb-2">Encuentra tu próximo coche</h1>
-      <p class="lead mb-4">Vehículos verificados, historial transparente y garantía disponible.</p>
-      <form class="catalog-hero__search" method="get" role="search" aria-label="Buscar vehículo">
-        <i class="bi bi-search text-primary ms-2"></i>
-        <input type="text" class="form-control border-0" name="q" placeholder="Buscar marca o modelo..." value="{{ request('q') }}">
-        <button class="btn btn-primary">Buscar</button>
-      </form>
-      <div class="d-flex catalog-hero__chips mt-3">
-        <a href="{{ route('catalog', ['fuel' => 'Híbrido']) }}" class="catalog-hero__chip">Híbrido</a>
-        <a href="{{ route('catalog', ['transmission' => 'Automático']) }}" class="catalog-hero__chip">Automático</a>
-        <a href="{{ route('catalog', ['body_type' => 'SUV']) }}" class="catalog-hero__chip">SUV</a>
-      </div>
+      <h1 class="display-6 fw-bold mb-2">Catálogo de Vehículos</h1>
+      <p class="lead mb-0 text-light-emphasis">Descubre nuestra selección premium – verificada técnicamente, historial claro y garantía.</p>
     </div>
   </div>
   <div class="container">
