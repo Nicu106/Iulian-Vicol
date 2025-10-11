@@ -12,7 +12,7 @@
 .catalog-filters.sticky-lg-top { top: calc(var(--nav-height) + 12px); }
 .catalog-filters { max-height: calc(100vh - var(--nav-height) - 24px); overflow: auto; }
 .catalog-filters .card-body { padding: 1rem; }
-.vehicle-card img { height: 190px; object-fit: cover; border-top-left-radius: 16px; border-top-right-radius: 16px; }
+.vehicle-card img { height: 190px; object-fit: contain; border-top-left-radius: 16px; border-top-right-radius: 16px; background-color: #f8f9fa; }
 .filters-form { overflow: auto; padding-right: 2px; }
 .filters-form::-webkit-scrollbar { width: 6px; }
 .filters-form::-webkit-scrollbar-thumb { background: rgba(0,0,0,.15); border-radius: 4px; }

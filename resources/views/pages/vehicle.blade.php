@@ -521,7 +521,7 @@
             <div class="card h-100 shadow-sm hover-shadow">
               @if($similar->cover_image)
                 <img src="{{ $similar->cover_image }}" class="card-img-top" alt="{{ $similar->title ?? ($similar->brand . ' ' . $similar->model) }}" 
-                     style="height: 200px; object-fit: cover;"
+                     style="height: 200px; object-fit: contain; background-color: #f8f9fa;"
                      onerror="this.src='https://via.placeholder.com/400x200/f8f9fa/6c757d?text=Fără+imagine'" />
               @else
                 <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">

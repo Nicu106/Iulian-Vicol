@@ -16,7 +16,7 @@ html { scroll-behavior: smooth; }
 }
 
 /* Consistent card image heights */
-.vehicle-card img { height: 170px; object-fit: cover; border-top-left-radius: 16px; border-top-right-radius: 16px; }
+.vehicle-card img { height: 170px; object-fit: contain; border-top-left-radius: 16px; border-top-right-radius: 16px; background-color: #f8f9fa; }
 @media (min-width: 768px) { .vehicle-card img { height: 190px; } }
 @media (min-width: 1200px) { .vehicle-card img { height: 200px; } }
 

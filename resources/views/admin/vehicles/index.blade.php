@@ -14,7 +14,7 @@
   .status-draft { background: #f3f4f6; color: #374151; }
   .featured-star { color: #f59e0b; cursor: pointer; font-size: 1.2rem; }
   .featured-star:hover { color: #d97706; }
-  .vehicle-thumb { width: 80px; height: 60px; object-fit: cover; border-radius: 8px; transition: transform 0.2s; }
+  .vehicle-thumb { width: 80px; height: 60px; object-fit: contain; border-radius: 8px; transition: transform 0.2s; background-color: #f8f9fa; }
   .vehicle-thumb:hover { transform: scale(1.05); }
   .vehicle-thumb-placeholder { width: 80px; height: 60px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: #f8fafc; border: 2px dashed #e2e8f0; }
   .price-display { font-weight: 600; font-size: 1.1rem; }
@@ -398,7 +398,7 @@
                   <img src="{{ $v['cover_image'] }}" 
                        alt="{{ $v['title'] ?? ($v['brand'] . ' ' . $v['model']) }}" 
                        class="img-fluid rounded"
-                       style="aspect-ratio: 4/3; object-fit: cover;"
+                       style="aspect-ratio: 4/3; object-fit: contain; background-color: #f8f9fa;"
                        loading="lazy"
                        onerror="handleImageError(this)">
                 @else
