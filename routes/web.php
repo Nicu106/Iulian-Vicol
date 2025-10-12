@@ -23,7 +23,7 @@ Route::post('/inquiries', [App\Http\Controllers\InquiryController::class, 'store
 Route::view('/saved-vehicles', 'pages.saved-vehicles')->name('saved-vehicles');
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return redirect()->route('admin.home');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {

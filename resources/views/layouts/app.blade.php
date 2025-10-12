@@ -50,6 +50,20 @@
               <i class="bi bi-lightning-charge-fill me-2"></i>Vendidos
               <span class="pulse-dot"></span>
             </a>
+            @auth
+              <form action="{{ route('logout') }}" method="POST" class="d-none d-lg-inline">
+                @csrf
+                <button type="submit" class="btn btn-outline-light btn-sm">
+                  <i class="bi bi-box-arrow-right me-1"></i>Salir
+                </button>
+              </form>
+              <form action="{{ route('logout') }}" method="POST" class="d-lg-none">
+                @csrf
+                <button type="submit" class="btn btn-outline-light btn-sm" title="Salir">
+                  <i class="bi bi-box-arrow-right"></i>
+                </button>
+              </form>
+            @endauth
             <div class="dropdown">
               <button class="btn btn-outline-primary position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="savedVehiclesBtn">
                 <i class="bi bi-bookmark-heart"></i>
