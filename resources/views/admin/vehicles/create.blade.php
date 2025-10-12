@@ -370,7 +370,7 @@
               <div class="image-upload-area" onclick="document.getElementById('cover_image').click()">
                 <i class="bi bi-cloud-upload fs-2 text-muted d-block mb-2"></i>
                 <p class="mb-2">Haz clic para seleccionar la imagen principal</p>
-                <small class="text-muted">JPG, PNG, GIF hasta 5MB</small>
+                <small class="text-muted">JPG, PNG, GIF</small>
                 <input type="file" id="cover_image" name="cover_image" accept="image/*" class="d-none" onchange="previewImage(this, 'cover-preview')">
               </div>
               <div id="cover-preview" class="mt-2"></div>
@@ -519,31 +519,47 @@ function previewImage(input, previewId) {
   }
 }
 
-function previewImages(input, previewId) {
+// Manage newly selected gallery files with removable thumbnails
+let newGalleryFilesCreate = [];
+const galleryInputCreate = document.getElementById('gallery_images');
+
+function rebuildGalleryInputFilesCreate() {
+  const dt = new DataTransfer();
+  newGalleryFilesCreate.forEach(f => dt.items.add(f));
+  if (galleryInputCreate) galleryInputCreate.files = dt.files;
+}
+
+function renderNewGalleryPreviewCreate(previewId) {
   const preview = document.getElementById(previewId);
+  if (!preview) return;
   preview.innerHTML = '';
-  
-  if (input.files) {
-    Array.from(input.files).forEach((file, index) => {
-      if (index < 6) { // Limit to 6 images for mobile
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const col = document.createElement('div');
-          col.className = 'col-6 col-md-4';
-          
-          const img = document.createElement('img');
-          img.src = e.target.result;
-          img.className = 'img-fluid rounded';
-          img.style.aspectRatio = '4/3';
-          img.style.objectFit = 'cover';
-          
-          col.appendChild(img);
-          preview.appendChild(col);
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-  }
+  newGalleryFilesCreate.forEach((file, index) => {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const col = document.createElement('div');
+      col.className = 'col-6 col-md-4 position-relative';
+      col.innerHTML = `
+        <img src="${e.target.result}" class="img-fluid rounded" style="aspect-ratio: 4/3; object-fit: cover;">
+        <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1" onclick="removeNewGalleryItemCreate(${index}, '${previewId}')">
+          <i class="bi bi-x"></i>
+        </button>
+      `;
+      preview.appendChild(col);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function previewImages(input, previewId) {
+  newGalleryFilesCreate = input.files ? Array.from(input.files) : [];
+  renderNewGalleryPreviewCreate(previewId);
+}
+
+function removeNewGalleryItemCreate(index, previewId) {
+  newGalleryFilesCreate.splice(index, 1);
+  rebuildGalleryInputFilesCreate();
+  renderNewGalleryPreviewCreate(previewId);
 }
 
 // Drag and drop functionality for mobile

@@ -446,23 +446,49 @@ function previewImage(input, previewId) {
   }
 }
 
-function previewGallery(input, previewId) {
-  const preview = document.getElementById(previewId);
-  preview.innerHTML = '';
+// Manage newly selected gallery files with removable thumbnails
+let newGalleryFiles = [];
+const galleryInput = document.getElementById('gallery_images');
 
-  if (input.files) {
-    Array.from(input.files).forEach((file, index) => {
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const div = document.createElement('div');
-          div.innerHTML = `<img src="${e.target.result}" style="width: 80px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #e5e7eb;">`;
-          preview.appendChild(div);
-        }
-        reader.readAsDataURL(file);
-      }
-    });
-  }
+function rebuildGalleryInputFiles() {
+  const dt = new DataTransfer();
+  newGalleryFiles.forEach(f => dt.items.add(f));
+  if (galleryInput) galleryInput.files = dt.files;
+}
+
+function renderNewGalleryPreview(previewId) {
+  const preview = document.getElementById(previewId);
+  if (!preview) return;
+  preview.innerHTML = '';
+  newGalleryFiles.forEach((file, index) => {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'position-relative';
+      wrapper.style.width = '80px';
+      wrapper.style.height = '60px';
+      wrapper.innerHTML = `
+        <img src="${e.target.result}" style="width: 80px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #e5e7eb;">
+        <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1" onclick="removeNewGalleryItem(${index}, '${previewId}')">
+          <i class="bi bi-x"></i>
+        </button>
+      `;
+      preview.appendChild(wrapper);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function previewGallery(input, previewId) {
+  newGalleryFiles = input.files ? Array.from(input.files) : [];
+  renderNewGalleryPreview(previewId);
+}
+
+function removeNewGalleryItem(index, previewId) {
+  newGalleryFiles.splice(index, 1);
+  rebuildGalleryInputFiles();
+  renderNewGalleryPreview(previewId);
 }
 
 // Remove existing gallery item
