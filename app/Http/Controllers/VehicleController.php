@@ -9,8 +9,9 @@ class VehicleController extends Controller
 {
     public function show($slug)
     {
+        // Allow viewing both available and sold vehicles (for "Vendidos" page)
         $vehicle = Vehicle::where('slug', $slug)
-            ->where('status', 'available')
+            ->whereIn('status', ['available', 'sold'])
             ->firstOrFail();
             
         // Increment views
