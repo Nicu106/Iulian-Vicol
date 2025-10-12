@@ -342,7 +342,7 @@ class VehicleController extends BaseController
         }
 
         return redirect()->route('admin.vehicles.index')
-            ->with('status', 'Vehicul adăugat cu succes! Slug: ' . $slug)
+            ->with('status', '¡Vehículo añadido con éxito! Slug: ' . $slug)
             ->with('preview_url', route('vehicle.show', ['slug' => $slug]));
     }
 
@@ -521,10 +521,10 @@ class VehicleController extends BaseController
         // Allow explicit redirect target from form (e.g., back to list)
         if ($request->filled('redirect_to')) {
             return redirect($request->input('redirect_to'))
-                ->with('status', 'Vehicul actualizat cu succes');
+                ->with('status', 'Vehículo actualizado con éxito');
         }
 
-        return redirect()->route('admin.vehicles.index')->with('status', 'Vehicul actualizat cu succes');
+        return redirect()->route('admin.vehicles.index')->with('status', 'Vehículo actualizado con éxito');
     }
 
     public function destroy(string $slug)

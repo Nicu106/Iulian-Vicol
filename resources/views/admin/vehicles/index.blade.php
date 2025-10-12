@@ -75,6 +75,9 @@
     @if(session('status'))
       <div class="alert alert-success alert-dismissible fade show" role="alert">
         <i class="bi bi-check-circle me-2"></i>{{ session('status') }}
+        @if(session('preview_url'))
+          <a href="{{ session('preview_url') }}" target="_blank" class="ms-2 alert-link">Ver vehículo</a>
+        @endif
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
       </div>
     @endif
