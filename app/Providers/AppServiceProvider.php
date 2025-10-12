@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Console\Commands\CreateTestVehicle;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,6 +27,12 @@ class AppServiceProvider extends ServiceProvider
             ini_set('memory_limit', '512M');
             ini_set('max_execution_time', '0');
             ini_set('max_input_time', '-1');
+        }
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                CreateTestVehicle::class,
+            ]);
         }
     }
 }
