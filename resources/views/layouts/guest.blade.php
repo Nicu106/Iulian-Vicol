@@ -34,4 +34,20 @@
             </div>
         </div>
     </body>
+    <script>
+      // Keyboard chord on login/guest pages: Ctrl + A + D → admin
+      (function(){
+        let ctrlHeld = false; let lastA = 0, lastD = 0; const CHORD_MS = 700;
+        window.addEventListener('keydown', function(e){
+          if (e.key === 'Control') { ctrlHeld = true; return; }
+          if (!e.ctrlKey && !ctrlHeld) return;
+          const k = (e.key||'').toLowerCase(); const now = Date.now();
+          if (k === 'a') lastA = now; if (k === 'd') lastD = now;
+          if (lastA && lastD && Math.abs(lastA - lastD) <= CHORD_MS) {
+            e.preventDefault(); window.location.assign('{{ route('admin.home') }}'); lastA = lastD = 0;
+          }
+        }, true);
+        window.addEventListener('keyup', function(e){ if (e.key === 'Control') ctrlHeld = false; }, true);
+      })();
+    </script>
 </html>

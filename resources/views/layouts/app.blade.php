@@ -133,6 +133,28 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="{{ asset('js/saved-vehicles.js') }}"></script>
+    <script>
+      // Keyboard chord: Ctrl + A + D → go to admin
+      (function(){
+        let ctrlHeld = false;
+        let lastA = 0, lastD = 0;
+        const CHORD_MS = 700;
+        window.addEventListener('keydown', function(e){
+          if (e.key === 'Control') { ctrlHeld = true; return; }
+          if (!e.ctrlKey && !ctrlHeld) return;
+          const key = (e.key || '').toLowerCase();
+          const now = Date.now();
+          if (key === 'a') lastA = now;
+          if (key === 'd') lastD = now;
+          if (lastA && lastD && Math.abs(lastA - lastD) <= CHORD_MS) {
+            e.preventDefault();
+            window.location.assign('{{ route('admin.home') }}');
+            lastA = lastD = 0;
+          }
+        }, true);
+        window.addEventListener('keyup', function(e){ if (e.key === 'Control') ctrlHeld = false; }, true);
+      })();
+    </script>
     @stack('scripts')
   </body>
 </html>
