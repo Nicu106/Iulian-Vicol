@@ -209,7 +209,8 @@
             $mainIndex = 0;
             $mainMedia = $allMedia[$mainIndex] ?? null;
             // Include toate item-urile în thumbnails (inclusiv primul) pentru a permite revenirea la video
-            $thumbnails = array_slice($allMedia, 0, 6); // Max 6 thumbnails afișate
+            // Pe mobil vom afișa lista orizontală scrollabilă, fără limită la 6
+            $thumbnails = $allMedia;
           @endphp
           
           @isset($mainMedia)
@@ -247,16 +248,17 @@
               <!-- Thumbnails -->
               @if(!empty($thumbnails) && count($thumbnails) > 0)
                 <div class="thumbnails-container">
-                  <div class="row g-2">
+                  <!-- Mobil: listă orizontală scrollabilă; Desktop: grilă -->
+                  <div class="row g-2 flex-nowrap overflow-auto px-1 px-md-0">
                     @foreach($thumbnails as $index => $media)
-                    <div class="col-4 col-md-3">
+                    <div class="col-auto col-md-3">
                       <div class="thumbnail-item {{ $media['type'] === 'video' ? 'video-thumbnail' : 'image-thumbnail' }} 
                                    {{ $index === $mainIndex ? 'active' : '' }}"
                            data-type="{{ $media['type'] }}"
                            data-url="{{ $media['url'] }}"
                            @if($media['type'] === 'video') data-embed="{{ $media['embed'] ?? '' }}" @endif
                            data-thumbnail="{{ $media['thumbnail'] ?? $media['url'] }}">
-                        <div class="ratio ratio-16x9 rounded overflow-hidden">
+                        <div class="ratio ratio-16x9 rounded overflow-hidden" style="width: 96px;" >
                           @if($media['type'] === 'video')
                             <img src="{{ $media['thumbnail'] ?? 'https://via.placeholder.com/300x200/f8f9fa/6c757d?text=Video' }}" 
                                  class="w-100 h-100 object-fit-contain" 
