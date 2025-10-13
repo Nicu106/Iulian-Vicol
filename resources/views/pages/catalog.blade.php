@@ -281,7 +281,7 @@
           <div class="row g-4">
             @foreach($vehicles as $vehicle)
             <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-              <div class="card h-100 shadow-sm vehicle-card">
+              <div class="card h-100 shadow-sm vehicle-card position-relative" data-href="{{ route('vehicle.show', $vehicle->slug) }}">
                 @php
                   $vehicleImage = null;
                   if (!empty($vehicle->cover_image)) {
@@ -295,14 +295,16 @@
                 @endphp
                 
                 @if($vehicleImage)
-                  <img 
-                    src="{{ $vehicleImage }}" 
-                    class="card-img-top" 
-                    alt="{{ $vehicle->title ?? ($vehicle->brand . ' ' . $vehicle->model . ' ' . $vehicle->year) }}" 
-                    loading="lazy" 
-                    style="height: 200px; object-fit: cover;"
-                    onerror="this.src='https://via.placeholder.com/480x320/f8f9fa/6c757d?text=Sin+imagen'"
-                  />
+                  <a href="{{ route('vehicle.show', $vehicle->slug) }}" class="d-block">
+                    <img 
+                      src="{{ $vehicleImage }}" 
+                      class="card-img-top" 
+                      alt="{{ $vehicle->title ?? ($vehicle->brand . ' ' . $vehicle->model . ' ' . $vehicle->year) }}" 
+                      loading="lazy" 
+                      style="height: 200px; object-fit: cover;"
+                      onerror="this.src='https://via.placeholder.com/480x320/f8f9fa/6c757d?text=Sin+imagen'"
+                    />
+                  </a>
                 @else
                   <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 200px;">
                     <i class="bi bi-car-front text-muted" style="font-size: 3rem;"></i>
@@ -319,7 +321,9 @@
                   @endif
                   
                   <h6 class="card-title mb-1">
-                    {{ $vehicle->title ?? ($vehicle->brand . ' ' . $vehicle->model . ' ' . $vehicle->year) }}
+                    <a href="{{ route('vehicle.show', $vehicle->slug) }}" class="text-decoration-none text-dark">
+                      {{ $vehicle->title ?? ($vehicle->brand . ' ' . $vehicle->model . ' ' . $vehicle->year) }}
+                    </a>
                   </h6>
                   
                   <div class="small text-secondary mb-2">
@@ -344,7 +348,7 @@
                       @endif
                     </div>
                     <div class="d-flex gap-1">
-                      <button type="button" class="btn btn-sm btn-outline-primary save-vehicle-btn" 
+                      <button type="button" class="btn btn-sm btn-outline-primary save-vehicle-btn position-relative" style="z-index:2;"
                               data-vehicle-id="{{ $vehicle->id }}" 
                               data-vehicle-title="{{ $vehicle->title ?? ($vehicle->brand . ' ' . $vehicle->model . ' ' . $vehicle->year) }}"
                               data-vehicle-slug="{{ $vehicle->slug }}"
@@ -355,6 +359,7 @@
                       </button>
                       <a href="{{ url('/vehicles/' . $vehicle->slug) }}" class="btn btn-sm btn-primary">Detalles</a>
                     </div>
+                    <a href="{{ route('vehicle.show', $vehicle->slug) }}" class="stretched-link" aria-label="Ver detalles"></a>
                   </div>
                 </div>
               </div>
