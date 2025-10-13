@@ -44,6 +44,19 @@
   $title = $baseTitle;
   $displayPrice = $vehicle->has_active_offer ? $vehicle->offer_price : $vehicle->price;
   $originalPrice = $vehicle->has_active_offer ? $vehicle->price : null;
+  // Calcul precio de mercado (marketing): de obicei ~€1500 mai scump decât al nostru,
+  // cu o șansă de 3% să fie mai ieftin decât al nostru
+  $basePriceNum = (float) $extractPrice($displayPrice);
+  $chance = random_int(1, 100);
+  if ($chance <= 3) {
+    $marketDelta = random_int(200, 800);
+    $marketPrice = max(0, $basePriceNum - $marketDelta);
+    $isBetterDeal = false; // prețul nostru > piață (rar)
+  } else {
+    $marketDelta = random_int(1200, 1800);
+    $marketPrice = $basePriceNum + $marketDelta;
+    $isBetterDeal = true; // prețul nostru < piață (uzual)
+  }
 @endphp
 
 @push('styles')
@@ -488,7 +501,7 @@
           Vehículos similares para comparar
         </h4>
         
-        <!-- Comparație prețuri -->
+        <!-- Comparație prețuri (marketing) -->
         <div class="card shadow-sm mb-4">
           <div class="card-body">
             <h6 class="card-title text-muted mb-3">Comparație prețuri</h6>
@@ -503,18 +516,20 @@
                 </div>
               </div>
               
-              @php
-                $avgPrice = $similarVehicles->avg('price');
-                $minPrice = $similarVehicles->min('price');
-                $maxPrice = $similarVehicles->max('price');
-              @endphp
-              
               <div class="col-md-6">
                 <div class="d-flex align-items-center justify-content-between p-3 bg-info bg-opacity-10 rounded border border-info">
                   <div>
-                    <small class="text-muted d-block">Media del mercado</small>
-                    <span class="h5 fw-bold text-info mb-0">€ {{ number_format($extractPrice($avgPrice)) }}</span>
-                    <small class="text-muted d-block">€{{ number_format($extractPrice($minPrice)) }} - €{{ number_format($extractPrice($maxPrice)) }}</small>
+                    <small class="text-muted d-block">Media del mercado (estimativa)</small>
+                    <span class="h5 fw-bold {{ $isBetterDeal ? 'text-info' : 'text-danger' }} mb-0">€ {{ number_format($marketPrice) }}</span>
+                    @if($isBetterDeal)
+                      <small class="text-success d-block">
+                        <i class="bi bi-arrow-down"></i> Ahorro estimado de € {{ number_format(max(0, $marketPrice - $extractPrice($displayPrice))) }}
+                      </small>
+                    @else
+                      <small class="text-danger d-block">
+                        <i class="bi bi-exclamation-triangle"></i> Oferta limitada, verifica disponibilidad
+                      </small>
+                    @endif
                   </div>
                   <i class="bi bi-graph-up text-info" style="font-size: 2rem;"></i>
                 </div>
