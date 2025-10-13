@@ -202,7 +202,7 @@
           @isset($mainMedia)
             <div class="vehicle-gallery">
               <!-- Imaginea/Video-ul principal -->
-              <div class="main-media-container mb-3">
+              <div class="main-media-container mb-3 position-relative">
                 <div class="ratio ratio-16x9 rounded overflow-hidden shadow-sm">
                   @if($mainMedia['type'] === 'video')
                     <iframe src="{{ $mainMedia['embed'] ?? $mainMedia['url'] }}" 
@@ -221,6 +221,14 @@
                          onerror="this.src='https://via.placeholder.com/800x450/f8f9fa/6c757d?text=Fără+imagine'" />
                   @endif
                 </div>
+                @if(count($allMedia) > 1)
+                  <button type="button" class="btn btn-light rounded-circle shadow position-absolute top-50 start-0 translate-middle-y ms-2 gallery-prev" aria-label="Anterior">
+                    <i class="bi bi-chevron-left"></i>
+                  </button>
+                  <button type="button" class="btn btn-light rounded-circle shadow position-absolute top-50 end-0 translate-middle-y me-2 gallery-next" aria-label="Siguiente">
+                    <i class="bi bi-chevron-right"></i>
+                  </button>
+                @endif
               </div>
               
               <!-- Thumbnails -->
@@ -588,42 +596,61 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const thumbnailItems = document.querySelectorAll('.thumbnail-item');
-    const mainMediaContainer = document.querySelector('.main-media-container .ratio');
-    
-    thumbnailItems.forEach(function(item) {
-        item.addEventListener('click', function() {
-            const mediaType = this.dataset.type;
-            const mediaUrl = this.dataset.url;
-            const thumbnailUrl = this.dataset.thumbnail;
-            
-            // Remove active class from all thumbnails
-            thumbnailItems.forEach(thumb => thumb.classList.remove('active'));
-            // Add active class to clicked thumbnail
-            this.classList.add('active');
-            
-            // Update main media
-            if (mediaType === 'video') {
-                const embedUrl = this.dataset.embed || mediaUrl;
-                mainMediaContainer.innerHTML = `
-                    <iframe src="${embedUrl}" 
-                            class="w-100 h-100" 
-                            frameborder="0" 
-                            allowfullscreen
-                            title="Video prezentare vehicul">
-                    </iframe>
-                `;
-            } else {
-                mainMediaContainer.innerHTML = `
-                    <img src="${mediaUrl}" 
-                         class="w-100 h-100 object-fit-contain" 
-                         alt="Gallery image" 
-                         id="main-gallery-image"
-                         onerror="this.src='https://via.placeholder.com/800x450/f8f9fa/6c757d?text=Fără+imagine'" />
-                `;
-            }
-        });
+  const mainMediaContainer = document.querySelector('.main-media-container .ratio');
+  const prevBtn = document.querySelector('.main-media-container .gallery-prev');
+  const nextBtn = document.querySelector('.main-media-container .gallery-next');
+  const thumbnailItems = document.querySelectorAll('.thumbnail-item');
+
+  const mediaItems = {!! json_encode($allMedia, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!};
+  let currentIndex = 0;
+
+  function renderMedia(index) {
+    if (!mediaItems || !mediaItems.length) return;
+    const item = mediaItems[index];
+    if (!item) return;
+    if (item.type === 'video') {
+      const embedUrl = item.embed || item.url;
+      mainMediaContainer.innerHTML = `
+        <iframe src="${embedUrl}" class="w-100 h-100" frameborder="0" allowfullscreen title="Video prezentare vehicul"></iframe>
+      `;
+    } else {
+      mainMediaContainer.innerHTML = `
+        <img src="${item.url}" class="w-100 h-100 object-fit-contain" alt="Gallery image" id="main-gallery-image" onerror="this.src='https://via.placeholder.com/800x450/f8f9fa/6c757d?text=Fără+imagine'" />
+      `;
+    }
+    // Update active thumbnail if visible
+    thumbnailItems.forEach(el => el.classList.remove('active'));
+    const thumb = document.querySelector(`.thumbnail-item[data-url="${CSS.escape(item.url)}"]`);
+    if (thumb) thumb.classList.add('active');
+  }
+
+  function setCurrent(index) {
+    const total = mediaItems.length;
+    if (!total) return;
+    currentIndex = ((index % total) + total) % total; // wrap around
+    renderMedia(currentIndex);
+  }
+
+  // Thumbnail clicks
+  thumbnailItems.forEach(function(item, idx) {
+    item.addEventListener('click', function() {
+      const url = this.dataset.url;
+      const index = mediaItems.findIndex(m => m.url === url);
+      setCurrent(index >= 0 ? index : idx);
     });
+  });
+
+  // Prev/Next buttons
+  if (prevBtn) prevBtn.addEventListener('click', function(){ setCurrent(currentIndex - 1); });
+  if (nextBtn) nextBtn.addEventListener('click', function(){ setCurrent(currentIndex + 1); });
+
+  // Initialize index from active thumbnail if present
+  const activeThumb = document.querySelector('.thumbnail-item.active');
+  if (activeThumb) {
+    const url = activeThumb.dataset.url;
+    const idx = mediaItems.findIndex(m => m.url === url);
+    if (idx >= 0) currentIndex = idx;
+  }
 });
 </script>
 <!-- JSON-LD Vehicle Schema -->
