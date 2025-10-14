@@ -667,9 +667,12 @@ async function previewImages(input, previewId) {
     done += 100 / Math.max(1, files.length);
     showCompressionProgress(done);
   }
-  newGalleryFilesCreate = compressed;
+  // Append to any previously selected files so multiple selections accumulate
+  newGalleryFilesCreate = newGalleryFilesCreate.concat(compressed);
   rebuildGalleryInputFilesCreate();
   renderNewGalleryPreviewCreate(previewId);
+  // Reset input to allow selecting the same files again if needed
+  if (input) input.value = '';
 }
 
 function removeNewGalleryItemCreate(index, previewId) {

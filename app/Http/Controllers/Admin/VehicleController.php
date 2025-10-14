@@ -443,10 +443,15 @@ class VehicleController extends BaseController
         if ($request->hasFile('gallery_images')) {
             $galleryUrls = $vehicleData['gallery_images'] ?? [];
             foreach ($request->file('gallery_images') as $img) {
-                $path = $img->store('vehicles/' . $slug, 'public');
-                $galleryUrls[] = Storage::url($path);
+                try {
+                    $path = $img->store('vehicles/' . $slug, 'public');
+                    $galleryUrls[] = Storage::url($path);
+                } catch (\Throwable $e) {
+                    \Log::error('Gallery image store failed: ' . $e->getMessage());
+                }
             }
-            $vehicleData['gallery_images'] = $galleryUrls;
+            // Ensure unique and keep insertion order
+            $vehicleData['gallery_images'] = array_values(array_unique($galleryUrls));
         }
 
         // Handle removal of existing gallery images

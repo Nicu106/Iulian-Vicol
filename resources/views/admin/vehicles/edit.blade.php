@@ -551,9 +551,11 @@ async function previewGallery(input, previewId) {
     if (bar) bar.querySelector('.progress-bar').style.width = Math.min(100, Math.round(done)) + '%';
   }
   if (bar) setTimeout(() => bar.remove(), 600);
-  newGalleryFiles = compressed;
+  // Append to existing pending files so previous selections are kept
+  newGalleryFiles = newGalleryFiles.concat(compressed);
   rebuildGalleryInputFiles();
   renderNewGalleryPreview(previewId);
+  if (input) input.value = '';
 }
 
 function removeNewGalleryItem(index, previewId) {
