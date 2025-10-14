@@ -193,6 +193,7 @@ class VehicleController extends BaseController
         ini_set('post_max_size', '0');
         ini_set('memory_limit', '512M');
         ini_set('max_execution_time', '0');
+        ini_set('max_file_uploads', '200');
         
         // DEBUG: Detailed logging for creation
         \Log::info('STORE DEBUG START', [
@@ -364,6 +365,7 @@ class VehicleController extends BaseController
         ini_set('post_max_size', '0');
         ini_set('memory_limit', '512M');
         ini_set('max_execution_time', '0');
+        ini_set('max_file_uploads', '200');
         
         // Removed excessive debug logging for performance
         
