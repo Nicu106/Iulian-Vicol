@@ -480,8 +480,50 @@ function renderNewGalleryPreview(previewId) {
   });
 }
 
-function previewGallery(input, previewId) {
-  newGalleryFiles = input.files ? Array.from(input.files) : [];
+async function compressImage(file, maxWidth = 1920, maxHeight = 1280, quality = 0.82) {
+  return new Promise((resolve) => {
+    try {
+      const img = new Image();
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        img.onload = function() {
+          let { width, height } = img;
+          const ratio = Math.min(maxWidth / width, maxHeight / height, 1);
+          const targetW = Math.round(width * ratio);
+          const targetH = Math.round(height * ratio);
+          const canvas = document.createElement('canvas');
+          canvas.width = targetW; canvas.height = targetH;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, targetW, targetH);
+          canvas.toBlob((blob) => {
+            const outName = file.name.replace(/\.[^.]+$/, '') + '.jpg';
+            const outFile = new File([blob], outName, { type: 'image/jpeg', lastModified: Date.now() });
+            resolve(outFile);
+          }, 'image/jpeg', quality);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      resolve(file);
+    }
+  });
+}
+
+async function previewGallery(input, previewId) {
+  const files = input.files ? Array.from(input.files) : [];
+  const compressed = [];
+  for (const f of files) {
+    if (f.type && f.type.startsWith('image/')) {
+      /* eslint-disable no-await-in-loop */
+      const c = await compressImage(f);
+      compressed.push(c);
+    } else {
+      compressed.push(f);
+    }
+  }
+  newGalleryFiles = compressed;
+  rebuildGalleryInputFiles();
   renderNewGalleryPreview(previewId);
 }
 

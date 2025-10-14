@@ -501,21 +501,59 @@
 @push('scripts')
 <script>
 // Mobile-friendly image preview functions
+async function compressImage(file, maxWidth = 1920, maxHeight = 1280, quality = 0.82) {
+  return new Promise((resolve) => {
+    try {
+      const img = new Image();
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        img.onload = function() {
+          let { width, height } = img;
+          const ratio = Math.min(maxWidth / width, maxHeight / height, 1);
+          const targetW = Math.round(width * ratio);
+          const targetH = Math.round(height * ratio);
+          const canvas = document.createElement('canvas');
+          canvas.width = targetW; canvas.height = targetH;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, targetW, targetH);
+          canvas.toBlob((blob) => {
+            const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+            const outName = file.name.replace(/\.[^.]+$/, '') + '.jpg';
+            const outFile = new File([blob], outName, { type: 'image/jpeg', lastModified: Date.now() });
+            resolve(outFile);
+          }, 'image/jpeg', quality);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      resolve(file); // fallback without compression
+    }
+  });
+}
+
 function previewImage(input, previewId) {
   const preview = document.getElementById(previewId);
   preview.innerHTML = '';
   
   if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const img = document.createElement('img');
-      img.src = e.target.result;
-      img.className = 'img-fluid rounded';
-      img.style.maxHeight = '200px';
-      img.style.objectFit = 'cover';
-      preview.appendChild(img);
-    };
-    reader.readAsDataURL(input.files[0]);
+    const original = input.files[0];
+    compressImage(original).then((compressed) => {
+      // replace input file with compressed
+      const dt = new DataTransfer();
+      dt.items.add(compressed);
+      input.files = dt.files;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.className = 'img-fluid rounded';
+        img.style.maxHeight = '200px';
+        img.style.objectFit = 'cover';
+        preview.appendChild(img);
+      };
+      reader.readAsDataURL(compressed);
+    });
   }
 }
 
@@ -551,8 +589,21 @@ function renderNewGalleryPreviewCreate(previewId) {
   });
 }
 
-function previewImages(input, previewId) {
-  newGalleryFilesCreate = input.files ? Array.from(input.files) : [];
+async function previewImages(input, previewId) {
+  const files = input.files ? Array.from(input.files) : [];
+  const compressed = [];
+  for (const f of files) {
+    if (f.type && f.type.startsWith('image/')) {
+      // Compress sequentially to avoid UI freeze on mobile
+      /* eslint-disable no-await-in-loop */
+      const c = await compressImage(f);
+      compressed.push(c);
+    } else {
+      compressed.push(f);
+    }
+  }
+  newGalleryFilesCreate = compressed;
+  rebuildGalleryInputFilesCreate();
   renderNewGalleryPreviewCreate(previewId);
 }
 
