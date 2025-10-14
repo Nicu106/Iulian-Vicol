@@ -451,7 +451,8 @@ class VehicleController extends BaseController
                 }
             }
             // Ensure unique and keep insertion order
-            $vehicleData['gallery_images'] = array_values(array_unique($galleryUrls));
+            $galleryUrls = array_values(array_unique($galleryUrls));
+            $vehicleData['gallery_images'] = $galleryUrls;
         }
 
         // Handle removal of existing gallery images
