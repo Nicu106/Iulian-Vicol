@@ -41,6 +41,15 @@
       return $matches[0] ? (float) implode('', $matches[0]) : 0.0;
   };
   
+  $resizeImg = function($url, $w) {
+      if (!is_string($url) || $url === '') return $url;
+      // Only resize local storage files like /storage/...
+      if (preg_match('/^\/storage\//', $url) === 1) {
+          try { return route('img.resize', ['w' => (int)$w]) . '?p=' . urlencode($url); } catch (\Throwable $e) { return $url; }
+      }
+      return $url;
+  };
+  
   $title = $baseTitle;
   $displayPrice = $vehicle->has_active_offer ? $vehicle->offer_price : $vehicle->price;
   $originalPrice = $vehicle->has_active_offer ? $vehicle->price : null;
@@ -175,7 +184,9 @@
             if($vehicle->cover_image) {
               $allMedia[] = [
                 'type' => 'image',
-                'url' => $vehicle->cover_image
+                'url' => $vehicle->cover_image,
+                'display' => $resizeImg($vehicle->cover_image, 1200),
+                'thumb' => $resizeImg($vehicle->cover_image, 240)
               ];
             }
             
@@ -184,7 +195,9 @@
               foreach($vehicle->gallery_images as $img) {
                 $allMedia[] = [
                   'type' => 'image',
-                  'url' => $img
+                  'url' => $img,
+                  'display' => $resizeImg($img, 1200),
+                  'thumb' => $resizeImg($img, 240)
                 ];
               }
             }
@@ -200,6 +213,8 @@
                     $allMedia[] = [
                       'type' => 'image',
                       'url' => $imgUrl,
+                      'display' => $resizeImg($imgUrl, 1200),
+                      'thumb' => $resizeImg($imgUrl, 240)
                     ];
                   }
                 }
@@ -228,7 +243,7 @@
                             title="Video prezentare vehicul">
                     </iframe>
                   @else
-                    <img src="{{ $mainMedia['url'] }}" 
+                    <img src="{{ $mainMedia['display'] ?? $mainMedia['url'] }}" 
                          class="w-100 h-100 object-fit-contain" 
                          alt="{{ $title }}" 
                          id="main-gallery-image"
@@ -269,7 +284,7 @@
                               <i class="bi bi-play-circle-fill"></i>
                             </div>
                           @else
-                            <img src="{{ $media['url'] }}" 
+                            <img src="{{ $media['thumb'] ?? $media['url'] }}" 
                                  class="w-100 h-100 object-fit-contain" 
                                  alt="{{ $title }}" 
                                  loading="lazy"

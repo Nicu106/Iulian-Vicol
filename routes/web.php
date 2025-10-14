@@ -11,6 +11,9 @@ Route::view('/contact', 'pages.contact')->name('contact');
 Route::get('/catalog', [App\Http\Controllers\CatalogController::class, 'index'])->name('catalog');
 Route::post('/contact/send', [App\Http\Controllers\ContactController::class, 'store'])->name('contact.send');
 
+// Lightweight image resize with caching (local files only)
+Route::get('/img/{w}', [App\Http\Controllers\ImageController::class, 'resize'])->whereNumber('w')->name('img.resize');
+
 // Sell Your Car routes
 Route::get('/sell-car', [App\Http\Controllers\SellCarController::class, 'index'])->name('sell-car');
 Route::post('/sell-car', [App\Http\Controllers\SellCarController::class, 'store'])->name('sell-car.store');
