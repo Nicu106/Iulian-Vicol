@@ -480,30 +480,45 @@ function renderNewGalleryPreview(previewId) {
   });
 }
 
-async function compressImage(file, maxWidth = 1920, maxHeight = 1280, quality = 0.82) {
+async function compressImage(file, maxWidth = 1600, maxHeight = 1600, quality = 0.85) {
+  if (file.size && file.size <= 600 * 1024) return file;
   return new Promise((resolve) => {
     try {
-      const img = new Image();
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        img.onload = function() {
-          let { width, height } = img;
-          const ratio = Math.min(maxWidth / width, maxHeight / height, 1);
-          const targetW = Math.round(width * ratio);
-          const targetH = Math.round(height * ratio);
+      const useImageBitmap = 'createImageBitmap' in window;
+      const run = (bitmap) => {
+        const ratio = Math.min(maxWidth / bitmap.width, maxHeight / bitmap.height, 1);
+        if (ratio >= 1) { resolve(file); return; }
+        const targetW = Math.round(bitmap.width * ratio);
+        const targetH = Math.round(bitmap.height * ratio);
+        if (typeof OffscreenCanvas !== 'undefined') {
+          const canvas = new OffscreenCanvas(targetW, targetH);
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(bitmap, 0, 0, targetW, targetH);
+          canvas.convertToBlob({ type: 'image/jpeg', quality }).then((blob) => {
+            const outName = file.name.replace(/\.[^.]+$/, '') + '.jpg';
+            resolve(new File([blob], outName, { type: 'image/jpeg', lastModified: Date.now() }));
+          }).catch(() => resolve(file));
+        } else {
           const canvas = document.createElement('canvas');
           canvas.width = targetW; canvas.height = targetH;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, targetW, targetH);
+          canvas.getContext('2d').drawImage(bitmap, 0, 0, targetW, targetH);
           canvas.toBlob((blob) => {
             const outName = file.name.replace(/\.[^.]+$/, '') + '.jpg';
-            const outFile = new File([blob], outName, { type: 'image/jpeg', lastModified: Date.now() });
-            resolve(outFile);
+            resolve(new File([blob], outName, { type: 'image/jpeg', lastModified: Date.now() }));
           }, 'image/jpeg', quality);
-        };
-        img.src = e.target.result;
+        }
       };
-      reader.readAsDataURL(file);
+      if (useImageBitmap) {
+        createImageBitmap(file).then(run).catch(() => resolve(file));
+      } else {
+        const img = new Image();
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          img.onload = function() { run(img); };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
     } catch (err) {
       resolve(file);
     }
@@ -513,6 +528,17 @@ async function compressImage(file, maxWidth = 1920, maxHeight = 1280, quality = 
 async function previewGallery(input, previewId) {
   const files = input.files ? Array.from(input.files) : [];
   const compressed = [];
+  let done = 0;
+  const barId = 'compress-progress-edit';
+  const container = document.getElementById('gallery_preview')?.parentElement;
+  let bar = document.getElementById(barId);
+  if (container && !bar) {
+    bar = document.createElement('div');
+    bar.id = barId;
+    bar.className = 'w-100 mb-2';
+    bar.innerHTML = '<div class="progress" style="height:8px;"><div class="progress-bar progress-bar-striped progress-bar-animated" style="width:0%"></div></div>';
+    container.insertBefore(bar, document.getElementById('gallery_preview'));
+  }
   for (const f of files) {
     if (f.type && f.type.startsWith('image/')) {
       /* eslint-disable no-await-in-loop */
@@ -521,7 +547,10 @@ async function previewGallery(input, previewId) {
     } else {
       compressed.push(f);
     }
+    done += 100 / Math.max(1, files.length);
+    if (bar) bar.querySelector('.progress-bar').style.width = Math.min(100, Math.round(done)) + '%';
   }
+  if (bar) setTimeout(() => bar.remove(), 600);
   newGalleryFiles = compressed;
   rebuildGalleryInputFiles();
   renderNewGalleryPreview(previewId);

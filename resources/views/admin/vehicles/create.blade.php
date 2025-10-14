@@ -501,31 +501,75 @@
 @push('scripts')
 <script>
 // Mobile-friendly image preview functions
-async function compressImage(file, maxWidth = 1920, maxHeight = 1280, quality = 0.82) {
+// Fast client-side compression using createImageBitmap/OffscreenCanvas when available
+async function compressImage(file, maxWidth = 1600, maxHeight = 1600, quality = 0.85) {
+  // Skip compression for already-small files (< 600KB) to be instant
+  if (file.size && file.size <= 600 * 1024) {
+    return file;
+  }
   return new Promise((resolve) => {
     try {
-      const img = new Image();
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        img.onload = function() {
-          let { width, height } = img;
-          const ratio = Math.min(maxWidth / width, maxHeight / height, 1);
-          const targetW = Math.round(width * ratio);
-          const targetH = Math.round(height * ratio);
+      const useImageBitmap = 'createImageBitmap' in window;
+      const work = (bitmap) => {
+        let width = bitmap.width;
+        let height = bitmap.height;
+        const ratio = Math.min(maxWidth / width, maxHeight / height, 1);
+        const targetW = Math.round(width * ratio);
+        const targetH = Math.round(height * ratio);
+        if (ratio >= 1) {
+          // No resize needed; keep original to save CPU
+          return file;
+        }
+
+        if (typeof OffscreenCanvas !== 'undefined') {
+          const canvas = new OffscreenCanvas(targetW, targetH);
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(bitmap, 0, 0, targetW, targetH);
+          canvas.convertToBlob({ type: 'image/jpeg', quality }).then((blob) => {
+            const outName = file.name.replace(/\.[^.]+$/, '') + '.jpg';
+            resolve(new File([blob], outName, { type: 'image/jpeg', lastModified: Date.now() }));
+          }).catch(() => resolve(file));
+          return null;
+        } else {
           const canvas = document.createElement('canvas');
           canvas.width = targetW; canvas.height = targetH;
           const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, targetW, targetH);
+          ctx.drawImage(bitmap, 0, 0, targetW, targetH);
           canvas.toBlob((blob) => {
-            const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
             const outName = file.name.replace(/\.[^.]+$/, '') + '.jpg';
-            const outFile = new File([blob], outName, { type: 'image/jpeg', lastModified: Date.now() });
-            resolve(outFile);
+            resolve(new File([blob], outName, { type: 'image/jpeg', lastModified: Date.now() }));
           }, 'image/jpeg', quality);
-        };
-        img.src = e.target.result;
+          return null;
+        }
       };
-      reader.readAsDataURL(file);
+
+      if (useImageBitmap) {
+        const blob = file;
+        createImageBitmap(blob).then((bitmap) => {
+          const result = work(bitmap);
+          if (result) resolve(result);
+        }).catch(() => resolve(file));
+      } else {
+        const img = new Image();
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const ratio = Math.min(maxWidth / img.width, maxHeight / img.height, 1);
+            const targetW = Math.round(img.width * ratio);
+            const targetH = Math.round(img.height * ratio);
+            if (ratio >= 1) { resolve(file); return; }
+            canvas.width = targetW; canvas.height = targetH;
+            canvas.getContext('2d').drawImage(img, 0, 0, targetW, targetH);
+            canvas.toBlob((blob) => {
+              const outName = file.name.replace(/\.[^.]+$/, '') + '.jpg';
+              resolve(new File([blob], outName, { type: 'image/jpeg', lastModified: Date.now() }));
+            }, 'image/jpeg', quality);
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
     } catch (err) {
       resolve(file); // fallback without compression
     }
@@ -589,9 +633,28 @@ function renderNewGalleryPreviewCreate(previewId) {
   });
 }
 
+// Simple progress while preparing many images
+function showCompressionProgress(count) {
+  const preview = document.getElementById('gallery-preview');
+  if (!preview) return;
+  const barId = 'compress-progress';
+  let bar = document.getElementById(barId);
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.id = barId;
+    bar.className = 'w-100 mb-2';
+    bar.innerHTML = '<div class="progress" style="height:8px;"><div class="progress-bar progress-bar-striped progress-bar-animated" style="width:0%"></div></div>';
+    preview.parentElement.insertBefore(bar, preview);
+  }
+  const inner = bar.querySelector('.progress-bar');
+  inner.style.width = Math.min(100, Math.round(count)) + '%';
+  if (count >= 100) setTimeout(() => bar.remove(), 600);
+}
+
 async function previewImages(input, previewId) {
   const files = input.files ? Array.from(input.files) : [];
   const compressed = [];
+  let done = 0;
   for (const f of files) {
     if (f.type && f.type.startsWith('image/')) {
       // Compress sequentially to avoid UI freeze on mobile
@@ -601,6 +664,8 @@ async function previewImages(input, previewId) {
     } else {
       compressed.push(f);
     }
+    done += 100 / Math.max(1, files.length);
+    showCompressionProgress(done);
   }
   newGalleryFilesCreate = compressed;
   rebuildGalleryInputFilesCreate();
