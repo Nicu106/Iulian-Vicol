@@ -620,9 +620,11 @@ function renderNewGalleryPreviewCreate(previewId) {
     const reader = new FileReader();
     reader.onload = function(e) {
       const col = document.createElement('div');
-      col.className = 'col-6 col-md-4 position-relative';
+      col.className = 'col-6 col-md-4 position-relative draggable-thumb';
+      col.dataset.idx = String(index);
+      col.style.touchAction = 'none';
       col.innerHTML = `
-        <img src="${e.target.result}" class="img-fluid rounded" style="aspect-ratio: 4/3; object-fit: cover;">
+        <img src="${e.target.result}" class="img-fluid rounded" style="aspect-ratio: 4/3; object-fit: cover; cursor: grab;">
         <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1" onclick="removeNewGalleryItemCreate(${index}, '${previewId}')">
           <i class="bi bi-x"></i>
         </button>
@@ -630,6 +632,17 @@ function renderNewGalleryPreviewCreate(previewId) {
       preview.appendChild(col);
     };
     reader.readAsDataURL(file);
+  });
+
+  enableDragSort(preview, '.draggable-thumb', () => {
+    // Recompute order based on DOM
+    const orderedIdx = Array.from(preview.querySelectorAll('.draggable-thumb')).map(n => parseInt(n.dataset.idx || '0', 10));
+    const newOrder = [];
+    orderedIdx.forEach(i => { if (newGalleryFilesCreate[i]) newOrder.push(newGalleryFilesCreate[i]); });
+    newGalleryFilesCreate = newOrder;
+    rebuildGalleryInputFilesCreate();
+    // Re-render to refresh dataset idx
+    renderNewGalleryPreviewCreate(previewId);
   });
 }
 
@@ -679,6 +692,56 @@ function removeNewGalleryItemCreate(index, previewId) {
   newGalleryFilesCreate.splice(index, 1);
   rebuildGalleryInputFilesCreate();
   renderNewGalleryPreviewCreate(previewId);
+}
+
+// Generic drag-sort helper (pointer events) that works on mobile and desktop
+function enableDragSort(container, itemSelector, onReorder) {
+  let dragged = null;
+  let startY = 0;
+  let placeholder = null;
+
+  function pointerMove(e) {
+    if (!dragged) return;
+    const pointY = e.clientY || (e.touches && e.touches[0] && e.touches[0].clientY) || startY;
+    const el = document.elementFromPoint((e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX) || 0), pointY);
+    const target = el ? el.closest(itemSelector) : null;
+    if (target && target !== placeholder) {
+      if (target.compareDocumentPosition(placeholder) & Node.DOCUMENT_POSITION_FOLLOWING) {
+        target.parentNode.insertBefore(placeholder, target);
+      } else {
+        target.parentNode.insertBefore(placeholder, target.nextSibling);
+      }
+    }
+    e.preventDefault();
+  }
+
+  function pointerUp() {
+    if (!dragged) return;
+    placeholder.replaceWith(dragged);
+    dragged.style.opacity = '';
+    container.releasePointerCapture && container.releasePointerCapture;
+    container.removeEventListener('pointermove', pointerMove);
+    container.removeEventListener('pointerup', pointerUp);
+    dragged = null;
+    placeholder = null;
+    onReorder && onReorder();
+  }
+
+  container.addEventListener('pointerdown', function(e) {
+    const item = e.target.closest(itemSelector);
+    if (!item) return;
+    dragged = item;
+    startY = e.clientY || (e.touches && e.touches[0] && e.touches[0].clientY) || 0;
+    placeholder = document.createElement('div');
+    placeholder.className = item.className;
+    placeholder.style.height = item.offsetHeight + 'px';
+    placeholder.style.width = item.offsetWidth + 'px';
+    item.parentNode.insertBefore(placeholder, item.nextSibling);
+    item.style.opacity = '0.4';
+    container.addEventListener('pointermove', pointerMove);
+    container.addEventListener('pointerup', pointerUp);
+    e.preventDefault();
+  });
 }
 
 // Drag and drop functionality for mobile

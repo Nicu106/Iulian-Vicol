@@ -465,11 +465,13 @@ function renderNewGalleryPreview(previewId) {
     const reader = new FileReader();
     reader.onload = function(e) {
       const wrapper = document.createElement('div');
-      wrapper.className = 'position-relative';
+      wrapper.className = 'position-relative draggable-thumb';
+      wrapper.dataset.idx = String(index);
       wrapper.style.width = '80px';
       wrapper.style.height = '60px';
+      wrapper.style.touchAction = 'none';
       wrapper.innerHTML = `
-        <img src="${e.target.result}" style="width: 80px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #e5e7eb;">
+        <img src="${e.target.result}" style="width: 80px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #e5e7eb; cursor: grab;">
         <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1" onclick="removeNewGalleryItem(${index}, '${previewId}')">
           <i class="bi bi-x"></i>
         </button>
@@ -477,6 +479,16 @@ function renderNewGalleryPreview(previewId) {
       preview.appendChild(wrapper);
     };
     reader.readAsDataURL(file);
+  });
+
+  enableDragSort(document.getElementById(previewId), '.draggable-thumb', () => {
+    const container = document.getElementById(previewId);
+    const orderedIdx = Array.from(container.querySelectorAll('.draggable-thumb')).map(n => parseInt(n.dataset.idx || '0', 10));
+    const newOrder = [];
+    orderedIdx.forEach(i => { if (newGalleryFiles[i]) newOrder.push(newGalleryFiles[i]); });
+    newGalleryFiles = newOrder;
+    rebuildGalleryInputFiles();
+    renderNewGalleryPreview(previewId);
   });
 }
 
@@ -578,6 +590,53 @@ function removeExistingGalleryItem(button, url) {
   if (wrapper) {
     wrapper.remove();
   }
+}
+
+// Reuse the same helper from create page
+function enableDragSort(container, itemSelector, onReorder) {
+  let dragged = null;
+  let startY = 0;
+  let placeholder = null;
+  function move(e) {
+    if (!dragged) return;
+    const y = e.clientY || (e.touches && e.touches[0] && e.touches[0].clientY) || startY;
+    const x = e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX) || 0;
+    const el = document.elementFromPoint(x, y);
+    const target = el ? el.closest(itemSelector) : null;
+    if (target && target !== placeholder) {
+      if (target.compareDocumentPosition(placeholder) & Node.DOCUMENT_POSITION_FOLLOWING) {
+        target.parentNode.insertBefore(placeholder, target);
+      } else {
+        target.parentNode.insertBefore(placeholder, target.nextSibling);
+      }
+    }
+    e.preventDefault();
+  }
+  function up() {
+    if (!dragged) return;
+    placeholder.replaceWith(dragged);
+    dragged.style.opacity = '';
+    container.removeEventListener('pointermove', move);
+    container.removeEventListener('pointerup', up);
+    dragged = null;
+    placeholder = null;
+    onReorder && onReorder();
+  }
+  container.addEventListener('pointerdown', function(e) {
+    const item = e.target.closest(itemSelector);
+    if (!item) return;
+    dragged = item;
+    startY = e.clientY || (e.touches && e.touches[0] && e.touches[0].clientY) || 0;
+    placeholder = document.createElement('div');
+    placeholder.className = item.className;
+    placeholder.style.height = item.offsetHeight + 'px';
+    placeholder.style.width = item.offsetWidth + 'px';
+    item.parentNode.insertBefore(placeholder, item.nextSibling);
+    item.style.opacity = '0.4';
+    container.addEventListener('pointermove', move);
+    container.addEventListener('pointerup', up);
+    e.preventDefault();
+  });
 }
 </script>
 @endpush
