@@ -71,11 +71,12 @@
 @push('styles')
   <link rel="stylesheet" href="{{ asset('css/pages/vehicle.css') }}">
   <style>
-    .gallery-lightbox { position: fixed; inset: 0; z-index: 2000; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.92); }
+    .gallery-lightbox { position: fixed; inset: 0; z-index: 2000; display: none; background: rgba(0,0,0,0.92); overflow: auto; }
     .gallery-lightbox.show { display: flex; }
-    .gallery-lightbox .lightbox-inner { max-width: 95vw; max-height: 90vh; position: relative; }
+    .gallery-lightbox .lightbox-inner { position: relative; margin: auto; min-height: 100vh; width: 100%; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .gallery-lightbox .lightbox-media { display: flex; align-items: center; justify-content: center; width: 100%; }
     .gallery-lightbox .lightbox-media img,
-    .gallery-lightbox .lightbox-media iframe { max-width: 95vw; max-height: 90vh; width: auto; height: auto; object-fit: contain; display: block; background: #000; }
+    .gallery-lightbox .lightbox-media iframe { max-width: 95vw; max-height: 90vh; width: auto; height: auto; object-fit: contain; display: block; background: #000; margin: 0 auto; }
     .gallery-lightbox .lightbox-close { position: absolute; top: 12px; right: 12px; z-index: 1; }
     .gallery-lightbox .lightbox-prev,
     .gallery-lightbox .lightbox-next { position: absolute; top: 50%; transform: translateY(-50%); }
@@ -736,10 +737,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!item) return;
     if (item.type === 'video') {
       const embedUrl = item.embed || item.url;
-      lightboxMedia.innerHTML = `<iframe src="${embedUrl}" frameborder="0" allowfullscreen title="Video prezentare vehicul" style="width:95vw; height:calc(95vw*9/16); max-height:90vh;"></iframe>`;
+      lightboxMedia.innerHTML = `<iframe src="${embedUrl}" frameborder="0" allowfullscreen title="Video prezentare vehicul" style="width:min(95vw,1200px); height:min(calc(95vw*9/16), 90vh);"></iframe>`;
     } else {
       const displayUrl = item.display || item.url;
-      lightboxMedia.innerHTML = `<img src="${displayUrl}" alt="Imagine" style="max-width:95vw; max-height:90vh; object-fit:contain;" />`;
+      lightboxMedia.innerHTML = `<img src="${displayUrl}" alt="Imagine" style="max-width:min(95vw,1600px); max-height:90vh; object-fit:contain; margin:0 auto;" />`;
     }
   }
   function openLightbox() {
