@@ -386,18 +386,38 @@
               <tr><th>Modelo</th><td>{{ $vehicle->model ?? 'N/A' }}</td><th>Motor</th><td>{{ $vehicle->engine ?? 'N/A' }}</td></tr>
               <tr><th>Año</th><td>{{ $vehicle->year ?? 'N/A' }}</td><th>Color</th><td>{{ $vehicle->color ?? 'N/A' }}</td></tr>
               <tr><th>Kilometraje</th><td>{{ $vehicle->mileage ? number_format($extractMileage($vehicle->mileage)) . ' km' : 'N/A' }}</td><th>Estado</th><td>{{ $vehicle->condition ?? 'N/A' }}</td></tr>
-              <tr><th>Combustible</th><td>{{ $vehicle->fuel ?? 'N/A' }}</td><th>Sin imágenes disponibles</th><td>@if($vehicle->vin)<code>{{ substr($vehicle->vin,0,6) }}••••••</code>@else N/A @endif</td></tr>
+              <tr><th>Combustible</th><td>{{ $vehicle->fuel ?? 'N/A' }}</td><th>Sin imágenes disponibles</th><td>@if($vehicle->vin)<code>{{ substr($vehicle->vin,0,6) }}••••••</code>@else Sin imágenes disponibles @endif</td></tr>
               @if($vehicle->power || $vehicle->drivetrain)
-                <tr>
-                  @if($vehicle->power)<th>Potencia</th><td>{{ $vehicle->power }}</td>@else<th></th><td></td>@endif
-                  @if($vehicle->drivetrain)<th>Tracción</th><td>{{ $vehicle->drivetrain }}</td>@else<th></th><td></td>@endif
-                </tr>
+                @if($vehicle->power && $vehicle->drivetrain)
+                  <tr>
+                    <th>Potencia</th><td>{{ $vehicle->power }}</td>
+                    <th>Tracción</th><td>{{ $vehicle->drivetrain }}</td>
+                  </tr>
+                @elseif($vehicle->power)
+                  <tr>
+                    <th>Potencia</th><td colspan="3">{{ $vehicle->power }}</td>
+                  </tr>
+                @else
+                  <tr>
+                    <th>Tracción</th><td colspan="3">{{ $vehicle->drivetrain }}</td>
+                  </tr>
+                @endif
               @endif
               @if($vehicle->body_type || $vehicle->location)
-                <tr>
-                  @if($vehicle->body_type)<th>Carrocería</th><td>{{ $vehicle->body_type }}</td>@else<th></th><td></td>@endif
-                  @if($vehicle->location)<th>Ubicación</th><td>{{ $vehicle->location }}</td>@else<th></th><td></td>@endif
-                </tr>
+                @if($vehicle->body_type && $vehicle->location)
+                  <tr>
+                    <th>Carrocería</th><td>{{ $vehicle->body_type }}</td>
+                    <th>Ubicación</th><td>{{ $vehicle->location }}</td>
+                  </tr>
+                @elseif($vehicle->body_type)
+                  <tr>
+                    <th>Carrocería</th><td colspan="3">{{ $vehicle->body_type }}</td>
+                  </tr>
+                @else
+                  <tr>
+                    <th>Ubicación</th><td colspan="3">{{ $vehicle->location }}</td>
+                  </tr>
+                @endif
               @endif
             </tbody>
           </table>
