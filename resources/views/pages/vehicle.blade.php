@@ -329,7 +329,7 @@
             <div class="ratio ratio-16x9 rounded overflow-hidden bg-light d-flex align-items-center justify-content-center">
               <div class="text-center text-muted">
                 <i class="bi bi-car-front" style="font-size: 4rem;"></i>
-                <p class="mt-2">Fără imagini disponibile</p>
+                <p class="mt-2">Sin imágenes disponibles</p>
               </div>
             </div>
           @endisset
@@ -337,7 +337,7 @@
           <div class="ratio ratio-16x9 rounded overflow-hidden bg-light d-flex align-items-center justify-content-center">
             <div class="text-center text-muted">
               <i class="bi bi-car-front" style="font-size: 4rem;"></i>
-              <p class="mt-2">Fără imagini disponibile</p>
+              <p class="mt-2">Sin imágenes disponibles</p>
             </div>
           </div>
         @endif
@@ -364,7 +364,7 @@
                 <li class="mb-2"><strong>Color:</strong> {{ $vehicle->color }}</li>
               @endif
               @if($vehicle->body_type)
-                <li class="mb-2"><strong>Caroserie:</strong> {{ $vehicle->body_type }}</li>
+                <li class="mb-2"><strong>Carrocería:</strong> {{ $vehicle->body_type }}</li>
               @endif
             </ul>
           </div>
@@ -386,7 +386,7 @@
               <tr><th>Modelo</th><td>{{ $vehicle->model ?? 'N/A' }}</td><th>Motor</th><td>{{ $vehicle->engine ?? 'N/A' }}</td></tr>
               <tr><th>Año</th><td>{{ $vehicle->year ?? 'N/A' }}</td><th>Color</th><td>{{ $vehicle->color ?? 'N/A' }}</td></tr>
               <tr><th>Kilometraje</th><td>{{ $vehicle->mileage ? number_format($extractMileage($vehicle->mileage)) . ' km' : 'N/A' }}</td><th>Estado</th><td>{{ $vehicle->condition ?? 'N/A' }}</td></tr>
-              <tr><th>Combustible</th><td>{{ $vehicle->fuel ?? 'N/A' }}</td><th>Etiqueta medioambiental</th><td>@if($vehicle->vin)<code>{{ substr($vehicle->vin,0,6) }}••••••</code>@else N/A @endif</td></tr>
+              <tr><th>Combustible</th><td>{{ $vehicle->fuel ?? 'N/A' }}</td><th>Sin imágenes disponibles</th><td>@if($vehicle->vin)<code>{{ substr($vehicle->vin,0,6) }}••••••</code>@else N/A @endif</td></tr>
               @if($vehicle->power || $vehicle->drivetrain)
                 <tr>
                   @if($vehicle->power)<th>Potencia</th><td>{{ $vehicle->power }}</td>@else<th></th><td></td>@endif
