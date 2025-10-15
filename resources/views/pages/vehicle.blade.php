@@ -387,7 +387,16 @@
               <tr><th>Modelo</th><td>{{ $vehicle->model ?? 'N/A' }}</td><th>Motor</th><td>{{ $vehicle->engine ?? 'N/A' }}</td></tr>
               <tr><th>Año</th><td>{{ $vehicle->year ?? 'N/A' }}</td><th>Color</th><td>{{ $vehicle->color ?? 'N/A' }}</td></tr>
               <tr><th>Kilometraje</th><td>{{ $vehicle->mileage ? number_format($extractMileage($vehicle->mileage)) . ' km' : 'N/A' }}</td><th>Estado</th><td>{{ $vehicle->condition ?? 'N/A' }}</td></tr>
-              <tr><th>Combustible</th><td>{{ $vehicle->fuel ?? 'N/A' }}</td><th>Etiqueta medioambiental</th><td>@if($vehicle->vin)<code>{{ substr($vehicle->vin,0,6) }}••••••</code>@else N/A @endif</td></tr>
+              @if(!empty($vehicle->vin))
+                <tr>
+                  <th>Combustible</th><td>{{ $vehicle->fuel ?? 'N/A' }}</td>
+                  <th>Etiqueta medioambiental</th><td><code>{{ substr($vehicle->vin,0,6) }}••••••</code></td>
+                </tr>
+              @else
+                <tr>
+                  <th>Combustible</th><td colspan="3">{{ $vehicle->fuel ?? 'N/A' }}</td>
+                </tr>
+              @endif
               @if($vehicle->power || $vehicle->drivetrain)
                 @if($vehicle->power && $vehicle->drivetrain)
                   <tr>
