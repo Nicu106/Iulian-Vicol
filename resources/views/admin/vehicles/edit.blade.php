@@ -563,8 +563,15 @@ async function previewGallery(input, previewId) {
     if (bar) bar.querySelector('.progress-bar').style.width = Math.min(100, Math.round(done)) + '%';
   }
   if (bar) setTimeout(() => bar.remove(), 600);
-  // Append to existing pending files so previous selections are kept
-  newGalleryFiles = newGalleryFiles.concat(compressed);
+  // Append to existing pending files so previous selections are kept (with dedupe)
+  const combined = newGalleryFiles.concat(compressed);
+  const seen = new Set();
+  newGalleryFiles = combined.filter(f => {
+    const key = [f.name, f.size, f.lastModified].join(':');
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
   rebuildGalleryInputFiles();
   renderNewGalleryPreview(previewId);
   if (input) input.value = '';

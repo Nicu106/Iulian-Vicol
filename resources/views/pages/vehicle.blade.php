@@ -33,14 +33,14 @@
       preg_match_all('/\d+/', (string) $priceStr, $matches);
       return $matches[0] ? (float) implode('', $matches[0]) : 0.0;
   };
-  
+
   $extractMileage = function($mileageStr) {
       if (is_numeric($mileageStr)) return (float) $mileageStr;
       if (empty($mileageStr) || is_null($mileageStr)) return 0.0;
       preg_match_all('/\d+/', (string) $mileageStr, $matches);
       return $matches[0] ? (float) implode('', $matches[0]) : 0.0;
   };
-  
+
   $resizeImg = function($url, $w) {
       if (!is_string($url) || $url === '') return $url;
       // Only resize local storage files like /storage/...
@@ -49,7 +49,7 @@
       }
       return $url;
   };
-  
+
   $title = $baseTitle;
   $displayPrice = $vehicle->has_active_offer ? $vehicle->offer_price : $vehicle->price;
   $originalPrice = $vehicle->has_active_offer ? $vehicle->price : null;
@@ -70,6 +70,18 @@
 
 @push('styles')
   <link rel="stylesheet" href="{{ asset('css/pages/vehicle.css') }}">
+  <style>
+    .gallery-lightbox { position: fixed; inset: 0; z-index: 2000; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.92); }
+    .gallery-lightbox.show { display: flex; }
+    .gallery-lightbox .lightbox-inner { max-width: 95vw; max-height: 90vh; position: relative; }
+    .gallery-lightbox .lightbox-media img,
+    .gallery-lightbox .lightbox-media iframe { max-width: 95vw; max-height: 90vh; width: auto; height: auto; object-fit: contain; display: block; background: #000; }
+    .gallery-lightbox .lightbox-close { position: absolute; top: 12px; right: 12px; z-index: 1; }
+    .gallery-lightbox .lightbox-prev,
+    .gallery-lightbox .lightbox-next { position: absolute; top: 50%; transform: translateY(-50%); }
+    .gallery-lightbox .lightbox-prev { left: 12px; }
+    .gallery-lightbox .lightbox-next { right: 12px; }
+  </style>
 @endpush
 @section('content')
 <section class="pt-5 vehicle-page">
@@ -127,8 +139,8 @@
         </div>
       </div>
       <div class="col-lg-4 d-grid gap-2 gap-lg-2">
-        <button type="button" class="btn btn-outline-primary btn-lg" id="saveVehicleBtn" 
-                data-vehicle-id="{{ $vehicle->id }}" 
+        <button type="button" class="btn btn-outline-primary btn-lg" id="saveVehicleBtn"
+                data-vehicle-id="{{ $vehicle->id }}"
                 data-vehicle-title="{{ $title }}"
                 data-vehicle-slug="{{ $vehicle->slug }}"
                 data-vehicle-price="{{ $vehicle->has_offer && $vehicle->offer_price ? $vehicle->offer_price : $vehicle->price }}"
@@ -138,7 +150,7 @@
         <a href="tel:+40123456789" class="btn btn-primary btn-lg"><i class="bi bi-telephone me-2"></i>Llamar ahora</a>
         <a href="https://wa.me/40123456789" class="btn btn-outline-success btn-lg"><i class="bi bi-whatsapp me-2"></i>WhatsApp</a>
         <a href="#testdrive" class="btn btn-outline-primary btn-lg"><i class="bi bi-calendar2-check me-2"></i>Programar prueba de manejo</a>
-        
+
       </div>
     </div>
 
@@ -147,7 +159,7 @@
         @if($vehicle->cover_image || !empty($vehicle->gallery_images) || $vehicle->video_url)
           @php
             $allMedia = [];
-            
+
             // Adaugă video-ul primul dacă există (normalizează la embed YouTube)
             if($vehicle->video_url) {
               $videoUrl = trim((string) $vehicle->video_url);
@@ -179,7 +191,7 @@
                 'thumbnail' => $videoThumb,
               ];
             }
-            
+
             // Adaugă imaginea de copertă
             if($vehicle->cover_image) {
               $allMedia[] = [
@@ -189,7 +201,7 @@
                 'thumb' => $resizeImg($vehicle->cover_image, 240)
               ];
             }
-            
+
             // Adaugă imaginile din galerie
             if($vehicle->gallery_images) {
               foreach($vehicle->gallery_images as $img) {
@@ -201,7 +213,7 @@
                 ];
               }
             }
-            
+
             // Adaugă imaginile din câmpul `images` (Sell Your Car)
             if(!empty($vehicle->images)) {
               $imagesField = is_string($vehicle->images) ? json_decode($vehicle->images, true) : $vehicle->images;
@@ -220,22 +232,22 @@
                 }
               }
             }
-            
+
             $mainIndex = 0;
             $mainMedia = $allMedia[$mainIndex] ?? null;
             // Include toate item-urile în thumbnails (inclusiv primul) pentru a permite revenirea la video
             // Pe mobil vom afișa lista orizontală scrollabilă, fără limită la 6
             $thumbnails = $allMedia;
           @endphp
-          
+
           @isset($mainMedia)
             <div class="vehicle-gallery">
               <!-- Imaginea/Video-ul principal -->
               <div class="main-media-container mb-3 position-relative">
-                <div class="ratio ratio-16x9 rounded overflow-hidden shadow-sm">
+                <div class="ratio ratio-16x9 rounded overflow-hidden shadow-sm" id="main-media-click">
                   @if($mainMedia['type'] === 'video')
-                    <iframe src="{{ $mainMedia['embed'] ?? $mainMedia['url'] }}" 
-                            class="w-100 h-100" 
+                    <iframe src="{{ $mainMedia['embed'] ?? $mainMedia['url'] }}"
+                            class="w-100 h-100"
                             frameborder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             allowfullscreen
@@ -243,13 +255,28 @@
                             title="Video prezentare vehicul">
                     </iframe>
                   @else
-                    <img src="{{ $mainMedia['display'] ?? $mainMedia['url'] }}" 
-                         class="w-100 h-100 object-fit-contain" 
-                         alt="{{ $title }}" 
+                    <img src="{{ $mainMedia['display'] ?? $mainMedia['url'] }}"
+                         class="w-100 h-100 object-fit-contain"
+                         alt="{{ $title }}"
                          id="main-gallery-image"
                          onerror="this.src='https://via.placeholder.com/800x450/f8f9fa/6c757d?text=Fără+imagine'" />
                   @endif
                 </div>
+              <!-- Lightbox overlay -->
+              <div class="gallery-lightbox" id="gallery-lightbox" role="dialog" aria-modal="true" aria-label="Vizualizare imagine pe tot ecranul">
+                <div class="lightbox-inner">
+                  <button type="button" class="btn btn-light btn-sm lightbox-close" id="lightbox-close" aria-label="Închide">
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                  <button type="button" class="btn btn-light rounded-circle lightbox-prev" id="lightbox-prev" aria-label="Anterior">
+                    <i class="bi bi-chevron-left"></i>
+                  </button>
+                  <div class="lightbox-media" id="lightbox-media"></div>
+                  <button type="button" class="btn btn-light rounded-circle lightbox-next" id="lightbox-next" aria-label="Următor">
+                    <i class="bi bi-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
                 @if(count($allMedia) > 1)
                   <button type="button" class="btn btn-light rounded-circle shadow position-absolute top-50 start-0 translate-middle-y ms-2 gallery-prev" aria-label="Anterior">
                     <i class="bi bi-chevron-left"></i>
@@ -259,7 +286,7 @@
                   </button>
                 @endif
               </div>
-              
+
               <!-- Thumbnails -->
               @if(!empty($thumbnails) && count($thumbnails) > 0)
                 <div class="thumbnails-container">
@@ -267,7 +294,7 @@
                   <div class="row g-2 flex-nowrap overflow-auto px-1 px-md-0">
                     @foreach($thumbnails as $index => $media)
                     <div class="col-auto col-md-3">
-                      <div class="thumbnail-item {{ $media['type'] === 'video' ? 'video-thumbnail' : 'image-thumbnail' }} 
+                      <div class="thumbnail-item {{ $media['type'] === 'video' ? 'video-thumbnail' : 'image-thumbnail' }}
                                    {{ $index === $mainIndex ? 'active' : '' }}"
                            data-type="{{ $media['type'] }}"
                            data-url="{{ $media['url'] }}"
@@ -275,18 +302,18 @@
                            data-thumbnail="{{ $media['thumbnail'] ?? $media['url'] }}">
                         <div class="ratio ratio-16x9 rounded overflow-hidden" style="width: 96px;" >
                           @if($media['type'] === 'video')
-                            <img src="{{ $media['thumbnail'] ?? 'https://via.placeholder.com/300x200/f8f9fa/6c757d?text=Video' }}" 
-                                 class="w-100 h-100 object-fit-contain" 
-                                 alt="Video thumbnail" 
+                            <img src="{{ $media['thumbnail'] ?? 'https://via.placeholder.com/300x200/f8f9fa/6c757d?text=Video' }}"
+                                 class="w-100 h-100 object-fit-contain"
+                                 alt="Video thumbnail"
                                  loading="lazy"
                                  onerror="this.src='https://via.placeholder.com/300x200/f8f9fa/6c757d?text=Video'" />
                             <div class="video-play-overlay">
                               <i class="bi bi-play-circle-fill"></i>
                             </div>
                           @else
-                            <img src="{{ $media['thumb'] ?? $media['url'] }}" 
-                                 class="w-100 h-100 object-fit-contain" 
-                                 alt="{{ $title }}" 
+                            <img src="{{ $media['thumb'] ?? $media['url'] }}"
+                                 class="w-100 h-100 object-fit-contain"
+                                 alt="{{ $title }}"
                                  loading="lazy"
                                  onerror="this.src='https://via.placeholder.com/300x200/f8f9fa/6c757d?text=Fără+imagine'" />
                           @endif
@@ -342,7 +369,7 @@
             </ul>
           </div>
         </div>
-        
+
       </div>
     </div>
 
@@ -359,7 +386,7 @@
               <tr><th>Modelo</th><td>{{ $vehicle->model ?? 'N/A' }}</td><th>Motor</th><td>{{ $vehicle->engine ?? 'N/A' }}</td></tr>
               <tr><th>Año</th><td>{{ $vehicle->year ?? 'N/A' }}</td><th>Color</th><td>{{ $vehicle->color ?? 'N/A' }}</td></tr>
               <tr><th>Kilometraje</th><td>{{ $vehicle->mileage ? number_format($extractMileage($vehicle->mileage)) . ' km' : 'N/A' }}</td><th>Estado</th><td>{{ $vehicle->condition ?? 'N/A' }}</td></tr>
-              <tr><th>Combustible</th><td>{{ $vehicle->fuel ?? 'N/A' }}</td><th>VIN</th><td>@if($vehicle->vin)<code>{{ substr($vehicle->vin,0,6) }}••••••</code>@else N/A @endif</td></tr>
+              <tr><th>Combustible</th><td>{{ $vehicle->fuel ?? 'N/A' }}</td><th>Etiqueta medioambiental</th><td>@if($vehicle->vin)<code>{{ substr($vehicle->vin,0,6) }}••••••</code>@else N/A @endif</td></tr>
               @if($vehicle->power || $vehicle->drivetrain)
                 <tr>
                   @if($vehicle->power)<th>Potencia</th><td>{{ $vehicle->power }}</td>@else<th></th><td></td>@endif
@@ -383,7 +410,7 @@
               <i class="bi bi-tag-fill text-primary me-2"></i>
               Precios y ofertas
             </h4>
-            
+
             <div class="row g-3">
               <div class="col-md-6">
                 <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded">
@@ -394,7 +421,7 @@
                   <i class="bi bi-currency-euro text-primary" style="font-size: 2rem;"></i>
                 </div>
               </div>
-              
+
               @if($vehicle->has_active_offer)
                 <div class="col-md-6">
                   <div class="d-flex align-items-center justify-content-between p-3 bg-danger bg-opacity-10 rounded border border-danger">
@@ -408,7 +435,7 @@
                     <i class="bi bi-tag-fill text-danger" style="font-size: 2rem;"></i>
                   </div>
                 </div>
-                
+
                 @if($vehicle->offer_expires_at)
                   <div class="col-12">
                     <div class="alert alert-warning d-flex align-items-center" role="alert">
@@ -420,7 +447,7 @@
                   </div>
                 @endif
               @endif
-              
+
               @if($vehicle->original_price && $vehicle->original_price != $vehicle->price)
                 <div class="col-md-6">
                   <div class="d-flex align-items-center justify-content-between p-3 bg-secondary bg-opacity-10 rounded">
@@ -433,7 +460,7 @@
                 </div>
               @endif
             </div>
-            
+
             @if($vehicle->has_active_offer)
               <div class="mt-3">
                 <div class="progress" style="height: 8px;">
@@ -441,7 +468,7 @@
                     $discountPercent = $vehicle->discount_percentage ?? 0;
                     $progressPercent = min($discountPercent, 100);
                   @endphp
-                  <div class="progress-bar bg-danger" role="progressbar" style="width: {{ $progressPercent }}%" 
+                  <div class="progress-bar bg-danger" role="progressbar" style="width: {{ $progressPercent }}%"
                        aria-valuenow="{{ $progressPercent }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 @php
@@ -470,7 +497,7 @@
             @endforeach
           </div>
         @endif
-        
+
       </div>
       <div class="col-lg-4">
         <div class="card shadow-sm mb-3">
@@ -517,7 +544,7 @@
           <i class="bi bi-graph-up text-primary me-2"></i>
           Vehículos similares para comparar
         </h4>
-        
+
         <!-- Comparație prețuri (marketing) -->
         <div class="card shadow-sm mb-4">
           <div class="card-body">
@@ -532,7 +559,7 @@
                   <i class="bi bi-car-front text-primary" style="font-size: 2rem;"></i>
                 </div>
               </div>
-              
+
               <div class="col-md-6">
                 <div class="d-flex align-items-center justify-content-between p-3 bg-info bg-opacity-10 rounded border border-info">
                   <div>
@@ -554,13 +581,13 @@
             </div>
           </div>
         </div>
-        
+
         <div class="row g-4">
           @foreach($similarVehicles as $similar)
           <div class="col-12 col-sm-6 col-lg-3">
             <div class="card h-100 shadow-sm hover-shadow">
               @if($similar->cover_image)
-                <img src="{{ $similar->cover_image }}" class="card-img-top" alt="{{ $similar->title ?? ($similar->brand . ' ' . $similar->model) }}" 
+                <img src="{{ $similar->cover_image }}" class="card-img-top" alt="{{ $similar->title ?? ($similar->brand . ' ' . $similar->model) }}"
                      style="height: 200px; object-fit: contain; background-color: #f8f9fa;"
                      onerror="this.src='https://via.placeholder.com/400x200/f8f9fa/6c757d?text=Fără+imagine'" />
               @else
@@ -576,12 +603,12 @@
                     </span>
                   </div>
                 @endif
-                
+
                 <h6 class="card-title mb-1">{{ $similar->title ?? ($similar->brand . ' ' . $similar->model . ' ' . $similar->year) }}</h6>
                 <div class="small text-secondary mb-2">
                   {{ $similar->fuel ?? 'N/A' }} • {{ $similar->mileage ? number_format($extractMileage($similar->mileage)) . ' km' : 'N/A' }} • {{ $similar->transmission ?? 'N/A' }}
                 </div>
-                
+
                 <!-- Comparație preț cu vehiculul principal -->
                 <div class="mb-2">
                   @php
@@ -590,7 +617,7 @@
                     $priceDiff = $similarPrice - $mainPrice;
                     $priceDiffPercent = $mainPrice > 0 ? ($priceDiff / $mainPrice) * 100 : 0;
                   @endphp
-                  
+
                   @if($priceDiff > 0)
                     <small class="text-danger">
                       <i class="bi bi-arrow-up"></i> +€{{ number_format($priceDiff) }} (+{{ number_format($priceDiffPercent, 1) }}%)
@@ -603,7 +630,7 @@
                     <small class="text-muted">Preț similar</small>
                   @endif
                 </div>
-                
+
                 <div class="mt-auto d-flex justify-content-between align-items-center">
                   @if($similar->has_active_offer)
                     <div>
@@ -632,6 +659,12 @@ document.addEventListener('DOMContentLoaded', function() {
   const prevBtn = document.querySelector('.main-media-container .gallery-prev');
   const nextBtn = document.querySelector('.main-media-container .gallery-next');
   const thumbnailItems = document.querySelectorAll('.thumbnail-item');
+  const lightbox = document.getElementById('gallery-lightbox');
+  const lightboxMedia = document.getElementById('lightbox-media');
+  const lightboxPrev = document.getElementById('lightbox-prev');
+  const lightboxNext = document.getElementById('lightbox-next');
+  const lightboxClose = document.getElementById('lightbox-close');
+  const mainMediaClick = document.getElementById('main-media-click');
 
   const mediaItems = {!! json_encode($allMedia, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!};
   let currentIndex = 0;
@@ -675,6 +708,47 @@ document.addEventListener('DOMContentLoaded', function() {
   // Prev/Next buttons
   if (prevBtn) prevBtn.addEventListener('click', function(){ setCurrent(currentIndex - 1); });
   if (nextBtn) nextBtn.addEventListener('click', function(){ setCurrent(currentIndex + 1); });
+
+  // Lightbox helpers
+  function renderLightbox(index) {
+    if (!mediaItems || !mediaItems.length) return;
+    const item = mediaItems[index];
+    if (!item) return;
+    if (item.type === 'video') {
+      const embedUrl = item.embed || item.url;
+      lightboxMedia.innerHTML = `<iframe src="${embedUrl}" frameborder="0" allowfullscreen title="Video prezentare vehicul" style="width:95vw; height:calc(95vw*9/16); max-height:90vh;"></iframe>`;
+    } else {
+      const displayUrl = item.display || item.url;
+      lightboxMedia.innerHTML = `<img src="${displayUrl}" alt="Imagine" style="max-width:95vw; max-height:90vh; object-fit:contain;" />`;
+    }
+  }
+  function openLightbox() {
+    if (!lightbox) return;
+    renderLightbox(currentIndex);
+    lightbox.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    if (!lightbox) return;
+    lightbox.classList.remove('show');
+    lightboxMedia.innerHTML = '';
+    document.body.style.overflow = '';
+  }
+  if (mainMediaClick) {
+    mainMediaClick.addEventListener('click', function(){ openLightbox(); });
+  }
+  if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+  if (lightboxPrev) lightboxPrev.addEventListener('click', function(){ setCurrent(currentIndex - 1); renderLightbox(currentIndex); });
+  if (lightboxNext) lightboxNext.addEventListener('click', function(){ setCurrent(currentIndex + 1); renderLightbox(currentIndex); });
+  if (lightbox) {
+    lightbox.addEventListener('click', function(e){ if (e.target === lightbox) closeLightbox(); });
+    document.addEventListener('keydown', function(e){
+      if (!lightbox.classList.contains('show')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') { setCurrent(currentIndex - 1); renderLightbox(currentIndex); }
+      if (e.key === 'ArrowRight') { setCurrent(currentIndex + 1); renderLightbox(currentIndex); }
+    });
+  }
 
   // Initialize index from active thumbnail if present
   const activeThumb = document.querySelector('.thumbnail-item.active');

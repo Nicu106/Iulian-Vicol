@@ -680,8 +680,15 @@ async function previewImages(input, previewId) {
     done += 100 / Math.max(1, files.length);
     showCompressionProgress(done);
   }
-  // Append to any previously selected files so multiple selections accumulate
-  newGalleryFilesCreate = newGalleryFilesCreate.concat(compressed);
+  // Append to any previously selected files so multiple selections accumulate (with dedupe)
+  const combined = newGalleryFilesCreate.concat(compressed);
+  const seen = new Set();
+  newGalleryFilesCreate = combined.filter(f => {
+    const key = [f.name, f.size, f.lastModified].join(':');
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
   rebuildGalleryInputFilesCreate();
   renderNewGalleryPreviewCreate(previewId);
   // Reset input to allow selecting the same files again if needed
