@@ -300,8 +300,8 @@
             
             <div class="row g-2 g-md-3 mt-2">
               <div class="col-12 col-md-6">
-                <label class="form-label fw-medium">VIN</label>
-                <input class="form-control" name="vin" value="{{ old('vin') }}" placeholder="Número de bastidor">
+                <label class="form-label fw-medium">Etiqueta medioambiental</label>
+                <input class="form-control" name="vin" value="{{ old('vin') }}" placeholder="Etiqueta medioambiental">
                 @error('vin')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
               </div>
               <div class="col-12 col-md-6">

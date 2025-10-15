@@ -226,8 +226,8 @@
                 </select>
               </div>
               <div class="col-md-4">
-                <label class="form-label">VIN</label>
-                <input class="form-control" name="vin" value="{{ old('vin', $vehicle['vin']) }}">
+                <label class="form-label">Etiqueta medioambiental</label>
+                <input class="form-control" name="vin" value="{{ old('vin', $vehicle['vin']) }}" placeholder="Etiqueta medioambiental">
               </div>
               <div class="col-12">
                 <label class="form-label">Stare</label>
