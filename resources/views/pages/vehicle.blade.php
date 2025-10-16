@@ -80,30 +80,26 @@
       bottom: 0 !important;
       width: 100vw !important;
       height: 100vh !important;
-      z-index: 2000 !important; 
+      z-index: 9999 !important; 
       display: none !important; 
       background: rgba(0,0,0,0.95) !important; 
       overflow: hidden !important;
       margin: 0 !important;
       padding: 0 !important;
-    }
-    .gallery-lightbox.show { 
-      display: flex !important; 
       align-items: center !important;
       justify-content: center !important;
     }
+    .gallery-lightbox.show { 
+      display: flex !important; 
+    }
     .gallery-lightbox .lightbox-inner { 
-      position: absolute !important; 
-      top: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      bottom: 0 !important;
+      position: relative !important; 
       width: 100% !important;
       height: 100% !important;
       display: flex !important; 
       align-items: center !important; 
       justify-content: center !important; 
-      padding: 0 !important;
+      padding: 60px 80px !important;
       margin: 0 !important;
     }
     .gallery-lightbox .lightbox-media { 
@@ -115,24 +111,27 @@
       margin: 0 !important;
       padding: 0 !important;
     }
-    .gallery-lightbox .lightbox-media img,
-    .gallery-lightbox .lightbox-media iframe { 
-      max-width: 90vw !important; 
-      max-height: 90vh !important; 
+    .gallery-lightbox .lightbox-media img { 
+      max-width: 100% !important; 
+      max-height: 100% !important; 
       width: auto !important; 
       height: auto !important; 
       object-fit: contain !important; 
       display: block !important; 
       margin: 0 auto !important;
-      position: relative !important;
-      top: 0 !important;
-      left: 0 !important;
+    }
+    .gallery-lightbox .lightbox-media iframe { 
+      width: 90vw !important; 
+      height: calc(90vw * 9 / 16) !important;
+      max-height: 90vh !important; 
+      display: block !important; 
+      margin: 0 auto !important;
     }
     .gallery-lightbox .lightbox-close { 
       position: fixed !important; 
       top: 20px !important; 
       right: 20px !important; 
-      z-index: 2001 !important; 
+      z-index: 10000 !important; 
       background: rgba(255,255,255,0.2) !important; 
       border: none !important; 
       color: white !important; 
@@ -142,6 +141,9 @@
       font-size: 24px !important; 
       cursor: pointer !important; 
       transition: all 0.3s !important; 
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
     }
     .gallery-lightbox .lightbox-close:hover { 
       background: rgba(255,255,255,0.3) !important; 
@@ -152,27 +154,122 @@
       position: fixed !important; 
       top: 50% !important; 
       transform: translateY(-50%) !important; 
-      background: rgba(255,255,255,0.2) !important; 
-      border: none !important; 
-      color: white !important; 
-      width: 60px !important; 
-      height: 60px !important; 
-      border-radius: 50% !important; 
-      font-size: 28px !important; 
+      background: rgba(255,255,255,0.22) !important; 
+      border: 1px solid rgba(255,255,255,0.35) !important;
+      color: #fff !important; 
+      width: 64px !important; 
+      height: 64px !important; 
+      border-radius: 999px !important; 
+      font-size: 30px !important; 
       cursor: pointer !important; 
-      transition: all 0.3s !important; 
-      z-index: 2001 !important; 
+      transition: background .2s ease, transform .15s ease !important; 
+      z-index: 10000 !important; 
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
+      box-shadow: 0 8px 24px rgba(0,0,0,.25) !important;
+      backdrop-filter: blur(2px);
     }
     .gallery-lightbox .lightbox-prev:hover,
     .gallery-lightbox .lightbox-next:hover { 
-      background: rgba(255,255,255,0.3) !important; 
-      transform: translateY(-50%) scale(1.1) !important; 
+      background: rgba(255,255,255,0.35) !important; 
+      transform: translateY(-50%) scale(1.05) !important; 
     }
-    .gallery-lightbox .lightbox-prev { left: 20px !important; }
-    .gallery-lightbox .lightbox-next { right: 20px !important; }
+    .gallery-lightbox .lightbox-prev { left: 24px !important; }
+    .gallery-lightbox .lightbox-next { right: 24px !important; }
+
+    /* Cursor pointer pentru imagine principală */
+    #main-media-click {
+      cursor: pointer !important;
+    }
+
+    /* Thumbnail Styles - Fix pentru dimensiune constantă */
+    .thumbnail-item {
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 3px solid transparent;
+      border-radius: 8px;
+      overflow: hidden;
+      width: 96px !important;
+      flex-shrink: 0 !important;
+      display: block;
+    }
+    
+    .thumbnail-item:hover {
+      border-color: rgba(13, 110, 253, 0.5);
+      transform: scale(1.05);
+    }
+    
+    .thumbnail-item.active {
+      border-color: #0d6efd !important;
+      box-shadow: 0 0 0 1px #0d6efd;
+    }
+    
+    .thumbnail-item .ratio {
+      width: 96px !important;
+      height: 54px !important;
+    }
+    
+    .thumbnail-item img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+    }
+    
+    .video-play-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2rem;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      pointer-events: none;
+    }
+    
+    .thumbnails-container {
+      margin-top: 1rem;
+    }
+    
+    .thumbnails-container .row {
+      margin: 0 -4px;
+    }
+    
+    .thumbnails-container .col-auto {
+      padding: 0 4px !important;
+      max-width: 104px !important;
+      flex: 0 0 auto !important;
+    }
+    
+    /* Desktop - thumbnails se aranjează pe mai multe rânduri */
+    @media (min-width: 768px) {
+      .thumbnails-container .row {
+        flex-wrap: wrap !important;
+        overflow: visible !important;
+      }
+    }
+
+    /* Responsive pentru mobile */
+    @media (max-width: 768px) {
+      .gallery-lightbox .lightbox-inner {
+        padding: 40px 20px !important;
+      }
+      .gallery-lightbox .lightbox-prev,
+      .gallery-lightbox .lightbox-next {
+        width: 52px !important;
+        height: 52px !important;
+        font-size: 22px !important;
+      }
+      .gallery-lightbox .lightbox-prev { left: 12px !important; }
+      .gallery-lightbox .lightbox-next { right: 12px !important; }
+      .gallery-lightbox .lightbox-close {
+        top: 10px !important;
+        right: 10px !important;
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 20px !important;
+      }
+    }
   </style>
 @endpush
 @section('content')
@@ -336,7 +433,7 @@
             <div class="vehicle-gallery">
               <!-- Imaginea/Video-ul principal -->
               <div class="main-media-container mb-3 position-relative">
-                <div class="ratio ratio-16x9 rounded overflow-hidden shadow-sm position-relative" id="main-media-click">
+                <div class="ratio ratio-16x9 rounded overflow-hidden shadow-sm" id="main-media-click">
                   @if($mainMedia['type'] === 'video')
                     <iframe src="{{ $mainMedia['embed'] ?? $mainMedia['url'] }}"
                             class="w-100 h-100"
@@ -346,38 +443,15 @@
                             referrerpolicy="strict-origin-when-cross-origin"
                             title="Video prezentare vehicul">
                     </iframe>
-                    <!-- Overlay pentru click pe video -->
-                    <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" 
-                         style="background: rgba(0,0,0,0.1); cursor: pointer; z-index: 10;"
-                         title="Apasă pentru a deschide în lightbox">
-                      <div class="bg-dark bg-opacity-50 text-white rounded-circle d-flex align-items-center justify-content-center" 
-                           style="width: 60px; height: 60px;">
-                        <i class="bi bi-arrows-fullscreen fs-4"></i>
-                      </div>
-                    </div>
                   @else
                     <img src="{{ $mainMedia['display'] ?? $mainMedia['url'] }}"
-                         class="w-100 h-100 object-fit-contain cursor-pointer"
+                         class="w-100 h-100 object-fit-contain"
                          alt="{{ $title }}"
                          id="main-gallery-image"
                          onerror="this.src='https://via.placeholder.com/800x450/f8f9fa/6c757d?text=Fără+imagine'" />
                   @endif
                 </div>
-              <!-- Lightbox overlay -->
-              <div class="gallery-lightbox" id="gallery-lightbox" role="dialog" aria-modal="true" aria-label="Vizualizare imagine pe tot ecranul">
-                <div class="lightbox-inner">
-                  <button type="button" class="btn btn-light btn-sm lightbox-close" id="lightbox-close" aria-label="Închide">
-                    <i class="bi bi-x-lg"></i>
-                  </button>
-                  <button type="button" class="btn btn-light rounded-circle lightbox-prev" id="lightbox-prev" aria-label="Anterior">
-                    <i class="bi bi-chevron-left"></i>
-                  </button>
-                  <div class="lightbox-media" id="lightbox-media"></div>
-                  <button type="button" class="btn btn-light rounded-circle lightbox-next" id="lightbox-next" aria-label="Următor">
-                    <i class="bi bi-chevron-right"></i>
-                  </button>
-                </div>
-              </div>
+                
                 @if(count($allMedia) > 1)
                   <button type="button" class="btn btn-light rounded-circle shadow position-absolute top-50 start-0 translate-middle-y ms-2 gallery-prev" aria-label="Anterior">
                     <i class="bi bi-chevron-left"></i>
@@ -392,19 +466,19 @@
               @if(!empty($thumbnails) && count($thumbnails) > 0)
                 <div class="thumbnails-container">
                   <!-- Mobil: listă orizontală scrollabilă; Desktop: grilă -->
-                  <div class="row g-2 flex-nowrap overflow-auto px-1 px-md-0">
+                  <div class="row g-2 flex-nowrap overflow-auto overflow-md-visible px-1 px-md-0">
                     @foreach($thumbnails as $index => $media)
-                    <div class="col-auto col-md-3">
+                    <div class="col-auto">
                       <div class="thumbnail-item {{ $media['type'] === 'video' ? 'video-thumbnail' : 'image-thumbnail' }}
                                    {{ $index === $mainIndex ? 'active' : '' }}"
                            data-type="{{ $media['type'] }}"
                            data-url="{{ $media['url'] }}"
                            @if($media['type'] === 'video') data-embed="{{ $media['embed'] ?? '' }}" @endif
                            data-thumbnail="{{ $media['thumbnail'] ?? $media['url'] }}">
-                        <div class="ratio ratio-16x9 rounded overflow-hidden" style="width: 96px;" >
+                        <div class="ratio ratio-16x9 rounded overflow-hidden">
                           @if($media['type'] === 'video')
                             <img src="{{ $media['thumbnail'] ?? 'https://via.placeholder.com/300x200/f8f9fa/6c757d?text=Video' }}"
-                                 class="w-100 h-100 object-fit-contain"
+                                 class="w-100 h-100 object-fit-cover"
                                  alt="Video thumbnail"
                                  loading="lazy"
                                  onerror="this.src='https://via.placeholder.com/300x200/f8f9fa/6c757d?text=Video'" />
@@ -413,7 +487,7 @@
                             </div>
                           @else
                             <img src="{{ $media['thumb'] ?? $media['url'] }}"
-                                 class="w-100 h-100 object-fit-contain"
+                                 class="w-100 h-100 object-fit-cover"
                                  alt="{{ $title }}"
                                  loading="lazy"
                                  onerror="this.src='https://via.placeholder.com/300x200/f8f9fa/6c757d?text=Fără+imagine'" />
@@ -782,6 +856,22 @@
   </div>
 </section>
 
+<!-- Lightbox overlay - MUTAT LA SFÂRȘIT, ÎNAINTE DE ÎNCHIDEREA BODY -->
+<div class="gallery-lightbox" id="gallery-lightbox" role="dialog" aria-modal="true" aria-label="Vizualizare imagine pe tot ecranul">
+  <div class="lightbox-inner">
+    <button type="button" class="lightbox-close" id="lightbox-close" aria-label="Închide">
+      <i class="bi bi-x-lg"></i>
+    </button>
+    <button type="button" class="lightbox-prev" id="lightbox-prev" aria-label="Anterior">
+      <i class="bi bi-chevron-left"></i>
+    </button>
+    <div class="lightbox-media" id="lightbox-media"></div>
+    <button type="button" class="lightbox-next" id="lightbox-next" aria-label="Următor">
+      <i class="bi bi-chevron-right"></i>
+    </button>
+  </div>
+</div>
+
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -799,24 +889,35 @@ document.addEventListener('DOMContentLoaded', function() {
   const mediaItems = {!! json_encode($allMedia, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!};
   let currentIndex = 0;
 
+  // Verifică dacă există media
+  if (!mediaItems || mediaItems.length === 0) {
+    console.warn('No media items available');
+    return;
+  }
+
   function renderMedia(index) {
     if (!mediaItems || !mediaItems.length) return;
     const item = mediaItems[index];
     if (!item) return;
+    
     if (item.type === 'video') {
       const embedUrl = item.embed || item.url;
       mainMediaContainer.innerHTML = `
         <iframe src="${embedUrl}" class="w-100 h-100" frameborder="0" allowfullscreen title="Video prezentare vehicul"></iframe>
       `;
     } else {
+      const displayUrl = item.display || item.url;
       mainMediaContainer.innerHTML = `
-        <img src="${item.url}" class="w-100 h-100 object-fit-contain" alt="Gallery image" id="main-gallery-image" onerror="this.src='https://via.placeholder.com/800x450/f8f9fa/6c757d?text=Fără+imagine'" />
+        <img src="${displayUrl}" class="w-100 h-100 object-fit-contain" alt="Gallery image" id="main-gallery-image" 
+             onerror="this.src='https://via.placeholder.com/800x450/f8f9fa/6c757d?text=Fără+imagine'" />
       `;
     }
-    // Update active thumbnail if visible
+    
+    // Update active thumbnail
     thumbnailItems.forEach(el => el.classList.remove('active'));
-    const thumb = document.querySelector(`.thumbnail-item[data-url="${CSS.escape(item.url)}"]`);
-    if (thumb) thumb.classList.add('active');
+    if (thumbnailItems[index]) {
+      thumbnailItems[index].classList.add('active');
+    }
   }
 
   function setCurrent(index) {
@@ -829,66 +930,122 @@ document.addEventListener('DOMContentLoaded', function() {
   // Thumbnail clicks
   thumbnailItems.forEach(function(item, idx) {
     item.addEventListener('click', function() {
-      const url = this.dataset.url;
-      const index = mediaItems.findIndex(m => m.url === url);
-      setCurrent(index >= 0 ? index : idx);
+      setCurrent(idx);
     });
   });
 
-  // Prev/Next buttons
+  // Prev/Next buttons pentru galeria principală
   if (prevBtn) prevBtn.addEventListener('click', function(){ setCurrent(currentIndex - 1); });
   if (nextBtn) nextBtn.addEventListener('click', function(){ setCurrent(currentIndex + 1); });
 
-  // Lightbox helpers
+  // Lightbox functions
   function renderLightbox(index) {
     if (!mediaItems || !mediaItems.length) return;
     const item = mediaItems[index];
     if (!item) return;
+    
+    lightboxMedia.innerHTML = ''; // Clear previous content
+    
     if (item.type === 'video') {
       const embedUrl = item.embed || item.url;
-      lightboxMedia.innerHTML = `<iframe src="${embedUrl}" frameborder="0" allowfullscreen title="Video prezentare vehicul" style="width:min(95vw,1200px); height:min(calc(95vw*9/16), 90vh);"></iframe>`;
+      const iframe = document.createElement('iframe');
+      iframe.src = embedUrl;
+      iframe.setAttribute('frameborder', '0');
+      iframe.setAttribute('allowfullscreen', '');
+      iframe.setAttribute('title', 'Video prezentare vehicul');
+      lightboxMedia.appendChild(iframe);
     } else {
       const displayUrl = item.display || item.url;
-      lightboxMedia.innerHTML = `<img src="${displayUrl}" alt="Imagine" style="max-width:min(95vw,1600px); max-height:90vh; object-fit:contain; margin:0 auto;" />`;
+      const img = document.createElement('img');
+      img.src = displayUrl;
+      img.alt = 'Imagine galerie';
+      img.onerror = function() {
+        this.src = 'https://via.placeholder.com/800x450/f8f9fa/6c757d?text=Fără+imagine';
+      };
+      lightboxMedia.appendChild(img);
     }
   }
+
   function openLightbox() {
     if (!lightbox) return;
     renderLightbox(currentIndex);
     lightbox.classList.add('show');
     document.body.style.overflow = 'hidden';
   }
+
   function closeLightbox() {
     if (!lightbox) return;
     lightbox.classList.remove('show');
     lightboxMedia.innerHTML = '';
     document.body.style.overflow = '';
   }
-  if (mainMediaClick) {
-    mainMediaClick.addEventListener('click', function(){ openLightbox(); });
+
+  function lightboxPrevious() {
+    setCurrent(currentIndex - 1);
+    renderLightbox(currentIndex);
   }
-  if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
-  if (lightboxPrev) lightboxPrev.addEventListener('click', function(){ setCurrent(currentIndex - 1); renderLightbox(currentIndex); });
-  if (lightboxNext) lightboxNext.addEventListener('click', function(){ setCurrent(currentIndex + 1); renderLightbox(currentIndex); });
-  if (lightbox) {
-    lightbox.addEventListener('click', function(e){ if (e.target === lightbox) closeLightbox(); });
-    document.addEventListener('keydown', function(e){
-      if (!lightbox.classList.contains('show')) return;
-      if (e.key === 'Escape') closeLightbox();
-      if (e.key === 'ArrowLeft') { setCurrent(currentIndex - 1); renderLightbox(currentIndex); }
-      if (e.key === 'ArrowRight') { setCurrent(currentIndex + 1); renderLightbox(currentIndex); }
+
+  function lightboxNextImage() {
+    setCurrent(currentIndex + 1);
+    renderLightbox(currentIndex);
+  }
+
+  // Click pe imaginea principală pentru a deschide lightbox
+  if (mainMediaClick) {
+    mainMediaClick.addEventListener('click', function(e) {
+      // Nu deschide lightbox dacă se face click pe butoanele prev/next
+      if (e.target.closest('.gallery-prev') || e.target.closest('.gallery-next')) {
+        return;
+      }
+      openLightbox();
     });
   }
+
+  // Event listeners pentru lightbox
+  if (lightboxClose) {
+    lightboxClose.addEventListener('click', closeLightbox);
+  }
+
+  if (lightboxPrev) {
+    lightboxPrev.addEventListener('click', lightboxPrevious);
+  }
+
+  if (lightboxNext) {
+    lightboxNext.addEventListener('click', lightboxNextImage);
+  }
+
+  // Click pe background pentru a închide
+  if (lightbox) {
+    lightbox.addEventListener('click', function(e) {
+      if (e.target === lightbox) {
+        closeLightbox();
+      }
+    });
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', function(e) {
+    if (!lightbox || !lightbox.classList.contains('show')) return;
+    
+    if (e.key === 'Escape') {
+      closeLightbox();
+    } else if (e.key === 'ArrowLeft') {
+      lightboxPrevious();
+    } else if (e.key === 'ArrowRight') {
+      lightboxNextImage();
+    }
+  });
 
   // Initialize index from active thumbnail if present
   const activeThumb = document.querySelector('.thumbnail-item.active');
   if (activeThumb) {
-    const url = activeThumb.dataset.url;
-    const idx = mediaItems.findIndex(m => m.url === url);
+    const activeThumbs = Array.from(thumbnailItems);
+    const idx = activeThumbs.indexOf(activeThumb);
     if (idx >= 0) currentIndex = idx;
   }
 });
 </script>
+
 <!-- JSON-LD Vehicle Schema -->
 <script type="application/ld+json">
 {!! json_encode([
@@ -916,4 +1073,3 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 @endpush
 @endsection
-
