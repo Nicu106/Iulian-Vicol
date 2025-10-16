@@ -71,17 +71,108 @@
 @push('styles')
   <link rel="stylesheet" href="{{ asset('css/pages/vehicle.css') }}">
   <style>
-    .gallery-lightbox { position: fixed; inset: 0; z-index: 2000; display: none; background: rgba(0,0,0,0.92); overflow: auto; }
-    .gallery-lightbox.show { display: flex; }
-    .gallery-lightbox .lightbox-inner { position: relative; margin: auto; min-height: 100vh; width: 100%; display: flex; align-items: center; justify-content: center; padding: 24px; }
-    .gallery-lightbox .lightbox-media { display: flex; align-items: center; justify-content: center; width: 100%; }
+    /* Lightbox - Imagine mare pe tot ecranul - FORȚAT */
+    .gallery-lightbox { 
+      position: fixed !important; 
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      z-index: 2000 !important; 
+      display: none !important; 
+      background: rgba(0,0,0,0.95) !important; 
+      overflow: hidden !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .gallery-lightbox.show { 
+      display: flex !important; 
+      align-items: center !important;
+      justify-content: center !important;
+    }
+    .gallery-lightbox .lightbox-inner { 
+      position: absolute !important; 
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      display: flex !important; 
+      align-items: center !important; 
+      justify-content: center !important; 
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+    .gallery-lightbox .lightbox-media { 
+      display: flex !important; 
+      align-items: center !important; 
+      justify-content: center !important; 
+      width: 100% !important; 
+      height: 100% !important; 
+      margin: 0 !important;
+      padding: 0 !important;
+    }
     .gallery-lightbox .lightbox-media img,
-    .gallery-lightbox .lightbox-media iframe { max-width: 95vw; max-height: 90vh; width: auto; height: auto; object-fit: contain; display: block; background: #000; margin: 0 auto; }
-    .gallery-lightbox .lightbox-close { position: absolute; top: 12px; right: 12px; z-index: 1; }
+    .gallery-lightbox .lightbox-media iframe { 
+      max-width: 90vw !important; 
+      max-height: 90vh !important; 
+      width: auto !important; 
+      height: auto !important; 
+      object-fit: contain !important; 
+      display: block !important; 
+      margin: 0 auto !important;
+      position: relative !important;
+      top: 0 !important;
+      left: 0 !important;
+    }
+    .gallery-lightbox .lightbox-close { 
+      position: fixed !important; 
+      top: 20px !important; 
+      right: 20px !important; 
+      z-index: 2001 !important; 
+      background: rgba(255,255,255,0.2) !important; 
+      border: none !important; 
+      color: white !important; 
+      width: 50px !important; 
+      height: 50px !important; 
+      border-radius: 50% !important; 
+      font-size: 24px !important; 
+      cursor: pointer !important; 
+      transition: all 0.3s !important; 
+    }
+    .gallery-lightbox .lightbox-close:hover { 
+      background: rgba(255,255,255,0.3) !important; 
+      transform: scale(1.1) !important; 
+    }
     .gallery-lightbox .lightbox-prev,
-    .gallery-lightbox .lightbox-next { position: absolute; top: 50%; transform: translateY(-50%); }
-    .gallery-lightbox .lightbox-prev { left: 12px; }
-    .gallery-lightbox .lightbox-next { right: 12px; }
+    .gallery-lightbox .lightbox-next { 
+      position: fixed !important; 
+      top: 50% !important; 
+      transform: translateY(-50%) !important; 
+      background: rgba(255,255,255,0.2) !important; 
+      border: none !important; 
+      color: white !important; 
+      width: 60px !important; 
+      height: 60px !important; 
+      border-radius: 50% !important; 
+      font-size: 28px !important; 
+      cursor: pointer !important; 
+      transition: all 0.3s !important; 
+      z-index: 2001 !important; 
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+    .gallery-lightbox .lightbox-prev:hover,
+    .gallery-lightbox .lightbox-next:hover { 
+      background: rgba(255,255,255,0.3) !important; 
+      transform: translateY(-50%) scale(1.1) !important; 
+    }
+    .gallery-lightbox .lightbox-prev { left: 20px !important; }
+    .gallery-lightbox .lightbox-next { right: 20px !important; }
   </style>
 @endpush
 @section('content')
@@ -245,7 +336,7 @@
             <div class="vehicle-gallery">
               <!-- Imaginea/Video-ul principal -->
               <div class="main-media-container mb-3 position-relative">
-                <div class="ratio ratio-16x9 rounded overflow-hidden shadow-sm" id="main-media-click">
+                <div class="ratio ratio-16x9 rounded overflow-hidden shadow-sm position-relative" id="main-media-click">
                   @if($mainMedia['type'] === 'video')
                     <iframe src="{{ $mainMedia['embed'] ?? $mainMedia['url'] }}"
                             class="w-100 h-100"
@@ -255,9 +346,18 @@
                             referrerpolicy="strict-origin-when-cross-origin"
                             title="Video prezentare vehicul">
                     </iframe>
+                    <!-- Overlay pentru click pe video -->
+                    <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" 
+                         style="background: rgba(0,0,0,0.1); cursor: pointer; z-index: 10;"
+                         title="Apasă pentru a deschide în lightbox">
+                      <div class="bg-dark bg-opacity-50 text-white rounded-circle d-flex align-items-center justify-content-center" 
+                           style="width: 60px; height: 60px;">
+                        <i class="bi bi-arrows-fullscreen fs-4"></i>
+                      </div>
+                    </div>
                   @else
                     <img src="{{ $mainMedia['display'] ?? $mainMedia['url'] }}"
-                         class="w-100 h-100 object-fit-contain"
+                         class="w-100 h-100 object-fit-contain cursor-pointer"
                          alt="{{ $title }}"
                          id="main-gallery-image"
                          onerror="this.src='https://via.placeholder.com/800x450/f8f9fa/6c757d?text=Fără+imagine'" />
