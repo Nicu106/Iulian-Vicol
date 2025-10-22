@@ -154,29 +154,27 @@
       position: fixed !important; 
       top: 50% !important; 
       transform: translateY(-50%) !important; 
-      background: rgba(255,255,255,0.22) !important; 
-      border: 1px solid rgba(255,255,255,0.35) !important;
-      color: #fff !important; 
-      width: 64px !important; 
-      height: 64px !important; 
-      border-radius: 999px !important; 
-      font-size: 30px !important; 
+      background: rgba(255,255,255,0.2) !important; 
+      border: none !important; 
+      color: white !important; 
+      width: 60px !important; 
+      height: 60px !important; 
+      border-radius: 50% !important; 
+      font-size: 28px !important; 
       cursor: pointer !important; 
-      transition: background .2s ease, transform .15s ease !important; 
+      transition: all 0.3s !important; 
       z-index: 10000 !important; 
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      box-shadow: 0 8px 24px rgba(0,0,0,.25) !important;
-      backdrop-filter: blur(2px);
     }
     .gallery-lightbox .lightbox-prev:hover,
     .gallery-lightbox .lightbox-next:hover { 
-      background: rgba(255,255,255,0.35) !important; 
-      transform: translateY(-50%) scale(1.05) !important; 
+      background: rgba(255,255,255,0.3) !important; 
+      transform: translateY(-50%) scale(1.1) !important; 
     }
-    .gallery-lightbox .lightbox-prev { left: 24px !important; }
-    .gallery-lightbox .lightbox-next { right: 24px !important; }
+    .gallery-lightbox .lightbox-prev { left: 20px !important; }
+    .gallery-lightbox .lightbox-next { right: 20px !important; }
 
     /* Cursor pointer pentru imagine principală */
     #main-media-click {
@@ -256,12 +254,12 @@
       }
       .gallery-lightbox .lightbox-prev,
       .gallery-lightbox .lightbox-next {
-        width: 52px !important;
-        height: 52px !important;
-        font-size: 22px !important;
+        width: 45px !important;
+        height: 45px !important;
+        font-size: 20px !important;
       }
-      .gallery-lightbox .lightbox-prev { left: 12px !important; }
-      .gallery-lightbox .lightbox-next { right: 12px !important; }
+      .gallery-lightbox .lightbox-prev { left: 10px !important; }
+      .gallery-lightbox .lightbox-next { right: 10px !important; }
       .gallery-lightbox .lightbox-close {
         top: 10px !important;
         right: 10px !important;

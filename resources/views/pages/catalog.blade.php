@@ -292,12 +292,17 @@
                       $vehicleImage = Storage::url($images[0]);
                     }
                   }
+                  // Build a resized thumbnail for local storage images to improve performance
+                  $thumbSrc = $vehicleImage;
+                  if (is_string($vehicleImage) && preg_match('/^\/storage\//', $vehicleImage) === 1) {
+                    try { $thumbSrc = route('img.resize', ['w' => 480]) . '?p=' . urlencode($vehicleImage); } catch (\Throwable $e) { /* ignore */ }
+                  }
                 @endphp
                 
                 @if($vehicleImage)
                   <a href="{{ route('vehicle.show', $vehicle->slug) }}" class="d-block">
                     <img 
-                      src="{{ $vehicleImage }}" 
+                      src="{{ $thumbSrc }}" 
                       class="card-img-top" 
                       alt="{{ $vehicle->title ?? ($vehicle->brand . ' ' . $vehicle->model . ' ' . $vehicle->year) }}" 
                       loading="lazy" 

@@ -12,6 +12,24 @@ use App\Models\Vehicle;
 
 class VehicleController extends BaseController
 {
+    private function warmResizeCache(string $publicUrl): void
+    {
+        // Only warm for local storage URLs (/storage/...)
+        if (!is_string($publicUrl) || strpos($publicUrl, '/storage/') !== 0) {
+            return;
+        }
+        $sizes = [240, 480, 1200];
+        foreach ($sizes as $w) {
+            try {
+                // Use the local HTTP kernel to invoke route handler
+                $resizeUrl = route('img.resize', ['w' => $w]) . '?p=' . urlencode($publicUrl);
+                // Fire-and-forget HTTP request via file_get_contents; ignore body
+                @file_get_contents($resizeUrl);
+            } catch (\Throwable $e) {
+                // Ignore failures (cache will build on first real request)
+            }
+        }
+    }
     private function readStore(): array
     {
         $storePath = storage_path('app/vehicles.json');
@@ -283,7 +301,12 @@ class VehicleController extends BaseController
         if ($request->hasFile('gallery_images')) {
             foreach ($request->file('gallery_images') as $img) {
                 $path = $img->store('vehicles/' . $slug, 'public');
-                $galleryUrls[] = Storage::url($path);
+                $publicUrl = Storage::url($path);
+                $galleryUrls[] = $publicUrl;
+                // Warm resize cache for common sizes to avoid first-load CPU spikes
+                try {
+                    $this->warmResizeCache($publicUrl);
+                } catch (\Throwable $e) { /* ignore warmup failures */ }
             }
         }
 
@@ -434,6 +457,7 @@ class VehicleController extends BaseController
             try {
                 $path = $file->store('vehicles/' . $slug, 'public');
                 $vehicleData['cover_image'] = Storage::url($path);
+                try { $this->warmResizeCache($vehicleData['cover_image']); } catch (\Throwable $e) { /* ignore */ }
                 // Success logging removed for performance
             } catch (\Exception $e) {
                 \Log::error('FAILED to update image: ' . $e->getMessage());
@@ -445,7 +469,9 @@ class VehicleController extends BaseController
             foreach ($request->file('gallery_images') as $img) {
                 try {
                     $path = $img->store('vehicles/' . $slug, 'public');
-                    $galleryUrls[] = Storage::url($path);
+                    $url = Storage::url($path);
+                    $galleryUrls[] = $url;
+                    try { $this->warmResizeCache($url); } catch (\Throwable $e) { /* ignore */ }
                 } catch (\Throwable $e) {
                     \Log::error('Gallery image store failed: ' . $e->getMessage());
                 }
