@@ -301,11 +301,27 @@
                 
                 @if($vehicleImage)
                   <a href="{{ route('vehicle.show', $vehicle->slug) }}" class="d-block">
+                    @php
+                      $isLocal = is_string($vehicleImage) && preg_match('/^\\/storage\\//', $vehicleImage) === 1;
+                      $srcset = null;
+                      $sizes = '(min-width: 1200px) 25vw, (min-width: 768px) 33vw, 50vw';
+                      if ($isLocal) {
+                        try {
+                          $src240 = route('img.resize', ['w' => 240]) . '?p=' . urlencode($vehicleImage);
+                          $src480 = route('img.resize', ['w' => 480]) . '?p=' . urlencode($vehicleImage);
+                          $src800 = route('img.resize', ['w' => 800]) . '?p=' . urlencode($vehicleImage);
+                          $srcset = $src240 . ' 240w, ' . $src480 . ' 480w, ' . $src800 . ' 800w';
+                        } catch (\\Throwable $e) { /* ignore */ }
+                      }
+                    @endphp
                     <img 
                       src="{{ $thumbSrc }}" 
+                      @if($srcset) srcset="{{ $srcset }}" sizes="{{ $sizes }}" @endif
                       class="card-img-top" 
                       alt="{{ $vehicle->title ?? ($vehicle->brand . ' ' . $vehicle->model . ' ' . $vehicle->year) }}" 
-                      loading="lazy" 
+                      decoding="async"
+                      @if($loop->first) fetchpriority="high" loading="eager" @else loading="lazy" @endif
+                      width="320" height="200"
                       style="height: 200px; object-fit: cover;"
                       onerror="this.src='https://via.placeholder.com/480x320/f8f9fa/6c757d?text=Sin+imagen'"
                     />
