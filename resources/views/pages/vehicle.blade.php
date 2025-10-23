@@ -789,7 +789,13 @@
           <div class="col-12 col-sm-6 col-lg-3">
             <div class="card h-100 shadow-sm hover-shadow">
               @if($similar->cover_image)
-                <img src="{{ $similar->cover_image }}" class="card-img-top" alt="{{ $similar->title ?? ($similar->brand . ' ' . $similar->model) }}"
+                @php
+                  $simThumb = $similar->cover_image;
+                  if (is_string($simThumb) && preg_match('/^\/storage\//', $simThumb) === 1) {
+                    try { $simThumb = route('img.resize', ['w' => 480]) . '?p=' . urlencode($simThumb); } catch (\Throwable $e) { /* ignore */ }
+                  }
+                @endphp
+                <img src="{{ $simThumb }}" class="card-img-top" alt="{{ $similar->title ?? ($similar->brand . ' ' . $similar->model) }}"
                      style="height: 200px; object-fit: contain; background-color: #f8f9fa;"
                      onerror="this.src='https://via.placeholder.com/400x200/f8f9fa/6c757d?text=Fără+imagine'" />
               @else

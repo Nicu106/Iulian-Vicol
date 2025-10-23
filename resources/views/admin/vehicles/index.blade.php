@@ -256,7 +256,13 @@
                 <td>
                   @if(!empty($v['cover_image']))
                     <div class="position-relative">
-                      <img src="{{ $v['cover_image'] }}" 
+                      @php
+                        $adminThumb = $v['cover_image'];
+                        if (is_string($adminThumb) && preg_match('/^\/storage\//', $adminThumb) === 1) {
+                          try { $adminThumb = route('img.resize', ['w' => 240]) . '?p=' . urlencode($adminThumb); } catch (\Throwable $e) { /* ignore */ }
+                        }
+                      @endphp
+                      <img src="{{ $adminThumb }}" 
                            alt="{{ $v['title'] ?? ($v['brand'] . ' ' . $v['model']) }}" 
                            class="vehicle-thumb"
                            loading="lazy"
@@ -398,7 +404,13 @@
                   <input type="checkbox" class="vehicle-checkbox-mobile form-check-input" value="{{ $v['slug'] }}" onchange="updateMobileBulkActions()">
                 </div>
                 @if(!empty($v['cover_image']))
-                  <img src="{{ $v['cover_image'] }}" 
+                  @php
+                    $adminThumbM = $v['cover_image'];
+                    if (is_string($adminThumbM) && preg_match('/^\/storage\//', $adminThumbM) === 1) {
+                      try { $adminThumbM = route('img.resize', ['w' => 240]) . '?p=' . urlencode($adminThumbM); } catch (\Throwable $e) { /* ignore */ }
+                    }
+                  @endphp
+                  <img src="{{ $adminThumbM }}" 
                        alt="{{ $v['title'] ?? ($v['brand'] . ' ' . $v['model']) }}" 
                        class="img-fluid rounded"
                        style="aspect-ratio: 4/3; object-fit: cover;"

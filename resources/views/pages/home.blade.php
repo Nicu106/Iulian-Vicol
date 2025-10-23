@@ -93,10 +93,14 @@
                   <a href="{{ route('vehicle.show', $v->slug) }}" class="d-flex align-items-center text-decoration-none">
                     @php
                       $img = $v->cover_image ?? (is_array($v->gallery_images) && count($v->gallery_images) ? $v->gallery_images[0] : null);
+                      $thumb = $img;
+                      if (is_string($img) && preg_match('/^\/storage\//', $img) === 1) {
+                        try { $thumb = route('img.resize', ['w' => 240]) . '?p=' . urlencode($img); } catch (\Throwable $e) { /* ignore */ }
+                      }
                     @endphp
                     <div class="me-3" style="width:72px;height:48px;border-radius:8px;overflow:hidden;background:#f3f4f6;flex-shrink:0;">
-                      @if($img)
-                        <img src="{{ $img }}" alt="{{ $v->title ?? ($v->brand.' '.$v->model) }}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
+                      @if($thumb)
+                        <img src="{{ $thumb }}" alt="{{ $v->title ?? ($v->brand.' '.$v->model) }}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
                       @else
                         <div class="d-flex w-100 h-100 align-items-center justify-content-center text-muted"><i class="bi bi-car-front"></i></div>
                       @endif
@@ -128,10 +132,14 @@
                   <a href="{{ route('vehicle.show', $v->slug) }}" class="d-flex align-items-center text-decoration-none">
                     @php
                       $img = $v->cover_image ?? (is_array($v->gallery_images) && count($v->gallery_images) ? $v->gallery_images[0] : null);
+                      $thumb = $img;
+                      if (is_string($img) && preg_match('/^\/storage\//', $img) === 1) {
+                        try { $thumb = route('img.resize', ['w' => 240]) . '?p=' . urlencode($img); } catch (\Throwable $e) { /* ignore */ }
+                      }
                     @endphp
                     <div class="me-3" style="width:72px;height:48px;border-radius:8px;overflow:hidden;background:#f3f4f6;flex-shrink:0;">
-                      @if($img)
-                        <img src="{{ $img }}" alt="{{ $v->title ?? ($v->brand.' '.$v->model) }}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
+                      @if($thumb)
+                        <img src="{{ $thumb }}" alt="{{ $v->title ?? ($v->brand.' '.$v->model) }}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
                       @else
                         <div class="d-flex w-100 h-100 align-items-center justify-content-center text-muted"><i class="bi bi-car-front"></i></div>
                       @endif
@@ -163,10 +171,14 @@
                   <a href="{{ route('vehicle.show', $v->slug) }}" class="d-flex align-items-center text-decoration-none">
                     @php
                       $img = $v->cover_image ?? (is_array($v->gallery_images) && count($v->gallery_images) ? $v->gallery_images[0] : null);
+                      $thumb = $img;
+                      if (is_string($img) && preg_match('/^\/storage\//', $img) === 1) {
+                        try { $thumb = route('img.resize', ['w' => 240]) . '?p=' . urlencode($img); } catch (\Throwable $e) { /* ignore */ }
+                      }
                     @endphp
                     <div class="me-3" style="width:72px;height:48px;border-radius:8px;overflow:hidden;background:#f3f4f6;flex-shrink:0;">
-                      @if($img)
-                        <img src="{{ $img }}" alt="{{ $v->title ?? ($v->brand.' '.$v->model) }}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
+                      @if($thumb)
+                        <img src="{{ $thumb }}" alt="{{ $v->title ?? ($v->brand.' '.$v->model) }}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
                       @else
                         <div class="d-flex w-100 h-100 align-items-center justify-content-center text-muted"><i class="bi bi-car-front"></i></div>
                       @endif

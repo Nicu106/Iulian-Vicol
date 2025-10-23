@@ -38,7 +38,7 @@
         <div class="collapse navbar-collapse" id="mainNav">
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
             <li class="nav-item"><a href="{{ url('/') }}" class="nav-link {{ request()->is('/') ? 'active' : '' }}">Inicio</a></li>
-            <li class="nav-item"><a href="{{ route('catalog') }}" class="nav-link {{ request()->is('catalog') ? 'active' : '' }}">Catálogo</a></li>
+            <li class="nav-item"><a href="{{ route('catalog') }}" class="nav-link {{ (request()->is('catalog') && request('status') !== 'sold') ? 'active' : '' }}">Catálogo</a></li>
             <li class="nav-item"><a href="{{ route('about') }}" class="nav-link {{ request()->is('despre') ? 'active' : '' }}">Sobre</a></li>
             <li class="nav-item"><a href="{{ route('contact') }}" class="nav-link {{ request()->is('contact') ? 'active' : '' }}">Contacto</a></li>
           </ul>
@@ -46,7 +46,7 @@
             <a href="{{ route('sell-car') }}" class="btn btn-success btn-sm">
               <i class="bi bi-car-front me-1"></i>Vende tu Coche
             </a>
-            <a href="{{ route('catalog', ['status' => 'sold']) }}" class="btn btn-sold-highlight d-flex align-items-center">
+            <a href="{{ route('catalog', ['status' => 'sold']) }}" class="btn btn-sold-highlight d-flex align-items-center {{ (request()->is('catalog') && request('status') === 'sold') ? 'active' : '' }}" @if(request()->is('catalog') && request('status') === 'sold') aria-current="page" @endif>
               <i class="bi bi-lightning-charge-fill me-2"></i>Vendidos
               <span class="pulse-dot"></span>
             </a>
