@@ -120,27 +120,29 @@ else
     echo '✗ Git pull failed' >&2;
     exit 1;
 fi;
-# Ensure very high upload limits for 60+ images
+# Ensure effectively unlimited upload/processing limits
 echo '→ Configuring PHP-FPM upload limits...';
 PHPV=\$(php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;');
 UPLOAD_INI=/etc/php/\$PHPV/fpm/conf.d/99-upload_limits.ini;
-printf "%s\n" \
-  "file_uploads = On" \
-  "max_file_uploads = 200" \
-  "upload_max_filesize = 2048M" \
-  "post_max_size = 2048M" \
-  "memory_limit = 1024M" \
-  "max_execution_time = 600" \
-  "max_input_time = 600" \
-  > \$UPLOAD_INI;
+mkdir -p /etc/php/\$PHPV/fpm/conf.d;
+cat > \$UPLOAD_INI <<'EOF'
+file_uploads = On
+max_file_uploads = 200
+upload_max_filesize = 0
+post_max_size = 0
+memory_limit = -1
+max_execution_time = 0
+max_input_time = -1
+EOF
 if [ \$? -eq 0 ]; then echo '✓ PHP limits file written at' \$UPLOAD_INI; else echo '✗ Failed to write PHP limits' >&2; fi;
 
 echo '→ Configuring Nginx client_max_body_size...';
-printf "%s\n" "client_max_body_size 2048M;" > /etc/nginx/conf.d/upload_limits.conf;
+mkdir -p /etc/nginx/conf.d;
+printf "%s\n" "client_max_body_size 0;" > /etc/nginx/conf.d/upload_limits.conf;
 if [ \$? -eq 0 ]; then echo '✓ Nginx limits file written'; else echo '✗ Failed to write Nginx limits' >&2; fi;
 
 echo '→ Restarting PHP-FPM...';
-systemctl restart php\$PHPV-fpm || systemctl restart php-fpm;
+systemctl reload php\$PHPV-fpm || systemctl restart php\$PHPV-fpm || systemctl restart php-fpm;
 if [ \$? -eq 0 ]; then echo '✓ PHP-FPM restarted'; else echo '✗ PHP-FPM restart failed' >&2; fi;
 "
 
