@@ -110,7 +110,7 @@
       display: flex !important; 
       align-items: center !important; 
       justify-content: center !important; 
-      padding: 60px 80px !important;
+      padding: 0 !important; /* remove padding to avoid any visible gaps */
       margin: 0 !important;
     }
     .gallery-lightbox .lightbox-media { 
@@ -965,6 +965,8 @@ document.addEventListener('DOMContentLoaded', function() {
     touchStartY = t.clientY;
     touchStartTime = Date.now();
     isSwiping = false;
+    // prevent page scroll when starting a horizontal swipe inside main media
+    try { e.target.closest('.main-media-container') && e.preventDefault(); } catch(_) {}
   }
   function onTouchMove(e){
     if (!e.touches || e.touches.length === 0) return;
@@ -973,6 +975,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const dy = t.clientY - touchStartY;
     if (!isSwiping && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
       isSwiping = true;
+      // lock vertical scroll while swiping horizontally
+      try { e.preventDefault(); } catch(_) {}
     }
   }
   function onTouchEnd(e){
@@ -1112,9 +1116,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     // Swipe on lightbox (touch)
     let lbStartX = 0, lbStartY = 0, lbTime = 0, lbSwiping = false;
-    lightbox.addEventListener('touchstart', function(e){ if (!e.touches || !e.touches[0]) return; const t=e.touches[0]; lbStartX=t.clientX; lbStartY=t.clientY; lbTime=Date.now(); lbSwiping=false; }, { passive: true });
-    lightbox.addEventListener('touchmove', function(e){ if (!e.touches || !e.touches[0]) return; const t=e.touches[0]; const dx=t.clientX-lbStartX; const dy=t.clientY-lbStartY; if (!lbSwiping && Math.abs(dx)>10 && Math.abs(dx)>Math.abs(dy)) lbSwiping=true; }, { passive: true });
-    lightbox.addEventListener('touchend', function(e){ if (!lbSwiping) return; const t=e.changedTouches && e.changedTouches[0]; if(!t) return; const dx=t.clientX-lbStartX; const dt=Date.now()-lbTime; if (Math.abs(dx)>50 && dt<1000) { if (dx<0) { lightboxNextImage(); } else { lightboxPrevious(); } } lbSwiping=false; }, { passive: true });
+    lightbox.addEventListener('touchstart', function(e){ if (!e.touches || !e.touches[0]) return; const t=e.touches[0]; lbStartX=t.clientX; lbStartY=t.clientY; lbTime=Date.now(); lbSwiping=false; try{ e.preventDefault(); }catch(_){} }, { passive: false });
+    lightbox.addEventListener('touchmove', function(e){ if (!e.touches || !e.touches[0]) return; const t=e.touches[0]; const dx=t.clientX-lbStartX; const dy=t.clientY-lbStartY; if (!lbSwiping && Math.abs(dx)>10 && Math.abs(dx)>Math.abs(dy)) lbSwiping=true; if (lbSwiping) { try{ e.preventDefault(); }catch(_){} } }, { passive: false });
+    lightbox.addEventListener('touchend', function(e){ if (!lbSwiping) return; const t=e.changedTouches && e.changedTouches[0]; if(!t) return; const dx=t.clientX-lbStartX; const dt=Date.now()-lbTime; if (Math.abs(dx)>50 && dt<1000) { if (dx<0) { lightboxNextImage(); } else { lightboxPrevious(); } } lbSwiping=false; try{ e.preventDefault(); }catch(_){} }, { passive: false });
     // Mouse drag on lightbox (desktop/tablet)
     let lbMouseDown=false, lbMouseX=0, lbMouseY=0, lbMouseTime=0, lbMouseSwiping=false;
     lightbox.addEventListener('mousedown', function(e){ lbMouseDown=true; lbMouseX=e.clientX; lbMouseY=e.clientY; lbMouseTime=Date.now(); lbMouseSwiping=false; });
