@@ -299,14 +299,16 @@ class VehicleController extends BaseController
 
         $galleryUrls = [];
         if ($request->hasFile('gallery_images')) {
+            $warmMax = 12; // limit warm-up to first 12 gallery images to avoid timeouts on bulk uploads
+            $warmed = 0;
             foreach ($request->file('gallery_images') as $img) {
                 $path = $img->store('vehicles/' . $slug, 'public');
                 $publicUrl = Storage::url($path);
                 $galleryUrls[] = $publicUrl;
-                // Warm resize cache for common sizes to avoid first-load CPU spikes
-                try {
-                    $this->warmResizeCache($publicUrl);
-                } catch (\Throwable $e) { /* ignore warmup failures */ }
+                if ($warmed < $warmMax) {
+                    try { $this->warmResizeCache($publicUrl); } catch (\Throwable $e) { /* ignore warmup failures */ }
+                    $warmed++;
+                }
             }
         }
 
@@ -457,6 +459,7 @@ class VehicleController extends BaseController
             try {
                 $path = $file->store('vehicles/' . $slug, 'public');
                 $vehicleData['cover_image'] = Storage::url($path);
+                // Always warm cover image only
                 try { $this->warmResizeCache($vehicleData['cover_image']); } catch (\Throwable $e) { /* ignore */ }
                 // Success logging removed for performance
             } catch (\Exception $e) {
@@ -466,12 +469,14 @@ class VehicleController extends BaseController
 
         if ($request->hasFile('gallery_images')) {
             $galleryUrls = $vehicleData['gallery_images'] ?? [];
+            $warmMax = 12; // limit warm-up for gallery
+            $warmed = 0;
             foreach ($request->file('gallery_images') as $img) {
                 try {
                     $path = $img->store('vehicles/' . $slug, 'public');
                     $url = Storage::url($path);
                     $galleryUrls[] = $url;
-                    try { $this->warmResizeCache($url); } catch (\Throwable $e) { /* ignore */ }
+                    if ($warmed < $warmMax) { try { $this->warmResizeCache($url); } catch (\Throwable $e) { /* ignore */ } $warmed++; }
                 } catch (\Throwable $e) {
                     \Log::error('Gallery image store failed: ' . $e->getMessage());
                 }
