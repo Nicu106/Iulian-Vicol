@@ -71,12 +71,21 @@
 @push('styles')
   <link rel="stylesheet" href="{{ asset('css/pages/vehicle.css') }}">
   <style>
+    /* Prevent background scroll when lightbox is open (mobile Safari fix) */
+    html.lightbox-open, body.lightbox-open {
+      overflow: hidden !important;
+      height: 100% !important;
+      position: relative !important;
+      touch-action: none !important;
+      overscroll-behavior: none !important;
+    }
     /* Lightbox - Imagine mare pe tot ecranul - FORȚAT */
     .gallery-lightbox { 
       position: fixed !important; 
       inset: 0 !important; /* top/left/right/bottom: 0 */
       width: 100vw !important;
-      height: 100dvh !important; /* cover dynamic viewport height on mobile */
+      height: 100svh !important; /* small viewport height for iOS Safari */
+      height: 100dvh !important; /* dynamic viewport height for modern browsers */
       min-height: 100vh !important; /* fallback */
       z-index: 9999 !important; 
       display: none !important; 
@@ -1042,6 +1051,8 @@ document.addEventListener('DOMContentLoaded', function() {
     renderLightbox(currentIndex);
     lightbox.classList.add('show');
     document.body.style.overflow = 'hidden';
+    document.documentElement.classList.add('lightbox-open');
+    document.body.classList.add('lightbox-open');
   }
 
   function closeLightbox() {
@@ -1049,6 +1060,8 @@ document.addEventListener('DOMContentLoaded', function() {
     lightbox.classList.remove('show');
     lightboxMedia.innerHTML = '';
     document.body.style.overflow = '';
+    document.documentElement.classList.remove('lightbox-open');
+    document.body.classList.remove('lightbox-open');
   }
 
   function lightboxPrevious() {
