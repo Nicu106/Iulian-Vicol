@@ -74,20 +74,22 @@
     /* Lightbox - Imagine mare pe tot ecranul - FORȚAT */
     .gallery-lightbox { 
       position: fixed !important; 
-      top: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      bottom: 0 !important;
+      inset: 0 !important; /* top/left/right/bottom: 0 */
       width: 100vw !important;
-      height: 100vh !important;
+      height: 100dvh !important; /* cover dynamic viewport height on mobile */
+      min-height: 100vh !important; /* fallback */
       z-index: 9999 !important; 
       display: none !important; 
-      background: rgba(0,0,0,0.95) !important; 
+      background: rgba(0,0,0,0.98) !important; 
       overflow: hidden !important;
       margin: 0 !important;
       padding: 0 !important;
+      padding-bottom: env(safe-area-inset-bottom, 0px) !important; /* iOS safe area */
       align-items: center !important;
       justify-content: center !important;
+      overscroll-behavior: contain !important;
+      -webkit-overflow-scrolling: touch !important;
+      touch-action: none !important;
     }
     .gallery-lightbox.show { 
       display: flex !important; 
@@ -103,21 +105,23 @@
       margin: 0 !important;
     }
     .gallery-lightbox .lightbox-media { 
-      display: flex !important; 
-      align-items: center !important; 
-      justify-content: center !important; 
+      display: block !important; 
       width: 100% !important; 
       height: 100% !important; 
       margin: 0 !important;
       padding: 0 !important;
+      overflow: auto !important; /* allow pan/scroll */
+      -webkit-overflow-scrolling: touch !important;
+      white-space: nowrap !important; /* horizontal flow */
+      cursor: grab !important;
     }
     .gallery-lightbox .lightbox-media img { 
-      max-width: 100% !important; 
+      max-width: none !important; 
       max-height: 100% !important; 
       width: auto !important; 
       height: auto !important; 
       object-fit: contain !important; 
-      display: block !important; 
+      display: inline-block !important; 
       margin: 0 auto !important;
     }
     .gallery-lightbox .lightbox-media iframe { 
@@ -1022,9 +1026,14 @@ document.addEventListener('DOMContentLoaded', function() {
       img.src = displayUrl;
       img.alt = 'Imagine galerie';
       img.onerror = function() {
-        this.src = 'https://via.placeholder.com/800x450/f8f9fa/6c757d?text=Fără+imagine';
+        this.src = 'https://via.placeholder.com/1200x800/000/fff?text=Image+not+available';
       };
+      // Center image and allow horizontal scroll/pan
+      img.style.userSelect = 'none';
+      img.addEventListener('dragstart', function(e){ e.preventDefault(); });
       lightboxMedia.appendChild(img);
+      // Center horizontally
+      lightboxMedia.scrollLeft = Math.max(0, (img.clientWidth - lightboxMedia.clientWidth) / 2);
     }
   }
 
