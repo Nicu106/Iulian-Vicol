@@ -467,15 +467,35 @@ class VehicleController extends BaseController
             }
         }
 
+        // DEBUG: Detailed logging for gallery images
+        \Log::info('UPDATE DEBUG - Gallery Images', [
+            'has_gallery_files' => $request->hasFile('gallery_images'),
+            'all_files_keys' => array_keys($request->allFiles()),
+            'gallery_files_count' => $request->hasFile('gallery_images') ? count($request->file('gallery_images')) : 0,
+            'request_method' => $request->method(),
+            'content_type' => $request->header('Content-Type'),
+        ]);
+
         if ($request->hasFile('gallery_images')) {
             $galleryUrls = $vehicleData['gallery_images'] ?? [];
             $warmMax = 12; // limit warm-up for gallery
             $warmed = 0;
-            foreach ($request->file('gallery_images') as $img) {
+            \Log::info('Processing gallery images', ['count' => count($request->file('gallery_images'))]);
+            
+            foreach ($request->file('gallery_images') as $index => $img) {
+                \Log::info('Gallery image ' . $index, [
+                    'name' => $img->getClientOriginalName(),
+                    'size' => $img->getSize(),
+                    'mime' => $img->getMimeType(),
+                    'is_valid' => $img->isValid(),
+                    'error' => $img->getError()
+                ]);
+                
                 try {
                     $path = $img->store('vehicles/' . $slug, 'public');
                     $url = Storage::url($path);
                     $galleryUrls[] = $url;
+                    \Log::info('Gallery image stored successfully', ['path' => $path, 'url' => $url]);
                     if ($warmed < $warmMax) { try { $this->warmResizeCache($url); } catch (\Throwable $e) { /* ignore */ } $warmed++; }
                 } catch (\Throwable $e) {
                     \Log::error('Gallery image store failed: ' . $e->getMessage());
@@ -484,6 +504,9 @@ class VehicleController extends BaseController
             // Ensure unique and keep insertion order
             $galleryUrls = array_values(array_unique($galleryUrls));
             $vehicleData['gallery_images'] = $galleryUrls;
+            \Log::info('Final gallery URLs', ['count' => count($galleryUrls), 'urls' => $galleryUrls]);
+        } else {
+            \Log::info('No gallery images to process');
         }
 
         // Handle removal of existing gallery images
