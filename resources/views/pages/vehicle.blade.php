@@ -125,13 +125,14 @@
       position: relative !important;
     }
     .gallery-lightbox .lightbox-media img {
-      max-width: 90vw !important;
-      max-height: 90vh !important;
+      max-width: 95vw !important;
+      max-height: 85vh !important;
       width: auto !important;
       height: auto !important;
       object-fit: contain !important;
+      object-position: center !important;
       display: block !important;
-      margin: 0 auto !important;
+      margin: auto !important;
       touch-action: pan-x !important;
     }
     .gallery-lightbox .lightbox-media iframe { 
@@ -141,27 +142,30 @@
       display: block !important; 
       margin: 0 auto !important;
     }
-    .gallery-lightbox .lightbox-close { 
-      position: fixed !important; 
-      top: 20px !important; 
-      right: 20px !important; 
-      z-index: 10000 !important; 
-      background: rgba(255,255,255,0.2) !important; 
-      border: none !important; 
-      color: white !important; 
-      width: 50px !important; 
-      height: 50px !important; 
-      border-radius: 50% !important; 
-      font-size: 24px !important; 
-      cursor: pointer !important; 
-      transition: all 0.3s !important; 
+    .gallery-lightbox .lightbox-close {
+      position: fixed !important;
+      top: 20px !important;
+      right: 20px !important;
+      z-index: 10001 !important;
+      background: rgba(255,255,255,0.3) !important;
+      border: none !important;
+      color: white !important;
+      width: 50px !important;
+      height: 50px !important;
+      border-radius: 50% !important;
+      font-size: 24px !important;
+      cursor: pointer !important;
+      transition: all 0.3s !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
+      -webkit-tap-highlight-color: transparent !important;
+      touch-action: manipulation !important;
     }
-    .gallery-lightbox .lightbox-close:hover { 
-      background: rgba(255,255,255,0.3) !important; 
-      transform: scale(1.1) !important; 
+    .gallery-lightbox .lightbox-close:hover,
+    .gallery-lightbox .lightbox-close:active {
+      background: rgba(255,255,255,0.5) !important;
+      transform: scale(1.1) !important;
     }
     .gallery-lightbox .lightbox-prev,
     .gallery-lightbox .lightbox-next { 
@@ -280,6 +284,43 @@
         width: 40px !important;
         height: 40px !important;
         font-size: 20px !important;
+      }
+
+      /* Fix pentru prețuri pe mobil */
+      .price-card {
+        padding: 0.75rem !important;
+        font-size: 0.85rem !important;
+      }
+
+      .price-card .h4 {
+        font-size: 1.25rem !important;
+      }
+
+      .price-card .display-5 {
+        font-size: 1.75rem !important;
+      }
+
+      .price-card .small {
+        font-size: 0.75rem !important;
+      }
+
+      .price-card .badge {
+        font-size: 0.7rem !important;
+        padding: 0.35rem 0.65rem !important;
+      }
+
+      /* Previne wrap-ul cifrelor de preț */
+      .price-value {
+        white-space: nowrap !important;
+        font-size: 1.5rem !important;
+      }
+
+      .price-label {
+        font-size: 0.75rem !important;
+      }
+
+      .price-estimate {
+        font-size: 0.7rem !important;
       }
     }
   </style>
@@ -1068,13 +1109,16 @@ document.addEventListener('DOMContentLoaded', function() {
         this.src = 'https://via.placeholder.com/1200x800/000/fff?text=Image+not+available';
       };
 
-      // Style pentru centrare perfectă
+      // Style pentru centrare perfectă și afișare completă
       img.style.userSelect = 'none';
       img.style.display = 'block';
-      img.style.margin = '0 auto';
-      img.style.maxWidth = '90vw';
-      img.style.maxHeight = '90vh';
+      img.style.margin = 'auto';
+      img.style.maxWidth = '95vw';
+      img.style.maxHeight = '85vh';
+      img.style.width = 'auto';
+      img.style.height = 'auto';
       img.style.objectFit = 'contain';
+      img.style.objectPosition = 'center';
 
       img.addEventListener('dragstart', function(e){ e.preventDefault(); });
       lightboxMedia.appendChild(img);
@@ -1127,7 +1171,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Event listeners pentru lightbox
   if (lightboxClose) {
-    lightboxClose.addEventListener('click', closeLightbox);
+    lightboxClose.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      closeLightbox();
+    });
+    // Touch event pentru mobil
+    lightboxClose.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      closeLightbox();
+    }, { passive: false });
   }
 
   if (lightboxPrev) {
