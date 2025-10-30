@@ -285,6 +285,28 @@
               </div>
               @endif
 
+              @if(!empty($vehicle['images']))
+              <div class="col-12">
+                <label class="form-label">Imagini încărcate (Sell Your Car)</label>
+                <div class="d-flex flex-wrap gap-2">
+                  @php
+                    $imagesField = is_string($vehicle['images']) ? json_decode($vehicle['images'], true) : $vehicle['images'];
+                  @endphp
+                  @if(is_array($imagesField))
+                    @foreach($imagesField as $img)
+                      @php
+                        $isAbs = is_string($img) && preg_match('/^https?:\/\//i', $img);
+                        $imgUrl = $isAbs ? $img : (is_string($img) ? Storage::url($img) : null);
+                      @endphp
+                      @if($imgUrl)
+                        <img src="{{ $imgUrl }}" style="width: 100px; height: 75px; object-fit: cover; border-radius: 6px; border: 1px solid #e5e7eb;">
+                      @endif
+                    @endforeach
+                  @endif
+                </div>
+              </div>
+              @endif
+
               <div class="col-md-6">
                 <label class="form-label">{{ !empty($vehicle['cover_image']) ? 'Înlocuiește' : 'Adaugă' }} imagine principală</label>
                 <input type="file" name="cover_image" accept="image/*" class="form-control" id="cover_image" onchange="previewImage(this, 'cover_preview')">

@@ -356,13 +356,20 @@
 
     <div class="row g-3 mb-4">
       <div class="col-lg-8">
-        @if($vehicle->cover_image || !empty($vehicle->gallery_images) || $vehicle->video_url)
+        @php
+          $hasCover = is_object($vehicle) ? !empty($vehicle->cover_image) : !empty($vehicle['cover_image']);
+          $hasGallery = is_object($vehicle) ? !empty($vehicle->gallery_images) : !empty($vehicle['gallery_images']);
+          $hasImages = is_object($vehicle) ? !empty($vehicle->images) : !empty($vehicle['images']);
+          $hasVideo = is_object($vehicle) ? !empty($vehicle->video_url) : !empty($vehicle['video_url']);
+        @endphp
+        @if($hasCover || $hasGallery || $hasImages || $hasVideo)
           @php
             $allMedia = [];
 
             // Adaugă video-ul primul dacă există (normalizează la embed YouTube)
-            if($vehicle->video_url) {
-              $videoUrl = trim((string) $vehicle->video_url);
+            $videoUrlRaw = is_object($vehicle) ? ($vehicle->video_url ?? null) : ($vehicle['video_url'] ?? null);
+            if($videoUrlRaw) {
+              $videoUrl = trim((string) $videoUrlRaw);
               $host = (string) (parse_url($videoUrl, PHP_URL_HOST) ?? '');
               $path = trim((string) (parse_url($videoUrl, PHP_URL_PATH) ?? ''), '/');
               $queryStr = (string) (parse_url($videoUrl, PHP_URL_QUERY) ?? '');
@@ -392,31 +399,47 @@
               ];
             }
 
-            // Adaugă imaginea de copertă
-            if($vehicle->cover_image) {
-              $allMedia[] = [
-                'type' => 'image',
-                'url' => $vehicle->cover_image,
-                'display' => $resizeImg($vehicle->cover_image, 1200),
-                'thumb' => $resizeImg($vehicle->cover_image, 240)
-              ];
-            }
-
-            // Adaugă imaginile din galerie
-            if($vehicle->gallery_images) {
-              foreach($vehicle->gallery_images as $img) {
+            // Adaugă imaginea de copertă (normalizează URL-ul dacă e cale relativă)
+            $coverImage = is_object($vehicle) ? ($vehicle->cover_image ?? null) : ($vehicle['cover_image'] ?? null);
+            if($coverImage) {
+              $coverRaw = $coverImage;
+              $isAbsolute = is_string($coverRaw) && preg_match('/^https?:\/\//i', $coverRaw);
+              $coverUrl = $isAbsolute ? $coverRaw : (is_string($coverRaw)
+                ? (preg_match('/^\/storage\//', $coverRaw) ? $coverRaw : Storage::url($coverRaw))
+                : null);
+              if ($coverUrl) {
                 $allMedia[] = [
                   'type' => 'image',
-                  'url' => $img,
-                  'display' => $resizeImg($img, 1200),
-                  'thumb' => $resizeImg($img, 240)
+                  'url' => $coverUrl,
+                  'display' => $resizeImg($coverUrl, 1200),
+                  'thumb' => $resizeImg($coverUrl, 240)
                 ];
               }
             }
 
+            // Adaugă imaginile din galerie (normalizează URL-urile dacă sunt căi relative)
+            $galleryImages = is_object($vehicle) ? ($vehicle->gallery_images ?? []) : ($vehicle['gallery_images'] ?? []);
+            if($galleryImages) {
+              foreach($galleryImages as $img) {
+                $isAbsolute = is_string($img) && preg_match('/^https?:\/\//i', $img);
+                $imgUrl = $isAbsolute ? $img : (is_string($img)
+                  ? (preg_match('/^\/storage\//', $img) ? $img : Storage::url($img))
+                  : null);
+                if ($imgUrl) {
+                  $allMedia[] = [
+                    'type' => 'image',
+                    'url' => $imgUrl,
+                    'display' => $resizeImg($imgUrl, 1200),
+                    'thumb' => $resizeImg($imgUrl, 240)
+                  ];
+                }
+              }
+            }
+
             // Adaugă imaginile din câmpul `images` (Sell Your Car)
-            if(!empty($vehicle->images)) {
-              $imagesField = is_string($vehicle->images) ? json_decode($vehicle->images, true) : $vehicle->images;
+            $vehicleImages = is_object($vehicle) ? ($vehicle->images ?? null) : ($vehicle['images'] ?? null);
+            if(!empty($vehicleImages)) {
+              $imagesField = is_string($vehicleImages) ? json_decode($vehicleImages, true) : $vehicleImages;
               if (is_array($imagesField)) {
                 foreach($imagesField as $img) {
                   $isAbsolute = is_string($img) && preg_match('/^https?:\/\//i', $img);
