@@ -317,8 +317,8 @@
               </div>
               <div class="col-md-6">
                 <label class="form-label">Adaugă imagini la galerie</label>
-                <input type="file" name="gallery_images[]" accept="image/*" class="form-control" multiple id="gallery_images" onchange="previewGallery(this, 'gallery_preview')">
-                <div class="hint">Poți încărca mai multe imagini</div>
+                <input type="file" name="gallery_images[]" accept="image/*" class="form-control" multiple id="gallery_images">
+                <div class="hint">Poți încărca mai multe imagini (JavaScript dezactivat pentru debug)</div>
                 <div id="gallery_preview" class="mt-2 d-flex flex-wrap gap-2"></div>
               </div>
               <div class="col-12">
