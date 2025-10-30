@@ -113,25 +113,26 @@
       padding: 0 !important; /* remove padding to avoid any visible gaps */
       margin: 0 !important;
     }
-    .gallery-lightbox .lightbox-media { 
-      display: block !important; 
-      width: 100% !important; 
-      height: 100% !important; 
+    .gallery-lightbox .lightbox-media {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 100% !important;
+      height: 100% !important;
       margin: 0 !important;
       padding: 0 !important;
-      overflow: auto !important; /* allow pan/scroll */
-      -webkit-overflow-scrolling: touch !important;
-      white-space: nowrap !important; /* horizontal flow */
-      cursor: grab !important;
+      overflow: hidden !important;
+      position: relative !important;
     }
-    .gallery-lightbox .lightbox-media img { 
-      max-width: none !important; 
-      max-height: 100% !important; 
-      width: auto !important; 
-      height: auto !important; 
-      object-fit: contain !important; 
-      display: inline-block !important; 
+    .gallery-lightbox .lightbox-media img {
+      max-width: 90vw !important;
+      max-height: 90vh !important;
+      width: auto !important;
+      height: auto !important;
+      object-fit: contain !important;
+      display: block !important;
       margin: 0 auto !important;
+      touch-action: pan-x !important;
     }
     .gallery-lightbox .lightbox-media iframe { 
       width: 90vw !important; 
@@ -1045,9 +1046,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!mediaItems || !mediaItems.length) return;
     const item = mediaItems[index];
     if (!item) return;
-    
+
     lightboxMedia.innerHTML = ''; // Clear previous content
-    
+
     if (item.type === 'video') {
       const embedUrl = item.embed || item.url;
       const iframe = document.createElement('iframe');
@@ -1055,6 +1056,8 @@ document.addEventListener('DOMContentLoaded', function() {
       iframe.setAttribute('frameborder', '0');
       iframe.setAttribute('allowfullscreen', '');
       iframe.setAttribute('title', 'Video prezentare vehicul');
+      iframe.style.display = 'block';
+      iframe.style.margin = '0 auto';
       lightboxMedia.appendChild(iframe);
     } else {
       const displayUrl = item.display || item.url;
@@ -1064,12 +1067,17 @@ document.addEventListener('DOMContentLoaded', function() {
       img.onerror = function() {
         this.src = 'https://via.placeholder.com/1200x800/000/fff?text=Image+not+available';
       };
-      // Center image and allow horizontal scroll/pan
+
+      // Style pentru centrare perfectă
       img.style.userSelect = 'none';
+      img.style.display = 'block';
+      img.style.margin = '0 auto';
+      img.style.maxWidth = '90vw';
+      img.style.maxHeight = '90vh';
+      img.style.objectFit = 'contain';
+
       img.addEventListener('dragstart', function(e){ e.preventDefault(); });
       lightboxMedia.appendChild(img);
-      // Center horizontally
-      lightboxMedia.scrollLeft = Math.max(0, (img.clientWidth - lightboxMedia.clientWidth) / 2);
     }
   }
 
@@ -1137,11 +1145,58 @@ document.addEventListener('DOMContentLoaded', function() {
         closeLightbox();
       }
     });
-    // Swipe on lightbox (touch)
+    // Swipe on lightbox (touch) - Improved for mobile
     let lbStartX = 0, lbStartY = 0, lbTime = 0, lbSwiping = false;
-    lightbox.addEventListener('touchstart', function(e){ if (!e.touches || !e.touches[0]) return; const t=e.touches[0]; lbStartX=t.clientX; lbStartY=t.clientY; lbTime=Date.now(); lbSwiping=false; try{ e.preventDefault(); }catch(_){} }, { passive: false });
-    lightbox.addEventListener('touchmove', function(e){ if (!e.touches || !e.touches[0]) return; const t=e.touches[0]; const dx=t.clientX-lbStartX; const dy=t.clientY-lbStartY; if (!lbSwiping && Math.abs(dx)>10 && Math.abs(dx)>Math.abs(dy)) lbSwiping=true; if (lbSwiping) { try{ e.preventDefault(); }catch(_){} } }, { passive: false });
-    lightbox.addEventListener('touchend', function(e){ if (!lbSwiping) return; const t=e.changedTouches && e.changedTouches[0]; if(!t) return; const dx=t.clientX-lbStartX; const dt=Date.now()-lbTime; if (Math.abs(dx)>50 && dt<1000) { if (dx<0) { lightboxNextImage(); } else { lightboxPrevious(); } } lbSwiping=false; try{ e.preventDefault(); }catch(_){} }, { passive: false });
+
+    lightbox.addEventListener('touchstart', function(e) {
+      if (!e.touches || !e.touches[0]) return;
+      const t = e.touches[0];
+      lbStartX = t.clientX;
+      lbStartY = t.clientY;
+      lbTime = Date.now();
+      lbSwiping = false;
+    }, { passive: true });
+
+    lightbox.addEventListener('touchmove', function(e) {
+      if (!e.touches || !e.touches[0]) return;
+      const t = e.touches[0];
+      const dx = t.clientX - lbStartX;
+      const dy = t.clientY - lbStartY;
+
+      // Detect horizontal swipe
+      if (!lbSwiping && Math.abs(dx) > 15 && Math.abs(dx) > Math.abs(dy)) {
+        lbSwiping = true;
+      }
+
+      // Prevent vertical scroll when swiping horizontally
+      if (lbSwiping) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    lightbox.addEventListener('touchend', function(e) {
+      if (!lbSwiping) return;
+
+      const t = e.changedTouches && e.changedTouches[0];
+      if (!t) {
+        lbSwiping = false;
+        return;
+      }
+
+      const dx = t.clientX - lbStartX;
+      const dt = Date.now() - lbTime;
+
+      // Swipe threshold: at least 50px movement in less than 800ms
+      if (Math.abs(dx) > 50 && dt < 800) {
+        if (dx < 0) {
+          lightboxNextImage();
+        } else {
+          lightboxPrevious();
+        }
+      }
+
+      lbSwiping = false;
+    }, { passive: true });
     // Mouse drag on lightbox (desktop/tablet)
     let lbMouseDown=false, lbMouseX=0, lbMouseY=0, lbMouseTime=0, lbMouseSwiping=false;
     lightbox.addEventListener('mousedown', function(e){ lbMouseDown=true; lbMouseX=e.clientX; lbMouseY=e.clientY; lbMouseTime=Date.now(); lbMouseSwiping=false; });
