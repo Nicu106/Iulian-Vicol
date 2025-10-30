@@ -56,4 +56,9 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
+    
+    // Handle GET requests to logout (redirect to login)
+    Route::get('logout', function () {
+        return redirect()->route('login')->with('message', 'Para cerrar sesión, use el botón de logout.');
+    });
 });
