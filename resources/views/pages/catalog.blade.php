@@ -311,7 +311,7 @@
                           $src480 = route('img.resize', ['w' => 480]) . '?p=' . urlencode($vehicleImage);
                           $src800 = route('img.resize', ['w' => 800]) . '?p=' . urlencode($vehicleImage);
                           $srcset = $src240 . ' 240w, ' . $src480 . ' 480w, ' . $src800 . ' 800w';
-                        } catch (\\Throwable $e) { /* ignore */ }
+                        } catch (\Throwable $e) { /* ignore */ }
                       }
                     @endphp
                     <img 
