@@ -310,3 +310,138 @@ main { padding-top: calc(var(--nav-height) + 8px); }
 .offcanvas { z-index: 1200; }
 .offcanvas-backdrop { z-index: 1199; }
 
+/* ========================================
+   MOBILE NAVIGATION IMPROVEMENTS
+   ======================================== */
+
+@media (max-width: 767.98px) {
+  /* Logo and brand optimized for small screens */
+  .brand-text {
+    font-size: 0.85rem !important;
+    letter-spacing: 0.1rem !important;
+  }
+
+  .brand-logo {
+    height: 28px !important;
+  }
+
+  /* Navbar toggler larger touch target */
+  .navbar-dark .navbar-toggler {
+    padding: 0.6rem 0.85rem;
+    min-width: 50px;
+    min-height: 44px;
+  }
+
+  /* Navbar collapse with distinct background */
+  .navbar-collapse {
+    background: rgba(17, 24, 39, 0.98);
+    border-radius: 16px;
+    margin-top: 0.75rem;
+    padding: 1rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Nav items larger for touch */
+  header .navbar .nav-item {
+    margin: 0.25rem 0;
+  }
+
+  header .navbar .nav-link {
+    padding: 0.875rem 1rem !important;
+    font-size: 1rem !important;
+    border-radius: 12px;
+    display: block;
+    text-align: left;
+  }
+
+  /* Separator after nav links */
+  header .navbar .navbar-nav {
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Buttons container spacing */
+  header .navbar .d-flex {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.75rem;
+  }
+
+  /* All buttons full-width and larger */
+  header .navbar .btn {
+    width: 100% !important;
+    padding: 0.875rem 1.25rem !important;
+    font-size: 1rem !important;
+    border-radius: 12px;
+    justify-content: center;
+    min-height: 48px;
+  }
+
+  /* Saved vehicles dropdown full-width */
+  header .navbar .dropdown {
+    width: 100%;
+  }
+
+  header .navbar .dropdown .btn {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Dropdown menu full-width on mobile */
+  header .navbar .dropdown-menu {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  /* Remove margins between buttons on mobile */
+  header .navbar .btn + .btn,
+  header .navbar .btn + form,
+  header .navbar form + .dropdown {
+    margin-left: 0 !important;
+  }
+
+  /* Logout form full-width */
+  header .navbar form {
+    width: 100%;
+  }
+
+  /* Adjust sold button for mobile */
+  .btn-sold-highlight {
+    padding: 0.875rem 1.25rem !important;
+    font-size: 1rem !important;
+  }
+
+  .btn-sold-highlight .pulse-dot {
+    top: 2px;
+    right: 8px;
+  }
+}
+
+/* Small mobile devices (< 375px) */
+@media (max-width: 374.98px) {
+  .brand-text {
+    font-size: 0.75rem !important;
+    letter-spacing: 0.05rem !important;
+  }
+
+  .brand-logo {
+    height: 24px !important;
+  }
+
+  header .navbar .nav-link {
+    font-size: 0.95rem !important;
+    padding: 0.75rem 0.875rem !important;
+  }
+
+  header .navbar .btn {
+    font-size: 0.95rem !important;
+    padding: 0.75rem 1rem !important;
+  }
+}
+
