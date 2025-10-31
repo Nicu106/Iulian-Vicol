@@ -117,17 +117,20 @@
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      width: 100vw !important;
-      height: 100vh !important;
+      width: 100% !important;
+      height: 100% !important;
       margin: 0 !important;
-      padding: 80px 20px !important;
+      padding: 0 !important;
       overflow: hidden !important;
-      position: relative !important;
-      box-sizing: border-box !important;
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
     }
     .gallery-lightbox .lightbox-media img {
-      max-width: 100% !important;
-      max-height: 100% !important;
+      max-width: calc(100vw - 100px) !important;
+      max-height: calc(100vh - 160px) !important;
       width: auto !important;
       height: auto !important;
       object-fit: contain !important;
@@ -274,15 +277,21 @@
 
       /* Container pentru imagine pe mobil */
       .gallery-lightbox .lightbox-media {
-        padding: 100px 15px 80px 15px !important;
+        padding: 0 !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
       }
 
-      /* Imaginile în lightbox pe mobil - să se vadă complet */
+      /* Imaginile în lightbox pe mobil - să se vadă COMPLET */
       .gallery-lightbox .lightbox-media img {
-        max-width: 100% !important;
-        max-height: 100% !important;
+        max-width: calc(100vw - 120px) !important;
+        max-height: calc(100vh - 200px) !important;
         width: auto !important;
         height: auto !important;
+        object-fit: contain !important;
       }
 
       .gallery-lightbox .lightbox-prev,
@@ -291,6 +300,7 @@
         height: 50px !important;
         font-size: 22px !important;
         background: rgba(0,0,0,0.6) !important;
+        z-index: 10001 !important;
       }
       .gallery-lightbox .lightbox-prev { left: 5px !important; }
       .gallery-lightbox .lightbox-next { right: 5px !important; }
