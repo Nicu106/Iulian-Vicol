@@ -285,13 +285,14 @@
         bottom: 0 !important;
       }
 
-      /* Imaginile în lightbox pe mobil - să se vadă COMPLET */
+      /* Imaginile în lightbox pe mobil - să se vadă COMPLET - VERSIUNE AGRESIVĂ */
       .gallery-lightbox .lightbox-media img {
-        max-width: calc(100vw - 120px) !important;
-        max-height: calc(100vh - 200px) !important;
-        width: auto !important;
+        max-width: 85vw !important;
+        max-height: 60vh !important;
+        width: 85vw !important;
         height: auto !important;
         object-fit: contain !important;
+        object-position: center center !important;
       }
 
       .gallery-lightbox .lightbox-prev,
@@ -305,13 +306,21 @@
       .gallery-lightbox .lightbox-prev { left: 5px !important; }
       .gallery-lightbox .lightbox-next { right: 5px !important; }
       .gallery-lightbox .lightbox-close {
-        top: 15px !important;
-        right: 15px !important;
-        width: 50px !important;
-        height: 50px !important;
-        font-size: 24px !important;
-        background: rgba(0,0,0,0.7) !important;
+        top: 10px !important;
+        right: 10px !important;
+        width: 60px !important;
+        height: 60px !important;
+        font-size: 28px !important;
+        background: rgba(255,255,255,0.9) !important;
+        color: #000 !important;
         z-index: 10002 !important;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3) !important;
+        border: 2px solid rgba(0,0,0,0.1) !important;
+      }
+
+      .gallery-lightbox .lightbox-close:active {
+        background: rgba(255,255,255,1) !important;
+        transform: scale(0.95) !important;
       }
 
       /* Fix pentru prețuri pe mobil */
@@ -1232,9 +1241,19 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     // Swipe on lightbox (touch) - Improved for mobile
     let lbStartX = 0, lbStartY = 0, lbTime = 0, lbSwiping = false;
+    let touchedCloseButton = false;
 
     lightbox.addEventListener('touchstart', function(e) {
       if (!e.touches || !e.touches[0]) return;
+
+      // Check if touch started on close button
+      touchedCloseButton = e.target.closest('.lightbox-close') !== null;
+
+      if (touchedCloseButton) {
+        // Don't start swipe if touching close button
+        return;
+      }
+
       const t = e.touches[0];
       lbStartX = t.clientX;
       lbStartY = t.clientY;
@@ -1244,6 +1263,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     lightbox.addEventListener('touchmove', function(e) {
       if (!e.touches || !e.touches[0]) return;
+      if (touchedCloseButton) return; // Skip swipe if close button was touched
+
       const t = e.touches[0];
       const dx = t.clientX - lbStartX;
       const dy = t.clientY - lbStartY;
@@ -1260,6 +1281,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }, { passive: false });
 
     lightbox.addEventListener('touchend', function(e) {
+      if (touchedCloseButton) {
+        touchedCloseButton = false;
+        return; // Don't process swipe if close button was touched
+      }
+
       if (!lbSwiping) return;
 
       const t = e.changedTouches && e.changedTouches[0];
