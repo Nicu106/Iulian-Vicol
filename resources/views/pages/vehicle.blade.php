@@ -268,8 +268,17 @@
     /* Responsive pentru mobile */
     @media (max-width: 768px) {
       .gallery-lightbox .lightbox-inner {
-        padding: 40px 20px !important;
+        padding: 60px 10px !important;
       }
+
+      /* Imaginile în lightbox pe mobil - să se vadă complet */
+      .gallery-lightbox .lightbox-media img {
+        max-width: 90vw !important;
+        max-height: 70vh !important;
+        width: 100% !important;
+        height: auto !important;
+      }
+
       .gallery-lightbox .lightbox-prev,
       .gallery-lightbox .lightbox-next {
         width: 45px !important;
@@ -1090,6 +1099,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     lightboxMedia.innerHTML = ''; // Clear previous content
 
+    // Detectează dacă suntem pe mobil
+    const isMobile = window.innerWidth <= 768;
+
     if (item.type === 'video') {
       const embedUrl = item.embed || item.url;
       const iframe = document.createElement('iframe');
@@ -1109,16 +1121,26 @@ document.addEventListener('DOMContentLoaded', function() {
         this.src = 'https://via.placeholder.com/1200x800/000/fff?text=Image+not+available';
       };
 
-      // Style pentru centrare perfectă și afișare completă
+      // Style pentru afișare completă - diferite pentru mobil vs desktop
       img.style.userSelect = 'none';
       img.style.display = 'block';
       img.style.margin = 'auto';
-      img.style.maxWidth = '95vw';
-      img.style.maxHeight = '85vh';
-      img.style.width = 'auto';
-      img.style.height = 'auto';
       img.style.objectFit = 'contain';
       img.style.objectPosition = 'center';
+
+      if (isMobile) {
+        // Pe mobil: forțează imaginea să se vadă completă
+        img.style.maxWidth = '90vw';
+        img.style.maxHeight = '70vh';
+        img.style.width = '100%';
+        img.style.height = 'auto';
+      } else {
+        // Pe desktop: permite dimensiuni mai mari
+        img.style.maxWidth = '95vw';
+        img.style.maxHeight = '85vh';
+        img.style.width = 'auto';
+        img.style.height = 'auto';
+      }
 
       img.addEventListener('dragstart', function(e){ e.preventDefault(); });
       lightboxMedia.appendChild(img);
