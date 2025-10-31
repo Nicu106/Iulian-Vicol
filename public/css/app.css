@@ -413,13 +413,25 @@ main { padding-top: calc(var(--nav-height) + 8px); }
 
   /* Adjust sold button for mobile */
   .btn-sold-highlight {
+    width: 100% !important;
     padding: 0.875rem 1.25rem !important;
     font-size: 1rem !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
   }
 
   .btn-sold-highlight .pulse-dot {
     top: 2px;
     right: 8px;
+  }
+
+  /* Green button (Vende tu Coche) also full-width */
+  header .navbar .btn-success {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
   }
 }
 
