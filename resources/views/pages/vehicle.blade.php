@@ -117,23 +117,24 @@
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      width: 100% !important;
-      height: 100% !important;
+      width: 100vw !important;
+      height: 100vh !important;
       margin: 0 !important;
-      padding: 0 !important;
+      padding: 80px 20px !important;
       overflow: hidden !important;
       position: relative !important;
+      box-sizing: border-box !important;
     }
     .gallery-lightbox .lightbox-media img {
-      max-width: 95vw !important;
-      max-height: 85vh !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
       width: auto !important;
       height: auto !important;
       object-fit: contain !important;
       object-position: center !important;
       display: block !important;
       margin: auto !important;
-      touch-action: pan-x !important;
+      pointer-events: none !important;
     }
     .gallery-lightbox .lightbox-media iframe { 
       width: 90vw !important; 
@@ -268,31 +269,39 @@
     /* Responsive pentru mobile */
     @media (max-width: 768px) {
       .gallery-lightbox .lightbox-inner {
-        padding: 60px 10px !important;
+        padding: 0 !important;
+      }
+
+      /* Container pentru imagine pe mobil */
+      .gallery-lightbox .lightbox-media {
+        padding: 100px 15px 80px 15px !important;
       }
 
       /* Imaginile în lightbox pe mobil - să se vadă complet */
       .gallery-lightbox .lightbox-media img {
-        max-width: 90vw !important;
-        max-height: 70vh !important;
-        width: 100% !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        width: auto !important;
         height: auto !important;
       }
 
       .gallery-lightbox .lightbox-prev,
       .gallery-lightbox .lightbox-next {
-        width: 45px !important;
-        height: 45px !important;
-        font-size: 20px !important;
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 22px !important;
+        background: rgba(0,0,0,0.6) !important;
       }
-      .gallery-lightbox .lightbox-prev { left: 10px !important; }
-      .gallery-lightbox .lightbox-next { right: 10px !important; }
+      .gallery-lightbox .lightbox-prev { left: 5px !important; }
+      .gallery-lightbox .lightbox-next { right: 5px !important; }
       .gallery-lightbox .lightbox-close {
-        top: 10px !important;
-        right: 10px !important;
-        width: 40px !important;
-        height: 40px !important;
-        font-size: 20px !important;
+        top: 15px !important;
+        right: 15px !important;
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 24px !important;
+        background: rgba(0,0,0,0.7) !important;
+        z-index: 10002 !important;
       }
 
       /* Fix pentru prețuri pe mobil */
@@ -1099,9 +1108,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     lightboxMedia.innerHTML = ''; // Clear previous content
 
-    // Detectează dacă suntem pe mobil
-    const isMobile = window.innerWidth <= 768;
-
     if (item.type === 'video') {
       const embedUrl = item.embed || item.url;
       const iframe = document.createElement('iframe');
@@ -1109,8 +1115,6 @@ document.addEventListener('DOMContentLoaded', function() {
       iframe.setAttribute('frameborder', '0');
       iframe.setAttribute('allowfullscreen', '');
       iframe.setAttribute('title', 'Video prezentare vehicul');
-      iframe.style.display = 'block';
-      iframe.style.margin = '0 auto';
       lightboxMedia.appendChild(iframe);
     } else {
       const displayUrl = item.display || item.url;
@@ -1121,27 +1125,7 @@ document.addEventListener('DOMContentLoaded', function() {
         this.src = 'https://via.placeholder.com/1200x800/000/fff?text=Image+not+available';
       };
 
-      // Style pentru afișare completă - diferite pentru mobil vs desktop
-      img.style.userSelect = 'none';
-      img.style.display = 'block';
-      img.style.margin = 'auto';
-      img.style.objectFit = 'contain';
-      img.style.objectPosition = 'center';
-
-      if (isMobile) {
-        // Pe mobil: forțează imaginea să se vadă completă
-        img.style.maxWidth = '90vw';
-        img.style.maxHeight = '70vh';
-        img.style.width = '100%';
-        img.style.height = 'auto';
-      } else {
-        // Pe desktop: permite dimensiuni mai mari
-        img.style.maxWidth = '95vw';
-        img.style.maxHeight = '85vh';
-        img.style.width = 'auto';
-        img.style.height = 'auto';
-      }
-
+      // Nu mai setăm stiluri inline - lăsăm CSS-ul să facă treaba
       img.addEventListener('dragstart', function(e){ e.preventDefault(); });
       lightboxMedia.appendChild(img);
     }
@@ -1191,27 +1175,42 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Event listeners pentru lightbox
+  // Event listeners pentru lightbox - prioritate pentru close button
   if (lightboxClose) {
+    // Click event
     lightboxClose.addEventListener('click', function(e) {
       e.preventDefault();
       e.stopPropagation();
+      e.stopImmediatePropagation();
       closeLightbox();
-    });
-    // Touch event pentru mobil
+    }, true);
+
+    // Touch events pentru mobil - mai mulți event handlers pentru compatibilitate
+    lightboxClose.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }, { passive: false });
+
     lightboxClose.addEventListener('touchend', function(e) {
       e.preventDefault();
       e.stopPropagation();
+      e.stopImmediatePropagation();
       closeLightbox();
     }, { passive: false });
   }
 
   if (lightboxPrev) {
-    lightboxPrev.addEventListener('click', lightboxPrevious);
+    lightboxPrev.addEventListener('click', function(e) {
+      e.stopPropagation();
+      lightboxPrevious();
+    });
   }
 
   if (lightboxNext) {
-    lightboxNext.addEventListener('click', lightboxNextImage);
+    lightboxNext.addEventListener('click', function(e) {
+      e.stopPropagation();
+      lightboxNextImage();
+    });
   }
 
   // Click pe background pentru a închide
