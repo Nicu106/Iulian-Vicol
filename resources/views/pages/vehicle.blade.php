@@ -364,21 +364,27 @@
       }
     }
 
-    /* Vehicle description formatting */
-    .vehicle-description {
-      color: #333;
-      line-height: 1.7;
-      font-size: 1rem;
-      font-style: normal !important; /* Force normal, not italic */
+    /* Vehicle description formatting - FORCE NORMAL STYLING */
+    .vehicle-description,
+    .vehicle-description p,
+    .vehicle-description div,
+    .vehicle-description span,
+    .vehicle-description li,
+    .vehicle-description td,
+    .vehicle-description th {
+      font-style: normal !important; /* FORCE normal, never italic */
+      color: #333 !important;
+      line-height: 1.7 !important;
+      font-size: 1rem !important;
     }
 
-    .vehicle-description * {
-      font-style: normal; /* All elements are normal by default */
+    /* Override any inherited styles */
+    .vehicle-description *:not(em):not(i) {
+      font-style: normal !important; /* All elements normal except <em> and <i> */
     }
 
     .vehicle-description p {
-      margin-bottom: 1rem;
-      font-style: normal; /* Explicitly normal, not italic */
+      margin-bottom: 1rem !important;
     }
 
     .vehicle-description ul,
