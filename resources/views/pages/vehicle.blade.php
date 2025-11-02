@@ -363,43 +363,21 @@
         font-size: 0.7rem !important;
       }
 
-      /* Stiluri pentru price-card-offer pe mobil */
-      .price-card-offer {
-        padding: 0.75rem !important;
+      /* Layout vertical pentru prețuri pe mobil */
+      .price-layout-mobile {
+        padding: 1rem 0;
       }
 
-      .price-card-offer .h5 {
+      .price-layout-mobile .h5 {
         font-size: 1.1rem !important;
       }
 
-      .price-card-offer .h4 {
-        font-size: 1.5rem !important;
-      }
-
-      .price-card-offer .small {
-        font-size: 0.75rem !important;
+      .price-layout-mobile .h3 {
+        font-size: 1.75rem !important;
       }
 
       .price-card-offer .badge {
-        font-size: 0.75rem !important;
-        padding: 0.4rem 0.8rem !important;
-      }
-
-      /* Două coloane egale pe mobil pentru prețuri */
-      .price-card-offer .col-6 {
-        flex: 0 0 50% !important;
-        max-width: 50% !important;
-      }
-    }
-
-    /* Stiluri pentru desktop (peste 768px) */
-    @media (min-width: 768px) {
-      .h4-md {
-        font-size: 1.5rem !important;
-      }
-
-      .display-5-md {
-        font-size: 3rem !important;
+        font-size: 0.85rem !important;
       }
     }
 
@@ -488,32 +466,41 @@
               $baseOriginal = $vehicle->original_price ?: $vehicle->price;
             @endphp
             <div class="price-card-offer bg-danger-subtle border-0 p-3 rounded-4">
-              <div class="row g-3 align-items-center">
-                <!-- Precio Original -->
-                <div class="col-6 col-md-auto">
-                  <div class="text-muted small mb-1">Precio original</div>
-                  <div class="h5 h4-md text-muted text-decoration-line-through mb-0" style="white-space: nowrap;">€ {{ number_format($extractPrice($baseOriginal)) }}</div>
-                </div>
-
-                <!-- Precio de Oferta -->
-                <div class="col-6 col-md-auto">
-                  <div class="text-danger small mb-1">Precio de oferta</div>
-                  <div class="h4 display-5-md text-danger fw-bold mb-0" style="white-space: nowrap;">€ {{ number_format($extractPrice($vehicle->offer_price)) }}</div>
-                </div>
-
-                <!-- Badge Descuento -->
-                @if($vehicle->discount_percentage)
-                <div class="col-12 col-md-auto">
-                  <span class="badge bg-danger rounded-pill px-3 py-2 fs-6">{{ $vehicle->discount_percentage }}% descuento</span>
-                </div>
-                @endif
-
-                <!-- Fecha Expiración -->
+              <!-- Badge Descuento - FIRST on mobile -->
+              @if($vehicle->discount_percentage)
+              <div class="text-center text-md-start mb-3 mb-md-0 d-md-inline-block">
+                <span class="badge bg-danger rounded-pill px-3 py-2 fs-6">{{ $vehicle->discount_percentage }}% descuento</span>
                 @if($vehicle->offer_expires_at)
-                <div class="col-12 col-md-auto">
-                  <small class="text-danger">Expira {{ \Carbon\Carbon::parse($vehicle->offer_expires_at)->format('d.m.Y') }}</small>
-                </div>
+                <small class="text-danger d-block d-md-inline-block ms-md-2 mt-2 mt-md-0">Expira {{ \Carbon\Carbon::parse($vehicle->offer_expires_at)->format('d.m.Y') }}</small>
                 @endif
+              </div>
+              @endif
+
+              <!-- Precios - Vertical en móvil, horizontal en desktop -->
+              <div class="price-layout-mobile d-md-none">
+                <!-- Precio Original - móvil -->
+                <div class="text-center mb-3">
+                  <div class="text-muted small mb-1">Precio original</div>
+                  <div class="h5 text-muted text-decoration-line-through mb-0">€ {{ number_format($extractPrice($baseOriginal)) }}</div>
+                </div>
+
+                <!-- Precio de Oferta - móvil -->
+                <div class="text-center">
+                  <div class="text-danger small mb-1">Precio de oferta</div>
+                  <div class="h3 text-danger fw-bold mb-0">€ {{ number_format($extractPrice($vehicle->offer_price)) }}</div>
+                </div>
+              </div>
+
+              <!-- Precios - Desktop -->
+              <div class="d-none d-md-flex align-items-center gap-4 flex-wrap">
+                <div>
+                  <div class="text-muted small mb-1">Precio original</div>
+                  <div class="h4 text-muted text-decoration-line-through mb-0">€ {{ number_format($extractPrice($baseOriginal)) }}</div>
+                </div>
+                <div>
+                  <div class="text-danger small mb-1">Precio de oferta</div>
+                  <div class="display-5 text-danger fw-bold mb-0">€ {{ number_format($extractPrice($vehicle->offer_price)) }}</div>
+                </div>
               </div>
             </div>
           @else
