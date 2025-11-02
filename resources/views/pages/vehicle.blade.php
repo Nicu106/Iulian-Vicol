@@ -369,10 +369,16 @@
       color: #333;
       line-height: 1.7;
       font-size: 1rem;
+      font-style: normal !important; /* Force normal, not italic */
+    }
+
+    .vehicle-description * {
+      font-style: normal; /* All elements are normal by default */
     }
 
     .vehicle-description p {
       margin-bottom: 1rem;
+      font-style: normal; /* Explicitly normal, not italic */
     }
 
     .vehicle-description ul,
