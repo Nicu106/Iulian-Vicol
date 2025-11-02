@@ -129,8 +129,8 @@
       bottom: 0 !important;
     }
     .gallery-lightbox .lightbox-media img {
-      max-width: calc(100vw - 100px) !important;
-      max-height: calc(100vh - 160px) !important;
+      max-width: calc(100vw - 40px) !important; /* Mai puțin padding - imagine mai mare */
+      max-height: calc(100vh - 100px) !important; /* Mai puțin padding - imagine mai mare */
       width: auto !important;
       height: auto !important;
       object-fit: contain !important;
@@ -287,8 +287,8 @@
 
       /* Imaginile în lightbox pe mobil - scalare NATURALĂ fără forțare */
       .gallery-lightbox .lightbox-media img {
-        max-width: 80vw !important;
-        max-height: 65vh !important;
+        max-width: 90vw !important; /* Mai mare pe mobil */
+        max-height: 75vh !important; /* Mai mare pe mobil */
         width: auto !important;
         height: auto !important;
         object-fit: contain !important;
