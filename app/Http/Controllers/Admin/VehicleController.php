@@ -206,12 +206,14 @@ class VehicleController extends BaseController
 
     public function store(Request $request)
     {
-        // Force PHP settings for this request
+        // Force PHP settings for this request - ABSOLUTELY NO LIMITS
         ini_set('upload_max_filesize', '0');
         ini_set('post_max_size', '0');
-        ini_set('memory_limit', '512M');
+        ini_set('memory_limit', '-1');
         ini_set('max_execution_time', '0');
-        ini_set('max_file_uploads', '200');
+        ini_set('max_input_time', '-1');
+        ini_set('max_file_uploads', '1000');
+        ini_set('max_input_vars', '100000');
         
         // DEBUG: Detailed logging for creation
         \Log::info('STORE DEBUG START', [
@@ -385,12 +387,14 @@ class VehicleController extends BaseController
 
     public function update(Request $request, string $slug)
     {
-        // Force PHP settings for this request
+        // Force PHP settings for this request - ABSOLUTELY NO LIMITS
         ini_set('upload_max_filesize', '0');
         ini_set('post_max_size', '0');
-        ini_set('memory_limit', '512M');
+        ini_set('memory_limit', '-1');
         ini_set('max_execution_time', '0');
-        ini_set('max_file_uploads', '200');
+        ini_set('max_input_time', '-1');
+        ini_set('max_file_uploads', '1000');
+        ini_set('max_input_vars', '100000');
         
         // Removed excessive debug logging for performance
         

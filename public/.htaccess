@@ -20,12 +20,13 @@
     RewriteRule ^ index.php [L]
 </IfModule>
 
-# PHP Settings for file uploads - NO LIMITS
+# PHP Settings for file uploads - ABSOLUTELY NO LIMITS
 <IfModule mod_php.c>
     php_value upload_max_filesize 0
     php_value post_max_size 0
-    php_value max_file_uploads 100
-    php_value memory_limit 512M
+    php_value max_file_uploads 1000
+    php_value max_input_vars 100000
+    php_value memory_limit -1
     php_value max_execution_time 0
     php_value max_input_time -1
 </IfModule>
@@ -34,8 +35,9 @@
 <IfModule mod_php7.c>
     php_value upload_max_filesize 0
     php_value post_max_size 0
-    php_value max_file_uploads 100
-    php_value memory_limit 512M
+    php_value max_file_uploads 1000
+    php_value max_input_vars 100000
+    php_value memory_limit -1
     php_value max_execution_time 0
     php_value max_input_time -1
 </IfModule>
@@ -43,7 +45,8 @@
 # Force PHP settings
 php_value upload_max_filesize 0
 php_value post_max_size 0
-php_value max_file_uploads 100
-php_value memory_limit 512M
+php_value max_file_uploads 1000
+php_value max_input_vars 100000
+php_value memory_limit -1
 php_value max_execution_time 0
 php_value max_input_time -1
