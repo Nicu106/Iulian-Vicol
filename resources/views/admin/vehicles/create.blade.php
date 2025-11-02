@@ -691,8 +691,8 @@ async function previewImages(input, previewId) {
   });
   rebuildGalleryInputFilesCreate();
   renderNewGalleryPreviewCreate(previewId);
-  // Reset input to allow selecting the same files again if needed
-  if (input) input.value = '';
+  // DO NOT RESET input.value - it clears the files after rebuild!
+  // if (input) input.value = '';
 }
 
 function removeNewGalleryItemCreate(index, previewId) {
