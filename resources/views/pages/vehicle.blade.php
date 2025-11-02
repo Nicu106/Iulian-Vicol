@@ -363,6 +363,57 @@
         font-size: 0.7rem !important;
       }
     }
+
+    /* Vehicle description formatting */
+    .vehicle-description {
+      color: #333;
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    .vehicle-description p {
+      margin-bottom: 1rem;
+    }
+
+    .vehicle-description ul,
+    .vehicle-description ol {
+      margin-bottom: 1rem;
+      padding-left: 1.5rem;
+    }
+
+    .vehicle-description li {
+      margin-bottom: 0.5rem;
+    }
+
+    .vehicle-description strong {
+      font-weight: 600;
+      color: #111;
+    }
+
+    .vehicle-description em {
+      font-style: italic;
+    }
+
+    .vehicle-description h1,
+    .vehicle-description h2,
+    .vehicle-description h3,
+    .vehicle-description h4,
+    .vehicle-description h5,
+    .vehicle-description h6 {
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+      color: #111;
+    }
+
+    .vehicle-description a {
+      color: #2563eb;
+      text-decoration: underline;
+    }
+
+    .vehicle-description a:hover {
+      color: #1d4ed8;
+    }
   </style>
 @endpush
 @section('content')
@@ -667,7 +718,9 @@
     <div class="row g-4">
       <div class="col-lg-8">
         <h4>Descripción</h4>
-        <p class="text-secondary">{{ $vehicle->description ?? 'Descripción no disponible para este vehículo.' }}</p>
+        <div class="vehicle-description">
+          {!! $vehicle->description ?? '<p class="text-muted">Descripción no disponible para este vehículo.</p>' !!}
+        </div>
 
         <h4 class="mt-4">Especificaciones técnicas</h4>
         <div class="table-responsive">

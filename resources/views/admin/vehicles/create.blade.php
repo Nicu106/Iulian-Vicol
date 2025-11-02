@@ -329,9 +329,9 @@
             <div class="mb-3">
               <label class="form-label fw-medium">Descripción</label>
               <div class="form-floating-custom">
-                <textarea class="form-control" name="description" rows="4" placeholder="Describe el vehículo en detalle...">{{ old('description') }}</textarea>
+                <textarea id="description" class="form-control" name="description" rows="8" placeholder="Describe el vehículo en detalle...">{{ old('description') }}</textarea>
               </div>
-              <div class="hint">Describe las características principales, estado, historial, etc.</div>
+              <div class="hint">Usa el editor para formatear el texto (negrita, cursiva, listas, etc.)</div>
               @error('description')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
             </div>
             
@@ -797,6 +797,33 @@ document.querySelector('form').addEventListener('submit', function(e) {
     firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 });
+
+// TinyMCE Rich Text Editor for Description
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof tinymce !== 'undefined') {
+    tinymce.init({
+      selector: '#description',
+      height: 350,
+      menubar: false,
+      language: 'es',
+      plugins: [
+        'advlist', 'autolink', 'lists', 'link', 'charmap', 'preview',
+        'searchreplace', 'visualblocks', 'code', 'fullscreen',
+        'insertdatetime', 'table', 'help', 'wordcount'
+      ],
+      toolbar: 'undo redo | formatselect | bold italic underline | ' +
+        'alignleft aligncenter alignright alignjustify | ' +
+        'bullist numlist outdent indent | removeformat | help',
+      content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px }',
+      branding: false,
+      promotion: false
+    });
+  }
+});
 </script>
+
+<!-- TinyMCE CDN -->
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
 @endpush
 @endsection

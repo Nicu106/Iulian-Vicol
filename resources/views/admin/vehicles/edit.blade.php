@@ -251,7 +251,8 @@
             <div class="row g-3">
               <div class="col-12">
                 <label class="form-label">Descriere</label>
-                <textarea class="form-control" name="description" rows="4" placeholder="Detalii cheie și beneficii">{{ old('description', $vehicle['description']) }}</textarea>
+                <textarea id="description" class="form-control" name="description" rows="8" placeholder="Detalii cheie și beneficii">{{ old('description', $vehicle['description']) }}</textarea>
+                <div class="hint">Folosește editorul pentru a formata textul (bold, italic, liste, etc.)</div>
               </div>
               <div class="col-12">
                 <label class="form-label">Dotări (separate prin virgulă)</label>
@@ -667,7 +668,34 @@ function enableDragSort(container, itemSelector, onReorder) {
     e.preventDefault();
   });
 }
+
+// TinyMCE Rich Text Editor for Description
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof tinymce !== 'undefined') {
+    tinymce.init({
+      selector: '#description',
+      height: 350,
+      menubar: false,
+      language: 'es',
+      plugins: [
+        'advlist', 'autolink', 'lists', 'link', 'charmap', 'preview',
+        'searchreplace', 'visualblocks', 'code', 'fullscreen',
+        'insertdatetime', 'table', 'help', 'wordcount'
+      ],
+      toolbar: 'undo redo | formatselect | bold italic underline | ' +
+        'alignleft aligncenter alignright alignjustify | ' +
+        'bullist numlist outdent indent | removeformat | help',
+      content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px }',
+      branding: false,
+      promotion: false
+    });
+  }
+});
 </script>
+
+<!-- TinyMCE CDN -->
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
 @endpush
 
 @endsection
