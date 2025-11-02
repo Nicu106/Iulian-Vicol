@@ -730,8 +730,15 @@
     <div class="row g-4">
       <div class="col-lg-8">
         <h4>Descripción</h4>
-        <div class="vehicle-description">
-          {!! $vehicle->description ?? '<p class="text-muted">Descripción no disponible para este vehículo.</p>' !!}
+        <div class="vehicle-description" style="font-style: normal !important; white-space: pre-wrap;">
+          @php
+            $description = $vehicle->description ?? '<p class="text-muted">Descripción no disponible para este vehículo.</p>';
+            // Wrap plain text in <p> if no HTML tags present
+            if (strip_tags($description) === $description) {
+              $description = '<p style="font-style: normal !important;">' . nl2br(e($description)) . '</p>';
+            }
+          @endphp
+          {!! $description !!}
         </div>
 
         <h4 class="mt-4">Especificaciones técnicas</h4>
