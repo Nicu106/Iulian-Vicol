@@ -8,7 +8,8 @@ echo "Server will run on http://localhost:8000"
 
 php -d upload_max_filesize=100M \
     -d post_max_size=100M \
-    -d max_file_uploads=100 \
+    -d max_file_uploads=200 \
+    -d max_input_vars=20000 \
     -d memory_limit=512M \
     -d max_execution_time=300 \
     -d max_input_time=300 \

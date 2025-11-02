@@ -1,18 +1,66 @@
 <?php
 // PHP Configuration for large file uploads
-ini_set('upload_max_filesize', '100M');
-ini_set('post_max_size', '100M');
-ini_set('max_file_uploads', '100');
-ini_set('memory_limit', '512M');
-ini_set('max_execution_time', '300');
-ini_set('max_input_time', '300');
-
-// Display current settings
-echo "Current PHP Settings:\n";
-echo "upload_max_filesize: " . ini_get('upload_max_filesize') . "\n";
-echo "post_max_size: " . ini_get('post_max_size') . "\n";
-echo "max_file_uploads: " . ini_get('max_file_uploads') . "\n";
-echo "memory_limit: " . ini_get('memory_limit') . "\n";
-echo "max_execution_time: " . ini_get('max_execution_time') . "\n";
-echo "max_input_time: " . ini_get('max_input_time') . "\n";
+header('Content-Type: text/html; charset=utf-8');
 ?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PHP Upload Configuration</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #f5f5f5; }
+        .config { background: white; padding: 20px; border-radius: 8px; max-width: 600px; margin: 0 auto; }
+        h1 { color: #333; font-size: 18px; margin-bottom: 20px; }
+        .setting { padding: 8px; margin: 4px 0; background: #f9f9f9; border-left: 3px solid #4CAF50; }
+        .setting.warning { border-left-color: #ff9800; }
+        .setting.error { border-left-color: #f44336; }
+        .label { font-weight: bold; display: inline-block; width: 200px; }
+        .value { color: #0066cc; }
+    </style>
+</head>
+<body>
+    <div class="config">
+        <h1>📊 Current PHP Upload Configuration</h1>
+        <?php
+        $settings = [
+            'upload_max_filesize' => ['recommended' => '100M', 'critical' => true],
+            'post_max_size' => ['recommended' => '100M', 'critical' => true],
+            'max_file_uploads' => ['recommended' => '200', 'critical' => true],
+            'max_input_vars' => ['recommended' => '20000', 'critical' => true],
+            'memory_limit' => ['recommended' => '512M', 'critical' => false],
+            'max_execution_time' => ['recommended' => '300', 'critical' => false],
+            'max_input_time' => ['recommended' => '300', 'critical' => false],
+            'upload_tmp_dir' => ['recommended' => '', 'critical' => false],
+        ];
+
+        foreach ($settings as $key => $info) {
+            $value = ini_get($key);
+            $class = 'setting';
+
+            if ($info['critical']) {
+                if ($key === 'max_input_vars' && (int)$value < 5000) {
+                    $class .= ' error';
+                    $value .= ' ⚠️ TOO LOW! Recommended: ' . $info['recommended'];
+                } elseif ($key === 'max_file_uploads' && (int)$value < 100) {
+                    $class .= ' error';
+                    $value .= ' ⚠️ TOO LOW! Recommended: ' . $info['recommended'];
+                }
+            }
+
+            if (empty($value) && $key === 'upload_tmp_dir') {
+                $value = sys_get_temp_dir() . ' (system default)';
+            }
+
+            echo "<div class='{$class}'>";
+            echo "<span class='label'>{$key}:</span> ";
+            echo "<span class='value'>{$value}</span>";
+            echo "</div>";
+        }
+        ?>
+
+        <div style="margin-top: 20px; padding: 10px; background: #e3f2fd; border-radius: 4px;">
+            <strong>💡 Tip:</strong> If you see warnings, restart your server with:<br>
+            <code>./start-server-large-uploads.sh</code>
+        </div>
+    </div>
+</body>
+</html>

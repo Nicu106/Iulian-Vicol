@@ -128,6 +128,7 @@ mkdir -p /etc/php/\$PHPV/fpm/conf.d;
 cat > \$UPLOAD_INI <<'EOF'
 file_uploads = On
 max_file_uploads = 200
+max_input_vars = 20000
 upload_max_filesize = 0
 post_max_size = 0
 memory_limit = -1
