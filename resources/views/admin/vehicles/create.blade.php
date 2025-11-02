@@ -775,11 +775,24 @@ document.querySelectorAll('.image-upload-area').forEach(area => {
   });
 });
 
-// Form validation enhancement for mobile
+// Form validation enhancement for mobile + DEBUG gallery files
 document.querySelector('form').addEventListener('submit', function(e) {
+  // DEBUG: Log gallery files before submit
+  const galleryInput = document.getElementById('gallery_images');
+  console.log('=== FORM SUBMIT DEBUG ===');
+  console.log('Gallery input exists:', !!galleryInput);
+  console.log('Gallery input files count:', galleryInput ? galleryInput.files.length : 0);
+  console.log('Gallery files array:', galleryInput ? Array.from(galleryInput.files).map(f => ({name: f.name, size: f.size})) : []);
+  console.log('newGalleryFilesCreate array:', newGalleryFilesCreate.map(f => ({name: f.name, size: f.size})));
+
+  // Force rebuild one more time before submit
+  console.log('Forcing final rebuild before submit...');
+  rebuildGalleryInputFilesCreate();
+  console.log('After rebuild - Gallery input files count:', galleryInput ? galleryInput.files.length : 0);
+
   const requiredFields = this.querySelectorAll('[required]');
   let firstError = null;
-  
+
   requiredFields.forEach(field => {
     if (!field.value.trim()) {
       field.classList.add('is-invalid');
@@ -790,7 +803,7 @@ document.querySelector('form').addEventListener('submit', function(e) {
       field.classList.remove('is-invalid');
     }
   });
-  
+
   if (firstError) {
     e.preventDefault();
     firstError.focus();
