@@ -300,18 +300,44 @@ class VehicleController extends BaseController
         }
 
         $galleryUrls = [];
+
+        // DEBUG: Detailed logging for gallery images
+        \Log::info('STORE - Gallery Images Check', [
+            'has_gallery_files' => $request->hasFile('gallery_images'),
+            'all_files_keys' => array_keys($request->allFiles()),
+            'gallery_files_count' => $request->hasFile('gallery_images') ? count($request->file('gallery_images')) : 0,
+        ]);
+
         if ($request->hasFile('gallery_images')) {
             $warmMax = 12; // limit warm-up to first 12 gallery images to avoid timeouts on bulk uploads
             $warmed = 0;
-            foreach ($request->file('gallery_images') as $img) {
-                $path = $img->store('vehicles/' . $slug, 'public');
-                $publicUrl = Storage::url($path);
-                $galleryUrls[] = $publicUrl;
-                if ($warmed < $warmMax) {
-                    try { $this->warmResizeCache($publicUrl); } catch (\Throwable $e) { /* ignore warmup failures */ }
-                    $warmed++;
+            \Log::info('STORE - Processing gallery images', ['count' => count($request->file('gallery_images'))]);
+
+            foreach ($request->file('gallery_images') as $index => $img) {
+                \Log::info('STORE - Gallery image ' . $index, [
+                    'name' => $img->getClientOriginalName(),
+                    'size' => $img->getSize(),
+                    'mime' => $img->getMimeType(),
+                    'is_valid' => $img->isValid(),
+                    'error' => $img->getError()
+                ]);
+
+                try {
+                    $path = $img->store('vehicles/' . $slug, 'public');
+                    $publicUrl = Storage::url($path);
+                    $galleryUrls[] = $publicUrl;
+                    \Log::info('STORE - Gallery image stored successfully', ['path' => $path, 'url' => $publicUrl]);
+                    if ($warmed < $warmMax) {
+                        try { $this->warmResizeCache($publicUrl); } catch (\Throwable $e) { /* ignore warmup failures */ }
+                        $warmed++;
+                    }
+                } catch (\Throwable $e) {
+                    \Log::error('STORE - Gallery image store failed: ' . $e->getMessage());
                 }
             }
+            \Log::info('STORE - Final gallery URLs', ['count' => count($galleryUrls), 'urls' => $galleryUrls]);
+        } else {
+            \Log::info('STORE - No gallery images to process');
         }
 
         $features = array_filter(array_map('trim', explode(',', $validated['features'] ?? '')));
