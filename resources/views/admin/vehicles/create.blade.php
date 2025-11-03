@@ -776,53 +776,64 @@ document.querySelectorAll('.image-upload-area').forEach(area => {
 });
 
 // Form validation enhancement for mobile + FORCE REBUILD gallery files
-document.querySelector('form').addEventListener('submit', function(e) {
-  const galleryInput = document.getElementById('gallery_images');
-
-  console.log('=== FORM SUBMIT DEBUG ===');
-  console.log('Gallery input exists:', !!galleryInput);
-  console.log('newGalleryFilesCreate array length:', newGalleryFilesCreate.length);
-
-  // CRITICAL FIX: If we have files in array but not in input, rebuild NOW
-  if (newGalleryFilesCreate.length > 0) {
-    console.log('Rebuilding gallery input with', newGalleryFilesCreate.length, 'files');
-
-    // Create fresh DataTransfer
-    const dt = new DataTransfer();
-    newGalleryFilesCreate.forEach((file, idx) => {
-      console.log('Adding file', idx, ':', file.name, file.size);
-      dt.items.add(file);
-    });
-
-    // Set to input
-    if (galleryInput) {
-      galleryInput.files = dt.files;
-      console.log('After rebuild - Gallery input files count:', galleryInput.files.length);
-      console.log('Gallery files:', Array.from(galleryInput.files).map(f => ({name: f.name, size: f.size})));
-    }
-  } else {
-    console.log('No files in newGalleryFilesCreate array');
+// CRITICAL: Wait for DOM to be ready before attaching event listener!
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form');
+  if (!form) {
+    console.error('Form not found!');
+    return;
   }
 
-  const requiredFields = this.querySelectorAll('[required]');
-  let firstError = null;
+  console.log('Form submit handler attached successfully');
 
-  requiredFields.forEach(field => {
-    if (!field.value.trim()) {
-      field.classList.add('is-invalid');
-      if (!firstError) {
-        firstError = field;
+  form.addEventListener('submit', function(e) {
+    const galleryInput = document.getElementById('gallery_images');
+
+    console.log('=== FORM SUBMIT DEBUG ===');
+    console.log('Gallery input exists:', !!galleryInput);
+    console.log('newGalleryFilesCreate array length:', newGalleryFilesCreate.length);
+
+    // CRITICAL FIX: If we have files in array but not in input, rebuild NOW
+    if (newGalleryFilesCreate.length > 0) {
+      console.log('Rebuilding gallery input with', newGalleryFilesCreate.length, 'files');
+
+      // Create fresh DataTransfer
+      const dt = new DataTransfer();
+      newGalleryFilesCreate.forEach((file, idx) => {
+        console.log('Adding file', idx, ':', file.name, file.size);
+        dt.items.add(file);
+      });
+
+      // Set to input
+      if (galleryInput) {
+        galleryInput.files = dt.files;
+        console.log('After rebuild - Gallery input files count:', galleryInput.files.length);
+        console.log('Gallery files:', Array.from(galleryInput.files).map(f => ({name: f.name, size: f.size})));
       }
     } else {
-      field.classList.remove('is-invalid');
+      console.log('No files in newGalleryFilesCreate array');
+    }
+
+    const requiredFields = form.querySelectorAll('[required]');
+    let firstError = null;
+
+    requiredFields.forEach(field => {
+      if (!field.value.trim()) {
+        field.classList.add('is-invalid');
+        if (!firstError) {
+          firstError = field;
+        }
+      } else {
+        field.classList.remove('is-invalid');
+      }
+    });
+
+    if (firstError) {
+      e.preventDefault();
+      firstError.focus();
+      firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   });
-
-  if (firstError) {
-    e.preventDefault();
-    firstError.focus();
-    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
 });
 
 // TinyMCE Rich Text Editor for Description
