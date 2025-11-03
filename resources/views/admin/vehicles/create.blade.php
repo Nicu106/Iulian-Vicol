@@ -379,12 +379,8 @@
             
             <div>
               <label class="form-label fw-medium">Galería de imágenes</label>
-              <div class="image-upload-area" onclick="document.getElementById('gallery_images').click()">
-                <i class="bi bi-images fs-2 text-muted d-block mb-2"></i>
-                <p class="mb-2">Haz clic para seleccionar múltiples imágenes</p>
-                <small class="text-muted">Selecciona varias imágenes para la galería (se van a cargar directamente sin compresión)</small>
-                <input type="file" id="gallery_images" name="gallery_images[]" accept="image/*" multiple class="d-none">
-              </div>
+              <input type="file" name="gallery_images[]" accept="image/*" class="form-control" multiple id="gallery_images">
+              <div class="hint">Poți încărca mai multe imagini (direct upload, fără compresie)</div>
               <div id="gallery-preview" class="mt-2 row g-2"></div>
               @error('gallery_images.*')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
             </div>
