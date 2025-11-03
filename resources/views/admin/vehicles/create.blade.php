@@ -379,7 +379,7 @@
             
             <div>
               <label class="form-label fw-medium">Galería de imágenes</label>
-              <input type="file" name="gallery_images[]" accept="image/*" class="form-control" multiple id="gallery_images">
+              <input type="file" name="gallery_images[]" accept="image/*" class="form-control" multiple id="gallery_images" onchange="console.log('Gallery files selected:', this.files.length, 'files:', Array.from(this.files).map(f => f.name))">
               <div class="hint">Poți încărca mai multe imagini (direct upload, fără compresie)</div>
               <div id="gallery-preview" class="mt-2 row g-2"></div>
               @error('gallery_images.*')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
@@ -786,7 +786,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const galleryInput = document.getElementById('gallery_images');
 
     console.log('=== FORM SUBMIT DEBUG ===');
+    console.log('Form action:', form.action);
+    console.log('Form method:', form.method);
+    console.log('Form enctype:', form.enctype);
     console.log('Gallery input exists:', !!galleryInput);
+    console.log('Gallery input.files.length:', galleryInput ? galleryInput.files.length : 'N/A');
+    console.log('Gallery input.files:', galleryInput ? Array.from(galleryInput.files).map(f => ({name: f.name, size: f.size})) : []);
     console.log('newGalleryFilesCreate array length:', newGalleryFilesCreate.length);
 
     // CRITICAL FIX: If we have files in array but not in input, rebuild NOW
