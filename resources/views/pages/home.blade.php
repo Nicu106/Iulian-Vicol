@@ -388,7 +388,6 @@
 
   @php
     $carouselTestimonials = \App\Models\Testimonial::where('is_active', true)->orderBy('order_index')->get();
-    // Completăm pentru a avea multiplu de 3 (pentru a evita golurile)
     $totalCount = $carouselTestimonials->count();
     $remainder = $totalCount % 3;
     if ($remainder > 0 && $totalCount > 0) {
@@ -399,52 +398,53 @@
     }
   @endphp
   @if($carouselTestimonials->count() > 0)
-  <section class="testimonials-section-pro py-5" data-anim="reveal">
+  <section class="testimonials-luxury py-5" data-anim="reveal">
     <div class="container">
-      <!-- Header Premium -->
+      <!-- Header Minimalist -->
       <div class="text-center mb-5">
-        <span class="testimonials-badge">Testimonios verificados</span>
-        <h2 class="testimonials-title">Lo que dicen nuestros clientes</h2>
-        <p class="testimonials-subtitle">Experiencias reales de compradores satisfechos</p>
+        <p class="testimonials-eyebrow">TESTIMONIOS</p>
+        <h2 class="testimonials-heading">Lo que dicen nuestros clientes</h2>
+        <div class="testimonials-line"></div>
       </div>
 
-      <!-- Carousel Premium -->
-      <div id="testimonialsCarousel" class="carousel slide testimonials-carousel-pro" data-bs-ride="carousel" data-bs-interval="5000">
+      <!-- Carousel Minimalist -->
+      <div id="testimonialsCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
         <div class="carousel-inner">
           @foreach($carouselTestimonials->chunk(3) as $i => $chunk)
           <div class="carousel-item {{ $i === 0 ? 'active' : '' }}">
-            <div class="row g-4">
+            <div class="row g-4 justify-content-center">
               @foreach($chunk as $t)
-              <div class="col-md-4">
-                <div class="testimonial-card-pro">
-                  <div class="testimonial-image-container">
+              <div class="col-lg-4 col-md-6">
+                <div class="testimonial-card-luxury">
+                  <!-- Avatar circular -->
+                  <div class="testimonial-avatar-wrapper">
                     @if($t->image_path)
-                      <img src="{{ $t->image_path }}" class="testimonial-image-pro" alt="Cliente {{ $t->author_name }}" loading="lazy">
+                      <img src="{{ $t->image_path }}" class="testimonial-avatar" alt="{{ $t->author_name }}" loading="lazy">
                     @else
-                      <img src="https://images.unsplash.com/photo-1514316454349-750a7fd3da3a?q=80&w=800&auto=format&fit=crop" class="testimonial-image-pro" alt="Cliente" loading="lazy">
+                      <div class="testimonial-avatar-placeholder">
+                        <span>{{ strtoupper(substr($t->author_name, 0, 1)) }}</span>
+                      </div>
                     @endif
-                    <div class="testimonial-gradient"></div>
-                    <div class="testimonial-quote-icon">
-                      <i class="bi bi-quote"></i>
-                    </div>
                   </div>
-                  <div class="testimonial-body">
-                    <p class="testimonial-text-pro">"{{ $t->quote }}"</p>
-                    <div class="testimonial-footer">
-                      <div class="testimonial-author-info">
-                        <span class="author-name-pro">{{ $t->author_name }}</span>
-                        @if($t->author_location)
-                        <span class="author-location-pro"><i class="bi bi-geo-alt"></i> {{ $t->author_location }}</span>
-                        @endif
-                      </div>
-                      <div class="testimonial-stars">
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                      </div>
-                    </div>
+
+                  <!-- Estrellas -->
+                  <div class="testimonial-rating">
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                  </div>
+
+                  <!-- Quote -->
+                  <p class="testimonial-quote-luxury">"{{ $t->quote }}"</p>
+
+                  <!-- Author -->
+                  <div class="testimonial-author-luxury">
+                    <span class="author-name-luxury">{{ $t->author_name }}</span>
+                    @if($t->author_location)
+                    <span class="author-location-luxury">{{ $t->author_location }}</span>
+                    @endif
                   </div>
                 </div>
               </div>
@@ -454,224 +454,194 @@
           @endforeach
         </div>
 
-        <!-- Controale Premium -->
-        <button class="carousel-nav-pro carousel-nav-prev" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="prev">
-          <i class="bi bi-arrow-left"></i>
+        <!-- Controles minimalistas -->
+        <button class="carousel-control-luxury carousel-control-prev-luxury" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="prev">
+          <i class="bi bi-chevron-left"></i>
         </button>
-        <button class="carousel-nav-pro carousel-nav-next" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="next">
-          <i class="bi bi-arrow-right"></i>
+        <button class="carousel-control-luxury carousel-control-next-luxury" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="next">
+          <i class="bi bi-chevron-right"></i>
         </button>
       </div>
 
-      <!-- Indicatori Premium -->
-      <div class="testimonials-indicators">
+      <!-- Indicadores minimalistas -->
+      <div class="testimonials-dots">
         @foreach($carouselTestimonials->chunk(3) as $i => $chunk)
-        <button type="button" data-bs-target="#testimonialsCarousel" data-bs-slide-to="{{ $i }}" class="indicator-dot {{ $i === 0 ? 'active' : '' }}" aria-label="Slide {{ $i + 1 }}"></button>
+        <button type="button" data-bs-target="#testimonialsCarousel" data-bs-slide-to="{{ $i }}" class="dot-luxury {{ $i === 0 ? 'active' : '' }}" aria-label="Slide {{ $i + 1 }}"></button>
         @endforeach
       </div>
     </div>
   </section>
 
   <style>
-    .testimonials-section-pro {
-      background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+    .testimonials-luxury {
+      background: #fafafa;
       position: relative;
-      overflow: hidden;
     }
-    .testimonials-section-pro::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-      opacity: 0.5;
-    }
-    .testimonials-badge {
-      display: inline-block;
-      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-      color: #fff;
-      padding: 0.5rem 1.25rem;
-      border-radius: 50px;
-      font-size: 0.8rem;
+    .testimonials-eyebrow {
+      font-size: 0.75rem;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 1rem;
-    }
-    .testimonials-title {
-      color: #fff;
-      font-size: 2.5rem;
-      font-weight: 800;
+      letter-spacing: 3px;
+      color: #9ca3af;
       margin-bottom: 0.75rem;
     }
-    .testimonials-subtitle {
-      color: rgba(255,255,255,0.6);
-      font-size: 1.1rem;
-      margin-bottom: 0;
+    .testimonials-heading {
+      font-size: 2rem;
+      font-weight: 300;
+      color: #111;
+      letter-spacing: -0.5px;
+      margin-bottom: 1.5rem;
     }
-    .testimonial-card-pro {
+    .testimonials-line {
+      width: 50px;
+      height: 1px;
+      background: #111;
+      margin: 0 auto;
+    }
+    .testimonial-card-luxury {
       background: #fff;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid #eee;
+      padding: 2.5rem 2rem;
+      text-align: center;
       height: 100%;
+      min-height: 380px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.3s ease;
     }
-    .testimonial-card-pro:hover {
-      transform: translateY(-10px) scale(1.02);
-      box-shadow: 0 35px 60px -15px rgba(0,0,0,0.5);
+    .testimonial-card-luxury:hover {
+      border-color: #ddd;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.06);
     }
-    .testimonial-image-container {
-      position: relative;
-      height: 220px;
+    .testimonial-avatar-wrapper {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
       overflow: hidden;
+      margin-bottom: 1.5rem;
+      border: 2px solid #f3f4f6;
     }
-    .testimonial-image-pro {
+    .testimonial-avatar {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.6s ease;
     }
-    .testimonial-card-pro:hover .testimonial-image-pro {
-      transform: scale(1.1);
-    }
-    .testimonial-gradient {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 100px;
-      background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
-    }
-    .testimonial-quote-icon {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      width: 45px;
-      height: 45px;
-      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-      border-radius: 12px;
+    .testimonial-avatar-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
     }
-    .testimonial-quote-icon i {
+    .testimonial-avatar-placeholder span {
       color: #fff;
-      font-size: 1.25rem;
+      font-size: 1.75rem;
+      font-weight: 300;
     }
-    .testimonial-body {
-      padding: 1.75rem;
-    }
-    .testimonial-text-pro {
-      color: #334155;
-      font-size: 0.95rem;
-      line-height: 1.7;
-      margin-bottom: 1.25rem;
-      font-style: italic;
-    }
-    .testimonial-footer {
+    .testimonial-rating {
       display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      border-top: 1px solid #f1f5f9;
-      padding-top: 1rem;
+      gap: 3px;
+      margin-bottom: 1.25rem;
     }
-    .testimonial-author-info {
+    .testimonial-rating i {
+      color: #111;
+      font-size: 0.7rem;
+    }
+    .testimonial-quote-luxury {
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: #555;
+      font-weight: 300;
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .testimonial-author-luxury {
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
+      margin-top: auto;
     }
-    .author-name-pro {
-      font-weight: 700;
-      color: #0f172a;
-      font-size: 1rem;
-    }
-    .author-location-pro {
-      color: #64748b;
-      font-size: 0.85rem;
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-    }
-    .testimonial-stars {
-      display: flex;
-      gap: 2px;
-    }
-    .testimonial-stars i {
-      color: #fbbf24;
+    .author-name-luxury {
       font-size: 0.9rem;
+      font-weight: 500;
+      color: #111;
+      letter-spacing: 0.5px;
     }
-    .carousel-nav-pro {
+    .author-location-luxury {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      font-weight: 300;
+    }
+    .carousel-control-luxury {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      width: 55px;
-      height: 55px;
-      border-radius: 50%;
+      width: 48px;
+      height: 48px;
       background: #fff;
-      border: none;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      border: 1px solid #e5e5e5;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       transition: all 0.3s ease;
       z-index: 10;
-      color: #0f172a;
+      color: #111;
     }
-    .carousel-nav-pro:hover {
-      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    .carousel-control-luxury:hover {
+      background: #111;
+      border-color: #111;
       color: #fff;
-      transform: translateY(-50%) scale(1.1);
     }
-    .carousel-nav-pro i {
-      font-size: 1.25rem;
+    .carousel-control-luxury i {
+      font-size: 1rem;
     }
-    .carousel-nav-prev { left: -25px; }
-    .carousel-nav-next { right: -25px; }
-    .testimonials-indicators {
+    .carousel-control-prev-luxury { left: 0; }
+    .carousel-control-next-luxury { right: 0; }
+    .testimonials-dots {
       display: flex;
       justify-content: center;
-      gap: 12px;
-      margin-top: 2.5rem;
+      gap: 10px;
+      margin-top: 3rem;
     }
-    .indicator-dot {
-      width: 12px;
-      height: 12px;
+    .dot-luxury {
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.3);
+      background: #ddd;
       border: none;
       cursor: pointer;
       transition: all 0.3s ease;
       padding: 0;
     }
-    .indicator-dot:hover {
-      background: rgba(255,255,255,0.6);
+    .dot-luxury:hover {
+      background: #aaa;
     }
-    .indicator-dot.active {
-      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-      width: 35px;
-      border-radius: 20px;
+    .dot-luxury.active {
+      background: #111;
+      width: 24px;
+      border-radius: 10px;
     }
     @media (max-width: 991.98px) {
-      .carousel-nav-prev { left: 10px; }
-      .carousel-nav-next { right: 10px; }
-      .carousel-nav-pro {
-        width: 45px;
-        height: 45px;
+      .carousel-control-prev-luxury { left: -10px; }
+      .carousel-control-next-luxury { right: -10px; }
+      .carousel-control-luxury {
+        width: 40px;
+        height: 40px;
       }
     }
     @media (max-width: 767.98px) {
-      .testimonials-title {
-        font-size: 1.75rem;
+      .testimonials-heading {
+        font-size: 1.5rem;
       }
-      .testimonial-image-container {
-        height: 180px;
+      .testimonial-card-luxury {
+        min-height: 340px;
+        padding: 2rem 1.5rem;
       }
-      .carousel-nav-pro {
+      .carousel-control-luxury {
         display: none;
       }
     }
