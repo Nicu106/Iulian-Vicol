@@ -470,7 +470,7 @@
 
   <style>
     .testimonials-elite {
-      background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
+      background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
       position: relative;
     }
     .elite-badge {
@@ -478,8 +478,8 @@
       font-size: 0.7rem;
       font-weight: 500;
       letter-spacing: 4px;
-      color: #c9a227;
-      border: 1px solid rgba(201, 162, 39, 0.3);
+      color: #0d6efd;
+      border: 1px solid rgba(13, 110, 253, 0.3);
       padding: 0.5rem 1.5rem;
       margin-bottom: 1.25rem;
     }
@@ -520,7 +520,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.1) 100%);
+      background: linear-gradient(to top, rgba(15,23,42,0.95) 0%, rgba(15,23,42,0.5) 50%, rgba(15,23,42,0.1) 100%);
       z-index: 2;
     }
     .elite-content {
@@ -536,7 +536,7 @@
       margin-bottom: 1rem;
     }
     .elite-stars i {
-      color: #c9a227;
+      color: #fbbf24;
       font-size: 0.85rem;
     }
     .elite-quote {
@@ -582,9 +582,9 @@
       color: #fff;
     }
     .elite-nav:hover {
-      background: #c9a227;
-      border-color: #c9a227;
-      color: #000;
+      background: #0d6efd;
+      border-color: #0d6efd;
+      color: #fff;
     }
     .elite-nav i {
       font-size: 1.1rem;
@@ -611,7 +611,7 @@
       background: rgba(255,255,255,0.4);
     }
     .elite-dot.active {
-      background: #c9a227;
+      background: #0d6efd;
       width: 30px;
       border-radius: 10px;
     }
