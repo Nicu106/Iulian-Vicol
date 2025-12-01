@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Sobre Auto Premium - Líderes en la venta de vehículos premium')
+@section('title', 'Sobre IV motorclass - Líderes en la venta de vehículos premium')
 @push('styles')
   <link rel="stylesheet" href="{{ asset('css/pages/about.css') }}">
 @endpush
