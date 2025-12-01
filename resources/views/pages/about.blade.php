@@ -18,8 +18,8 @@
       </div>
       <div class="col-lg-6">
         <div class="ratio ratio-16x9 rounded overflow-hidden shadow">
-          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13330657.024701731!2d-17.598073622580067!3d35.341871956064345!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xc42e3783261bc8b%3A0xa6ec2c940768a3ec!2sSpain!5e0!3m2!1sen!2s!4v1760020369448!5m2!1sen!2s" 
-                  width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Harta showroom MOTORCLASS - Spania"></iframe>
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d89050.94300482779!2d-3.893537894909068!3d43.461314816187446!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd4949ae8a6bee71%3A0xd27cdc801682ba96!2sSantander%2C%20Cantabria%2C%20Spania!5e1!3m2!1sro!2s!4v1764560953148!5m2!1sro!2s"
+                  width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Harta showroom MOTORCLASS - Santander"></iframe>
         </div>
       </div>
     </div>
