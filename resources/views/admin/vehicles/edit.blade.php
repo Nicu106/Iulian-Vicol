@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Admin • Editează vehicul')
+@section('title', 'Admin • Editar vehículo')
 
 @push('styles')
   <style>
@@ -19,11 +19,11 @@
 <section class="py-4">
   <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h1 class="h4 mb-0">Editează: {{ $vehicle['title'] ?? ($vehicle['brand'] . ' ' . $vehicle['model']) }}</h1>
+      <h1 class="h4 mb-0">Editar: {{ $vehicle['title'] ?? ($vehicle['brand'] . ' ' . $vehicle['model']) }}</h1>
       <div>
-        <a href="{{ route('admin.vehicles.show', $vehicle['slug']) }}" class="btn btn-outline-info me-2">Vezi detalii</a>
-        <a href="{{ route('admin.vehicles.index') }}" class="btn btn-outline-secondary me-2">Lista vehicule</a>
-        <a href="{{ route('vehicle.show', $vehicle['slug']) }}" class="btn btn-outline-success" target="_blank">Vezi pe site</a>
+        <a href="{{ route('admin.vehicles.show', $vehicle['slug']) }}" class="btn btn-outline-info me-2">Ver detalles</a>
+        <a href="{{ route('admin.vehicles.index') }}" class="btn btn-outline-secondary me-2">Lista de vehículos</a>
+        <a href="{{ route('vehicle.show', $vehicle['slug']) }}" class="btn btn-outline-success" target="_blank">Ver en sitio</a>
       </div>
     </div>
 
@@ -63,12 +63,12 @@
                 @error('price')<div class="text-danger small">{{ $message }}</div>@enderror
               </div>
               <div class="col-md-4">
-                <label class="form-label">Kilometraj</label>
+                <label class="form-label">Kilometraje</label>
                 <input type="number" class="form-control" name="mileage" placeholder="35000" value="{{ old('mileage', $vehicle['mileage']) }}">
-                <div class="hint">Doar numărul de km (fără separatori)</div>
+                <div class="hint">Solo el número de km (sin separadores)</div>
               </div>
               <div class="col-md-4">
-                <label class="form-label">Culoare</label>
+                <label class="form-label">Color</label>
                 <input class="form-control" name="color" value="{{ old('color', $vehicle['color']) }}">
               </div>
             </div>
@@ -78,14 +78,14 @@
         <!-- Pricing & Offers -->
         <div class="card admin-card shadow-sm mb-3">
           <div class="card-body">
-            <div class="form-section-title">Prețuri și oferte</div>
-            
+            <div class="form-section-title">Precios y ofertas</div>
+
             <!-- Current Pricing Display -->
             <div class="row g-3 mb-3">
               <div class="col-md-4">
                 <div class="card bg-light">
                   <div class="card-body text-center">
-                    <div class="h6 text-muted">Preț curent</div>
+                    <div class="h6 text-muted">Precio actual</div>
                     <div class="h4 text-primary">€{{ number_format($vehicle['price'] ?? 0, 0, ',', '.') }}</div>
                   </div>
                 </div>
@@ -93,7 +93,7 @@
               <div class="col-md-4">
                 <div class="card bg-light">
                   <div class="card-body text-center">
-                    <div class="h6 text-muted">Preț original</div>
+                    <div class="h6 text-muted">Precio original</div>
                     <div class="h4 text-secondary">€{{ number_format($vehicle['original_price'] ?? $vehicle['price'] ?? 0, 0, ',', '.') }}</div>
                   </div>
                 </div>
@@ -118,35 +118,35 @@
             <div class="offer-section">
               <div class="row g-3">
                 <div class="col-md-6">
-                  <label class="form-label">Preț original (pentru reduceri)</label>
+                  <label class="form-label">Precio original (para descuentos)</label>
                   <input type="number" step="0.01" class="form-control" name="original_price" value="{{ old('original_price', $vehicle['original_price']) }}">
-                  <div class="hint">Dacă este diferit de prețul curent</div>
+                  <div class="hint">Si es diferente del precio actual</div>
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label">Preț ofertă</label>
+                  <label class="form-label">Precio oferta</label>
                   <input type="number" step="0.01" class="form-control" name="offer_price" value="{{ old('offer_price', $vehicle['offer_price']) }}">
-                  <div class="hint">Prețul redus (dacă există)</div>
+                  <div class="hint">Precio rebajado (si existe)</div>
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label">Data expirării ofertei</label>
+                  <label class="form-label">Fecha de expiración de la oferta</label>
                   <input type="date" class="form-control" name="offer_expires_at" min="{{ date('Y-m-d', strtotime('+1 day')) }}" value="{{ old('offer_expires_at', $vehicle['offer_expires_at']) }}">
-                  <div class="hint">Lasă gol pentru ofertă permanentă</div>
+                  <div class="hint">Dejar vacío para oferta permanente</div>
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label">Tip ofertă</label>
+                  <label class="form-label">Tipo de oferta</label>
                   <select class="form-control" name="offer_type">
-                    <option value="">Fără ofertă</option>
+                    <option value="">Sin oferta</option>
                     <option value="flash_sale" {{ old('offer_type', $vehicle['offer_type'] ?? '') == 'flash_sale' ? 'selected' : '' }}>Flash Sale</option>
-                    <option value="seasonal" {{ old('offer_type', $vehicle['offer_type'] ?? '') == 'seasonal' ? 'selected' : '' }}>Ofertă sezonieră</option>
-                    <option value="clearance" {{ old('offer_type', $vehicle['offer_type'] ?? '') == 'clearance' ? 'selected' : '' }}>Lichidare stoc</option>
-                    <option value="negotiable" {{ old('offer_type', $vehicle['offer_type'] ?? '') == 'negotiable' ? 'selected' : '' }}>Preț negociabil</option>
-                    <option value="promotion" {{ old('offer_type', $vehicle['offer_type'] ?? '') == 'promotion' ? 'selected' : '' }}>Promoție</option>
+                    <option value="seasonal" {{ old('offer_type', $vehicle['offer_type'] ?? '') == 'seasonal' ? 'selected' : '' }}>Oferta de temporada</option>
+                    <option value="clearance" {{ old('offer_type', $vehicle['offer_type'] ?? '') == 'clearance' ? 'selected' : '' }}>Liquidación</option>
+                    <option value="negotiable" {{ old('offer_type', $vehicle['offer_type'] ?? '') == 'negotiable' ? 'selected' : '' }}>Precio negociable</option>
+                    <option value="promotion" {{ old('offer_type', $vehicle['offer_type'] ?? '') == 'promotion' ? 'selected' : '' }}>Promoción</option>
                   </select>
                 </div>
                 <div class="col-12">
-                  <label class="form-label">Descriere ofertă</label>
-                  <textarea class="form-control" name="offer_description" rows="2" placeholder="Descrie oferta (opțional)">{{ old('offer_description', $vehicle['offer_description'] ?? '') }}</textarea>
-                  <div class="hint">Ex: "Reducere 15% pentru achiziții în această lună"</div>
+                  <label class="form-label">Descripción de la oferta</label>
+                  <textarea class="form-control" name="offer_description" rows="2" placeholder="Describe la oferta (opcional)">{{ old('offer_description', $vehicle['offer_description'] ?? '') }}</textarea>
+                  <div class="hint">Ej: "Descuento 15% para compras este mes"</div>
                 </div>
               </div>
             </div>
@@ -154,15 +154,15 @@
             <!-- Pricing History -->
             @if(isset($vehicle['pricing_history']) && is_array($vehicle['pricing_history']))
             <div class="mt-3">
-              <div class="h6">Istoric prețuri:</div>
+              <div class="h6">Historial de precios:</div>
               <div class="table-responsive">
                 <table class="table table-sm">
                   <thead>
                     <tr>
-                      <th>Data</th>
-                      <th>Preț</th>
-                      <th>Tip</th>
-                      <th>Motiv</th>
+                      <th>Fecha</th>
+                      <th>Precio</th>
+                      <th>Tipo</th>
+                      <th>Motivo</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -185,25 +185,25 @@
         <!-- Technical Details -->
         <div class="card admin-card shadow-sm mb-3">
           <div class="card-body">
-            <div class="form-section-title">Detalii tehnice</div>
+            <div class="form-section-title">Detalles técnicos</div>
             <div class="row g-3">
               <div class="col-md-4">
-                <label class="form-label">Combustibil</label>
+                <label class="form-label">Combustible</label>
                 <select class="form-control" name="fuel">
-                  <option value="">Selectează</option>
-                  <option value="Benzină" {{ old('fuel', $vehicle['fuel']) == 'Benzină' ? 'selected' : '' }}>Benzină</option>
+                  <option value="">Seleccionar</option>
+                  <option value="Gasolina" {{ old('fuel', $vehicle['fuel']) == 'Gasolina' ? 'selected' : '' }}>Gasolina</option>
                   <option value="Diesel" {{ old('fuel', $vehicle['fuel']) == 'Diesel' ? 'selected' : '' }}>Diesel</option>
-                  <option value="Hibrid" {{ old('fuel', $vehicle['fuel']) == 'Hibrid' ? 'selected' : '' }}>Hibrid</option>
-                  <option value="Electric" {{ old('fuel', $vehicle['fuel']) == 'Electric' ? 'selected' : '' }}>Electric</option>
-                  <option value="GPL" {{ old('fuel', $vehicle['fuel']) == 'GPL' ? 'selected' : '' }}>GPL</option>
+                  <option value="Híbrido" {{ old('fuel', $vehicle['fuel']) == 'Híbrido' ? 'selected' : '' }}>Híbrido</option>
+                  <option value="Eléctrico" {{ old('fuel', $vehicle['fuel']) == 'Eléctrico' ? 'selected' : '' }}>Eléctrico</option>
+                  <option value="GLP" {{ old('fuel', $vehicle['fuel']) == 'GLP' ? 'selected' : '' }}>GLP</option>
                 </select>
               </div>
               <div class="col-md-4">
-                <label class="form-label">Transmisie</label>
+                <label class="form-label">Transmisión</label>
                 <select class="form-control" name="transmission">
-                  <option value="">Selectează</option>
-                  <option value="Manuală" {{ old('transmission', $vehicle['transmission']) == 'Manuală' ? 'selected' : '' }}>Manuală</option>
-                  <option value="Automată" {{ old('transmission', $vehicle['transmission']) == 'Automată' ? 'selected' : '' }}>Automată</option>
+                  <option value="">Seleccionar</option>
+                  <option value="Manual" {{ old('transmission', $vehicle['transmission']) == 'Manual' ? 'selected' : '' }}>Manual</option>
+                  <option value="Automático" {{ old('transmission', $vehicle['transmission']) == 'Automático' ? 'selected' : '' }}>Automático</option>
                   <option value="CVT" {{ old('transmission', $vehicle['transmission']) == 'CVT' ? 'selected' : '' }}>CVT</option>
                 </select>
               </div>
@@ -229,16 +229,16 @@
                 <input class="form-control" name="engine" placeholder="3.0L" value="{{ old('engine', $vehicle['engine']) }}">
               </div>
               <div class="col-md-4">
-                <label class="form-label">Putere</label>
-                <input class="form-control" name="power" placeholder="286 CP" value="{{ old('power', $vehicle['power']) }}">
+                <label class="form-label">Potencia</label>
+                <input class="form-control" name="power" placeholder="286 CV" value="{{ old('power', $vehicle['power']) }}">
               </div>
               <div class="col-md-4">
-                <label class="form-label">Tracțiune</label>
+                <label class="form-label">Tracción</label>
                 <select class="form-control" name="drivetrain">
-                  <option value="">Selectează</option>
-                  <option value="FWD" {{ old('drivetrain', $vehicle['drivetrain']) == 'FWD' ? 'selected' : '' }}>FWD (Față)</option>
-                  <option value="RWD" {{ old('drivetrain', $vehicle['drivetrain']) == 'RWD' ? 'selected' : '' }}>RWD (Spate)</option>
-                  <option value="AWD" {{ old('drivetrain', $vehicle['drivetrain']) == 'AWD' ? 'selected' : '' }}>AWD (Integrală)</option>
+                  <option value="">Seleccionar</option>
+                  <option value="FWD" {{ old('drivetrain', $vehicle['drivetrain']) == 'FWD' ? 'selected' : '' }}>FWD (Delantera)</option>
+                  <option value="RWD" {{ old('drivetrain', $vehicle['drivetrain']) == 'RWD' ? 'selected' : '' }}>RWD (Trasera)</option>
+                  <option value="AWD" {{ old('drivetrain', $vehicle['drivetrain']) == 'AWD' ? 'selected' : '' }}>AWD (Integral)</option>
                   <option value="4WD" {{ old('drivetrain', $vehicle['drivetrain']) == '4WD' ? 'selected' : '' }}>4WD (4x4)</option>
                 </select>
               </div>
@@ -247,14 +247,14 @@
                 <input class="form-control" name="vin" value="{{ old('vin', $vehicle['vin']) }}" placeholder="Etiqueta medioambiental">
               </div>
               <div class="col-12">
-                <label class="form-label">Stare</label>
+                <label class="form-label">Estado</label>
                 <select class="form-control" name="condition">
-                  <option value="">Selectează</option>
-                  <option value="Nouă" {{ old('condition', $vehicle['condition']) == 'Nouă' ? 'selected' : '' }}>Nouă</option>
-                  <option value="Excelentă" {{ old('condition', $vehicle['condition']) == 'Excelentă' ? 'selected' : '' }}>Excelentă</option>
-                  <option value="Foarte bună" {{ old('condition', $vehicle['condition']) == 'Foarte bună' ? 'selected' : '' }}>Foarte bună</option>
-                  <option value="Bună" {{ old('condition', $vehicle['condition']) == 'Bună' ? 'selected' : '' }}>Bună</option>
-                  <option value="Acceptabilă" {{ old('condition', $vehicle['condition']) == 'Acceptabilă' ? 'selected' : '' }}>Acceptabilă</option>
+                  <option value="">Seleccionar</option>
+                  <option value="Nuevo" {{ old('condition', $vehicle['condition']) == 'Nuevo' ? 'selected' : '' }}>Nuevo</option>
+                  <option value="Excelente" {{ old('condition', $vehicle['condition']) == 'Excelente' ? 'selected' : '' }}>Excelente</option>
+                  <option value="Muy bueno" {{ old('condition', $vehicle['condition']) == 'Muy bueno' ? 'selected' : '' }}>Muy bueno</option>
+                  <option value="Bueno" {{ old('condition', $vehicle['condition']) == 'Bueno' ? 'selected' : '' }}>Bueno</option>
+                  <option value="Aceptable" {{ old('condition', $vehicle['condition']) == 'Aceptable' ? 'selected' : '' }}>Aceptable</option>
                 </select>
               </div>
             </div>
@@ -264,31 +264,31 @@
         <!-- Content & Media -->
         <div class="card admin-card shadow-sm mb-3">
           <div class="card-body">
-            <div class="form-section-title">Conținut și media</div>
+            <div class="form-section-title">Contenido y medios</div>
             <div class="row g-3">
               <div class="col-12">
-                <label class="form-label">Descriere</label>
-                <textarea id="description" class="form-control" name="description" rows="8" placeholder="Detalii cheie și beneficii">{{ old('description', $vehicle['description']) }}</textarea>
-                <div class="hint">Folosește editorul pentru a formata textul (bold, italic, liste, etc.)</div>
+                <label class="form-label">Descripción</label>
+                <textarea id="description" class="form-control" name="description" rows="8" placeholder="Detalles clave y beneficios">{{ old('description', $vehicle['description']) }}</textarea>
+                <div class="hint">Usa el editor para formatear el texto (negrita, cursiva, listas, etc.)</div>
               </div>
               <div class="col-12">
-                <label class="form-label">Dotări (separate prin virgulă)</label>
-                <input class="form-control" name="features" placeholder="LED Matrix, Pachet M, Panoramic, Senzori parcare" value="{{ old('features', is_array($vehicle['features'] ?? null) ? implode(', ', $vehicle['features']) : $vehicle['features']) }}">
+                <label class="form-label">Equipamiento (separado por comas)</label>
+                <input class="form-control" name="features" placeholder="LED Matrix, Paquete M, Techo panorámico, Sensores de aparcamiento" value="{{ old('features', is_array($vehicle['features'] ?? null) ? implode(', ', $vehicle['features']) : $vehicle['features']) }}">
               </div>
 
               <!-- Current Images Display -->
               @if(!empty($vehicle['cover_image']))
                 <div class="col-12">
-                  <label class="form-label">Imagine actuală (cover)</label>
+                  <label class="form-label">Imagen actual (portada)</label>
                   <div class="mb-2">
-                    <img src="{{ $vehicle['cover_image'] }}" alt="Cover actual" class="current-image">
+                    <img src="{{ $vehicle['cover_image'] }}" alt="Portada actual" class="current-image">
                   </div>
                 </div>
               @endif
 
               @if(!empty($vehicle['gallery_images']))
               <div class="col-12">
-                <label class="form-label">Imagini existente în galerie</label>
+                <label class="form-label">Imágenes existentes en galería</label>
                 <div id="existing_gallery" class="d-flex flex-wrap gap-2">
                   @foreach($vehicle['gallery_images'] as $img)
                     <div class="position-relative" data-url="{{ $img }}">
@@ -305,7 +305,7 @@
 
               @if(!empty($vehicle['images']))
               <div class="col-12">
-                <label class="form-label">Imagini încărcate (Sell Your Car)</label>
+                <label class="form-label">Imágenes cargadas (Vende tu coche)</label>
                 <div class="d-flex flex-wrap gap-2">
                   @php
                     $imagesField = is_string($vehicle['images']) ? json_decode($vehicle['images'], true) : $vehicle['images'];
@@ -326,17 +326,17 @@
               @endif
 
               <div class="col-md-6">
-                <label class="form-label">{{ !empty($vehicle['cover_image']) ? 'Înlocuiește' : 'Adaugă' }} imagine principală</label>
+                <label class="form-label">{{ !empty($vehicle['cover_image']) ? 'Reemplazar' : 'Añadir' }} imagen principal</label>
                 <input type="file" name="cover_image" accept="image/*" class="form-control" id="cover_image" onchange="previewImage(this, 'cover_preview')">
-                <div class="hint">PNG/JPG orice dimensiune</div>
+                <div class="hint">PNG/JPG cualquier tamaño</div>
                 <div id="cover_preview" class="mt-2" style="display: none;">
                   <img style="max-width: 150px; max-height: 100px; border-radius: 8px; border: 2px solid #e5e7eb;">
                 </div>
               </div>
               <div class="col-md-6">
-                <label class="form-label">Adaugă imagini la galerie</label>
+                <label class="form-label">Añadir imágenes a la galería</label>
                 <input type="file" name="gallery_images[]" accept="image/*" class="form-control" multiple id="gallery_images">
-                <div class="hint">Poți încărca mai multe imagini (JavaScript dezactivat pentru debug)</div>
+                <div class="hint">Puedes subir varias imágenes</div>
                 <div id="gallery_preview" class="mt-2 d-flex flex-wrap gap-2"></div>
               </div>
               <div class="col-12">
@@ -350,34 +350,34 @@
         <!-- SEO & Marketing -->
         <div class="card admin-card shadow-sm">
           <div class="card-body">
-            <div class="form-section-title">SEO și marketing</div>
+            <div class="form-section-title">SEO y marketing</div>
             <div class="row g-3">
               <div class="col-md-6">
-                <label class="form-label">Titlu META (SEO)</label>
+                <label class="form-label">Título META (SEO)</label>
                 <input class="form-control" name="meta_title" maxlength="60" value="{{ old('meta_title', $vehicle['meta_title']) }}">
-                <div class="hint">Maxim 60 caractere</div>
+                <div class="hint">Máximo 60 caracteres</div>
               </div>
               <div class="col-md-6">
-                <label class="form-label">Locație</label>
-                <input class="form-control" name="location" placeholder="București, Sector 1" value="{{ old('location', $vehicle['location']) }}">
+                <label class="form-label">Ubicación</label>
+                <input class="form-control" name="location" placeholder="Santander, Cantabria" value="{{ old('location', $vehicle['location']) }}">
               </div>
               <div class="col-12">
-                <label class="form-label">Descriere META (SEO)</label>
+                <label class="form-label">Descripción META (SEO)</label>
                 <textarea class="form-control" name="meta_description" rows="2" maxlength="160">{{ old('meta_description', $vehicle['meta_description']) }}</textarea>
-                <div class="hint">Maxim 160 caractere</div>
+                <div class="hint">Máximo 160 caracteres</div>
               </div>
               <div class="col-md-6">
-                <label class="form-label">Badge-uri (separate prin virgulă)</label>
-                <input class="form-control" name="badges" placeholder="Nou, Garanție, Finanțare" value="{{ old('badges', is_array($vehicle['badges'] ?? null) ? implode(', ', $vehicle['badges']) : $vehicle['badges']) }}">
+                <label class="form-label">Insignias (separadas por comas)</label>
+                <input class="form-control" name="badges" placeholder="Nuevo, Garantía, Financiación" value="{{ old('badges', is_array($vehicle['badges'] ?? null) ? implode(', ', $vehicle['badges']) : $vehicle['badges']) }}">
               </div>
               <div class="col-md-6">
-                <label class="form-label">Tag-uri (separate prin virgulă)</label>
+                <label class="form-label">Etiquetas (separadas por comas)</label>
                 <input class="form-control" name="tags" placeholder="sport, family, luxury" value="{{ old('tags', is_array($vehicle['tags'] ?? null) ? implode(', ', $vehicle['tags']) : $vehicle['tags']) }}">
               </div>
               <div class="col-12">
-                <label class="form-label">Note interne</label>
-                <textarea class="form-control" name="internal_notes" rows="2" placeholder="Note private pentru echipă">{{ old('internal_notes', $vehicle['internal_notes']) }}</textarea>
-                <div class="hint">Aceste note nu vor fi vizibile pe site</div>
+                <label class="form-label">Notas internas</label>
+                <textarea class="form-control" name="internal_notes" rows="2" placeholder="Notas privadas para el equipo">{{ old('internal_notes', $vehicle['internal_notes']) }}</textarea>
+                <div class="hint">Estas notas no serán visibles en el sitio</div>
               </div>
             </div>
           </div>
@@ -388,35 +388,35 @@
         <!-- Actions & Status -->
         <div class="card admin-card shadow-sm mb-3">
           <div class="card-body">
-            <div class="form-section-title">Acțiuni și status</div>
+            <div class="form-section-title">Acciones y estado</div>
             <div class="d-grid gap-2 mb-3">
-              <button type="submit" class="btn btn-primary btn-lg">Actualizează vehicul</button>
-              <a href="{{ route('admin.vehicles.index') }}" class="btn btn-outline-secondary">Anulează</a>
+              <button type="submit" class="btn btn-primary btn-lg">Actualizar vehículo</button>
+              <a href="{{ route('admin.vehicles.index') }}" class="btn btn-outline-secondary">Cancelar</a>
             </div>
 
             <div class="mb-3">
-              <label class="form-label">Status vehicul</label>
+              <label class="form-label">Estado del vehículo</label>
               <select class="form-control" name="status">
-                <option value="available" {{ old('status', $vehicle['status']) == 'available' ? 'selected' : '' }}>Disponibil</option>
-                <option value="draft" {{ old('status', $vehicle['status']) == 'draft' ? 'selected' : '' }}>Draft</option>
-                <option value="reserved" {{ old('status', $vehicle['status']) == 'reserved' ? 'selected' : '' }}>Rezervat</option>
-                <option value="sold" {{ old('status', $vehicle['status']) == 'sold' ? 'selected' : '' }}>Vândut</option>
-                <option value="maintenance" {{ old('status', $vehicle['status']) == 'maintenance' ? 'selected' : '' }}>În service</option>
+                <option value="available" {{ old('status', $vehicle['status']) == 'available' ? 'selected' : '' }}>Disponible</option>
+                <option value="draft" {{ old('status', $vehicle['status']) == 'draft' ? 'selected' : '' }}>Borrador</option>
+                <option value="reserved" {{ old('status', $vehicle['status']) == 'reserved' ? 'selected' : '' }}>Reservado</option>
+                <option value="sold" {{ old('status', $vehicle['status']) == 'sold' ? 'selected' : '' }}>Vendido</option>
+                <option value="maintenance" {{ old('status', $vehicle['status']) == 'maintenance' ? 'selected' : '' }}>En servicio</option>
               </select>
             </div>
 
             <div class="mb-3">
-              <label class="form-label">Prioritate afișare</label>
+              <label class="form-label">Prioridad de visualización</label>
               <input type="number" class="form-control" name="priority" min="0" max="999" value="{{ old('priority', $vehicle['priority'] ?? 0) }}">
-              <div class="hint">0 = normal, mai mare = mai important</div>
+              <div class="hint">0 = normal, mayor = más importante</div>
             </div>
 
             <div class="form-check">
               <input class="form-check-input" type="checkbox" name="featured" id="featured" {{ old('featured', $vehicle['featured']) ? 'checked' : '' }}>
               <label class="form-check-label" for="featured">
-                <strong>Vehicul recomandat</strong>
+                <strong>Vehículo recomendado</strong>
               </label>
-              <div class="hint">Va apărea în secțiunea specială</div>
+              <div class="hint">Aparecerá en la sección especial</div>
             </div>
           </div>
         </div>
@@ -424,14 +424,14 @@
         <!-- Current Info -->
         <div class="card admin-card shadow-sm">
           <div class="card-body">
-            <div class="form-section-title">Informații curente</div>
+            <div class="form-section-title">Información actual</div>
             <div class="small text-muted">
-              <p><strong>Creat:</strong> {{ isset($vehicle['created_at']) ? date('d.m.Y H:i', strtotime($vehicle['created_at'])) : 'N/A' }}</p>
-              <p><strong>Actualizat:</strong> {{ isset($vehicle['updated_at']) ? date('d.m.Y H:i', strtotime($vehicle['updated_at'])) : 'N/A' }}</p>
-              <p><strong>Vizualizări:</strong> {{ $vehicle['views_count'] ?? 0 }}</p>
-              <p><strong>Întrebări:</strong> {{ $vehicle['inquiries_count'] ?? 0 }}</p>
+              <p><strong>Creado:</strong> {{ isset($vehicle['created_at']) ? date('d.m.Y H:i', strtotime($vehicle['created_at'])) : 'N/A' }}</p>
+              <p><strong>Actualizado:</strong> {{ isset($vehicle['updated_at']) ? date('d.m.Y H:i', strtotime($vehicle['updated_at'])) : 'N/A' }}</p>
+              <p><strong>Visualizaciones:</strong> {{ $vehicle['views_count'] ?? 0 }}</p>
+              <p><strong>Consultas:</strong> {{ $vehicle['inquiries_count'] ?? 0 }}</p>
               @if(!empty($vehicle['sold_date']))
-                <p><strong>Vândut la:</strong> {{ date('d.m.Y', strtotime($vehicle['sold_date'])) }}</p>
+                <p><strong>Vendido el:</strong> {{ date('d.m.Y', strtotime($vehicle['sold_date'])) }}</p>
               @endif
             </div>
           </div>
@@ -464,7 +464,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const submitBtn = form.querySelector('button[type="submit"]');
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Se salvează...';
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Guardando...';
       }
     });
   }
