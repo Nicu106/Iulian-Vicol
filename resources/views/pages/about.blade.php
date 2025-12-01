@@ -9,8 +9,8 @@
     <!-- Hero Section -->
     <div class="row align-items-center mb-5">
       <div class="col-lg-6">
-        <h1 class="display-5 fw-bold mb-3">Auto Premium</h1>
-        <p class="lead text-secondary mb-4">Líderes en la venta de vehículos premium en España, con más de 4 años de experiencia y miles de clientes satisfechos.</p>
+        <h1 class="display-5 fw-bold mb-3">IV motorclass</h1>
+        <p class="lead text-secondary mb-4">Líderes en la venta de vehículos premium en España, con más de 7 años de experiencia y miles de clientes satisfechos.</p>
         <div class="d-flex gap-3">
           <a href="{{ route('catalog') }}" class="btn btn-primary btn-lg">Ver catálogo</a>
           <a href="{{ route('contact') }}" class="btn btn-outline-primary btn-lg">Contáctanos</a>
@@ -29,7 +29,7 @@
       <div class="col-6 col-md-3 mb-4">
         <div class="card border-0 shadow-sm h-100">
           <div class="card-body">
-            <div class="display-4 fw-bold text-primary mb-2">2500+</div>
+            <div class="display-4 fw-bold text-primary mb-2">900+</div>
             <h6 class="text-secondary mb-0">Vehículos vendidos</h6>
           </div>
         </div>
@@ -53,7 +53,7 @@
       <div class="col-6 col-md-3 mb-4">
         <div class="card border-0 shadow-sm h-100">
           <div class="card-body">
-            <div class="display-4 fw-bold text-info mb-2">4+</div>
+            <div class="display-4 fw-bold text-info mb-2">7+</div>
             <h6 class="text-secondary mb-0">Años de experiencia</h6>
           </div>
         </div>
@@ -65,7 +65,7 @@
       <div class="col-lg-8 mx-auto text-center">
         <h2 class="h3 mb-4">Nuestra historia</h2>
         <p class="lead text-secondary mb-4">
-          Auto Premium nació de la pasión por los vehículos de calidad y el deseo de ofrecer a los clientes una experiencia de compra excepcional. 
+          IV motorclass nació de la pasión por los vehículos de calidad y el deseo de ofrecer a los clientes una experiencia de compra excepcional. 
           Desde el principio, nos hemos centrado en la transparencia, calidad y servicios de alta gama.
         </p>
         <p class="text-secondary">
@@ -298,7 +298,7 @@
         <div class="card border-0 bg-light">
           <div class="card-body p-5">
             <h3 class="mb-3">Encontremos el vehículo perfecto para ti</h3>
-            <p class="text-secondary mb-4">Con nuestra experiencia de 4+ años y más de 2500 vehículos vendidos, estamos listos para ayudarte a tomar la decisión correcta.</p>
+            <p class="text-secondary mb-4">Con nuestra experiencia de 7+ años y más de 900 vehículos vendidos, estamos listos para ayudarte a tomar la decisión correcta.</p>
             <div class="d-flex gap-3 justify-content-center flex-wrap">
               <a href="{{ route('catalog') }}" class="btn btn-primary btn-lg">Explora el catálogo</a>
               <a href="{{ route('contact') }}" class="btn btn-outline-primary btn-lg">Habla con un experto</a>
