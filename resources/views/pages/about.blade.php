@@ -190,7 +190,7 @@
       </div>
     </div>
 
-    <!-- Echipa / Fondatori -->
+    {{-- Echipa / Fondatori - COMENTAT
     <div class="row mb-5">
       <div class="col-12">
         <h2 class="h3 text-center mb-5">Equipo directivo</h2>
@@ -234,6 +234,7 @@
         </div>
       </div>
     </div>
+    --}}
 
     <!-- Valorile noastre -->
     <div class="row mb-5">
