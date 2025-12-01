@@ -399,31 +399,51 @@
     }
   @endphp
   @if($carouselTestimonials->count() > 0)
-  <section class="py-5" data-anim="reveal">
+  <section class="testimonials-section-pro py-5" data-anim="reveal">
     <div class="container">
+      <!-- Header Premium -->
       <div class="text-center mb-5">
-        <h2 class="fw-bold">Opiniones de clientes</h2>
-        <p class="text-secondary">Confianza construida a través de experiencias reales</p>
+        <span class="testimonials-badge">Testimonios verificados</span>
+        <h2 class="testimonials-title">Lo que dicen nuestros clientes</h2>
+        <p class="testimonials-subtitle">Experiencias reales de compradores satisfechos</p>
       </div>
 
-      <!-- Carousel cu imaginile clienților -->
-      <div id="testimonialsCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+      <!-- Carousel Premium -->
+      <div id="testimonialsCarousel" class="carousel slide testimonials-carousel-pro" data-bs-ride="carousel" data-bs-interval="5000">
         <div class="carousel-inner">
           @foreach($carouselTestimonials->chunk(3) as $i => $chunk)
           <div class="carousel-item {{ $i === 0 ? 'active' : '' }}">
             <div class="row g-4">
               @foreach($chunk as $t)
               <div class="col-md-4">
-                <div class="testimonial-card position-relative overflow-hidden rounded-4 shadow-lg">
-                  @if($t->image_path)
-                    <img src="{{ $t->image_path }}" class="testimonial-bg-image" alt="Cliente {{ $t->author_name }}" loading="lazy">
-                  @else
-                    <img src="https://images.unsplash.com/photo-1514316454349-750a7fd3da3a?q=80&w=1200&auto=format&fit=crop" class="testimonial-bg-image" alt="Cliente" loading="lazy">
-                  @endif
-                  <div class="testimonial-overlay">
-                    <div class="testimonial-content text-center text-white">
-                      <p class="testimonial-text mb-3">"{{ $t->quote }}"</p>
-                      <div class="testimonial-author">— {{ $t->author_name }}@if($t->author_location), {{ $t->author_location }}@endif</div>
+                <div class="testimonial-card-pro">
+                  <div class="testimonial-image-container">
+                    @if($t->image_path)
+                      <img src="{{ $t->image_path }}" class="testimonial-image-pro" alt="Cliente {{ $t->author_name }}" loading="lazy">
+                    @else
+                      <img src="https://images.unsplash.com/photo-1514316454349-750a7fd3da3a?q=80&w=800&auto=format&fit=crop" class="testimonial-image-pro" alt="Cliente" loading="lazy">
+                    @endif
+                    <div class="testimonial-gradient"></div>
+                    <div class="testimonial-quote-icon">
+                      <i class="bi bi-quote"></i>
+                    </div>
+                  </div>
+                  <div class="testimonial-body">
+                    <p class="testimonial-text-pro">"{{ $t->quote }}"</p>
+                    <div class="testimonial-footer">
+                      <div class="testimonial-author-info">
+                        <span class="author-name-pro">{{ $t->author_name }}</span>
+                        @if($t->author_location)
+                        <span class="author-location-pro"><i class="bi bi-geo-alt"></i> {{ $t->author_location }}</span>
+                        @endif
+                      </div>
+                      <div class="testimonial-stars">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -434,25 +454,228 @@
           @endforeach
         </div>
 
-        <!-- Controale carousel -->
-        <button class="carousel-control-prev" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Anterior</span>
+        <!-- Controale Premium -->
+        <button class="carousel-nav-pro carousel-nav-prev" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="prev">
+          <i class="bi bi-arrow-left"></i>
         </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Siguiente</span>
+        <button class="carousel-nav-pro carousel-nav-next" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="next">
+          <i class="bi bi-arrow-right"></i>
         </button>
+      </div>
 
-        <!-- Indicatori -->
-        <div class="carousel-indicators">
-          @foreach($carouselTestimonials->chunk(3) as $i => $chunk)
-          <button type="button" data-bs-target="#testimonialsCarousel" data-bs-slide-to="{{ $i }}" @if($i === 0) class="active" aria-current="true" @endif aria-label="Slide {{ $i + 1 }}"></button>
-          @endforeach
-        </div>
+      <!-- Indicatori Premium -->
+      <div class="testimonials-indicators">
+        @foreach($carouselTestimonials->chunk(3) as $i => $chunk)
+        <button type="button" data-bs-target="#testimonialsCarousel" data-bs-slide-to="{{ $i }}" class="indicator-dot {{ $i === 0 ? 'active' : '' }}" aria-label="Slide {{ $i + 1 }}"></button>
+        @endforeach
       </div>
     </div>
   </section>
+
+  <style>
+    .testimonials-section-pro {
+      background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .testimonials-section-pro::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      opacity: 0.5;
+    }
+    .testimonials-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+      color: #fff;
+      padding: 0.5rem 1.25rem;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+    }
+    .testimonials-title {
+      color: #fff;
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+    }
+    .testimonials-subtitle {
+      color: rgba(255,255,255,0.6);
+      font-size: 1.1rem;
+      margin-bottom: 0;
+    }
+    .testimonial-card-pro {
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      height: 100%;
+    }
+    .testimonial-card-pro:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 35px 60px -15px rgba(0,0,0,0.5);
+    }
+    .testimonial-image-container {
+      position: relative;
+      height: 220px;
+      overflow: hidden;
+    }
+    .testimonial-image-pro {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+    .testimonial-card-pro:hover .testimonial-image-pro {
+      transform: scale(1.1);
+    }
+    .testimonial-gradient {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 100px;
+      background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
+    }
+    .testimonial-quote-icon {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      width: 45px;
+      height: 45px;
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+    }
+    .testimonial-quote-icon i {
+      color: #fff;
+      font-size: 1.25rem;
+    }
+    .testimonial-body {
+      padding: 1.75rem;
+    }
+    .testimonial-text-pro {
+      color: #334155;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 1.25rem;
+      font-style: italic;
+    }
+    .testimonial-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-top: 1px solid #f1f5f9;
+      padding-top: 1rem;
+    }
+    .testimonial-author-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .author-name-pro {
+      font-weight: 700;
+      color: #0f172a;
+      font-size: 1rem;
+    }
+    .author-location-pro {
+      color: #64748b;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .testimonial-stars {
+      display: flex;
+      gap: 2px;
+    }
+    .testimonial-stars i {
+      color: #fbbf24;
+      font-size: 0.9rem;
+    }
+    .carousel-nav-pro {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      background: #fff;
+      border: none;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+      color: #0f172a;
+    }
+    .carousel-nav-pro:hover {
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+      color: #fff;
+      transform: translateY(-50%) scale(1.1);
+    }
+    .carousel-nav-pro i {
+      font-size: 1.25rem;
+    }
+    .carousel-nav-prev { left: -25px; }
+    .carousel-nav-next { right: -25px; }
+    .testimonials-indicators {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 2.5rem;
+    }
+    .indicator-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 0;
+    }
+    .indicator-dot:hover {
+      background: rgba(255,255,255,0.6);
+    }
+    .indicator-dot.active {
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+      width: 35px;
+      border-radius: 20px;
+    }
+    @media (max-width: 991.98px) {
+      .carousel-nav-prev { left: 10px; }
+      .carousel-nav-next { right: 10px; }
+      .carousel-nav-pro {
+        width: 45px;
+        height: 45px;
+      }
+    }
+    @media (max-width: 767.98px) {
+      .testimonials-title {
+        font-size: 1.75rem;
+      }
+      .testimonial-image-container {
+        height: 180px;
+      }
+      .carousel-nav-pro {
+        display: none;
+      }
+    }
+  </style>
   @endif
 
   <section class="py-5 bg-light" data-anim="reveal">
