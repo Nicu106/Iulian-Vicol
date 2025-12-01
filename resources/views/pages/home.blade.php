@@ -57,10 +57,11 @@
   <style>
     .hero-luxury {
       position: relative;
-      min-height: 85vh;
+      min-height: 60vh;
       display: flex;
       align-items: center;
       background: url('https://images.unsplash.com/photo-1514316454349-750a7fd3da3a?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat;
+      padding-top: 80px;
     }
     .hero-overlay {
       position: absolute;
@@ -206,8 +207,7 @@
     }
     @media (max-width: 767.98px) {
       .hero-luxury {
-        min-height: 100vh;
-        padding-top: 80px;
+        min-height: 70vh;
       }
       .hero-title {
         font-size: 2.25rem;
