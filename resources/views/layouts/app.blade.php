@@ -154,7 +154,7 @@
                 </div>
                 <div class="schedule-item">
                   <span class="schedule-day">Domingo</span>
-                  <span class="schedule-time">Cerrado</span>
+                  <span class="schedule-time">Consultar</span>
                 </div>
               </div>
               <a href="{{ route('contact') }}" class="btn btn-outline-light btn-sm mt-3">
