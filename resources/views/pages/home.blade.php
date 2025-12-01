@@ -398,53 +398,49 @@
     }
   @endphp
   @if($carouselTestimonials->count() > 0)
-  <section class="testimonials-luxury py-5" data-anim="reveal">
+  <section class="testimonials-elite py-5" data-anim="reveal">
     <div class="container">
-      <!-- Header Minimalist -->
+      <!-- Header Elite -->
       <div class="text-center mb-5">
-        <p class="testimonials-eyebrow">TESTIMONIOS</p>
-        <h2 class="testimonials-heading">Lo que dicen nuestros clientes</h2>
-        <div class="testimonials-line"></div>
+        <span class="elite-badge">CLIENTES SATISFECHOS</span>
+        <h2 class="elite-title">Experiencias que hablan por nosotros</h2>
       </div>
 
-      <!-- Carousel Minimalist -->
+      <!-- Carousel Elite -->
       <div id="testimonialsCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
         <div class="carousel-inner">
           @foreach($carouselTestimonials->chunk(3) as $i => $chunk)
           <div class="carousel-item {{ $i === 0 ? 'active' : '' }}">
-            <div class="row g-4 justify-content-center">
+            <div class="row g-4">
               @foreach($chunk as $t)
-              <div class="col-lg-4 col-md-6">
-                <div class="testimonial-card-luxury">
-                  <!-- Avatar circular -->
-                  <div class="testimonial-avatar-wrapper">
+              <div class="col-md-4">
+                <div class="testimonial-elite-card">
+                  <!-- Imagen de fondo -->
+                  <div class="elite-image-bg">
                     @if($t->image_path)
-                      <img src="{{ $t->image_path }}" class="testimonial-avatar" alt="{{ $t->author_name }}" loading="lazy">
+                      <img src="{{ $t->image_path }}" alt="{{ $t->author_name }}" loading="lazy">
                     @else
-                      <div class="testimonial-avatar-placeholder">
-                        <span>{{ strtoupper(substr($t->author_name, 0, 1)) }}</span>
-                      </div>
+                      <img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?q=80&w=800&auto=format&fit=crop" alt="Cliente" loading="lazy">
                     @endif
                   </div>
 
-                  <!-- Estrellas -->
-                  <div class="testimonial-rating">
-                    <i class="bi bi-star-fill"></i>
-                    <i class="bi bi-star-fill"></i>
-                    <i class="bi bi-star-fill"></i>
-                    <i class="bi bi-star-fill"></i>
-                    <i class="bi bi-star-fill"></i>
-                  </div>
-
-                  <!-- Quote -->
-                  <p class="testimonial-quote-luxury">"{{ $t->quote }}"</p>
-
-                  <!-- Author -->
-                  <div class="testimonial-author-luxury">
-                    <span class="author-name-luxury">{{ $t->author_name }}</span>
-                    @if($t->author_location)
-                    <span class="author-location-luxury">{{ $t->author_location }}</span>
-                    @endif
+                  <!-- Overlay con contenido -->
+                  <div class="elite-overlay"></div>
+                  <div class="elite-content">
+                    <div class="elite-stars">
+                      <i class="bi bi-star-fill"></i>
+                      <i class="bi bi-star-fill"></i>
+                      <i class="bi bi-star-fill"></i>
+                      <i class="bi bi-star-fill"></i>
+                      <i class="bi bi-star-fill"></i>
+                    </div>
+                    <p class="elite-quote">"{{ $t->quote }}"</p>
+                    <div class="elite-author">
+                      <span class="elite-name">{{ $t->author_name }}</span>
+                      @if($t->author_location)
+                      <span class="elite-location">{{ $t->author_location }}</span>
+                      @endif
+                    </div>
                   </div>
                 </div>
               </div>
@@ -454,194 +450,189 @@
           @endforeach
         </div>
 
-        <!-- Controles minimalistas -->
-        <button class="carousel-control-luxury carousel-control-prev-luxury" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="prev">
-          <i class="bi bi-chevron-left"></i>
+        <!-- Controles Elite -->
+        <button class="elite-nav elite-nav-prev" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="prev">
+          <i class="bi bi-arrow-left"></i>
         </button>
-        <button class="carousel-control-luxury carousel-control-next-luxury" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="next">
-          <i class="bi bi-chevron-right"></i>
+        <button class="elite-nav elite-nav-next" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="next">
+          <i class="bi bi-arrow-right"></i>
         </button>
       </div>
 
-      <!-- Indicadores minimalistas -->
-      <div class="testimonials-dots">
+      <!-- Indicadores Elite -->
+      <div class="elite-indicators">
         @foreach($carouselTestimonials->chunk(3) as $i => $chunk)
-        <button type="button" data-bs-target="#testimonialsCarousel" data-bs-slide-to="{{ $i }}" class="dot-luxury {{ $i === 0 ? 'active' : '' }}" aria-label="Slide {{ $i + 1 }}"></button>
+        <button type="button" data-bs-target="#testimonialsCarousel" data-bs-slide-to="{{ $i }}" class="elite-dot {{ $i === 0 ? 'active' : '' }}"></button>
         @endforeach
       </div>
     </div>
   </section>
 
   <style>
-    .testimonials-luxury {
-      background: #fafafa;
+    .testimonials-elite {
+      background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
       position: relative;
     }
-    .testimonials-eyebrow {
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 3px;
-      color: #9ca3af;
-      margin-bottom: 0.75rem;
+    .elite-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 4px;
+      color: #c9a227;
+      border: 1px solid rgba(201, 162, 39, 0.3);
+      padding: 0.5rem 1.5rem;
+      margin-bottom: 1.25rem;
     }
-    .testimonials-heading {
-      font-size: 2rem;
+    .elite-title {
+      font-size: 2.25rem;
       font-weight: 300;
-      color: #111;
-      letter-spacing: -0.5px;
-      margin-bottom: 1.5rem;
+      color: #fff;
+      letter-spacing: 1px;
     }
-    .testimonials-line {
-      width: 50px;
-      height: 1px;
-      background: #111;
-      margin: 0 auto;
-    }
-    .testimonial-card-luxury {
-      background: #fff;
-      border: 1px solid #eee;
-      padding: 2.5rem 2rem;
-      text-align: center;
-      height: 100%;
-      min-height: 380px;
+    .testimonial-elite-card {
+      position: relative;
+      height: 420px;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      transition: all 0.3s ease;
+      justify-content: flex-end;
     }
-    .testimonial-card-luxury:hover {
-      border-color: #ddd;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.06);
+    .elite-image-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
     }
-    .testimonial-avatar-wrapper {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      overflow: hidden;
-      margin-bottom: 1.5rem;
-      border: 2px solid #f3f4f6;
-    }
-    .testimonial-avatar {
+    .elite-image-bg img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transition: transform 0.6s ease;
     }
-    .testimonial-avatar-placeholder {
+    .testimonial-elite-card:hover .elite-image-bg img {
+      transform: scale(1.05);
+    }
+    .elite-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.1) 100%);
+      z-index: 2;
     }
-    .testimonial-avatar-placeholder span {
-      color: #fff;
-      font-size: 1.75rem;
+    .elite-content {
+      position: relative;
+      z-index: 3;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .elite-stars {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 1rem;
+    }
+    .elite-stars i {
+      color: #c9a227;
+      font-size: 0.85rem;
+    }
+    .elite-quote {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.9);
       font-weight: 300;
-    }
-    .testimonial-rating {
-      display: flex;
-      gap: 3px;
+      font-style: italic;
       margin-bottom: 1.25rem;
     }
-    .testimonial-rating i {
-      color: #111;
-      font-size: 0.7rem;
-    }
-    .testimonial-quote-luxury {
-      font-size: 0.95rem;
-      line-height: 1.8;
-      color: #555;
-      font-weight: 300;
-      flex-grow: 1;
-      display: flex;
-      align-items: center;
-      margin-bottom: 1.5rem;
-    }
-    .testimonial-author-luxury {
+    .elite-author {
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
-      margin-top: auto;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 1rem;
     }
-    .author-name-luxury {
-      font-size: 0.9rem;
+    .elite-name {
+      font-size: 0.95rem;
       font-weight: 500;
-      color: #111;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+    .elite-location {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.5);
       letter-spacing: 0.5px;
     }
-    .author-location-luxury {
-      font-size: 0.8rem;
-      color: #9ca3af;
-      font-weight: 300;
-    }
-    .carousel-control-luxury {
+    .elite-nav {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      width: 48px;
-      height: 48px;
-      background: #fff;
-      border: 1px solid #e5e5e5;
+      width: 50px;
+      height: 50px;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       transition: all 0.3s ease;
       z-index: 10;
-      color: #111;
-    }
-    .carousel-control-luxury:hover {
-      background: #111;
-      border-color: #111;
       color: #fff;
     }
-    .carousel-control-luxury i {
-      font-size: 1rem;
+    .elite-nav:hover {
+      background: #c9a227;
+      border-color: #c9a227;
+      color: #000;
     }
-    .carousel-control-prev-luxury { left: 0; }
-    .carousel-control-next-luxury { right: 0; }
-    .testimonials-dots {
+    .elite-nav i {
+      font-size: 1.1rem;
+    }
+    .elite-nav-prev { left: -60px; }
+    .elite-nav-next { right: -60px; }
+    .elite-indicators {
       display: flex;
       justify-content: center;
-      gap: 10px;
-      margin-top: 3rem;
+      gap: 12px;
+      margin-top: 2.5rem;
     }
-    .dot-luxury {
-      width: 8px;
-      height: 8px;
+    .elite-dot {
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
-      background: #ddd;
+      background: rgba(255,255,255,0.2);
       border: none;
       cursor: pointer;
       transition: all 0.3s ease;
       padding: 0;
     }
-    .dot-luxury:hover {
-      background: #aaa;
+    .elite-dot:hover {
+      background: rgba(255,255,255,0.4);
     }
-    .dot-luxury.active {
-      background: #111;
-      width: 24px;
+    .elite-dot.active {
+      background: #c9a227;
+      width: 30px;
       border-radius: 10px;
     }
+    @media (max-width: 1399.98px) {
+      .elite-nav-prev { left: 10px; }
+      .elite-nav-next { right: 10px; }
+    }
     @media (max-width: 991.98px) {
-      .carousel-control-prev-luxury { left: -10px; }
-      .carousel-control-next-luxury { right: -10px; }
-      .carousel-control-luxury {
-        width: 40px;
-        height: 40px;
+      .elite-nav {
+        width: 44px;
+        height: 44px;
       }
     }
     @media (max-width: 767.98px) {
-      .testimonials-heading {
+      .elite-title {
         font-size: 1.5rem;
       }
-      .testimonial-card-luxury {
-        min-height: 340px;
-        padding: 2rem 1.5rem;
+      .testimonial-elite-card {
+        height: 380px;
       }
-      .carousel-control-luxury {
+      .elite-nav {
         display: none;
       }
     }
