@@ -117,10 +117,16 @@
                 <select class="form-select" name="body_type">
                   <option value="">Todos</option>
                   <option value="SUV" {{ request('body_type') == 'SUV' ? 'selected' : '' }}>SUV</option>
-                  <option value="Sedan" {{ request('body_type') == 'Sedan' ? 'selected' : '' }}>Sedan</option>
+                  <option value="Sedan" {{ request('body_type') == 'Sedan' ? 'selected' : '' }}>Berlina</option>
                   <option value="Hatchback" {{ request('body_type') == 'Hatchback' ? 'selected' : '' }}>Hatchback</option>
-                  <option value="Break" {{ request('body_type') == 'Break' ? 'selected' : '' }}>Break</option>
-                  <option value="Coupe" {{ request('body_type') == 'Coupe' ? 'selected' : '' }}>Coupe</option>
+                  <option value="Break" {{ request('body_type') == 'Break' ? 'selected' : '' }}>Familiar</option>
+                  <option value="Coupe" {{ request('body_type') == 'Coupe' ? 'selected' : '' }}>Coupé</option>
+                  <option value="Convertible" {{ request('body_type') == 'Convertible' ? 'selected' : '' }}>Descapotable</option>
+                  <option value="Monovolumen" {{ request('body_type') == 'Monovolumen' ? 'selected' : '' }}>Monovolumen</option>
+                  <option value="Pickup" {{ request('body_type') == 'Pickup' ? 'selected' : '' }}>Pickup</option>
+                  <option value="Furgoneta" {{ request('body_type') == 'Furgoneta' ? 'selected' : '' }}>Furgoneta</option>
+                  <option value="Todoterreno" {{ request('body_type') == 'Todoterreno' ? 'selected' : '' }}>Todoterreno</option>
+                  <option value="Otro" {{ request('body_type') == 'Otro' ? 'selected' : '' }}>Otro</option>
                 </select>
               </div>
               <div class="mb-3">
@@ -134,7 +140,7 @@
               </div>
               <div class="mb-3">
                 <label class="form-label">Palabras clave</label>
-                <input type="text" class="form-control" name="keywords" placeholder="Ex: pachet M, panoramic" value="{{ request('keywords') }}" />
+                <input type="text" class="form-control" name="keywords" placeholder="Ej: paquete M, panorámico" value="{{ request('keywords') }}" />
               </div>
               <div class="d-grid gap-2 mt-3">
                 <button type="submit" class="btn btn-primary">Aplicar filtros</button>
@@ -225,10 +231,16 @@
                   <select class="form-select" name="body_type">
                     <option value="">Todos</option>
                     <option value="SUV" {{ request('body_type') == 'SUV' ? 'selected' : '' }}>SUV</option>
-                    <option value="Sedan" {{ request('body_type') == 'Sedan' ? 'selected' : '' }}>Sedan</option>
+                    <option value="Sedan" {{ request('body_type') == 'Sedan' ? 'selected' : '' }}>Berlina</option>
                     <option value="Hatchback" {{ request('body_type') == 'Hatchback' ? 'selected' : '' }}>Hatchback</option>
-                    <option value="Break" {{ request('body_type') == 'Break' ? 'selected' : '' }}>Break</option>
-                    <option value="Coupe" {{ request('body_type') == 'Coupe' ? 'selected' : '' }}>Coupe</option>
+                    <option value="Break" {{ request('body_type') == 'Break' ? 'selected' : '' }}>Familiar</option>
+                    <option value="Coupe" {{ request('body_type') == 'Coupe' ? 'selected' : '' }}>Coupé</option>
+                    <option value="Convertible" {{ request('body_type') == 'Convertible' ? 'selected' : '' }}>Descapotable</option>
+                    <option value="Monovolumen" {{ request('body_type') == 'Monovolumen' ? 'selected' : '' }}>Monovolumen</option>
+                    <option value="Pickup" {{ request('body_type') == 'Pickup' ? 'selected' : '' }}>Pickup</option>
+                    <option value="Furgoneta" {{ request('body_type') == 'Furgoneta' ? 'selected' : '' }}>Furgoneta</option>
+                    <option value="Todoterreno" {{ request('body_type') == 'Todoterreno' ? 'selected' : '' }}>Todoterreno</option>
+                    <option value="Otro" {{ request('body_type') == 'Otro' ? 'selected' : '' }}>Otro</option>
                   </select>
                 </div>
                 <div class="mb-3">
