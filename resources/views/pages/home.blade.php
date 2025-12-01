@@ -63,7 +63,7 @@
         <div class="col-md-4">
           <div class="value-card-premium text-center h-100">
             <div class="value-icon-premium mx-auto mb-4">
-              <i class="bi bi-handshake"></i>
+              <i class="bi bi-people"></i>
             </div>
             <h5 class="fw-bold mb-3">Compromiso</h5>
             <p class="text-muted mb-0">Construimos relaciones duraderas a través de un servicio excepcional y soporte post-venta.</p>
@@ -254,35 +254,93 @@
     </div>
   </section>
 
-  <section class="py-5" data-anim="reveal">
-    <div class="container text-center">
-      <h2 class="fw-bold">Nuestros Servicios</h2>
-      <p class="text-secondary mb-4">Soluciones completas para tus necesidades automotrices</p>
-      <div class="row g-4">
+  <section class="py-5 services-section-premium" data-anim="reveal">
+    <div class="container">
+      <div class="text-center mb-5">
+        <span class="text-uppercase text-primary fw-semibold letter-spacing-2 small">Lo que ofrecemos</span>
+        <h2 class="fw-bold mt-2 mb-3" style="font-size: 2.25rem;">Nuestros Servicios</h2>
+        <div class="mx-auto" style="width: 60px; height: 3px; background: linear-gradient(90deg, #0d6efd, #0dcaf0);"></div>
+      </div>
+      <div class="row g-4 g-lg-5">
         <div class="col-md-4">
-          <div class="card shadow-sm h-100"><div class="card-body">
-            <div class="display-6 mb-2">🚗</div>
-            <h5 class="card-title">Test Drive</h5>
-            <p class="card-text small text-secondary">Prueba nuestros vehículos sin compromiso y somételos a cualquier prueba, ¡tan preparados estamos!</p>
-          </div></div>
+          <div class="service-card-premium h-100">
+            <div class="service-icon-premium">
+              <i class="bi bi-speedometer2"></i>
+            </div>
+            <h5 class="fw-bold mb-3">Test Drive</h5>
+            <p class="text-muted mb-0">Prueba nuestros vehículos sin compromiso y somételos a cualquier prueba. Estamos seguros de su calidad.</p>
+          </div>
         </div>
         <div class="col-md-4">
-          <div class="card shadow-sm h-100"><div class="card-body">
-            <div class="display-6 mb-2">📋</div>
-            <h5 class="card-title">Consultación</h5>
-            <p class="card-text small text-secondary">Pídenos el coche que deseas y prometemos entregarte la mejor unidad del mercado.</p>
-          </div></div>
+          <div class="service-card-premium h-100">
+            <div class="service-icon-premium">
+              <i class="bi bi-search"></i>
+            </div>
+            <h5 class="fw-bold mb-3">Búsqueda Personalizada</h5>
+            <p class="text-muted mb-0">Pídenos el coche que deseas y prometemos encontrarte la mejor unidad disponible en el mercado.</p>
+          </div>
         </div>
         <div class="col-md-4">
-          <div class="card shadow-sm h-100"><div class="card-body">
-            <div class="display-6 mb-2">🛡️</div>
-            <h5 class="card-title">Garantías</h5>
-            <p class="card-text small text-secondary">Puedes disfrutar de 2 o 3 años de tranquilidad estando protegido con la garantía mecánica de más confianza.</p>
-          </div></div>
+          <div class="service-card-premium h-100">
+            <div class="service-icon-premium">
+              <i class="bi bi-patch-check"></i>
+            </div>
+            <h5 class="fw-bold mb-3">Garantía Extendida</h5>
+            <p class="text-muted mb-0">Disfruta de hasta 3 años de tranquilidad con nuestra garantía mecánica de máxima confianza.</p>
+          </div>
         </div>
       </div>
     </div>
   </section>
+
+  <style>
+    .services-section-premium {
+      background: #fff;
+    }
+    .service-card-premium {
+      padding: 2.5rem 2rem;
+      border-radius: 20px;
+      background: linear-gradient(145deg, #f8f9fa 0%, #ffffff 100%);
+      border: 1px solid rgba(0,0,0,0.05);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s ease;
+    }
+    .service-card-premium::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #0d6efd, #0dcaf0);
+      transform: scaleX(0);
+      transition: transform 0.4s ease;
+    }
+    .service-card-premium:hover::before {
+      transform: scaleX(1);
+    }
+    .service-card-premium:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+    }
+    .service-icon-premium {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
+      box-shadow: 0 10px 30px rgba(13, 110, 253, 0.3);
+    }
+    .service-icon-premium i {
+      font-size: 1.75rem;
+      color: #fff;
+    }
+  </style>
 
   <section class="py-5 bg-light" data-anim="reveal">
     <div class="container">
