@@ -8,31 +8,221 @@
 @endpush
 
 @section('content')
-  <section class="home-hero text-light home-page" data-anim="reveal">
-    <div class="container py-5">
-      <div class="col-lg-8">
-        <h1 class="display-4 fw-bold">Tu coche perfecto te espera</h1>
-        <p class="lead mb-1">Meticulosamente escogido y llevado a los estandares mas altos para ti</p>
-        <p class="mb-4">Explora nuestro catalogo ya!</p>
-        <form class="hero-search mb-3" action="{{ route('catalog') }}" method="get" role="search" aria-label="Buscar marca o modelo">
-          <div class="input-group input-group-lg">
-            <span class="input-group-text"><i class="bi bi-search"></i></span>
-            <input type="text" class="form-control" name="q" placeholder="Buscar marca o modelo..." value="{{ request('q') }}">
-            <button class="btn btn-primary">Buscar</button>
+  <section class="hero-luxury text-light" data-anim="reveal">
+    <div class="hero-overlay"></div>
+    <div class="container position-relative py-5">
+      <div class="row min-vh-50 align-items-center">
+        <div class="col-lg-7">
+          <span class="hero-eyebrow">IV MOTORCLASS</span>
+          <h1 class="hero-title">Tu coche perfecto<br>te espera</h1>
+          <p class="hero-subtitle">Meticulosamente escogido y llevado a los estándares más altos para ti</p>
+
+          <form class="hero-search-luxury" action="{{ route('catalog') }}" method="get" role="search">
+            <div class="search-wrapper">
+              <i class="bi bi-search search-icon"></i>
+              <input type="text" name="q" placeholder="Buscar marca o modelo..." value="{{ request('q') }}">
+              <button type="submit">Buscar</button>
+            </div>
+          </form>
+
+          <div class="hero-buttons">
+            <a href="{{ route('catalog') }}" class="btn-hero-primary">
+              <span>Ver Catálogo</span>
+              <i class="bi bi-arrow-right"></i>
+            </a>
+            <a href="{{ route('contact') }}" class="btn-hero-outline">
+              Solicitar Oferta
+            </a>
           </div>
-        </form>
-        <div class="d-flex gap-2 flex-wrap hero-ctas">
-          <a href="{{ route('catalog') }}" class="btn btn-primary btn-lg btn-cta">Ver Catálogo</a>
-          <a href="{{ route('contact') }}" class="btn btn-outline-light btn-lg">Solicitar Oferta</a>
+
+          <div class="hero-features">
+            <div class="hero-feature">
+              <i class="bi bi-patch-check-fill"></i>
+              <span>Verificado</span>
+            </div>
+            <div class="hero-feature">
+              <i class="bi bi-shield-check"></i>
+              <span>Garantía</span>
+            </div>
+            <div class="hero-feature">
+              <i class="bi bi-file-earmark-text"></i>
+              <span>Historial claro</span>
+            </div>
+          </div>
         </div>
-        <ul class="list-inline small mt-3 hero-benefits">
-          <li class="list-inline-item"><span class="badge bg-success-subtle text-success border">Verificado técnicamente</span></li>
-          <li class="list-inline-item"><span class="badge bg-primary-subtle text-primary border">Garantía</span></li>
-          <li class="list-inline-item"><span class="badge bg-info-subtle text-dark border">Historial claro</span></li>
-        </ul>
       </div>
     </div>
   </section>
+
+  <style>
+    .hero-luxury {
+      position: relative;
+      min-height: 85vh;
+      display: flex;
+      align-items: center;
+      background: url('https://images.unsplash.com/photo-1514316454349-750a7fd3da3a?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat;
+    }
+    .hero-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.4) 100%);
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 4px;
+      color: #0d6efd;
+      margin-bottom: 1rem;
+    }
+    .hero-title {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 1.25rem;
+      letter-spacing: -1px;
+    }
+    .hero-subtitle {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 2rem;
+      max-width: 480px;
+    }
+    .hero-search-luxury {
+      margin-bottom: 2rem;
+    }
+    .search-wrapper {
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 0.5rem;
+      max-width: 500px;
+      transition: all 0.3s ease;
+    }
+    .search-wrapper:focus-within {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(13, 110, 253, 0.5);
+    }
+    .search-wrapper .search-icon {
+      color: rgba(255,255,255,0.5);
+      padding: 0 1rem;
+      font-size: 1.1rem;
+    }
+    .search-wrapper input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 1rem;
+      padding: 0.75rem 0;
+      outline: none;
+    }
+    .search-wrapper input::placeholder {
+      color: rgba(255,255,255,0.5);
+    }
+    .search-wrapper button {
+      background: #0d6efd;
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .search-wrapper button:hover {
+      background: #0b5ed7;
+    }
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+    }
+    .btn-hero-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: #0d6efd;
+      color: #fff;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    .btn-hero-primary:hover {
+      background: #0b5ed7;
+      transform: translateY(-2px);
+      color: #fff;
+    }
+    .btn-hero-primary i {
+      transition: transform 0.3s ease;
+    }
+    .btn-hero-primary:hover i {
+      transform: translateX(4px);
+    }
+    .btn-hero-outline {
+      display: inline-flex;
+      align-items: center;
+      background: transparent;
+      color: #fff;
+      padding: 1rem 2rem;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    .btn-hero-outline:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.5);
+      color: #fff;
+    }
+    .hero-features {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .hero-feature {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.9rem;
+    }
+    .hero-feature i {
+      color: #0d6efd;
+      font-size: 1rem;
+    }
+    .min-vh-50 {
+      min-height: 50vh;
+    }
+    @media (max-width: 767.98px) {
+      .hero-luxury {
+        min-height: 100vh;
+        padding-top: 80px;
+      }
+      .hero-title {
+        font-size: 2.25rem;
+      }
+      .hero-buttons {
+        flex-direction: column;
+      }
+      .btn-hero-primary, .btn-hero-outline {
+        justify-content: center;
+      }
+      .hero-features {
+        gap: 1rem;
+      }
+    }
+  </style>
 
   <section class="py-5 values-section-premium" data-anim="reveal">
     <div class="container">
