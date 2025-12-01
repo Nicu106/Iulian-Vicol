@@ -388,296 +388,71 @@
 
   @php
     $carouselTestimonials = \App\Models\Testimonial::where('is_active', true)->orderBy('order_index')->get();
+    // Completăm pentru a avea multiplu de 3 (pentru a evita golurile)
+    $totalCount = $carouselTestimonials->count();
+    $remainder = $totalCount % 3;
+    if ($remainder > 0 && $totalCount > 0) {
+      $needed = 3 - $remainder;
+      for ($i = 0; $i < $needed; $i++) {
+        $carouselTestimonials->push($carouselTestimonials[$i % $totalCount]);
+      }
+    }
   @endphp
   @if($carouselTestimonials->count() > 0)
-  <section class="py-5 testimonials-section-premium" data-anim="reveal">
+  <section class="py-5" data-anim="reveal">
     <div class="container">
       <div class="text-center mb-5">
-        <span class="text-uppercase text-primary fw-semibold letter-spacing-2 small">Testimonios</span>
-        <h2 class="fw-bold mt-2 mb-3" style="font-size: 2.25rem;">Opiniones de clientes</h2>
-        <div class="mx-auto" style="width: 60px; height: 3px; background: linear-gradient(90deg, #0d6efd, #0dcaf0);"></div>
-        <p class="text-muted mt-3">Confianza construida a través de experiencias reales</p>
+        <h2 class="fw-bold">Opiniones de clientes</h2>
+        <p class="text-secondary">Confianza construida a través de experiencias reales</p>
       </div>
 
-      <!-- Testimonials Slider -->
-      <div class="testimonials-slider-wrapper">
-        <div class="testimonials-slider" id="testimonialsSlider">
-          @foreach($carouselTestimonials as $t)
-          <div class="testimonial-slide">
-            <div class="testimonial-card-new">
-              <div class="testimonial-image-wrapper">
-                @if($t->image_path)
-                  <img src="{{ $t->image_path }}" class="testimonial-image" alt="Cliente {{ $t->author_name }}" loading="lazy">
-                @else
-                  <img src="https://images.unsplash.com/photo-1514316454349-750a7fd3da3a?q=80&w=600&auto=format&fit=crop" class="testimonial-image" alt="Cliente" loading="lazy">
-                @endif
-                <div class="testimonial-overlay-new"></div>
-              </div>
-              <div class="testimonial-content-new">
-                <div class="quote-icon"><i class="bi bi-quote"></i></div>
-                <p class="testimonial-quote">"{{ $t->quote }}"</p>
-                <div class="testimonial-author-new">
-                  <span class="author-name">{{ $t->author_name }}</span>
-                  @if($t->author_location)
-                  <span class="author-location">{{ $t->author_location }}</span>
+      <!-- Carousel cu imaginile clienților -->
+      <div id="testimonialsCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+        <div class="carousel-inner">
+          @foreach($carouselTestimonials->chunk(3) as $i => $chunk)
+          <div class="carousel-item {{ $i === 0 ? 'active' : '' }}">
+            <div class="row g-4">
+              @foreach($chunk as $t)
+              <div class="col-md-4">
+                <div class="testimonial-card position-relative overflow-hidden rounded-4 shadow-lg">
+                  @if($t->image_path)
+                    <img src="{{ $t->image_path }}" class="testimonial-bg-image" alt="Cliente {{ $t->author_name }}" loading="lazy">
+                  @else
+                    <img src="https://images.unsplash.com/photo-1514316454349-750a7fd3da3a?q=80&w=1200&auto=format&fit=crop" class="testimonial-bg-image" alt="Cliente" loading="lazy">
                   @endif
+                  <div class="testimonial-overlay">
+                    <div class="testimonial-content text-center text-white">
+                      <p class="testimonial-text mb-3">"{{ $t->quote }}"</p>
+                      <div class="testimonial-author">— {{ $t->author_name }}@if($t->author_location), {{ $t->author_location }}@endif</div>
+                    </div>
+                  </div>
                 </div>
               </div>
+              @endforeach
             </div>
           </div>
           @endforeach
         </div>
 
-        <!-- Navigation Arrows -->
-        <button class="slider-nav slider-prev" id="sliderPrev" aria-label="Anterior">
-          <i class="bi bi-chevron-left"></i>
+        <!-- Controale carousel -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Anterior</span>
         </button>
-        <button class="slider-nav slider-next" id="sliderNext" aria-label="Siguiente">
-          <i class="bi bi-chevron-right"></i>
+        <button class="carousel-control-next" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Siguiente</span>
         </button>
-      </div>
 
-      <!-- Dots Indicator -->
-      <div class="slider-dots" id="sliderDots"></div>
+        <!-- Indicatori -->
+        <div class="carousel-indicators">
+          @foreach($carouselTestimonials->chunk(3) as $i => $chunk)
+          <button type="button" data-bs-target="#testimonialsCarousel" data-bs-slide-to="{{ $i }}" @if($i === 0) class="active" aria-current="true" @endif aria-label="Slide {{ $i + 1 }}"></button>
+          @endforeach
+        </div>
+      </div>
     </div>
   </section>
-
-  <style>
-    .testimonials-section-premium {
-      background: linear-gradient(180deg, #f8f9fa 0%, #fff 100%);
-    }
-    .testimonials-slider-wrapper {
-      position: relative;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 0 50px;
-    }
-    .testimonials-slider {
-      display: flex;
-      overflow: hidden;
-      scroll-behavior: smooth;
-    }
-    .testimonial-slide {
-      min-width: 100%;
-      padding: 0 10px;
-      box-sizing: border-box;
-    }
-    .testimonial-card-new {
-      display: flex;
-      flex-direction: row;
-      background: #fff;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-      min-height: 350px;
-    }
-    .testimonial-image-wrapper {
-      flex: 0 0 45%;
-      position: relative;
-      overflow: hidden;
-    }
-    .testimonial-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .testimonial-overlay-new {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(135deg, rgba(13,110,253,0.1) 0%, transparent 100%);
-    }
-    .testimonial-content-new {
-      flex: 1;
-      padding: 2.5rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    .quote-icon {
-      font-size: 3rem;
-      color: #0d6efd;
-      opacity: 0.3;
-      line-height: 1;
-      margin-bottom: 1rem;
-    }
-    .testimonial-quote {
-      font-size: 1.15rem;
-      line-height: 1.7;
-      color: #333;
-      margin-bottom: 1.5rem;
-      font-style: italic;
-    }
-    .testimonial-author-new {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-    .author-name {
-      font-weight: 700;
-      color: #1a1a2e;
-      font-size: 1.1rem;
-    }
-    .author-location {
-      color: #6c757d;
-      font-size: 0.9rem;
-    }
-    .slider-nav {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: #fff;
-      border: none;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      z-index: 10;
-    }
-    .slider-nav:hover {
-      background: #0d6efd;
-      color: #fff;
-      transform: translateY(-50%) scale(1.1);
-    }
-    .slider-nav i {
-      font-size: 1.25rem;
-    }
-    .slider-prev { left: 0; }
-    .slider-next { right: 0; }
-    .slider-dots {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 2rem;
-    }
-    .slider-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #dee2e6;
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .slider-dot.active {
-      background: #0d6efd;
-      transform: scale(1.2);
-    }
-    .slider-dot:hover {
-      background: #0d6efd;
-    }
-    @media (max-width: 767.98px) {
-      .testimonials-slider-wrapper {
-        padding: 0 40px;
-      }
-      .testimonial-card-new {
-        flex-direction: column;
-        min-height: auto;
-      }
-      .testimonial-image-wrapper {
-        flex: 0 0 200px;
-        height: 200px;
-      }
-      .testimonial-content-new {
-        padding: 1.5rem;
-      }
-      .testimonial-quote {
-        font-size: 1rem;
-      }
-      .slider-nav {
-        width: 40px;
-        height: 40px;
-      }
-      .slider-prev { left: 0; }
-      .slider-next { right: 0; }
-    }
-  </style>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const slider = document.getElementById('testimonialsSlider');
-      const slides = slider.querySelectorAll('.testimonial-slide');
-      const prevBtn = document.getElementById('sliderPrev');
-      const nextBtn = document.getElementById('sliderNext');
-      const dotsContainer = document.getElementById('sliderDots');
-      let currentIndex = 0;
-      const totalSlides = slides.length;
-      let autoSlideInterval;
-
-      // Create dots
-      slides.forEach((_, i) => {
-        const dot = document.createElement('button');
-        dot.className = 'slider-dot' + (i === 0 ? ' active' : '');
-        dot.addEventListener('click', () => goToSlide(i));
-        dotsContainer.appendChild(dot);
-      });
-
-      const dots = dotsContainer.querySelectorAll('.slider-dot');
-
-      function updateSlider() {
-        slider.style.transform = `translateX(-${currentIndex * 100}%)`;
-        dots.forEach((dot, i) => {
-          dot.classList.toggle('active', i === currentIndex);
-        });
-      }
-
-      function goToSlide(index) {
-        currentIndex = index;
-        if (currentIndex >= totalSlides) currentIndex = 0;
-        if (currentIndex < 0) currentIndex = totalSlides - 1;
-        updateSlider();
-        resetAutoSlide();
-      }
-
-      function nextSlide() {
-        goToSlide(currentIndex + 1);
-      }
-
-      function prevSlide() {
-        goToSlide(currentIndex - 1);
-      }
-
-      function startAutoSlide() {
-        autoSlideInterval = setInterval(nextSlide, 5000);
-      }
-
-      function resetAutoSlide() {
-        clearInterval(autoSlideInterval);
-        startAutoSlide();
-      }
-
-      prevBtn.addEventListener('click', prevSlide);
-      nextBtn.addEventListener('click', nextSlide);
-
-      // Touch/swipe support
-      let touchStartX = 0;
-      let touchEndX = 0;
-
-      slider.addEventListener('touchstart', e => {
-        touchStartX = e.changedTouches[0].screenX;
-      }, {passive: true});
-
-      slider.addEventListener('touchend', e => {
-        touchEndX = e.changedTouches[0].screenX;
-        if (touchStartX - touchEndX > 50) nextSlide();
-        if (touchEndX - touchStartX > 50) prevSlide();
-      }, {passive: true});
-
-      // Start auto-slide
-      startAutoSlide();
-
-      // Pause on hover
-      slider.addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
-      slider.addEventListener('mouseleave', startAutoSlide);
-    });
-  </script>
   @endif
 
   <section class="py-5 bg-light" data-anim="reveal">
