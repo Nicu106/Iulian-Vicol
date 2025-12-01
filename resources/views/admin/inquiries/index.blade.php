@@ -187,6 +187,13 @@
                     <a href="tel:{{ $inq->phone }}" class="btn btn-outline-success" title="Llamar">
                       <i class="bi bi-telephone"></i>
                     </a>
+                    <form action="{{ route('admin.inquiries.destroy', $inq) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Estás seguro de eliminar esta solicitud?')">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit" class="btn btn-outline-danger" title="Eliminar">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </form>
                   </div>
                 </td>
               </tr>
@@ -243,11 +250,18 @@
             <!-- Actions -->
             <div class="d-flex gap-2">
               <button class="btn btn-outline-primary btn-sm flex-fill" onclick="viewInquiry({{ $inq->id }})">
-                <i class="bi bi-eye me-1"></i>Ver completo
+                <i class="bi bi-eye me-1"></i>Ver
               </button>
               <a href="tel:{{ $inq->phone }}" class="btn btn-outline-success btn-sm flex-fill">
                 <i class="bi bi-telephone me-1"></i>Llamar
               </a>
+              <form action="{{ route('admin.inquiries.destroy', $inq) }}" method="POST" class="flex-fill" onsubmit="return confirm('¿Estás seguro de eliminar esta solicitud?')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+                  <i class="bi bi-trash me-1"></i>Eliminar
+                </button>
+              </form>
             </div>
           </div>
         </div>

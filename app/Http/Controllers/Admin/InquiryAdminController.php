@@ -14,6 +14,12 @@ class InquiryAdminController extends Controller
         $contactMessages = ContactMessage::orderByDesc('created_at')->paginate(20);
         return view('admin.inquiries.index', compact('inquiries', 'contactMessages'));
     }
+
+    public function destroy(Inquiry $inquiry)
+    {
+        $inquiry->delete();
+        return redirect()->route('admin.inquiries.index')->with('status', 'Solicitud eliminada correctamente.');
+    }
 }
 
 

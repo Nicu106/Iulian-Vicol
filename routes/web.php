@@ -33,7 +33,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.home');
     Route::get('/admin/vehicles', [VehicleController::class, 'index'])->name('admin.vehicles.index');
     Route::get('/admin/inquiries', [App\Http\Controllers\Admin\InquiryAdminController::class, 'index'])->name('admin.inquiries.index');
+    Route::delete('/admin/inquiries/{inquiry}', [App\Http\Controllers\Admin\InquiryAdminController::class, 'destroy'])->name('admin.inquiries.destroy');
     Route::get('/admin/contacts', [App\Http\Controllers\Admin\ContactMessageController::class, 'index'])->name('admin.contacts.index');
+    Route::delete('/admin/contacts/{contact}', [App\Http\Controllers\Admin\ContactMessageController::class, 'destroy'])->name('admin.contacts.destroy');
     Route::get('/admin/vehicles/create', [VehicleController::class, 'create'])->name('admin.vehicles.create');
     Route::post('/admin/vehicles', [VehicleController::class, 'store'])->name('admin.vehicles.store');
     Route::get('/admin/vehicles/{slug}', [VehicleController::class, 'show'])->name('admin.vehicles.show');

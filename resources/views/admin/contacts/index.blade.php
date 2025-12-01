@@ -158,6 +158,13 @@
                     <a href="mailto:{{ $msg->email }}" class="btn btn-outline-success" title="Responder">
                       <i class="bi bi-reply"></i>
                     </a>
+                    <form action="{{ route('admin.contacts.destroy', $msg) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Estás seguro de eliminar este mensaje?')">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit" class="btn btn-outline-danger" title="Eliminar">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </form>
                   </div>
                 </td>
               </tr>
@@ -214,11 +221,18 @@
             <!-- Actions -->
             <div class="d-flex gap-2 mt-3">
               <button class="btn btn-outline-primary btn-sm flex-fill" onclick="viewMessage({{ $msg->id }})">
-                <i class="bi bi-eye me-1"></i>Ver completo
+                <i class="bi bi-eye me-1"></i>Ver
               </button>
               <a href="mailto:{{ $msg->email }}" class="btn btn-outline-success btn-sm flex-fill">
                 <i class="bi bi-reply me-1"></i>Responder
               </a>
+              <form action="{{ route('admin.contacts.destroy', $msg) }}" method="POST" class="flex-fill" onsubmit="return confirm('¿Estás seguro de eliminar este mensaje?')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+                  <i class="bi bi-trash me-1"></i>Eliminar
+                </button>
+              </form>
             </div>
           </div>
         </div>
