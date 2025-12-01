@@ -34,41 +34,92 @@
     </div>
   </section>
 
-  <section class="py-5 bg-light values-section" data-anim="reveal">
-    <div class="container text-center">
-      <h2 class="fw-bold section-title">Nuestros Valores</h2>
-      <p class="text-secondary mb-4 section-subtitle">Los principios que nos definen y nos guían cada día</p>
-      <div class="row g-4 align-items-stretch">
+  <section class="py-5 values-section-premium" data-anim="reveal">
+    <div class="container">
+      <div class="text-center mb-5">
+        <span class="text-uppercase text-primary fw-semibold letter-spacing-2 small">Por qué elegirnos</span>
+        <h2 class="fw-bold mt-2 mb-3" style="font-size: 2.25rem;">Nuestros Valores</h2>
+        <div class="mx-auto" style="width: 60px; height: 3px; background: linear-gradient(90deg, #0d6efd, #0dcaf0);"></div>
+      </div>
+      <div class="row g-4 g-lg-5">
         <div class="col-md-4">
-          <div class="card shadow-sm h-100 value-card">
-            <div class="card-body">
-              <div class="value-icon mb-3" aria-hidden="true">🛡️</div>
-              <h5 class="card-title value-title">Transparencia</h5>
-              <p class="card-text small text-secondary value-text">Historial completo y verificación técnica detallada para cada vehículo.</p>
+          <div class="value-card-premium text-center h-100">
+            <div class="value-icon-premium mx-auto mb-4">
+              <i class="bi bi-shield-check"></i>
             </div>
+            <h5 class="fw-bold mb-3">Transparencia</h5>
+            <p class="text-muted mb-0">Historial completo y verificación técnica detallada para cada vehículo que ofrecemos.</p>
           </div>
         </div>
         <div class="col-md-4">
-          <div class="card shadow-sm h-100 value-card">
-            <div class="card-body">
-              <div class="value-icon mb-3" aria-hidden="true">⚡</div>
-              <h5 class="card-title value-title">Calidad</h5>
-              <p class="card-text small text-secondary value-text">Verificado cuidadosamente por técnicos especializados para calidad superior.</p>
+          <div class="value-card-premium text-center h-100">
+            <div class="value-icon-premium mx-auto mb-4">
+              <i class="bi bi-award"></i>
             </div>
+            <h5 class="fw-bold mb-3">Calidad Premium</h5>
+            <p class="text-muted mb-0">Cada vehículo es verificado por técnicos especializados garantizando los más altos estándares.</p>
           </div>
         </div>
         <div class="col-md-4">
-          <div class="card shadow-sm h-100 value-card">
-            <div class="card-body">
-              <div class="value-icon mb-3" aria-hidden="true">💙</div>
-              <h5 class="card-title value-title">Confianza</h5>
-              <p class="card-text small text-secondary value-text">Relaciones de confianza a través de servicios de calidad y soporte post-compra.</p>
+          <div class="value-card-premium text-center h-100">
+            <div class="value-icon-premium mx-auto mb-4">
+              <i class="bi bi-handshake"></i>
             </div>
+            <h5 class="fw-bold mb-3">Compromiso</h5>
+            <p class="text-muted mb-0">Construimos relaciones duraderas a través de un servicio excepcional y soporte post-venta.</p>
           </div>
         </div>
       </div>
     </div>
   </section>
+
+  <style>
+    .values-section-premium {
+      background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+    }
+    .letter-spacing-2 {
+      letter-spacing: 2px;
+    }
+    .value-card-premium {
+      padding: 2rem 1.5rem;
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.06);
+      transition: all 0.3s ease;
+    }
+    .value-card-premium:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+      border-color: transparent;
+    }
+    .value-icon-premium {
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f0f7ff 0%, #e8f4fd 100%);
+      border: 2px solid rgba(13, 110, 253, 0.1);
+    }
+    .value-icon-premium i {
+      font-size: 2rem;
+      background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .value-card-premium:hover .value-icon-premium {
+      background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
+      border-color: transparent;
+    }
+    .value-card-premium:hover .value-icon-premium i {
+      background: #fff;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  </style>
 
   
 
