@@ -51,6 +51,9 @@
               <button type="button" class="btn btn-sm btn-outline-secondary js-clear-filters" title="Eliminar todos los filtros">Eliminar</button>
             </div>
             <form class="filters-form" method="get">
+              @if(request('status'))
+                <input type="hidden" name="status" value="{{ request('status') }}">
+              @endif
               <div class="mb-3">
                 <label class="form-label">Marca</label>
                 <select class="form-select" name="brand">
@@ -165,6 +168,9 @@
                 <button type="button" class="btn btn-sm btn-outline-secondary js-clear-filters" title="Eliminar todos los filtros">Eliminar</button>
               </div>
               <form class="filters-form" method="get">
+                @if(request('status'))
+                  <input type="hidden" name="status" value="{{ request('status') }}">
+                @endif
                 <div class="mb-3">
                   <label class="form-label">Marca</label>
                   <select class="form-select" name="brand">
