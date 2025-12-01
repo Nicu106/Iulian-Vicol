@@ -353,7 +353,7 @@
                   </a>
                 </div>
                 @empty
-                  <div class="col-12 small text-secondary">Momentan nu avem SUV-uri potrivite.</div>
+                  <div class="col-12 small text-secondary">Actualmente no tenemos SUV disponibles.</div>
                 @endforelse
               </div>
               <div class="mt-auto pt-2">
@@ -392,7 +392,7 @@
                   </a>
                 </div>
                 @empty
-                  <div class="col-12 small text-secondary">Momentan nu avem sedane potrivite.</div>
+                  <div class="col-12 small text-secondary">Actualmente no tenemos sedanes disponibles.</div>
                 @endforelse
               </div>
               <div class="mt-auto pt-2">
@@ -431,7 +431,7 @@
                   </a>
                 </div>
                 @empty
-                  <div class="col-12 small text-secondary">Momentan nu avem hibride/electrice potrivite.</div>
+                  <div class="col-12 small text-secondary">Actualmente no tenemos híbridos/eléctricos disponibles.</div>
                 @endforelse
               </div>
               <div class="mt-auto pt-2">
