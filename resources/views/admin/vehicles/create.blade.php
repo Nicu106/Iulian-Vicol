@@ -269,7 +269,28 @@
                 @error('transmission')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
               </div>
             </div>
-            
+
+            <div class="row g-2 g-md-3 mt-2">
+              <div class="col-12 col-md-4">
+                <label class="form-label fw-medium">Carrocería</label>
+                <select class="form-select" name="body_type">
+                  <option value="">Seleccionar</option>
+                  <option value="SUV" {{ old('body_type') == 'SUV' ? 'selected' : '' }}>SUV</option>
+                  <option value="Sedan" {{ old('body_type') == 'Sedan' ? 'selected' : '' }}>Berlina</option>
+                  <option value="Hatchback" {{ old('body_type') == 'Hatchback' ? 'selected' : '' }}>Hatchback</option>
+                  <option value="Break" {{ old('body_type') == 'Break' ? 'selected' : '' }}>Familiar</option>
+                  <option value="Coupe" {{ old('body_type') == 'Coupe' ? 'selected' : '' }}>Coupé</option>
+                  <option value="Convertible" {{ old('body_type') == 'Convertible' ? 'selected' : '' }}>Descapotable</option>
+                  <option value="Monovolumen" {{ old('body_type') == 'Monovolumen' ? 'selected' : '' }}>Monovolumen</option>
+                  <option value="Pickup" {{ old('body_type') == 'Pickup' ? 'selected' : '' }}>Pickup</option>
+                  <option value="Furgoneta" {{ old('body_type') == 'Furgoneta' ? 'selected' : '' }}>Furgoneta</option>
+                  <option value="Todoterreno" {{ old('body_type') == 'Todoterreno' ? 'selected' : '' }}>Todoterreno</option>
+                  <option value="Otro" {{ old('body_type') == 'Otro' ? 'selected' : '' }}>Otro</option>
+                </select>
+                @error('body_type')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+              </div>
+            </div>
+
             <div class="row g-2 g-md-3 mt-2">
               <div class="col-12 col-md-3">
                 <label class="form-label fw-medium">Motor</label>

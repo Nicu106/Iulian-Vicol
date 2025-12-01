@@ -208,6 +208,23 @@
                 </select>
               </div>
               <div class="col-md-4">
+                <label class="form-label">Carrocería</label>
+                <select class="form-control" name="body_type">
+                  <option value="">Seleccionar</option>
+                  <option value="SUV" {{ old('body_type', $vehicle['body_type'] ?? '') == 'SUV' ? 'selected' : '' }}>SUV</option>
+                  <option value="Sedan" {{ old('body_type', $vehicle['body_type'] ?? '') == 'Sedan' ? 'selected' : '' }}>Berlina</option>
+                  <option value="Hatchback" {{ old('body_type', $vehicle['body_type'] ?? '') == 'Hatchback' ? 'selected' : '' }}>Hatchback</option>
+                  <option value="Break" {{ old('body_type', $vehicle['body_type'] ?? '') == 'Break' ? 'selected' : '' }}>Familiar</option>
+                  <option value="Coupe" {{ old('body_type', $vehicle['body_type'] ?? '') == 'Coupe' ? 'selected' : '' }}>Coupé</option>
+                  <option value="Convertible" {{ old('body_type', $vehicle['body_type'] ?? '') == 'Convertible' ? 'selected' : '' }}>Descapotable</option>
+                  <option value="Monovolumen" {{ old('body_type', $vehicle['body_type'] ?? '') == 'Monovolumen' ? 'selected' : '' }}>Monovolumen</option>
+                  <option value="Pickup" {{ old('body_type', $vehicle['body_type'] ?? '') == 'Pickup' ? 'selected' : '' }}>Pickup</option>
+                  <option value="Furgoneta" {{ old('body_type', $vehicle['body_type'] ?? '') == 'Furgoneta' ? 'selected' : '' }}>Furgoneta</option>
+                  <option value="Todoterreno" {{ old('body_type', $vehicle['body_type'] ?? '') == 'Todoterreno' ? 'selected' : '' }}>Todoterreno</option>
+                  <option value="Otro" {{ old('body_type', $vehicle['body_type'] ?? '') == 'Otro' ? 'selected' : '' }}>Otro</option>
+                </select>
+              </div>
+              <div class="col-md-4">
                 <label class="form-label">Motor</label>
                 <input class="form-control" name="engine" placeholder="3.0L" value="{{ old('engine', $vehicle['engine']) }}">
               </div>
