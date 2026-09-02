@@ -255,19 +255,19 @@ class BrandbookController extends Controller
     {
         // family: which of the two voices speaks. wdth: the variable width axis.
         return [
-            ['--t-display', '34 → 52', 1.04, 600, '92%',  '−0.035em', 'ui',    'The one line at the top of the site.'],
-            ['--t-h1',      '28 → 40', 1.08, 600, '92%',  '−0.028em', 'ui',    'Page title.'],
-            ['--t-h2',      '22 → 28', 1.16, 600, '94%',  '−0.022em', 'ui',    'Section title. Always followed by a 2px rule.'],
+            ['--t-display', '34 → 52', 1.04, 600, '100%', '−0.035em', 'ui',    'The one line at the top of the site.'],
+            ['--t-h1',      '34 → 52', 1.06, 700, '100%', '−0.03em',  'ui',    'Page title.'],
+            ['--t-h2',      '28 → 40', 1.10, 600, '100%', '−0.03em',  'ui',    'Section title, with an 18px grey subtitle under it — the reference\'s size.'],
             ['--t-h3',      '18',      1.30, 600, '100%', '−0.012em', 'ui',    'Card title, block heading.'],
-            ['--t-price',   '28 → 36', 1.00, 600, '96%',  '−0.020em', 'ui',    'The price. Never appears without the mileage.'],
-            ['--t-km',      '22 → 28', 1.00, 600, '96%',  '−0.015em', 'ui',    'The mileage. 78% of the price, same ink, same weight.'],
-            ['--t-prose',   '17 → 18', 1.62, 400, '—',    '0',        'voice', 'The owner speaking. Serif, always.'],
+            ['--t-price',   '28 → 36', 1.00, 700, '100%', '−0.02em',  'ui',    'The price, in coral. Never appears without the mileage.'],
+            ['--t-km',      '22 → 28', 1.00, 500, '100%', '−0.01em',  'ui',    'The mileage. 78% of the price, beside it, in the secondary ink.'],
+            ['--t-prose',   '17 → 18', 1.62, 400, '100%', '0',        'ui',    'Descriptions and longer copy. One sans, like the reference.'],
             ['--t-body',    '16',      1.55, 400, '100%', '0',        'ui',    'Interface body copy.'],
             ['--t-ui',      '16',      1.20, 500, '100%', '+0.002em', 'ui',    'Buttons and controls. 16px is non-negotiable.'],
             ['--t-value',   '17',      1.30, 600, '100%', '0',        'ui',    'A spec value in the data table.'],
             ['--t-small',   '14',      1.45, 400, '100%', '0',        'ui',    'Fine print that still has to be read.'],
             ['--t-label',   '13',      1.30, 500, '100%', '+0.010em', 'ui',    'Field label. The floor of the system.'],
-            ['--t-caption', '14',      1.45, 400, '—',    '0',        'voice', 'Photo caption. Italic serif.'],
+            ['--t-caption', '14',      1.45, 400, '—',    '0',        'voice', 'A customer\'s own words in the wall. The one place the serif survives.'],
         ];
     }
 
@@ -313,8 +313,8 @@ class BrandbookController extends Controller
             '--m-tap'     => 'Release',
             '--m-quick'   => 'Colour, border, opacity',
             '--m-state'   => 'Focus, header state change',
-            '--m-move'    => 'THE STROKE, accordion, panel',
-            '--m-reveal'  => 'The one scroll reveal',
+            '--m-move'    => 'The sending button\'s line, an accordion, a panel',
+            '--m-reveal'  => 'Reserved. Nothing on the site reveals on scroll',
         ];
         $easing = [
             '--e-out'   => 'Anything entering or settling',

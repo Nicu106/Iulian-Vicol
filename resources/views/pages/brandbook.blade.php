@@ -136,7 +136,7 @@
       <tr><td>Navy footer</td><td><b>Yes</b> <span class="bb-st bb-st--prop">Proposed</span></td><td>It signals where the page ends. Ours is slightly lighter than theirs on purpose — see the colour section.</td></tr>
       <tr><td>Soft corners, measured</td><td><b>Yes</b> <span class="bb-st bb-st--prop">Proposed</span></td><td>Their filled buttons are 10px in 100% of cases, cards 22px in 26 of 26, chips 4px. Only the photographs and bare text links are square. An earlier draft took "square" to every element, and it read as old-school — so this now follows their numbers: 4 / 10 / 16.</td></tr>
       <tr><td>Clean header, grid of cars, long detail page, fixed bar on mobile</td><td><b>Yes</b> <span class="bb-st bb-st--fixed">Fixed</span></td><td>This is the structure you asked for, and it is the right one.</td></tr>
-      <tr><td>A warm red-orange accent</td><td><b>Yes, corrected</b> <span class="bb-st bb-st--prop">Proposed</span></td><td>Their coral fails legibility at 3.59:1. We keep the relationship and fix the number — ours is 5.36:1.</td></tr>
+      <tr><td>A coral price</td><td><b>Yes, corrected</b> <span class="bb-st bb-st--prop">Proposed</span></td><td>Their coral fails legibility at 3.59:1 as 16px text. Ours keeps their hue at a lightness that passes — 4.72:1 on white — and uses it only on the price, which is always large.</td></tr>
       <tr><td>Filters, search and sort</td><td><b>Not yet</b> <span class="bb-st bb-st--you">Your call</span></td><td>They have thousands of cars. You have {{ $inventory['available'] }}. A filter panel over {{ $inventory['available'] }} cars advertises stock that isn't there. If you plan to hold 25+, we build it — say so and it goes in.</td></tr>
       <tr><td>A gradient in the header</td><td><b>No</b> <span class="bb-st bb-st--prop">Proposed</span></td><td>Gradients band visibly on mid-range Android screens, which is most of your traffic. A banded header on a €20,000 purchase looks cheap.</td></tr>
       <tr><td>Their ink is 1.08:1 from pure black</td><td><b>No</b> <span class="bb-st bb-st--fixed">Fixed</span></td><td>Their "navy" is black in practice, and in Málaga sun on a cheap screen it reads as black. Ours holds 1.55:1 so it stays navy.</td></tr>
@@ -1582,9 +1582,10 @@
 
   <h3 style="margin:var(--s-6) 0 var(--s-4)">Motion</h3>
   <p class="bb-prose">
-    One idea, reused: a line that <em>draws</em> from the left. Under the price, under the
-    active menu item, on a focused card, on the loading button. A site with six animation
-    ideas looks like a template; one idea used consistently looks designed.
+    Almost none, on purpose. Cards lift slightly on hover, buttons change shade, and the
+    sending button draws a thin line along its bottom edge while it works. That is the whole
+    repertoire. The reference site animates nothing but a hover, and a site with six
+    animation ideas looks like a template.
   </p>
   <div class="bb-scroll">
   <table class="bb-t">
