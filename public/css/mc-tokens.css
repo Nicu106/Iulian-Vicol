@@ -9,37 +9,72 @@
 :root{
   color-scheme: light;
 
-  /* ---- GROUND — warm paper ------------------------------- */
-  --mc-paper:      #F4F1E9;   /* global page background */
-  --mc-paper-2:    #FBFAF5;   /* raised surfaces: inputs, quick spec panel */
-  --mc-paper-3:    #E7E2D6;   /* alternating bands, hover, pressed */
+  /* ---- SURFACES ------------------------------------------
+     Cool near-white page, pure white cards. Cards lift off the page
+     without a shadow, which matters because shadows disappear in glare. */
+  --mc-bg:        #F4F6FA;  /* page ground */
+  --mc-surface:   #FFFFFF;  /* raised: vehicle cards, forms */
+  --mc-band:      #E8EDF5;  /* alternating section band. Darkest light surface
+                               — every text token is proven against THIS one */
+  --mc-blue-tint: #EBF1FA;  /* blue wash. Max one section per page */
 
-  /* ---- INK ----------------------------------------------- */
-  --mc-ink:        #16181A;   /* body text, figures, heavy rules */
-  --mc-ink-2:      #4A4F52;   /* long prose, secondary text */
-  --mc-ink-3:      #5E6367;   /* labels, meta. Lightest text allowed */
+  /* ---- NAVY — footer and any fixed bar --------------------
+     Deliberately not near-black: 1.55:1 against #000 so it still reads as
+     navy on a cheap 6-bit Android panel. car-planet's own "navy" is 1.08:1
+     from black — functionally black. */
+  --mc-navy:      #0E2E57;  /* 13.57:1 with white */
+  --mc-navy-line: #2B4D73;  /* hairline inside navy. Decorative only */
 
-  /* ---- RULES --------------------------------------------- */
-  --mc-rule:       #D9D3C6;   /* decorative hairline: table rows */
-  --mc-rule-2:     #B3AC9C;   /* structural separation between blocks */
-  --mc-rule-3:     #868074;   /* legal minimum for control borders (3:1) */
-  --mc-rule-heavy: #16181A;   /* 2px, section boundary only */
+  /* ---- INK — blue-cast, never pure black ------------------
+     #000 haloes in direct sun on a phone fighting reflections. */
+  --mc-ink:       #111C2E;  /* headings, body, spec values. 15.79:1 on bg */
+  --mc-ink-2:     #475467;  /* labels, captions, metadata. 7.10:1 on bg */
+  --mc-ink-3:     #5D6B80;  /* LIGHTEST TEXT PERMITTED. 4.60:1 on --mc-band */
 
-  /* ---- SIGNAL — rust. One only, spent where money moves --- */
-  --mc-signal:     #A33B22;   /* passes as text AND as fill */
-  --mc-signal-up:  #E0724F;   /* the same signal ON dark ground */
-  --mc-wash:       #F6E4DC;   /* ground of the negative/note. NEVER without a rule */
+  --mc-on-navy:   #FFFFFF;  /* 13.57:1 */
+  --mc-on-navy-2: #A6B6C8;  /* 6.56:1 on navy. NEVER on light (2.07:1) */
 
-  /* ---- DARK SURFACE — green-black, not navy --------------- */
-  --mc-deep:       #101A16;   /* footer, fixed bottom bar, photo viewer */
-  --mc-deep-2:     #1B2A24;   /* elevation inside the dark zone */
-  --mc-on-deep:    #F4F1E9;
-  --mc-on-deep-2:  #A2A9A4;
-  --mc-on-deep-rule:#2C3833;
+  /* ---- BORDERS — three tiers ------------------------------ */
+  --mc-hairline:  #E3E8F0;  /* decorative: list separators */
+  --mc-rule:      #C9D2DF;  /* structural: card edge, section divider */
+  --mc-control:   #7A889B;  /* MUST-PASS: inputs, outline buttons, checkboxes.
+                               >=3:1 on all four grounds (3.33/3.61/3.07/3.76) */
 
-  /* ---- STATE — two, literal, never Bootstrap's ------------ */
-  --mc-ok:         #1F5B4A;   /* "it does have it", validated field */
-  --mc-note:       #7A5C0E;   /* "indicative", "estimated" */
+  /* ---- BLUE — the brand, hue 213 --------------------------
+     Below 220 to stay out of the OLED violet shift; above 208 to stay out
+     of municipal cyan. At 37% lightness one value does two jobs: 7.13:1 as
+     link text AND as a button fill with a white label. */
+  --mc-blue:       #0E56AC;  /* PRIMARY. 7.13:1 on white */
+  --mc-blue-dark:  #093E7D;  /* hover, pressed, large headings. 9.72:1 on bg */
+  --mc-blue-light: #6CAAE7;  /* links and icons ON NAVY ONLY. 5.52:1 on navy.
+                                Forbidden on light: 2.46:1 */
+  --mc-blue-100:   #C8D9EF;  /* blue chip fill */
+
+  /* ---- ACCENT — terracotta, hue 14. The only non-blue -----
+     Two jobs: the contact CTA, and the price. Nothing else.
+     car-planet pairs its blue with a warm red-orange (#E65848) that fails
+     at 3.59:1 both ways; this keeps the relationship and fixes the contrast. */
+  --mc-accent:      #C03D15;  /* 5.36:1 white-on-fill */
+  --mc-accent-dark: #9D3110;  /* hover; label colour when a CTA sits on navy */
+  --mc-accent-tint: #FBEAE5;  /* price chip ground */
+
+  /* ---- STATE — exactly two, neither a Bootstrap default --- */
+  --mc-ok:        #0A7A4B;  /* confirmation only: message sent, WhatsApp opened.
+                               NOT "disponible" — see the colour-blindness note */
+  --mc-ok-tint:   #E3F7EF;
+  --mc-warn:      #7B5200;  /* indicative: "precio orientativo", "km aprox." */
+  --mc-warn-tint: #FDF4E3;
+
+  /* ---- FOCUS — two rings, and this is why -----------------
+     A single ink ring drawn on the blue fill measures 2.40:1 and fails
+     SC 1.4.11. The white inner ring means the ink ring only ever touches
+     white (17.08) or the ground (15.79). */
+  --mc-focus:       #111C2E;
+  --mc-focus-inner: #FFFFFF;
+
+  /* ---- CHROME HEIGHTS ------------------------------------- */
+  --mc-head-h: 56px;
+  --mc-bar-h:  64px;
 
   /* ---- TYPEFACES ----------------------------------------- */
   --f-ui:    "Archivo","Archivo Fallback","Helvetica Neue",Arial,sans-serif;
@@ -79,6 +114,13 @@
   --ar-editorial: 3 / 2;    /* section imagery */
   --ar-social:   40 / 21;   /* 1200×630 OG, generated, never displayed */
 
+  /* Object-position for customer photographs. NOT "top": a skin-tone scan of
+     all 25 files puts the face band at 20-50% depth, peaking at 30-40%. Only
+     8.8% of skin pixels are in the top fifth, which is sky and warehouse
+     ceiling. Biasing upward preserves empty headroom and eats the car. */
+  --pos-portrait: 50% 40%;
+  --pos-vehicle:  50% 42%;   /* protects the roofline */
+
   /* ---- MOTION -------------------------------------------- */
   --m-instant:  80ms;   /* press down */
   --m-tap:     160ms;   /* release */
@@ -101,6 +143,8 @@
 }
 
 /* Metric-matched fallbacks: the page does not reflow when the webfont lands */
+@media (min-width:768px){ :root{ --mc-head-h:72px; } }
+
 @font-face{ font-family:"Archivo Fallback"; src:local("Arial"),local("Helvetica Neue");
   size-adjust:97%; ascent-override:92%; descent-override:24%; line-gap-override:0%; }
 @font-face{ font-family:"Serif Fallback"; src:local("Georgia"),local("Times New Roman");

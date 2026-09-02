@@ -25,7 +25,9 @@ class BrandbookController extends Controller
         return view('pages.brandbook', [
             'tokens'    => $tokens,
             'colors'    => $this->colorGroups($tokens),
-            'contrast'  => $this->contrastTable($tokens),
+            'contrast'  => $this->contrastTable($tokens)['rows'],
+            'forbidden' => $this->contrastTable($tokens)['forbidden'],
+            'quotes'    => $this->quoteStats(),
             'type'      => $this->typeScale(),
             'space'     => $this->spaceScale($tokens),
             'ratios'    => $this->ratios($tokens),
@@ -33,7 +35,9 @@ class BrandbookController extends Controller
             'metrics'   => $this->metrics(),
             'crops'     => $this->cropAudit(),
             'inventory' => $this->inventory(),
-            'sample'    => Testimonial::where('is_active', true)->orderBy('order_index')->limit(10)->get(),
+            'sample'    => Testimonial::where('is_active', true)->orderBy('order_index')->get(),
+            'car'       => Vehicle::where('status', 'available')->first(),
+            'sold'      => Vehicle::where('status', 'sold')->first(),
         ]);
     }
 
@@ -56,35 +60,42 @@ class BrandbookController extends Controller
     private function colorGroups(array $t): array
     {
         $groups = [
-            'Ground' => [
-                ['--mc-paper',   'Page background. Warm paper, not white — white is the default of every template.'],
-                ['--mc-paper-2', 'Raised surfaces: inputs, the quick-spec panel.'],
-                ['--mc-paper-3', 'Alternating bands, hover, pressed state.'],
+            'Surfaces' => [
+                ['--mc-bg',         'The page. A cool near-white, not pure white.'],
+                ['--mc-surface',    'Vehicle cards and forms. Pure white, so a card lifts off the page without a shadow — shadows disappear in glare.'],
+                ['--mc-band',       'Alternating section band. The darkest light surface, so every text colour is proven against this one.'],
+                ['--mc-blue-tint',  'Blue wash. One section per page, at most.'],
+            ],
+            'Blue' => [
+                ['--mc-blue',       'The brand. One value does two jobs: link text and button fill, both at 7.13:1.'],
+                ['--mc-blue-dark',  'Hover, pressed, and large headings.'],
+                ['--mc-blue-light', 'Links and icons on navy only. Forbidden on light — 2.46:1.'],
+                ['--mc-blue-100',   'Chip fill.'],
+            ],
+            'Navy' => [
+                ['--mc-navy',      'Footer and any fixed bar. Held at 1.55:1 from pure black so it survives a cheap phone panel.'],
+                ['--mc-navy-line', 'Hairline inside navy. Decorative.'],
+                ['--mc-on-navy',   'Text on navy.'],
+                ['--mc-on-navy-2', 'Secondary text on navy. Never on a light surface.'],
+            ],
+            'Accent' => [
+                ['--mc-accent',      'Terracotta. The one non-blue, for the contact action and the price. Nothing else.'],
+                ['--mc-accent-dark', 'Hover, and the label colour when a call-to-action sits on navy.'],
+                ['--mc-accent-tint', 'Price chip ground.'],
             ],
             'Ink' => [
-                ['--mc-ink',   'Body text, figures, heavy rules.'],
-                ['--mc-ink-2', 'Long prose and secondary text.'],
-                ['--mc-ink-3', 'Labels and meta. The lightest text the system allows.'],
+                ['--mc-ink',   'Headings, body, spec values. Never pure black — #000 haloes in direct sun.'],
+                ['--mc-ink-2', 'Labels, captions, metadata.'],
+                ['--mc-ink-3', 'The lightest text the system permits.'],
             ],
-            'Rules' => [
-                ['--mc-rule',   'Decorative hairline inside a table or spec list.'],
-                ['--mc-rule-2', 'Structural separation between cards and blocks.'],
-                ['--mc-rule-3', 'Legal minimum for a control border — 3:1 against paper.'],
-            ],
-            'Signal' => [
-                ['--mc-signal',    'Rust. One accent for the whole site, spent only where money moves.'],
-                ['--mc-signal-up', 'The same signal, lifted for dark ground.'],
-                ['--mc-wash',      'Ground of the negative block. Never used without a rule.'],
-            ],
-            'Deep' => [
-                ['--mc-deep',      'Footer, fixed bottom bar, photo viewer. Green-black, not navy.'],
-                ['--mc-deep-2',    'Elevation inside the dark zone.'],
-                ['--mc-on-deep',   'Text on deep.'],
-                ['--mc-on-deep-2', 'Secondary text on deep.'],
+            'Borders' => [
+                ['--mc-hairline', 'Decorative: list separators.'],
+                ['--mc-rule',     'Structural: card edge, section divider.'],
+                ['--mc-control',  'Inputs, outline buttons, checkboxes. Must clear 3:1 on every ground.'],
             ],
             'State' => [
-                ['--mc-ok',   'It does have it. A validated field.'],
-                ['--mc-note', 'Indicative, estimated. Never a warning.'],
+                ['--mc-ok',   'Confirmation only — message sent. Not "available"; see the colour-vision note.'],
+                ['--mc-warn', 'Indicative: "precio orientativo", "km aprox."'],
             ],
         ];
 
@@ -92,16 +103,14 @@ class BrandbookController extends Controller
             foreach ($rows as $i => [$var, $why]) {
                 $hex = $t[$var] ?? '#000000';
                 // Pick the label colour by measured contrast, not by a luminance
-                // guess. A mid-tone swatch (#868074, #E0724F) fails against both
-                // ink and paper under a naive threshold; this picks the better of
-                // the two and the swatch stays readable.
-                $onInk   = $this->ratio($hex, $t['--mc-ink'] ?? '#16181A');
-                $onPaper = $this->ratio($hex, $t['--mc-paper'] ?? '#F4F1E9');
+                // guess: a mid-tone swatch fails against both under a naive threshold.
+                $onInk   = $this->ratio($hex, $t['--mc-ink'] ?? '#111C2E');
+                $onPaper = $this->ratio($hex, '#FFFFFF');
                 $groups[$name][$i] = [
                     'var'   => $var,
                     'hex'   => strtoupper($hex),
                     'why'   => $why,
-                    'label' => $onPaper >= $onInk ? 'var(--mc-paper)' : 'var(--mc-ink)',
+                    'label' => $onPaper >= $onInk ? '#FFFFFF' : ($t['--mc-ink'] ?? '#111C2E'),
                 ];
             }
         }
@@ -145,25 +154,55 @@ class BrandbookController extends Controller
      */
     private function contrastTable(array $t): array
     {
+        // Every pair the UI actually renders, plus the pairs that are forbidden —
+        // computed so the prohibition is evidenced rather than asserted.
         $pairs = [
-            ['--mc-ink',        '--mc-paper',  'text',    'Body text on paper'],
-            ['--mc-ink-2',      '--mc-paper',  'text',    'Long prose on paper'],
-            ['--mc-ink-3',      '--mc-paper',  'text',    'Labels and meta on paper'],
-            ['--mc-ink',        '--mc-paper-2','text',    'Text on a raised surface'],
-            ['--mc-ink',        '--mc-paper-3','text',    'Text on an alternating band'],
-            ['--mc-signal',     '--mc-paper',  'text',    'Signal as text on paper'],
-            ['--mc-signal',     '--mc-paper',  'graphic', 'Signal as a 3px rule or fill'],
-            ['--mc-signal',     '--mc-wash',   'text',    'Signal on the negative wash'],
-            ['--mc-ink',        '--mc-wash',   'text',    'Negative body text'],
-            ['--mc-ok',         '--mc-paper',  'text',    'Confirmed state'],
-            ['--mc-note',       '--mc-paper',  'text',    'Indicative state'],
-            ['--mc-rule-3',     '--mc-paper',  'graphic', 'Input border on paper'],
-            ['--mc-rule-2',     '--mc-paper',  'none',    'Structural rule — decorative, exempt'],
-            ['--mc-rule',       '--mc-paper',  'none',    'Hairline — decorative, exempt'],
-            ['--mc-on-deep',    '--mc-deep',   'text',    'Footer text on deep'],
-            ['--mc-on-deep-2',  '--mc-deep',   'text',    'Footer secondary on deep'],
-            ['--mc-signal-up',  '--mc-deep',   'text',    'Signal on deep'],
-            ['--mc-on-deep',    '--mc-deep-2', 'text',    'Text on raised deep'],
+            // text on light
+            ['--mc-ink',        '--mc-bg',        'text',    'Body text on the page'],
+            ['--mc-ink',        '--mc-surface',   'text',    'Text on a card'],
+            ['--mc-ink',        '--mc-band',      'text',    'Text on an alternating band'],
+            ['--mc-ink-2',      '--mc-bg',        'text',    'Labels and metadata'],
+            ['--mc-ink-3',      '--mc-band',      'text',    'Lightest permitted text, worst case'],
+            // blue
+            ['--mc-blue',       '--mc-surface',   'text',    'Link on a card'],
+            ['--mc-blue',       '--mc-band',      'text',    'Link on a band'],
+            ['--mc-blue',       '--mc-blue-tint', 'text',    'Link on the blue wash'],
+            ['--mc-blue',       '--mc-blue-100',  'text',    'Text on a blue chip'],
+            ['--mc-blue-dark',  '--mc-bg',        'text',    'Large heading in blue'],
+            ['--mc-blue',       '--mc-surface',   'graphic', 'Blue 3px rule or button edge'],
+            ['--mc-surface',    '--mc-blue',      'text',    'White label on the blue button'],
+            ['--mc-surface',    '--mc-blue-dark', 'text',    'White label, button pressed'],
+            // accent
+            ['--mc-accent',     '--mc-surface',   'text',    'Price on a card'],
+            ['--mc-accent',     '--mc-band',      'text',    'Price on a band, worst case'],
+            ['--mc-accent',     '--mc-accent-tint','text',   'Price on its own chip'],
+            ['--mc-surface',    '--mc-accent',    'text',    'White label on the contact button'],
+            ['--mc-surface',    '--mc-accent-dark','text',   'White label, button pressed'],
+            ['--mc-accent',     '--mc-surface',   'graphic', 'Accent 3px rule or button edge'],
+            // borders
+            ['--mc-control',    '--mc-bg',        'graphic', 'Input border on the page'],
+            ['--mc-control',    '--mc-band',      'graphic', 'Input border on a band, worst case'],
+            ['--mc-control',    '--mc-navy',      'graphic', 'Input border on navy'],
+            ['--mc-rule',       '--mc-surface',   'none',    'Card edge — decorative, exempt'],
+            ['--mc-hairline',   '--mc-bg',        'none',    'List separator — decorative, exempt'],
+            // navy
+            ['--mc-on-navy',    '--mc-navy',      'text',    'Footer text'],
+            ['--mc-on-navy-2',  '--mc-navy',      'text',    'Footer secondary text'],
+            ['--mc-blue-light', '--mc-navy',      'text',    'Link on navy'],
+            // focus
+            ['--mc-focus-inner','--mc-blue',      'graphic', 'Focus: white inner ring on the blue fill'],
+            ['--mc-focus',      '--mc-focus-inner','graphic','Focus: ink outer ring on the white inner ring'],
+            // state
+            ['--mc-ok',         '--mc-surface',   'text',    'Confirmation text'],
+            ['--mc-warn',       '--mc-surface',   'text',    'Indicative text'],
+        ];
+
+        $forbidden = [
+            ['--mc-blue',       '--mc-navy',    'Primary blue on navy',            '--mc-blue-light on navy'],
+            ['--mc-blue-dark',  '--mc-navy',    'Dark blue on navy',               '--mc-on-navy'],
+            ['--mc-blue-light', '--mc-surface', 'Light blue on any light surface', '--mc-blue'],
+            ['--mc-accent',     '--mc-navy',    'Accent button on navy, unringed', 'ring it in white, or use a white fill with an accent-dark label'],
+            ['--mc-ink-3',      '--mc-navy',    'Lightest ink on navy',            '--mc-on-navy-2'],
         ];
 
         $thresholds = ['text' => 4.5, 'graphic' => 3.0, 'none' => 0.0];
@@ -182,7 +221,17 @@ class BrandbookController extends Controller
             ];
         }
 
-        return $rows;
+        $bad = [];
+        foreach ($forbidden as [$fg, $bg, $use, $instead]) {
+            $bad[] = [
+                'fgHex'   => strtoupper($t[$fg] ?? ''), 'bgHex' => strtoupper($t[$bg] ?? ''),
+                'use'     => $use,
+                'ratio'   => $this->ratio($t[$fg] ?? '#000', $t[$bg] ?? '#fff'),
+                'instead' => $instead,
+            ];
+        }
+
+        return ['rows' => $rows, 'forbidden' => $bad];
     }
 
     /* ------------------------------------------------------------------ type */
@@ -308,6 +357,43 @@ class BrandbookController extends Controller
         $rows['worst'] = round($rows['worst'] * 100, 1);
 
         return $rows;
+    }
+
+    /**
+     * The quote-length distribution decides the clamp. Measured live, because a
+     * layout tuned for 400-character quotes is wrong if the median is 194.
+     */
+    private function quoteStats(): array
+    {
+        $lens = Testimonial::where('is_active', true)
+            ->pluck('quote')
+            ->map(fn ($q) => mb_strlen(trim((string) $q)))
+            ->filter(fn ($n) => $n > 2)      // one row holds a single comma
+            ->sort()->values()->all();
+
+        $n = count($lens);
+        if ($n === 0) {
+            return ['n' => 0];
+        }
+
+        $pct = fn ($q) => $lens[max(0, min($n - 1, (int) floor($q * ($n - 1))))];
+        $buckets = ['0-80' => 0, '81-160' => 0, '161-280' => 0, '281-450' => 0, '450+' => 0];
+        foreach ($lens as $l) {
+            $key = $l <= 80 ? '0-80' : ($l <= 160 ? '81-160' : ($l <= 280 ? '161-280' : ($l <= 450 ? '281-450' : '450+')));
+            $buckets[$key]++;
+        }
+
+        // How many quotes a given character cap shows in full.
+        $caps = [];
+        foreach ([160, 200, 250, 300, 350, 500] as $c) {
+            $caps[$c] = round(count(array_filter($lens, fn ($l) => $l <= $c)) / $n * 100);
+        }
+
+        return [
+            'n' => $n, 'min' => $lens[0], 'max' => $lens[$n - 1],
+            'p10' => $pct(.10), 'median' => $pct(.50), 'p90' => $pct(.90),
+            'buckets' => $buckets, 'caps' => $caps,
+        ];
     }
 
     private function inventory(): array
