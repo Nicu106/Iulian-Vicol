@@ -1188,10 +1188,12 @@
       <p class="bb-display" style="margin-top:var(--s-4);color:var(--mc-accent)">24.800 €</p>
     </div>
     <div>
-      <h3>Source Serif — your voice</h3>
-      <p class="bb-small">Car descriptions, customer comments, captions. Chosen for a large
-      x-height and thick strokes, which is what decides whether it can be read at 17px on a
-      cheap screen in sunlight.</p>
+      <h3>Source Serif — the customer's voice only</h3>
+      <p class="bb-small">One place, and nowhere else: the customer's own words in the wall.
+      An earlier draft set all the site's prose in it, and that is a large part of what read
+      as old-school — the reference uses one sans throughout. It stays on the quotes because
+      a different voice for a different speaker is honest, and because its large x-height
+      and thick strokes are what let 14px be read on a cheap screen in sunlight.</p>
       <p class="bb-prose" style="margin-top:var(--s-4);font-style:italic">Compramos el coche
       para nuestra hija. Nos gustó el estado impecable y el historial claro.</p>
     </div>
