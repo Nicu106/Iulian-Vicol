@@ -1,0 +1,7 @@
+Contact: jvmotorclass@gmail.com
+Expires: 2026-09-29T23:59:59.000Z
+Encryption: https://pgp.mit.edu/pks/lookup?op=get&search=0x1234567890ABCDEF
+Acknowledgments: https://motorclass.com/security/acknowledgments
+Preferred-Languages: es, en
+Canonical: https://motorclass.com/.well-known/security.txt
+Policy: https://motorclass.com/security/policy

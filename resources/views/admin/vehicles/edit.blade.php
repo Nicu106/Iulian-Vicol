@@ -359,7 +359,7 @@
               </div>
               <div class="col-md-6">
                 <label class="form-label">Ubicación</label>
-                <input class="form-control" name="location" placeholder="Santander, Cantabria" value="{{ old('location', $vehicle['location']) }}">
+                <input class="form-control" name="location" placeholder="Málaga" value="{{ old('location', $vehicle['location']) }}">
               </div>
               <div class="col-12">
                 <label class="form-label">Descripción META (SEO)</label>

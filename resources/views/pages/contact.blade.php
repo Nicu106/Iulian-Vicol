@@ -29,7 +29,7 @@
                   </div>
                   <div>
                     <h6 class="mb-1">Teléfono</h6>
-                    <a href="tel:614753187" class="text-decoration-none text-primary fw-semibold">614 753 187</a>
+                    <a href="tel:+34614753187" class="text-decoration-none text-primary fw-semibold">+34 614 753 187</a>
                   </div>
                 </div>
                 <div class="d-flex align-items-center mb-3">
@@ -56,7 +56,7 @@
                   </div>
                   <div>
                     <h6 class="mb-1">Dirección</h6>
-                    <p class="text-secondary mb-0">Centro Comercial El Alisal<br/>Santander, España</p>
+                    <p class="text-secondary mb-0">Málaga, España</p>
                   </div>
                 </div>
               </div>
@@ -89,13 +89,13 @@
               <div class="card-body p-4 text-center">
                 <h6 class="mb-3">Acciones rápidas</h6>
                 <div class="d-grid gap-2">
-                  <a href="tel:+40123456789" class="btn btn-primary">
+                  <a href="tel:+34614753187" class="btn btn-primary">
                     <i class="bi bi-telephone me-2"></i>Llama ahora
                   </a>
                   <a href="{{ route('catalog') }}" class="btn btn-outline-primary">
                     <i class="bi bi-grid-3x3-gap me-2"></i>Ver catálogo
                   </a>
-                  <a href="https://wa.me/40123456789?text=Salut!%20Sunt%20interesat%20de%20vehiculele%20dumneavoastră." target="_blank" class="btn btn-outline-success">
+                  <a href="https://wa.me/34614753187?text=%C2%A1Hola!%20Estoy%20interesado%20en%20sus%20veh%C3%ADculos." target="_blank" class="btn btn-outline-success">
                     <i class="bi bi-whatsapp me-2"></i>WhatsApp
                   </a>
                 </div>

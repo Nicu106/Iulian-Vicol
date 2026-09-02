@@ -23,6 +23,8 @@ Route::get('/vehicles/{slug}', [App\Http\Controllers\VehicleController::class, '
 Route::post('/inquiries', [App\Http\Controllers\InquiryController::class, 'store'])->name('inquiries.store');
 
 // Pagina mașini salvate (doar frontend, fără backend)
+Route::get('/brandbook', [App\Http\Controllers\BrandbookController::class, 'index'])->name('brandbook');
+
 Route::view('/saved-vehicles', 'pages.saved-vehicles')->name('saved-vehicles');
 
 Route::get('/dashboard', function () {

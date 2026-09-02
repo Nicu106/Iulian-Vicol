@@ -1,0 +1,30 @@
+# MOTORCLASS - Concesionario de Coches Premium
+
+/* TEAM */
+Desarrollador: MOTORCLASS Team
+Contacto: jvmotorclass@gmail.com
+Teléfono: +34 614 753 187
+Ubicación: Málaga, España
+
+/* SITE */
+Última actualización: 2025-09-29
+Lenguaje: Español
+Tecnología: Laravel, PHP, MySQL, Bootstrap
+Servidor: Ubuntu 24.04.3 LTS
+
+/* SERVICIOS */
+- Venta de coches premium
+- Financiación rápida
+- Garantía extendida
+- Test drive
+- Consultoría personalizada
+
+/* HORARIOS */
+Abierto cada día
+Consultar disponibilidad
+
+/* CONTACTO */
+Email: jvmotorclass@gmail.com
+Teléfono: +34 614 753 187
+WhatsApp: +34 614 753 187
+Dirección: Málaga, España

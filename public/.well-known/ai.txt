@@ -1,0 +1,47 @@
+# MOTORCLASS - AI Crawler Information
+
+## Site Information
+Name: MOTORCLASS
+Type: Car Dealership
+Location: Málaga, España
+Language: Spanish
+Last Updated: 2025-09-29
+
+## Business Information
+Business Name: MOTORCLASS
+Business Type: Auto Dealer
+Industry: Automotive
+Services: Car Sales, Financing, Extended Warranty, Test Drive, Consultation
+
+## Contact Information
+Phone: +34 614 753 187
+Email: jvmotorclass@gmail.com
+WhatsApp: +34 614 753 187
+Address: Málaga, España
+
+## Operating Hours
+Schedule: Abierto cada día
+Availability: Consultar disponibilidad
+
+## Key Features
+- Premium car dealership
+- Fast financing approval
+- Extended warranty options
+- Test drive service
+- Personalized consultation
+- Quality vehicles
+- Professional service
+
+## Target Audience
+- Car buyers in Málaga, España
+- People looking for premium vehicles
+- Customers needing financing
+- Those seeking reliable car dealership
+
+## Content Categories
+- Vehicle listings
+- Car specifications
+- Pricing information
+- Financing options
+- Contact forms
+- Business information

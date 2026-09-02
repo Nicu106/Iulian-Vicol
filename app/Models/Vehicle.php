@@ -117,6 +117,46 @@ class Vehicle extends Model
         return $this->status === 'available';
     }
 
+
+    /** Primera imagen utilizable del vehículo (portada o primera de la galería). */
+    public function getPrimaryImageAttribute(): ?string
+    {
+        if (!empty($this->cover_image)) {
+            return $this->cover_image;
+        }
+        $gallery = $this->gallery_images;
+        if (is_string($gallery)) {
+            $gallery = json_decode($gallery, true);
+        }
+        return is_array($gallery) && count($gallery) ? $gallery[0] : null;
+    }
+
+    /** URL redimensionada para una imagen local; devuelve la original si es remota. */
+    public function thumbUrl(int $w = 600): ?string
+    {
+        $img = $this->primary_image;
+        if (!is_string($img) || $img === '') {
+            return null;
+        }
+        if (str_starts_with($img, '/storage/')) {
+            return route('img.resize', ['w' => $w]).'?p='.urlencode($img);
+        }
+        return $img;
+    }
+
+    /** srcset para tarjetas: 3 anchos del pipeline de imágenes. */
+    public function thumbSrcset(array $widths = [400, 600, 900]): ?string
+    {
+        $img = $this->primary_image;
+        if (!is_string($img) || !str_starts_with($img, '/storage/')) {
+            return null;
+        }
+        return implode(', ', array_map(
+            fn ($w) => route('img.resize', ['w' => $w]).'?p='.urlencode($img)." {$w}w",
+            $widths
+        ));
+    }
+
     // Helper methods
     public function incrementViews(): void
     {

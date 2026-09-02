@@ -13,12 +13,13 @@
 @endphp
 
 @section('content')
-<section class="py-5 bg-light catalog-page">
-  <!-- Hero Banner -->
-  <div class="catalog-hero text-light mb-4" data-anim="reveal">
-    <div class="container py-5">
-      <h1 class="display-6 fw-bold mb-2">Catálogo de Vehículos</h1>
-      <p class="lead mb-0 text-light-emphasis">Descubre nuestra selección premium – verificada técnicamente, historial claro y garantía.</p>
+<section class="catalog-page pb-5">
+  <!-- Cabecera de página -->
+  <div class="v2-pagehead mb-4">
+    <div class="container">
+      <nav aria-label="Ruta" class="v2-crumbs"><a href="{{ url('/') }}">Inicio</a> <span>›</span> Coches</nav>
+      <h1>{{ request('status') === 'sold' ? 'Coches vendidos' : 'Coches disponibles' }}</h1>
+      <p class="v2-lead mb-0">Todos revisados uno a uno: historial comprobado, mecánica al día y garantía.</p>
     </div>
   </div>
   <div class="container">
@@ -34,7 +35,7 @@
       </form>
     </div>
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h1 class="h3 mb-0">Catálogo de Vehículos</h1>
+      <div></div>
       <form class="d-none d-lg-flex" method="get" role="search" aria-label="Búsqueda rápida">
         <input type="text" class="form-control me-2" name="q" placeholder="Buscar marca, modelo..." value="{{ request('q') }}" />
         <button class="btn btn-outline-primary">Buscar</button>
@@ -298,110 +299,8 @@
 
           <div class="row g-4">
             @foreach($vehicles as $vehicle)
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-              <div class="card h-100 shadow-sm vehicle-card position-relative" data-href="{{ route('vehicle.show', $vehicle->slug) }}">
-                @php
-                  $vehicleImage = null;
-                  if (!empty($vehicle->cover_image)) {
-                    $vehicleImage = $vehicle->cover_image;
-                  } elseif (!empty($vehicle->images)) {
-                    $images = is_string($vehicle->images) ? json_decode($vehicle->images, true) : $vehicle->images;
-                    if (is_array($images) && count($images) > 0) {
-                      $vehicleImage = Storage::url($images[0]);
-                    }
-                  }
-                  // Build a resized thumbnail for local storage images to improve performance
-                  $thumbSrc = $vehicleImage;
-                  if (is_string($vehicleImage) && preg_match('/^\/storage\//', $vehicleImage) === 1) {
-                    try { $thumbSrc = route('img.resize', ['w' => 480]) . '?p=' . urlencode($vehicleImage); } catch (\Throwable $e) { /* ignore */ }
-                  }
-                @endphp
-                
-                @if($vehicleImage)
-                  <a href="{{ route('vehicle.show', $vehicle->slug) }}" class="d-block">
-                    @php
-                      $isLocal = is_string($vehicleImage) && preg_match('/^\\/storage\\//', $vehicleImage) === 1;
-                      $srcset = null;
-                      $sizes = '(min-width: 1200px) 25vw, (min-width: 768px) 33vw, 50vw';
-                      if ($isLocal) {
-                        try {
-                          $src240 = route('img.resize', ['w' => 240]) . '?p=' . urlencode($vehicleImage);
-                          $src480 = route('img.resize', ['w' => 480]) . '?p=' . urlencode($vehicleImage);
-                          $src800 = route('img.resize', ['w' => 800]) . '?p=' . urlencode($vehicleImage);
-                          $srcset = $src240 . ' 240w, ' . $src480 . ' 480w, ' . $src800 . ' 800w';
-                        } catch (\Throwable $e) { /* ignore */ }
-                      }
-                    @endphp
-                    <img 
-                      src="{{ $thumbSrc }}" 
-                      @if($srcset) srcset="{{ $srcset }}" sizes="{{ $sizes }}" @endif
-                      class="card-img-top" 
-                      alt="{{ $vehicle->title ?? ($vehicle->brand . ' ' . $vehicle->model . ' ' . $vehicle->year) }}" 
-                      decoding="async"
-                      @if($loop->first) fetchpriority="high" loading="eager" @else loading="lazy" @endif
-                      width="320" height="200"
-                      style="height: 200px; object-fit: cover;"
-                      onerror="this.src='https://via.placeholder.com/480x320/f8f9fa/6c757d?text=Sin+imagen'"
-                    />
-                  </a>
-                @else
-                  <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 200px;">
-                    <i class="bi bi-car-front text-muted" style="font-size: 3rem;"></i>
-                  </div>
-                @endif
-                
-                <div class="card-body d-flex flex-column">
-                  @if($vehicle->featured)
-                    <div class="mb-1">
-                      <span class="badge bg-warning text-dark">
-                        <i class="bi bi-star-fill"></i> Recomendado
-                      </span>
-                    </div>
-                  @endif
-                  
-                  <h6 class="card-title mb-1">
-                    <a href="{{ route('vehicle.show', $vehicle->slug) }}" class="text-decoration-none text-dark">
-                      {{ $vehicle->title ?? ($vehicle->brand . ' ' . $vehicle->model . ' ' . $vehicle->year) }}
-                    </a>
-                  </h6>
-                  
-                  <div class="small text-secondary mb-2">
-                    {{ $vehicle->fuel ?? $vehicle->fuel_type }} • {{ $vehicle->mileage ? number_format($vehicle->mileage) : 'N/A' }} km • {{ $vehicle->transmission }}
-                  </div>
-                  
-                  @if(!empty($vehicle->badges))
-                    <div class="mb-2">
-                      @foreach($vehicle->badges as $badge)
-                        <span class="badge bg-secondary me-1 small">{{ $badge }}</span>
-                      @endforeach
-                    </div>
-                  @endif
-                  
-                  <div class="mt-auto d-flex justify-content-between align-items-center">
-                    <div>
-                      @if($vehicle->has_offer && $vehicle->offer_price)
-                        <div class="small text-decoration-line-through text-muted">€ {{ number_format($extractPrice($vehicle->price)) }}</div>
-                        <span class="fw-bold text-danger">€ {{ number_format($extractPrice($vehicle->offer_price)) }}</span>
-                      @else
-                        <span class="fw-bold text-primary">€ {{ number_format($extractPrice($vehicle->price)) }}</span>
-                      @endif
-                    </div>
-                    <div class="d-flex gap-1">
-                      <button type="button" class="btn btn-sm btn-outline-primary save-vehicle-btn position-relative" style="z-index:2;"
-                              data-vehicle-id="{{ $vehicle->id }}" 
-                              data-vehicle-title="{{ $vehicle->title ?? ($vehicle->brand . ' ' . $vehicle->model . ' ' . $vehicle->year) }}"
-                              data-vehicle-slug="{{ $vehicle->slug }}"
-                              data-vehicle-price="{{ $vehicle->has_offer && $vehicle->offer_price ? $vehicle->offer_price : $vehicle->price }}"
-                              data-vehicle-image="{{ $vehicleImage ?? '' }}"
-                              title="Guardar coche">
-                        <i class="bi bi-bookmark-heart"></i>
-                      </button>
-                      <a href="{{ url('/vehicles/' . $vehicle->slug) }}" class="btn btn-sm btn-primary">Detalles</a>
-                    </div>
-                    <a href="{{ route('vehicle.show', $vehicle->slug) }}" class="stretched-link" aria-label="Ver detalles"></a>
-                  </div>
-                </div>
-              </div>
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-3 d-flex">
+              <x-v2-vehicle-card :vehicle="$vehicle" />
             </div>
             @endforeach
           </div>

@@ -31,7 +31,8 @@ class ImageController extends Controller
             @mkdir($cacheDir, 0755, true);
         }
 
-        $hash = md5($w . '|' . $relative . '|' . filemtime($sourceFsPath));
+        // 'v2' rompe la cache anterior: los thumbnails ya generados salieron girados
+        $hash = md5('v2|' . $w . '|' . $relative . '|' . filemtime($sourceFsPath));
         $canWebp = function_exists('imagewebp');
         $ext = $canWebp ? 'webp' : 'jpg';
         $cachePath = $cacheDir . '/img_' . $hash . '.' . $ext;
@@ -41,12 +42,17 @@ class ImageController extends Controller
             if (!$img) {
                 return response('Unsupported', 415);
             }
-            $srcW = imagesx($img);
+            // GD no aplica la etiqueta EXIF; los navegadores sí. Sin esto, el 9,8% de
+            // las fotos (182 de 1.859) se sirven giradas y con la proporción transpuesta.
+            $img = $this->applyExifOrientation($img, $sourceFsPath);
+            $srcW = imagesx($img);   // ya orientada
             $srcH = imagesy($img);
             $ratio = min($w / $srcW, 1.0);
             $targetW = (int) max(1, round($srcW * $ratio));
             $targetH = (int) max(1, round($srcH * $ratio));
             $dst = imagecreatetruecolor($targetW, $targetH);
+            imagealphablending($dst, false);
+            imagesavealpha($dst, true);
             imagecopyresampled($dst, $img, 0, 0, 0, 0, $targetW, $targetH, $srcW, $srcH);
             if ($canWebp) {
                 imagewebp($dst, $cachePath, 82);
@@ -62,6 +68,36 @@ class ImageController extends Controller
             'Content-Type' => $mime,
             'Cache-Control' => 'public, max-age=31536000, immutable'
         ]);
+    }
+
+
+    /** Aplica la orientación EXIF, que GD ignora al decodificar. */
+    private function applyExifOrientation($img, string $path)
+    {
+        if (!function_exists('exif_read_data')) {
+            return $img;
+        }
+
+        $orientation = 1;
+        try {
+            $exif = @exif_read_data($path);
+            $orientation = (int) ($exif['Orientation'] ?? 1);
+        } catch (\Throwable $e) {
+            return $img;
+        }
+
+        $angle = [3 => 180, 6 => -90, 8 => 90][$orientation] ?? 0;
+        if ($angle === 0) {
+            return $img;
+        }
+
+        $rotated = @imagerotate($img, $angle, 0);
+        if (!$rotated) {
+            return $img;
+        }
+        imagedestroy($img);
+
+        return $rotated;
     }
 
     private function createImageFromFile(string $path)

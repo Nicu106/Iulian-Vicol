@@ -531,8 +531,8 @@
                 data-vehicle-image="{{ $vehicle->cover_image ?? '' }}">
           <i class="bi bi-bookmark-heart me-2"></i><span id="saveVehicleText">Guardar coche</span>
         </button>
-        <a href="tel:+40123456789" class="btn btn-primary btn-lg"><i class="bi bi-telephone me-2"></i>Llamar ahora</a>
-        <a href="https://wa.me/40123456789" class="btn btn-outline-success btn-lg"><i class="bi bi-whatsapp me-2"></i>WhatsApp</a>
+        <a href="tel:+34614753187" class="btn btn-primary btn-lg"><i class="bi bi-telephone me-2"></i>Llamar ahora</a>
+        <a href="https://wa.me/34614753187" class="btn btn-outline-success btn-lg"><i class="bi bi-whatsapp me-2"></i>WhatsApp</a>
         <a href="#testdrive" class="btn btn-outline-primary btn-lg"><i class="bi bi-calendar2-check me-2"></i>Programar prueba de manejo</a>
 
       </div>

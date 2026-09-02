@@ -1,0 +1,35 @@
+{
+  "name": "MOTORCLASS - Concesionario de Coches Premium",
+  "short_name": "MOTORCLASS",
+  "description": "Concesionario de coches premium en Málaga, España. Vehículos de calidad, financiación rápida, garantía extendida.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#dc3545",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/images/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["automotive", "business", "shopping"],
+  "lang": "es",
+  "dir": "ltr",
+  "scope": "/",
+  "id": "motorclass-app",
+  "screenshots": [
+    {
+      "src": "/images/screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
+}
