@@ -17,14 +17,15 @@
 @php
   $sections = [
     ['1','What we take from car-planet','ref'],
-    ['2','Elements — what it will look like','elements'],
-    ['3','The customer wall','wall'],
-    ['4','Colour','colour'],
-    ['5','Type','type'],
-    ['6','Mobile','mobile'],
-    ['7','Photographs','photos'],
-    ['8','Voice','voice'],
-    ['9','Sign-off sheet','signoff'],
+    ['2','The order of the page','order'],
+    ['3','Elements — what it will look like','elements'],
+    ['4','The customer wall','wall'],
+    ['5','Colour','colour'],
+    ['6','Type','type'],
+    ['7','Mobile','mobile'],
+    ['8','Photographs','photos'],
+    ['9','Voice','voice'],
+    ['10','Sign-off sheet','signoff'],
     ['A','Appendix — the contrast maths','contrast'],
     ['B','Appendix — space, motion, build order','appendix'],
   ];
@@ -144,10 +145,234 @@
   </div>
 </section>
 
+
+{{-- ═══════════════════════════════════════════════ 2 ORDER ══ --}}
+<section class="bb-section" id="order">
+  <div class="bb-head">
+    <span class="bb-num bb-label">02</span>
+    <h2>The order of the page</h2>
+  </div>
+
+  <p class="bb-prose">
+    Which section comes first is not a matter of taste, and it is not something I should
+    decide on my own. Below is the order the published research supports, with the source
+    for each position. Where the research does not settle it, it says so and the decision
+    comes to you.
+  </p>
+
+  <div class="bb-note" style="border-left-color:var(--mc-accent)">
+    <h3>What your site does today, measured on your live pages</h3>
+    <p>Measured 2 September 2026 with a real browser at 390&nbsp;×&nbsp;759px — a normal
+      phone.</p>
+    <div class="bb-scroll">
+    <table class="bb-t" style="min-width:0">
+      <tbody>
+        <tr><td>The hero occupies</td><td class="bb-num-cell"><b>701px of 785</b> — 89% of the screen</td></tr>
+        <tr><td>First photo of a real car</td><td class="bb-num-cell"><b>3.1 screens down</b></td></tr>
+        <tr><td>Customer testimonials</td><td class="bb-num-cell"><b>6.2 screens down</b></td></tr>
+        <tr><td>Whole page</td><td class="bb-num-cell">9,048px — about 11.5 screens</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p style="margin-bottom:0">Nothing but the hero is visible on the first screen. And what
+      is on it is a <b>stock photograph of a car that is not yours</b>, the sentence
+      <em>Tu coche perfecto te espera</em>, a search box for nine cars, and a badge
+      reading <em>Garantía</em>. Eye-tracking puts <b>57% of viewing time above the fold
+      and 74% within the first two screens</b> — so your strongest asset, 25 photographed
+      customers, sits almost entirely outside where people look.</p>
+  </div>
+
+  <h3 style="margin:var(--s-7) 0 var(--s-4)">Home page — the recommended order</h3>
+  <div class="bb-scroll">
+  <table class="bb-t">
+    <thead><tr><th style="width:3ch">#</th><th style="width:22ch">Section</th><th>Why it sits here</th><th style="width:20ch">Evidence</th></tr></thead>
+    <tbody>
+      <tr><td class="bb-num-cell">1</td><td><b>Header: name, Málaga, phone, WhatsApp</b></td>
+        <td>Contact details are the highest-scoring credibility signal measured for an unknown seller. A physical address scored 1.86 and a phone number 1.71 on a −3…+3 scale — against 0.69 for photos of your own people.</td>
+        <td>Fogg et al., CHI 2001, n=1,410 <span class="bb-st bb-st--fixed">Fixed</span></td></tr>
+      <tr><td class="bb-num-cell">2</td><td><b>A short hero</b></td>
+        <td>Short enough that the first row of cars breaks the fold. A full-screen hero creates a "false floor" — people believe they have seen the page and leave.</td>
+        <td>NN/g eye-tracking, 120 participants, 130,000+ fixations <span class="bb-st bb-st--prop">Proposed</span></td></tr>
+      <tr><td class="bb-num-cell">3</td><td><b>The nine cars</b></td>
+        <td>Finding actual vehicles for sale is the second most common thing car buyers do online, at 68%. For a nine-car dealer the cars <em>are</em> the offer. All nine load at once — pagination on this many is pure friction.</td>
+        <td>Autotrader/Cox 2016, n=2,131 <span class="bb-st bb-st--fixed">Fixed</span></td></tr>
+      <tr><td class="bb-num-cell">4</td><td><b>The customer wall</b></td>
+        <td>After the cars, because it corroborates them rather than replacing them. Still inside the first two screens, where 74% of viewing time goes.</td>
+        <td>Spiegel, Northwestern 2017 <span class="bb-st bb-st--prop">Proposed</span></td></tr>
+      <tr><td class="bb-num-cell">5</td><td><b>Who you are</b></td>
+        <td>Name, face, where you are, how long you have been doing this. Below the wall because the testimonials give the biography its evidence.</td>
+        <td>Stanford credibility guidelines 2 &amp; 4 <span class="bb-st bb-st--prop">Proposed</span></td></tr>
+      <tr><td class="bb-num-cell">6</td><td><b>Cars delivered</b></td>
+        <td>Volume evidence. Genuinely optional here — it does the same job as the wall.</td>
+        <td>judgement call</td></tr>
+      <tr><td class="bb-num-cell">7</td><td><b>Contact</b></td>
+        <td>The ask comes after the proof: do not make a demand before the trust needs below it are met. This is the second contact point — the header serves people who arrive already convinced.</td>
+        <td>NN/g Hierarchy of Trust <span class="bb-st bb-st--prop">Proposed</span></td></tr>
+      <tr><td class="bb-num-cell">8</td><td><b>Footer</b></td>
+        <td>Used heavily as fallback navigation. Address, hours, legal identity.</td>
+        <td>NN/g, 70+ users, 100 sites</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="bb-dont" style="margin-top:var(--s-5)">
+    <h3>Cut the auto-rotating carousel <span class="bb-st bb-st--prop">Proposed</span></h3>
+    <ul>
+      <li>Across 28,928 recorded clicks, roughly <b>1% of visitors clicked a carousel at
+        all</b> — and 84% of those clicks landed on the first slide.</li>
+      <li>Anything on slide 2 or later is, in practice, not published.</li>
+    </ul>
+  </div>
+
+  <h3 style="margin:var(--s-7) 0 var(--s-4)">Vehicle page — where the money decision happens</h3>
+  <div class="bb-scroll">
+  <table class="bb-t">
+    <thead><tr><th style="width:3ch">#</th><th style="width:22ch">Section</th><th>Why it sits here</th><th style="width:20ch">Evidence</th></tr></thead>
+    <tbody>
+      <tr><td class="bb-num-cell">0</td><td><b>Fixed bar: WhatsApp + Call</b></td>
+        <td>Present from the first paint. 49% of phone use is one-handed and thumbs drive 75% of interactions; the bottom strip is the only reliably reachable zone. <b>Your site has no such bar today.</b></td>
+        <td>Hoober, 1,300+ people observed <span class="bb-st bb-st--fixed">Fixed</span></td></tr>
+      <tr><td class="bb-num-cell">1</td><td><b>Title — make, model, year</b></td>
+        <td>The "am I on the right car?" check. People scan headings first and the first two words carry the meaning.</td>
+        <td>NN/g F-pattern research</td></tr>
+      <tr><td class="bb-num-cell">2</td><td><b>Price and kilometres</b></td>
+        <td>Researching price is the <b>single most common thing car buyers do online — 71%</b>, ahead of finding the cars themselves. And in Spain specifically, <b>41% of used-car buyers name mileage as the decisive factor.</b> With stock at 108,000–184,000 km, stating it plainly reads as confidence; burying it reads as concealment.</td>
+        <td>Autotrader/Cox 2016 · GANVAM + DGT 2020, 700+ Spanish buyers <span class="bb-st bb-st--fixed">Fixed</span></td></tr>
+      <tr><td class="bb-num-cell">3</td><td><b>Photo gallery</b></td>
+        <td>Viewing car images is the top mobile action at 44%. But on a product page only 18% of viewing time goes to photos against 82% to text — photos earn attention, text carries the decision. So: facts first, then photos. <b>Put the odometer in the first three photos</b> — used-car buyers rank it the single most important image type, and almost nobody does it.</td>
+        <td>Google/Millward Brown 2013 · Cox, 521 consumers <span class="bb-st bb-st--prop">Proposed</span></td></tr>
+      <tr><td class="bb-num-cell">4</td><td><b>Key specs — six to eight</b></td>
+        <td>Short, headed chunks are the most effective way people scan.</td>
+        <td>NN/g layer-cake research</td></tr>
+      <tr><td class="bb-num-cell">5</td><td><b>Contact, inline</b></td>
+        <td>The first natural decision point. Your enquiry form currently sits at line 937 of 1,485 — below the description, the spec table, the equipment list and the tags.</td>
+        <td>Özpolat &amp; Jank 2015 <span class="bb-st bb-st--fixed">Fixed</span></td></tr>
+      <tr><td class="bb-num-cell">6</td><td><b>Your own description</b></td>
+        <td>Where a one-man dealer's voice does work no spec table can.</td>
+        <td>Baymard product-page benchmark</td></tr>
+      <tr><td class="bb-num-cell">7</td><td><b>Two or three testimonials</b></td>
+        <td>Next to the decision. A randomised field experiment across <b>250,000+ real transactions at 493 retailers</b> found trust signals work best for <em>small</em> sellers and <em>expensive</em> baskets — but in the <em>later</em> stages, not the early ones. <b>Your vehicle page has no social proof at all. This is the largest single omission on the page where the money decision is made.</b></td>
+        <td>Özpolat &amp; Jank, DSS 73 (2015) <span class="bb-st bb-st--fixed">Fixed</span></td></tr>
+      <tr><td class="bb-num-cell">8</td><td><b>Full spec table, folded</b></td>
+        <td>Collapse only the long tail, never the price strip. Reading comprehension on a phone measures about half the desktop level, so length has a real cost.</td>
+        <td>NN/g, n=50 <span class="bb-st bb-st--prop">Proposed</span></td></tr>
+      <tr><td class="bb-num-cell">9</td><td><b>Who you are + full contact</b></td>
+        <td>The form goes here, not higher — people do not want a form replacing a phone number.</td>
+        <td>NN/g contact-page research</td></tr>
+      <tr><td class="bb-num-cell">10</td><td><b>Other cars</b></td>
+        <td>After the ask. Placed above it, it invites the buyer to leave the car they were about to enquire about.</td>
+        <td>Baymard cross-sell research</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3 style="margin:var(--s-7) 0 var(--s-4)">Where the testimonials go — and an honest correction</h3>
+  <p class="bb-prose">
+    I told you earlier that your 25 photographs are your strongest asset because a
+    photograph cannot be faked the way a written review can. <b>The research does not
+    support that in the form I put it.</b> It is worth telling you before you repeat it to
+    anyone.
+  </p>
+
+  <div class="bb-two">
+    <div class="bb-dont">
+      <h3>What the evidence actually says about photographs</h3>
+      <ul>
+        <li>The most rigorous study in the set — <b>115 people, real money at stake, 12 real
+          shops</b> — found photographs of people had <b>no effect on trust</b>
+          (p&nbsp;=&nbsp;.99), and <em>reduced</em> people's ability to tell good sellers
+          from bad ones.</li>
+        <li>A famous finding that trustworthy-looking faces earn more on Airbnb
+          <b>failed a pre-registered replication with 1,020 participants.</b></li>
+        <li>In a study of 2,440 comments about what makes a website credible,
+          <b>testimonials never came up as a category at all.</b></li>
+        <li>People trust reviews on external sites <em>more</em> than the same reviews on
+          the company's own site.</li>
+      </ul>
+    </div>
+    <div class="bb-do">
+      <h3>What the evidence does support — strongly</h3>
+      <ul>
+        <li><b>A face captures the eye within about a third of a second.</b> In controlled
+          eye-tracking, a face was looked at in <b>92.6% of trials</b>, and on the very
+          first fixation 61% of the time. Faces pull attention <b>16.6× more</b> than
+          matched controls, and keep doing it even when people are told to look away.</li>
+        <li>So the photograph <b>buys the glance that gets the comment read.</b> Its value
+          is as an entry point and as verifiable identity — not as a trust mechanism on
+          its own.</li>
+        <li>Reviews raise conversion <b>+380% on expensive products against +190% on cheap
+          ones.</b> Your case for weighting social proof rests on the price of a car, not
+          on the photographs.</li>
+        <li>People read <b>the first few</b> testimonials, not all of them. Which ones
+          surface first is the real design lever — not how many there are.</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="bb-prose" style="margin-top:var(--s-5)">
+    So the placement splits into three, rather than being one block in one place:
+  </p>
+  <div class="bb-scroll">
+  <table class="bb-t">
+    <thead><tr><th style="width:22ch">Where</th><th>What</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td><b>High, in or under the hero</b></td><td>One line: <em>{{ $inventory['sold'] }} coches entregados · {{ $inventory['testimonials'] }} reseñas con foto · Málaga</em></td><td>Costs almost no vertical space, and sits where attention actually is. Keep it to one line — more than two trust signals measurably <em>lowers</em> completion.</td></tr>
+      <tr><td><b>Mid-page, home</b></td><td>The full wall of {{ $inventory['testimonials'] }}</td><td>High enough to fall inside the first two screens; low enough to corroborate the cars instead of preceding them.</td></tr>
+      <tr><td><b>Vehicle page, next to the contact block</b></td><td>Two or three</td><td>The placement the field-experiment data actually supports for an expensive purchase from a small seller. <b>Highest-value single change in this section.</b></td></tr>
+      <tr><td><b>A link out to Google</b></td><td>If you have a profile</td><td>External reviews are trusted more than on-site ones. Cheap to add, and it does work the wall cannot.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="bb-note" style="margin-top:var(--s-5)">
+    <p><b>One number worth knowing about the market you are in.</b> Buyers of used cars
+    from independent dealers report 56% satisfaction, against 65% from franchised dealers.
+    You start from a measurable trust deficit that a main dealer does not have — which is
+    the real argument for putting proof early and often, and for not claiming anything you
+    cannot show.</p>
+    <p style="margin-bottom:0">There is also an encouraging finding: in the Stanford study,
+    the third most credible site out of 100 tested was a company almost nobody had heard
+    of. It won on craft, clarity and contactability, not on brand. <b>Design quality was
+    cited in 46.1% of all credibility comments — nearly double the next factor.</b> That
+    is the one lever available to a nine-car dealer, and it is why this document exists.</p>
+  </div>
+
+  <h3 style="margin:var(--s-7) 0 var(--s-4)">Where the research does not decide</h3>
+  <p class="bb-prose">These are judgement calls, and I am flagging them as mine rather than
+  presenting them as findings.</p>
+  <div class="bb-scroll">
+  <table class="bb-t">
+    <thead><tr><th>Question</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>Testimonials high on the page or low</td><td><b>No study varies it.</b> Both positions are inferred from adjacent evidence. The three-way split above is a reconciliation, not a finding.</td></tr>
+      <tr><td>Photographs attached to testimonials versus text alone</td><td><b>No study found.</b> Any percentage lift claimed for testimonial headshots is unsupported.</td></tr>
+      <tr><td>Gallery before or after the price strip</td><td>Genuinely close. Price ranks #1 in buyer surveys; images rank #1 in mobile actions. I recommend facts first, but gallery-first is defensible.</td></tr>
+      <tr><td>Your biography before or after the wall</td><td>No evidence either way.</td></tr>
+      <tr><td>How tall a hero may be</td><td>The research says the fold matters; it gives no threshold. "Short enough that the first car row peeks" is a rule of thumb.</td></tr>
+      <tr><td>WhatsApp as a channel</td><td>Every figure found was marketing from companies selling WhatsApp integrations. This rests on your knowledge of your market, not on research.</td></tr>
+      <tr><td>Spain</td><td>Almost no public Spanish buyer-journey research exists. The mileage figure is the one solid Spain-specific input; everything else is American or Canadian and cultural transfer is assumed, not demonstrated.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="bb-note" style="margin-top:var(--s-5)">
+    <h3>What did not survive checking</h3>
+    <p>A widely-shared page of 29 conversion statistics was checked: <b>only three named a
+    study. The other 26 linked to other marketing blogs</b> with no method, no sample and
+    no date. Several famous numbers turned out to have no traceable source at all —
+    including the one most often used to argue that testimonials belong at the top of a
+    page, and a conversion figure attributed to a research institute that does not publish
+    it.</p>
+    <p style="margin-bottom:0">None of them are in this book. In a document you will show to
+    people, an invented citation is worse than no citation — and every claim above can be
+    checked.</p>
+  </div>
+</section>
+
 {{-- ════════════════════════════════════════════ 2 ELEMENTS ══ --}}
 <section class="bb-section" id="elements">
   <div class="bb-head">
-    <span class="bb-num bb-label">02</span>
+    <span class="bb-num bb-label">03</span>
     <h2>Elements — what it will look like</h2>
   </div>
   <p class="bb-prose">
@@ -588,7 +813,7 @@
 {{-- ════════════════════════════════════════════════ 3 WALL ══ --}}
 <section class="bb-section" id="wall">
   <div class="bb-head">
-    <span class="bb-num bb-label">03</span>
+    <span class="bb-num bb-label">04</span>
     <h2>The customer wall</h2>
   </div>
   <p class="bb-prose">
@@ -733,7 +958,7 @@
 {{-- ══════════════════════════════════════════════ 4 COLOUR ══ --}}
 <section class="bb-section" id="colour">
   <div class="bb-head">
-    <span class="bb-num bb-label">04</span>
+    <span class="bb-num bb-label">05</span>
     <h2>Colour</h2>
   </div>
   <p class="bb-prose">
@@ -812,7 +1037,7 @@
 {{-- ════════════════════════════════════════════════ 5 TYPE ══ --}}
 <section class="bb-section" id="type">
   <div class="bb-head">
-    <span class="bb-num bb-label">05</span>
+    <span class="bb-num bb-label">06</span>
     <h2>Type</h2>
   </div>
 
@@ -867,7 +1092,7 @@
 {{-- ══════════════════════════════════════════════ 6 MOBILE ══ --}}
 <section class="bb-section" id="mobile">
   <div class="bb-head">
-    <span class="bb-num bb-label">06</span>
+    <span class="bb-num bb-label">07</span>
     <h2>Mobile</h2>
   </div>
   <p class="bb-prose">
@@ -916,7 +1141,7 @@
 {{-- ══════════════════════════════════════════════ 7 PHOTOS ══ --}}
 <section class="bb-section" id="photos">
   <div class="bb-head">
-    <span class="bb-num bb-label">07</span>
+    <span class="bb-num bb-label">08</span>
     <h2>Photographs</h2>
   </div>
   <p class="bb-prose">
@@ -1006,7 +1231,7 @@
 {{-- ═══════════════════════════════════════════════ 8 VOICE ══ --}}
 <section class="bb-section" id="voice">
   <div class="bb-head">
-    <span class="bb-num bb-label">08</span>
+    <span class="bb-num bb-label">09</span>
     <h2>Voice</h2>
   </div>
   <p class="bb-prose">
@@ -1066,7 +1291,7 @@
 {{-- ═════════════════════════════════════════════ 9 SIGN-OFF ══ --}}
 <section class="bb-section" id="signoff">
   <div class="bb-head">
-    <span class="bb-num bb-label">09</span>
+    <span class="bb-num bb-label">10</span>
     <h2>Sign-off sheet</h2>
   </div>
   <p class="bb-prose">
