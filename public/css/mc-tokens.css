@@ -94,8 +94,11 @@
   --mc-bar-h:  64px;
 
   /* ---- TYPEFACES ----------------------------------------- */
-  --f-ui:    "Archivo","Archivo Fallback","Helvetica Neue",Arial,sans-serif;
-  --f-voice: "Source Serif 4","Serif Fallback",Georgia,"Times New Roman",serif;
+  /* DM Sans is what car-planet renders on 485 of 509 measured text nodes. Taken
+     on the owner's instruction to get as close as possible; one family, no serif,
+     exactly as they do. */
+  --f-ui:    "DM Sans","DM Sans Fallback","Helvetica Neue",Arial,sans-serif;
+  --f-voice: "DM Sans","DM Sans Fallback","Helvetica Neue",Arial,sans-serif;
 
   /* ---- TYPE SCALE — fluid 390px → 1200px, base 16px ------- */
   --t-display: clamp(2.125rem,1.60rem + 2.35vw,3.25rem);   /* 34 → 52 */
@@ -119,8 +122,7 @@
      photographs and bare text links, and it read as old-school. */
   --mc-r-s:    4px;      /* chips, badges, small tabs, spec rows */
   --mc-r:     10px;      /* buttons, inputs */
-  --mc-r-l:   16px;      /* cards, panels. car-planet is 22; 16 keeps the car's
-                            corners inside a 4/3 photo */
+  --mc-r-l:   22px;      /* cards, panels — car-planet's exact card radius (26/26) */
   --mc-r-pill: 999px;    /* icon discs only */
 
   /* ---- ELEVATION — shadow PLUS hairline, never instead of ----
@@ -177,7 +179,5 @@
 /* Metric-matched fallbacks: the page does not reflow when the webfont lands */
 @media (min-width:768px){ :root{ --mc-head-h:72px; } }
 
-@font-face{ font-family:"Archivo Fallback"; src:local("Arial"),local("Helvetica Neue");
-  size-adjust:97%; ascent-override:92%; descent-override:24%; line-gap-override:0%; }
-@font-face{ font-family:"Serif Fallback"; src:local("Georgia"),local("Times New Roman");
-  size-adjust:94%; ascent-override:95%; descent-override:27%; line-gap-override:0%; }
+@font-face{ font-family:"DM Sans Fallback"; src:local("Arial"),local("Helvetica Neue");
+  size-adjust:101%; ascent-override:96%; descent-override:27%; line-gap-override:0%; }

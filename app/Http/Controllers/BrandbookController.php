@@ -267,7 +267,7 @@ class BrandbookController extends Controller
             ['--t-value',   '17',      1.30, 600, '100%', '0',        'ui',    'A spec value in the data table.'],
             ['--t-small',   '14',      1.45, 400, '100%', '0',        'ui',    'Fine print that still has to be read.'],
             ['--t-label',   '13',      1.30, 500, '100%', '+0.010em', 'ui',    'Field label. The floor of the system.'],
-            ['--t-caption', '14',      1.45, 400, '—',    '0',        'voice', 'A customer\'s own words in the wall. The one place the serif survives.'],
+            ['--t-caption', '14',      1.45, 400, '100%', '0',        'voice', 'A customer\'s own words in the wall. Italic, same family.'],
         ];
     }
 

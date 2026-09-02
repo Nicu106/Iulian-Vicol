@@ -7,7 +7,7 @@
 <title>MOTORCLASS — Brandbook</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@88..100,400..700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400..500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&display=swap">
 <link rel="stylesheet" href="{{ asset('css/mc-tokens.css') }}">
 <link rel="stylesheet" href="{{ asset('css/brandbook.css') }}">
 <script>document.documentElement.className += ' js';</script>
@@ -134,7 +134,10 @@
     <tbody>
       <tr><td>Blue as ink and edges, not as fields</td><td><b>Yes</b> <span class="bb-st bb-st--fixed">Fixed</span></td><td>Measured on their site: 46 text uses to 2 fills. It is also what lets your photographs stay the loudest thing on the page.</td></tr>
       <tr><td>Navy footer</td><td><b>Yes</b> <span class="bb-st bb-st--prop">Proposed</span></td><td>It signals where the page ends. Ours is slightly lighter than theirs on purpose — see the colour section.</td></tr>
-      <tr><td>Soft corners, measured</td><td><b>Yes</b> <span class="bb-st bb-st--prop">Proposed</span></td><td>Their filled buttons are 10px in 100% of cases, cards 22px in 26 of 26, chips 4px. Only the photographs and bare text links are square. An earlier draft took "square" to every element, and it read as old-school — so this now follows their numbers: 4 / 10 / 16.</td></tr>
+      <tr><td>Their typeface</td><td><b>Yes</b> <span class="bb-st bb-st--prop">Proposed</span></td><td>DM Sans, which they render on 485 of 509 measured text nodes. One family, no serif. It is a free Google font, so nothing is copied that is theirs to own.</td></tr>
+      <tr><td>Soft corners, measured</td><td><b>Yes</b> <span class="bb-st bb-st--prop">Proposed</span></td><td>Their filled buttons are 10px in 100% of cases, cards 22px in 26 of 26, chips 4px. Only the photographs and bare text links are square. An earlier draft took "square" to every element, and it read as old-school — so this now follows their numbers exactly: 4 / 10 / 22.</td></tr>
+      <tr><td>The price in a pale box on the card</td><td><b>Yes</b> <span class="bb-st bb-st--prop">Proposed</span></td><td>Their card sets the price at 24px bold inside a tinted box. Same device, with the kilometres beside it.</td></tr>
+      <tr><td>Pale blue, everywhere it counts</td><td><b>Yes</b> <span class="bb-st bb-st--prop">Proposed</span></td><td>They paint pale blue 71 times against 48 saturated fills. Bands, spec rows and stages here lean blue, not grey.</td></tr>
       <tr><td>Clean header, grid of cars, long detail page, fixed bar on mobile</td><td><b>Yes</b> <span class="bb-st bb-st--fixed">Fixed</span></td><td>This is the structure you asked for, and it is the right one.</td></tr>
       <tr><td>A coral price</td><td><b>Yes, corrected</b> <span class="bb-st bb-st--prop">Proposed</span></td><td>Their coral fails legibility at 3.59:1 as 16px text. Ours keeps their hue at a lightness that passes — 4.72:1 on white — and uses it only on the price, which is always large.</td></tr>
       <tr><td>Filters, search and sort</td><td><b>Not yet</b> <span class="bb-st bb-st--you">Your call</span></td><td>They have thousands of cars. You have {{ $inventory['available'] }}. A filter panel over {{ $inventory['available'] }} cars advertises stock that isn't there. If you plan to hold 25+, we build it — say so and it goes in.</td></tr>
@@ -1181,19 +1184,18 @@
 
   <div class="bb-two">
     <div>
-      <h3>Archivo — everything structural</h3>
-      <p class="bb-small">Headings, buttons, labels, and every number. Square, evenly
-      spaced figures, which is what a price panel wants. Deliberately not the font
-      car-planet uses, and not the one on every other site.</p>
+      <h3>DM Sans — everything</h3>
+      <p class="bb-small">Headings, buttons, labels, prose, and every number. It is the
+      typeface car-planet renders on 485 of its 509 measured text nodes, taken deliberately
+      on your instruction to get as close to their register as possible. One family, no
+      serif — exactly as they do it.</p>
       <p class="bb-display" style="margin-top:var(--s-4);color:var(--mc-accent)">24.800 €</p>
     </div>
     <div>
-      <h3>Source Serif — the customer's voice only</h3>
-      <p class="bb-small">One place, and nowhere else: the customer's own words in the wall.
-      An earlier draft set all the site's prose in it, and that is a large part of what read
-      as old-school — the reference uses one sans throughout. It stays on the quotes because
-      a different voice for a different speaker is honest, and because its large x-height
-      and thick strokes are what let 14px be read on a cheap screen in sunlight.</p>
+      <h3>The customer's voice — italic, same family</h3>
+      <p class="bb-small">An earlier draft set the customer quotes in a serif. That was a
+      second typeface to load and a large part of what read as old-school. The quotes keep
+      a distinct voice with DM Sans italic instead — a different speaker, no second font.</p>
       <p class="bb-prose" style="margin-top:var(--s-4);font-style:italic">Compramos el coche
       para nuestra hija. Nos gustó el estado impecable y el historial claro.</p>
     </div>
