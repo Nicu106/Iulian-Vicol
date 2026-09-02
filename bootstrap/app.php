@@ -20,7 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Design-copy lockdown: serve the brandbook and nothing else while the
+        // rest of the site is unfinished. Toggle with BRANDBOOK_ONLY in .env.
+        $middleware->append(\App\Http\Middleware\BrandbookOnly::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

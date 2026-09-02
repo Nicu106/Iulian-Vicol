@@ -16,6 +16,12 @@ return [
     'name' => env('APP_NAME', 'Laravel'),
 
     /*
+    | When true this environment serves only /brandbook. Used to show the design
+    | copy to the client without exposing half-finished pages.
+    */
+    'brandbook_only' => env('BRANDBOOK_ONLY', false),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------
