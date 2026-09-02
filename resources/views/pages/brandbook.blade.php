@@ -31,6 +31,7 @@
   ];
   $fmt   = fn($n) => number_format($n);
   $euros = fn($n) => number_format($n, 0, ',', '.').' €';
+  $km    = fn($n) => number_format($n, 0, ',', '.').' km';   // Spanish, for everything that mimics the site
   $car   = $car ?? null;
   $carImg = $car?->thumbUrl(800);
 @endphp
@@ -54,7 +55,7 @@
       <div><span class="bb-label">Cars available</span><b>{{ $inventory['available'] }}</b></div>
       <div><span class="bb-label">Cars delivered</span><b>{{ $inventory['sold'] }}</b></div>
       <div><span class="bb-label">Customers photographed</span><b>{{ $inventory['testimonials'] }}</b></div>
-      <div><span class="bb-label">Elements to approve</span><b>21</b></div>
+      <div><span class="bb-label">Elements to approve</span><b>7</b></div>
       <div><span class="bb-label">Generated</span><b>{{ now()->format('d M Y H:i') }}</b></div>
     </div>
   </div>
@@ -369,249 +370,309 @@
   </div>
 </section>
 
-{{-- ════════════════════════════════════════════ 2 ELEMENTS ══ --}}
+{{-- ════════════════════════════════════════════ 3 ELEMENTS ══ --}}
 <section class="bb-section" id="elements">
   <div class="bb-head">
     <span class="bb-num bb-label">03</span>
     <h2>Elements — what it will look like</h2>
   </div>
+
+  @php
+    $cardFor = function ($v, $extra = '') use ($euros, $km) {
+      $img = $v?->thumbUrl(800);
+      ob_start(); ?>
+      <article class="mc-card <?= $extra ?>">
+        <a class="mc-card__link" href="#elements">
+          <div class="mc-frame mc-frame--card">
+            <?php if ($img): ?><img class="mc-img mc-img--vehicle" src="<?= $img ?>"
+              alt="<?= e($v->brand.' '.$v->model.' '.$v->year) ?>" width="800" height="600" loading="lazy" decoding="async"><?php endif; ?>
+          </div>
+          <div class="mc-card__body">
+            <h3 class="mc-card__title"><?= e($v?->brand.' '.$v?->model) ?></h3>
+            <div>
+              <div class="mc-pair">
+                <span class="mc-price"><?= $v ? $euros($v->price) : '—' ?></span>
+                <?php if ($v?->mileage): ?><span class="mc-km"><?= $km($v->mileage) ?></span>
+                <?php else: ?><span class="mc-km is-unknown">Km sin confirmar</span><?php endif; ?>
+              </div>
+              <span class="mc-pair-under" style="max-width:11rem"></span>
+            </div>
+            <ul class="mc-chips">
+              <li class="mc-chip"><?= e($v?->year) ?></li>
+              <li class="mc-chip"><?= e($v?->fuel) ?></li>
+              <li class="mc-chip"><?= e($v?->transmission) ?></li>
+            </ul>
+            <span class="mc-card__go">Ver el coche <span class="mc-card__arrow">&rarr;</span></span>
+          </div>
+        </a>
+      </article>
+      <?php return ob_get_clean();
+    };
+    $rowFor = function ($t) {
+      $rel = ltrim(preg_replace('#^/?storage/#', '', $t->image_path ?? ''), '/');
+      $src = $rel ? asset('storage/'.$rel) : null;
+      $fs  = $rel ? storage_path('app/public/'.$rel) : null;
+      $cls = '';
+      if ($fs && is_file($fs)) { $sz = @getimagesize($fs);
+        if ($sz && $sz[1]) { $rr = $sz[0]/$sz[1]; $cls = $rr < 0.62 ? 'is-tall' : ($rr > 1.05 ? 'is-wide' : ''); } }
+      $q = trim((string) $t->quote);
+      ob_start(); ?>
+      <article class="tt-row">
+        <div class="tt-photo <?= $cls ?>">
+          <?php if ($src): ?><img class="mc-img mc-img--portrait" src="<?= $src ?>" alt="<?= e($t->author_name) ?>" loading="lazy" decoding="async" width="400" height="500"><?php endif; ?>
+        </div>
+        <div class="tt-body">
+          <?php if (mb_strlen($q) > 2): ?><p class="tt-quote is-clamped"><?= e($q) ?></p><?php endif; ?>
+          <span class="tt-attr"><b><?= e(str_replace('&', ' y ', $t->author_name)) ?></b><?= $t->author_location ? ' · '.e($t->author_location) : '' ?></span>
+        </div>
+      </article>
+      <?php return ob_get_clean();
+    };
+    $goodQuotes = $sample->filter(fn($t) => mb_strlen(trim((string)$t->quote)) > 40)->values();
+  @endphp
+
   <p class="bb-prose">
-    Every piece of the site, at real size, in the real code. Not screenshots: if a colour
-    changes tomorrow, these change with it. Each one says <b>where it appears</b>, shows
-    every state side by side, and has a box to tick.
-  </p>
-  <p class="bb-small" style="color:var(--mc-ink-3)">
-    States are shown as separate frozen copies rather than on hover, because you are
-    probably reading this on a phone, where hover does not exist — and because a document
-    you can print is a document you can sign.
+    Two screens, assembled from the real pieces in the order §2 recommends, at the size of
+    a normal phone. The dashed line is the bottom of the first screen — on your current
+    site nothing but a stock photograph sits above it.
   </p>
 
-  {{-- ---------- EL-BTN-01 ---------- --}}
-  <article class="bb-el" id="EL-BTN-01">
-    <div class="bb-el__bar">
-      <span class="bb-el__id">EL-BTN-01</span>
-      <span class="bb-el__name">Botón principal</span>
-      <span class="bb-el__where">Home · catálogo · ficha de coche</span>
-    </div>
-    <div class="bb-el__stage"><a class="mc-btn" href="#EL-BTN-01">Ver los coches</a></div>
-    <div class="bb-el__states">
-      <div class="bb-state"><span class="bb-label">Normal</span><span class="mc-btn">Ver los coches</span></div>
-      <div class="bb-state"><span class="bb-label">Ratón encima</span><span class="mc-btn is-hover">Ver los coches</span></div>
-      <div class="bb-state"><span class="bb-label">Con el teclado</span><span class="mc-btn is-focus">Ver los coches</span></div>
-      <div class="bb-state"><span class="bb-label">Pulsado</span><span class="mc-btn is-active">Ver los coches</span></div>
-      <div class="bb-state"><span class="bb-label">Desactivado</span><span class="mc-btn is-disabled">Ver los coches</span></div>
-      <div class="bb-state"><span class="bb-label">Enviando</span><span class="mc-btn is-loading"><span class="mc-btn__label" data-busy="Enviando…">Ver los coches</span><span class="mc-btn__prog"></span></span></div>
-    </div>
-    <p class="bb-el__why">Blue, filled, and it appears <b>once per screen</b>. If there are
-      two on a screen, neither one is the main action. The loading state draws a line
-      rather than spinning a circle — the site has one movement idea and reuses it.</p>
-    <div class="bb-sign"><span class="bb-label">EL-BTN-01</span>
-      <span class="bb-sign__box">Aprobado</span><span class="bb-sign__box">Con cambios</span>
-      <span class="bb-sign__note">Nota:</span></div>
-  </article>
+  {{-- ══ THE TWO ASSEMBLED PHONES ══ --}}
+  <div class="bb-phones" style="margin-top:var(--s-6)">
 
-  {{-- ---------- EL-BTN-02 ---------- --}}
-  <article class="bb-el" id="EL-BTN-02">
-    <div class="bb-el__bar">
-      <span class="bb-el__id">EL-BTN-02</span>
-      <span class="bb-el__name">WhatsApp y Llamar</span>
-      <span class="bb-el__where">Cabecera · ficha · barra fija · pie</span>
-    </div>
-    <div class="bb-el__stage">
-      <div class="mc-cta" style="max-width:26rem">
-        <a class="mc-btn mc-btn--cta" href="https://wa.me/34614753187">WhatsApp</a>
-        <a class="mc-btn mc-btn--outline" href="tel:+34614753187">Llamar</a>
-      </div>
-      <p class="bb-small" style="margin:var(--s-3) 0 0;font-family:var(--f-voice);color:var(--mc-ink-3)">
-        Contesto yo. Suelo tardar unas horas, no unos minutos.</p>
-    </div>
-    <div class="bb-el__states">
-      <div class="bb-state"><span class="bb-label">Normal</span><span class="mc-btn mc-btn--cta">WhatsApp</span></div>
-      <div class="bb-state"><span class="bb-label">Ratón encima</span><span class="mc-btn mc-btn--cta is-hover">WhatsApp</span></div>
-      <div class="bb-state"><span class="bb-label">Secundario</span><span class="mc-btn mc-btn--outline">Llamar</span></div>
-      <div class="bb-state"><span class="bb-label">Secundario, encima</span><span class="mc-btn mc-btn--outline is-hover">Llamar</span></div>
-    </div>
-    <div class="bb-el__stage bb-el__stage--navy on-navy">
-      <span class="bb-label" style="display:block;color:var(--mc-on-navy-2);margin-bottom:var(--s-3)">In the footer, the same two buttons flip — terracotta on navy measures 2.53:1 and cannot be fixed by recolouring</span>
-      <div class="mc-cta" style="max-width:26rem">
-        <span class="mc-btn mc-btn--cta">WhatsApp</span>
-        <span class="mc-btn mc-btn--outline">Llamar</span>
-      </div>
-    </div>
-    <p class="bb-el__why">WhatsApp is terracotta everywhere, Call is outlined everywhere.
-      It is <b>not WhatsApp green</b> — the name already carries the recognition, and a
-      second brand's colour would break the rule that makes the price stand out.
-      <span class="bb-st bb-st--you">Your call</span> if you want the green anyway.</p>
-    <div class="bb-sign"><span class="bb-label">EL-BTN-02</span>
-      <span class="bb-sign__box">Aprobado</span><span class="bb-sign__box">Con cambios</span>
-      <span class="bb-sign__note">Nota:</span></div>
-  </article>
+    {{-- HOME --}}
+    <div>
+      <span class="bb-label">Home · 390px · the first two screens</span>
+      <div class="ph ph--clip">
+        <div class="ph__status"><span>9:41</span><i></i></div>
+        <div class="ph__screen">
+          <div class="ph__fold"><span>first screen ends here</span></div>
 
-  {{-- ---------- EL-CARD-01 ---------- --}}
-  <article class="bb-el" id="EL-CARD-01">
+          <div class="mc-head">
+            <div class="mc-head__in">
+              <a class="mc-logo" href="#elements">IV&nbsp;MOTORCLASS</a>
+              <span class="mc-btn mc-btn--cta" style="padding-inline:var(--s-3)">WhatsApp</span>
+              <span class="mc-burger"><span class="mc-burger__bars"></span></span>
+            </div>
+          </div>
+
+          <div class="pg-sec">
+            <span class="pg-eyebrow">Málaga</span>
+            <h1 class="pg-h1">{{ ['','Un','Dos','Tres','Cuatro','Cinco','Seis','Siete','Ocho','Nueve','Diez'][$inventory['available']] ?? $inventory['available'] }} coches. Los he conducido todos yo.</h1>
+            <p class="pg-lead">Los kilómetros están a la vista, y también lo que no me gusta de cada uno.</p>
+            <div class="pg-proof">
+              <span><b>{{ $inventory['sold'] }}</b> coches entregados</span>
+              <span>·</span>
+              <span><b>{{ $inventory['testimonials'] }}</b> reseñas con foto</span>
+            </div>
+            <span class="mc-btn mc-btn--block">Ver los coches</span>
+          </div>
+
+          <div class="pg-sec">
+            <h2 class="pg-h">Disponibles hoy</h2>
+            <div class="mc-cardgrid">
+              @foreach($cars->take(2) as $v){!! $cardFor($v) !!}@endforeach
+            </div>
+          </div>
+
+          <div class="pg-sec pg-sec--band">
+            <h2 class="pg-h">{{ $inventory['testimonials'] }} personas se hicieron la foto</h2>
+            <p class="pg-note" style="margin:0 0 var(--s-4)">No pedí ninguna. Están todas.</p>
+            <div class="tt-list">
+              @foreach($goodQuotes->take(2) as $t){!! $rowFor($t) !!}@endforeach
+            </div>
+          </div>
+
+          <div class="pg-sec">
+            <h2 class="pg-h">Quién soy</h2>
+            <div class="pg-prose"><p>Compro los coches yo, los conduzco yo, y te contesto yo.</p></div>
+          </div>
+        </div>
+        <div class="ph__home"></div>
+      </div>
+      <p class="bb-small" style="margin-top:var(--s-3);color:var(--mc-ink-3)">
+        Continues: who you are · cars delivered · contact · footer. The first car is visible
+        <b>without scrolling</b>; today it is 3.1 screens down.</p>
+    </div>
+
+    {{-- VEHICLE --}}
+    <div>
+      <span class="bb-label">Vehicle page · 390px · the first two screens</span>
+      <div class="ph ph--clip">
+        <div class="ph__status"><span>9:41</span><i></i></div>
+        <div class="ph__screen">
+          <div class="ph__fold"><span>first screen ends here</span></div>
+
+          <div class="mc-head">
+            <div class="mc-head__in">
+              <a class="mc-logo" href="#elements">IV&nbsp;MOTORCLASS</a>
+              <span class="mc-btn mc-btn--cta" style="padding-inline:var(--s-3)">WhatsApp</span>
+              <span class="mc-burger"><span class="mc-burger__bars"></span></span>
+            </div>
+          </div>
+
+          <div class="pg-sec" style="padding-top:var(--s-3)">
+            <a class="mc-go" href="#elements" style="border:0;color:var(--mc-ink-2);font-size:var(--t-small)"><span class="mc-go__arrow">&larr;</span> Todos los coches</a>
+            <h1 class="pg-h1" style="margin-top:var(--s-2)">{{ $car?->brand }} {{ $car?->model }} {{ $car?->year }}</h1>
+            <div class="mc-pair">
+              <span class="mc-price">{{ $car ? $euros($car->price) : '—' }}</span>
+              <span class="mc-km">{{ $car?->mileage ? $km($car->mileage) : '—' }}</span>
+            </div>
+            <span class="mc-pair-under is-drawn" style="max-width:12rem;margin-top:var(--s-2)"></span>
+            <p class="pg-note">Precio para particular. Transferencia no incluida.</p>
+
+            <div class="mc-frame mc-frame--card" style="margin-top:var(--s-4)">
+              @if($carImg)<img class="mc-img mc-img--vehicle" src="{{ $carImg }}" alt="" width="800" height="600" loading="lazy">@endif
+            </div>
+            <div class="pg-gal">
+              <div class="is-on">@if($carImg)<img class="mc-img mc-img--vehicle" src="{{ $carImg }}" alt="" width="200" height="150" loading="lazy">@endif</div>
+              <div><span class="pg-gal__tag">Odómetro</span></div>
+              <div></div><div></div>
+            </div>
+          </div>
+
+          <div class="pg-sec">
+            <h2 class="pg-h">Los datos</h2>
+            <dl class="mc-specs">
+              <div class="mc-specs__row"><dt>Año</dt><dd>{{ $car?->year }}</dd></div>
+              <div class="mc-specs__row"><dt>Kilómetros</dt><dd>{{ $car?->mileage ? $km($car->mileage) : '—' }}</dd></div>
+              <div class="mc-specs__row"><dt>Combustible</dt><dd>{{ $car?->fuel }}</dd></div>
+              <div class="mc-specs__row"><dt>Cambio</dt><dd>{{ $car?->transmission }}</dd></div>
+              <div class="mc-specs__row"><dt>Dónde está</dt><dd>Málaga</dd></div>
+            </dl>
+          </div>
+
+          <div class="pg-sec pg-sec--band">
+            <div class="mc-cta">
+              <span class="mc-btn mc-btn--cta">WhatsApp</span>
+              <span class="mc-btn mc-btn--outline">Llamar</span>
+            </div>
+            <p class="pg-note">Contesto yo. Suelo tardar unas horas, no unos minutos.</p>
+          </div>
+
+          <div class="pg-sec">
+            <h2 class="pg-h">Lo que te digo yo</h2>
+            <div class="pg-prose">
+              <p>Lo compré en Málaga a su primer dueño. Tiene las revisiones al día y lo he conducido dos semanas antes de ponerlo a la venta.</p>
+            </div>
+          </div>
+
+          <div class="pg-sec">
+            <h2 class="pg-h">Quien me compró uno parecido</h2>
+            <div class="tt-list">
+              @foreach($goodQuotes->slice(2,1) as $t){!! $rowFor($t) !!}@endforeach
+            </div>
+          </div>
+        </div>
+        <div class="ph__bar">
+          <div class="mc-bar">
+            <div class="mc-bar__pair">
+              <span class="mc-bar__price">{{ $car ? $euros($car->price) : '—' }}</span>
+              <span class="mc-bar__km">{{ $car?->mileage ? $km($car->mileage) : '' }}</span>
+            </div>
+            <div class="mc-bar__act">
+              <span class="mc-btn mc-btn--cta">WhatsApp</span>
+              <span class="mc-btn mc-btn--outline" style="padding-inline:var(--s-3)">Tel</span>
+            </div>
+          </div>
+        </div>
+        <div class="ph__home"></div>
+      </div>
+      <p class="bb-small" style="margin-top:var(--s-3);color:var(--mc-ink-3)">
+        Price and kilometres before the gallery; the odometer photo in the first three; the
+        bar with WhatsApp and Call pinned from the first paint. Today this page has neither
+        the bar nor a single testimonial.</p>
+    </div>
+  </div>
+
+  <p class="bb-prose" style="margin-top:var(--s-8)">
+    Now the pieces those screens are made of. Each one shows where it appears, every state
+    side by side, and has a box to tick. States are frozen copies rather than hover, because
+    you are probably reading this on a phone — and because a document you can print is a
+    document you can sign.
+  </p>
+
+  {{-- ══ EL-CARD-01 — in context ══ --}}
+  <article class="bb-el" id="EL-CARD-01" style="margin-top:var(--s-6)">
     <div class="bb-el__bar">
       <span class="bb-el__id">EL-CARD-01</span>
       <span class="bb-el__name">Tarjeta de coche</span>
-      <span class="bb-el__where">Home · catálogo · página 404</span>
+      <div class="bb-el__where"><span>Home</span><span>Catálogo</span><span>404</span></div>
     </div>
     <div class="bb-el__stage">
+      <span class="bb-stagecap">As it appears in the catalogue — three real cars under the section heading</span>
+      <h2 class="pg-h" style="max-width:none">Disponibles hoy</h2>
       <div class="mc-cardgrid">
-        @foreach(['','is-hover','is-focus'] as $st)
-          <article class="mc-card {{ $st }}">
-            <a class="mc-card__link" href="#EL-CARD-01">
-              <div class="mc-frame mc-frame--card">
-                @if($carImg)<img class="mc-img mc-img--vehicle" src="{{ $carImg }}"
-                  alt="{{ $car->brand }} {{ $car->model }} {{ $car->year }}" width="800" height="600" loading="lazy">@endif
-              </div>
-              <div class="mc-card__body">
-                <h3 class="mc-card__title">{{ $car?->brand }} {{ $car?->model }}</h3>
-                <div>
-                  <div class="mc-pair">
-                    <span class="mc-price">{{ $car ? $euros($car->price) : '14.990 €' }}</span>
-                    <span class="mc-km">{{ $car?->mileage ? $fmt($car->mileage).' km' : '—' }}</span>
-                  </div>
-                  <span class="mc-pair-under" style="max-width:11rem"></span>
-                </div>
-                <ul class="mc-chips">
-                  <li class="mc-chip">{{ $car?->year }}</li>
-                  <li class="mc-chip">{{ $car?->fuel }}</li>
-                  <li class="mc-chip">{{ $car?->transmission }}</li>
-                </ul>
-                <span class="mc-card__go">Ver el coche <span class="mc-card__arrow">&rarr;</span></span>
-              </div>
-            </a>
-          </article>
-        @endforeach
+        @foreach($cars->take(3) as $v){!! $cardFor($v) !!}@endforeach
       </div>
-      <p class="bb-label" style="margin-top:var(--s-3)">Left: normal. Middle: mouse over. Right: reached with the keyboard.</p>
     </div>
-    <div class="bb-el__states" style="grid-template-columns:1fr">
-      <div class="bb-state" style="align-items:stretch">
-        <span class="bb-label">Vendido — a variant, not an error</span>
-        <div style="max-width:22rem">
-          <article class="mc-card mc-card--sold">
-            <div class="mc-frame mc-frame--card">
-              @if($carImg)<img class="mc-img mc-img--vehicle" src="{{ $carImg }}" alt="" width="800" height="600" loading="lazy">@endif
-              <span class="mc-badge mc-badge--sold">Vendido</span>
-            </div>
-            <div class="mc-card__body">
-              <h3 class="mc-card__title">{{ $sold?->brand ?? 'Peugeot' }} {{ $sold?->model ?? '308' }}</h3>
-              <div class="mc-pair">
-                <span class="mc-price">{{ $sold ? $euros($sold->price) : '11.500 €' }}</span>
-                <span class="mc-km">{{ $sold?->mileage ? $fmt($sold->mileage).' km' : '—' }}</span>
-              </div>
-            </div>
-          </article>
-        </div>
-      </div>
+    <div class="bb-el__states">
+      <div class="bb-state">{!! $cardFor($car, 'is-hover') !!}<span class="bb-cap">Ratón encima — el borde se oscurece y la línea se dibuja</span></div>
+      <div class="bb-state">{!! $cardFor($car, 'is-focus') !!}<span class="bb-cap">Con el teclado — anillo y regla azul arriba</span></div>
+      <div class="bb-state">{!! $cardFor($sold ?? $car, 'mc-card--sold') !!}<span class="bb-cap">Vendido — una variante, no un error</span></div>
     </div>
     <p class="bb-el__why">The whole card is <b>one link</b>. A card with a title link plus a
-      button plus a photo link is three targets stacked in 300px, and it is why dealer
-      grids are unusable one-handed. The photo never zooms on hover — movement on a
-      photograph of a real car is exactly the stock-photo effect we are avoiding.</p>
+      button plus a photo link is three targets stacked in 300px, and it is why dealer grids
+      are unusable one-handed. The photo never zooms on hover — movement on a photograph
+      of a real car is exactly the stock-photo effect we are avoiding.</p>
     <div class="bb-sign"><span class="bb-label">EL-CARD-01</span>
       <span class="bb-sign__box">Aprobado</span><span class="bb-sign__box">Con cambios</span>
       <span class="bb-sign__note">Nota:</span></div>
   </article>
 
-  {{-- ---------- EL-PRICE-01 ---------- --}}
-  <article class="bb-el" id="EL-PRICE-01">
+  {{-- ══ EL-BTN-01 ══ --}}
+  <article class="bb-el" id="EL-BTN-01">
     <div class="bb-el__bar">
-      <span class="bb-el__id">EL-PRICE-01</span>
-      <span class="bb-el__name">Precio y kilómetros</span>
-      <span class="bb-el__where">Tarjeta · ficha · barra fija</span>
+      <span class="bb-el__id">EL-BTN-01</span>
+      <span class="bb-el__name">Botones</span>
+      <div class="bb-el__where"><span>Todo el sitio</span></div>
     </div>
     <div class="bb-el__stage">
-      <div class="bb-two">
-        <div>
-          <span class="bb-label" style="display:block;margin-bottom:var(--s-2)">Con kilómetros</span>
-          <div class="mc-pair"><span class="mc-price">24.800 €</span><span class="mc-km">184.000 km</span></div>
-          <span class="mc-pair-under is-drawn" style="max-width:16rem;margin-top:var(--s-2)"></span>
-          <p class="bb-small" style="margin-top:var(--s-3);color:var(--mc-ink-3)">Precio para
-            particular. Transferencia e impuesto de matriculación no incluidos.
-            <span class="bb-st bb-st--you">Your call</span></p>
-        </div>
-        <div>
-          <span class="bb-label" style="display:block;margin-bottom:var(--s-2)">Sin kilómetros confirmados — el hueco no se elimina</span>
-          <div class="mc-pair"><span class="mc-price">18.500 €</span><span class="mc-km is-unknown">Km sin confirmar</span></div>
-        </div>
+      <span class="bb-stagecap">The whole family, at rest. One blue, one terracotta, one outlined, one quiet.</span>
+      <div style="display:flex;flex-wrap:wrap;gap:var(--s-3);align-items:center">
+        <span class="mc-btn">Ver los coches</span>
+        <span class="mc-btn mc-btn--cta">WhatsApp</span>
+        <span class="mc-btn mc-btn--outline">Llamar</span>
+        <span class="mc-btn mc-btn--quiet">Ver más fotos</span>
       </div>
     </div>
-    <p class="bb-el__why">The price is the only terracotta thing on the page apart from the
-      contact button, and the mileage always sits beside it at three quarters of the size.
-      Your cars run 108,000–184,000 km — that is the buyer's first question, so it is
-      answered before it is asked instead of being hidden in grey at the bottom.</p>
-    <div class="bb-sign"><span class="bb-label">EL-PRICE-01</span>
-      <span class="bb-sign__box">Aprobado</span><span class="bb-sign__box">Con cambios</span>
-      <span class="bb-sign__note">Nota:</span></div>
-  </article>
-
-  {{-- ---------- EL-BADGE-01 ---------- --}}
-  <article class="bb-el" id="EL-BADGE-01">
-    <div class="bb-el__bar">
-      <span class="bb-el__id">EL-BADGE-01</span>
-      <span class="bb-el__name">Estado y datos rápidos</span>
-      <span class="bb-el__where">Tarjeta de coche</span>
+    <div class="bb-el__states">
+      <div class="bb-state"><span class="mc-btn">Ver los coches</span><span class="bb-cap">Normal</span></div>
+      <div class="bb-state"><span class="mc-btn is-hover">Ver los coches</span><span class="bb-cap">Ratón encima</span></div>
+      <div class="bb-state"><span class="mc-btn is-focus">Ver los coches</span><span class="bb-cap">Con el teclado — dos anillos</span></div>
+      <div class="bb-state"><span class="mc-btn is-active">Ver los coches</span><span class="bb-cap">Pulsado</span></div>
+      <div class="bb-state"><span class="mc-btn is-disabled">Ver los coches</span><span class="bb-cap">Desactivado</span></div>
+      <div class="bb-state"><span class="mc-btn is-loading"><span class="mc-btn__label" data-busy="Enviando…">Ver los coches</span><span class="mc-btn__prog"></span></span><span class="bb-cap">Enviando — la línea se dibuja</span></div>
     </div>
-    <div class="bb-el__stage">
-      <div style="display:flex;gap:var(--s-3);flex-wrap:wrap;margin-bottom:var(--s-4)">
-        <span class="mc-badge mc-badge--available">Disponible</span>
-        <span class="mc-badge mc-badge--reserved">Reservado</span>
-        <span class="mc-badge mc-badge--sold">Vendido</span>
+    <div class="bb-el__stage bb-el__stage--navy on-navy">
+      <span class="bb-stagecap" style="color:var(--mc-on-navy-2)">In the footer the same two flip — terracotta on navy measures 2.53:1 and cannot be fixed by recolouring</span>
+      <div style="display:flex;flex-wrap:wrap;gap:var(--s-3)">
+        <span class="mc-btn mc-btn--cta">WhatsApp</span>
+        <span class="mc-btn mc-btn--outline">Llamar</span>
       </div>
-      <ul class="mc-chips">
-        <li class="mc-chip">2017</li><li class="mc-chip">Diésel</li>
-        <li class="mc-chip">Automático</li><li class="mc-chip">190 CV</li>
-      </ul>
     </div>
-    <p class="bb-el__why">In the catalogue, where every car is available, <b>the "Disponible"
-      badge is not printed</b> — a badge on 9 of 9 cards is decoration. The state is always
-      the Spanish word, never colour alone: terracotta and green are the same grey to a
-      red-green colourblind buyer, and roughly one man in twelve is.</p>
-    <div class="bb-sign"><span class="bb-label">EL-BADGE-01</span>
+    <p class="bb-el__why">Blue appears <b>once per screen</b> — if there are two, neither is
+      the main action. WhatsApp is terracotta everywhere and Call is outlined everywhere.
+      It is <b>not WhatsApp green</b>: the name already carries the recognition, and a
+      second brand's colour would break the rule that makes the price stand out.
+      <span class="bb-st bb-st--you">Your call</span> if you want the green anyway.</p>
+    <div class="bb-sign"><span class="bb-label">EL-BTN-01</span>
       <span class="bb-sign__box">Aprobado</span><span class="bb-sign__box">Con cambios</span>
       <span class="bb-sign__note">Nota:</span></div>
   </article>
 
-  {{-- ---------- EL-SPEC-01 ---------- --}}
-  <article class="bb-el" id="EL-SPEC-01">
-    <div class="bb-el__bar">
-      <span class="bb-el__id">EL-SPEC-01</span>
-      <span class="bb-el__name">Los datos</span>
-      <span class="bb-el__where">Ficha de coche</span>
-    </div>
-    <div class="bb-el__stage">
-      <dl class="mc-specs">
-        <div class="mc-specs__row"><dt>Año</dt><dd>{{ $car?->year ?? 2017 }}</dd></div>
-        <div class="mc-specs__row"><dt>Kilómetros</dt><dd>{{ $car?->mileage ? $fmt($car->mileage).' km' : '155.000 km' }}</dd></div>
-        <div class="mc-specs__row"><dt>Combustible</dt><dd>{{ $car?->fuel ?? 'Gasolina' }}</dd></div>
-        <div class="mc-specs__row"><dt>Cambio</dt><dd>{{ $car?->transmission ?? 'Manual' }}</dd></div>
-        <div class="mc-specs__row"><dt>Potencia</dt><dd>{{ $car?->power ?? '150 CV' }}</dd></div>
-        <div class="mc-specs__row"><dt>Color</dt><dd>{{ $car?->color ?? 'Gris' }}</dd></div>
-        <div class="mc-specs__row"><dt>Dónde está</dt><dd>Málaga</dd></div>
-      </dl>
-    </div>
-    <p class="bb-el__why">A row with no value is <b>removed, not filled with a dash</b> — an
-      empty row makes the reader wonder what is being hidden. The one exception is
-      mileage, which never disappears, because a missing kilometre count is itself
-      information the buyer is owed.</p>
-    <div class="bb-sign"><span class="bb-label">EL-SPEC-01</span>
-      <span class="bb-sign__box">Aprobado</span><span class="bb-sign__box">Con cambios</span>
-      <span class="bb-sign__note">Nota:</span></div>
-  </article>
-
-  {{-- ---------- EL-HDR-01 ---------- --}}
+  {{-- ══ EL-HDR-01 ══ --}}
   <article class="bb-el" id="EL-HDR-01">
     <div class="bb-el__bar">
       <span class="bb-el__id">EL-HDR-01</span>
       <span class="bb-el__name">Cabecera</span>
-      <span class="bb-el__where">Todo el sitio</span>
+      <div class="bb-el__where"><span>Todo el sitio</span></div>
     </div>
     <div class="bb-el__stage bb-el__stage--flush">
       <div class="mc-head">
-        <div class="mc-head__in">
+        <div class="mc-head__in" style="padding:0 var(--s-5)">
           <a class="mc-logo" href="#EL-HDR-01">IV&nbsp;MOTORCLASS</a>
-          <nav class="mc-nav" style="display:none" data-desk>
+          <nav class="mc-nav" data-desk>
             <a class="mc-nav__i is-current" href="#EL-HDR-01">Coches</a>
             <a class="mc-nav__i" href="#EL-HDR-01">Entregados</a>
             <a class="mc-nav__i" href="#EL-HDR-01">Quién soy</a>
@@ -620,175 +681,237 @@
           <a class="mc-btn mc-btn--cta" href="#EL-HDR-01">WhatsApp</a>
         </div>
       </div>
+      <div style="height:64px;background:var(--mc-bg)"></div>
     </div>
-    <div class="bb-el__states" style="grid-template-columns:1fr">
-      <div class="bb-state" style="align-items:stretch">
-        <span class="bb-label">A 390px el menú se pliega — WhatsApp se queda fuera, siempre visible</span>
-        <div style="border:1px solid var(--mc-ink);max-width:390px">
-          <div class="mc-head">
-            <div class="mc-head__in">
+    <div class="bb-el__stage bb-el__stage--band">
+      <span class="bb-stagecap">At 390px the menu folds. WhatsApp stays outside it, always visible.</span>
+      <div class="bb-el__stage--twin">
+        <div class="ph">
+          <div class="ph__status"><span>9:41</span><i></i></div>
+          <div class="ph__screen">
+            <div class="mc-head"><div class="mc-head__in">
               <a class="mc-logo" href="#EL-HDR-01">IV&nbsp;MOTORCLASS</a>
-              <span class="mc-btn mc-btn--cta" style="padding-inline:var(--s-3)">WA</span>
-              <span class="mc-burger"><span class="mc-burger__bars"></span>Menú</span>
-            </div>
+              <span class="mc-btn mc-btn--cta" style="padding-inline:var(--s-3)">WhatsApp</span>
+              <span class="mc-burger"><span class="mc-burger__bars"></span></span>
+            </div></div>
+            <div style="height:120px"></div>
           </div>
-          <div style="padding:0 var(--s-4) var(--s-4);background:var(--mc-surface)">
-            <a class="mc-nav__i is-current" style="display:flex;min-height:56px;border-bottom:1px solid var(--mc-hairline);font-size:var(--t-h3);text-decoration:none;border-left:3px solid var(--mc-blue);padding-left:var(--s-3)" href="#EL-HDR-01">Coches</a>
-            <a class="mc-nav__i" style="display:flex;min-height:56px;border-bottom:1px solid var(--mc-hairline);font-size:var(--t-h3);text-decoration:none" href="#EL-HDR-01">Entregados</a>
-            <a class="mc-nav__i" style="display:flex;min-height:56px;border-bottom:1px solid var(--mc-hairline);font-size:var(--t-h3);text-decoration:none" href="#EL-HDR-01">Quién soy</a>
-            <a class="mc-nav__i" style="display:flex;min-height:56px;font-size:var(--t-h3);text-decoration:none" href="#EL-HDR-01">Contacto</a>
+        </div>
+        <div class="ph">
+          <div class="ph__status"><span>9:41</span><i></i></div>
+          <div class="ph__screen">
+            <div class="mc-head"><div class="mc-head__in">
+              <a class="mc-logo" href="#EL-HDR-01">IV&nbsp;MOTORCLASS</a>
+              <span class="mc-btn mc-btn--cta" style="padding-inline:var(--s-3)">WhatsApp</span>
+              <span class="mc-burger" style="background:var(--mc-band);border-color:var(--mc-ink)"><span class="mc-burger__bars"></span></span>
+            </div></div>
+            <div style="padding:0 var(--s-4) var(--s-4);background:var(--mc-surface)">
+              @foreach([['Coches',true],['Entregados',false],['Quién soy',false],['Contacto',false]] as [$l,$cur])
+                <a class="mc-nav__i" href="#EL-HDR-01" style="display:flex;min-height:56px;border-bottom:1px solid var(--mc-hairline);font-size:var(--t-h3);text-decoration:none{{ $cur ? ';border-left:3px solid var(--mc-blue);padding-left:var(--s-3);font-weight:600' : '' }}">{{ $l }}</a>
+              @endforeach
+            </div>
           </div>
         </div>
       </div>
     </div>
     <p class="bb-el__why"><b>WhatsApp never goes inside the menu.</b> It is how most of your
       customers will contact you, so it stays visible at every width. The menu holds the
-      four navigation links and nothing that converts.</p>
+      four navigation links and nothing that converts. Open, it pushes down under the
+      header rather than sliding in from the side — four links do not justify a drawer, and
+      every line of drawer machinery is a line that can break on a mid-range Android.</p>
     <div class="bb-sign"><span class="bb-label">EL-HDR-01</span>
       <span class="bb-sign__box">Aprobado</span><span class="bb-sign__box">Con cambios</span>
       <span class="bb-sign__note">Nota:</span></div>
   </article>
 
-  {{-- ---------- EL-BAR-01 ---------- --}}
+  {{-- ══ EL-BAR-01 ══ --}}
   <article class="bb-el" id="EL-BAR-01">
     <div class="bb-el__bar">
       <span class="bb-el__id">EL-BAR-01</span>
       <span class="bb-el__name">Barra fija inferior</span>
-      <span class="bb-el__where">Ficha de coche, solo móvil</span>
+      <div class="bb-el__where"><span>Ficha de coche</span><span>Solo móvil</span></div>
     </div>
-    <div class="bb-el__stage">
-      <div style="max-width:390px;border:1px solid var(--mc-ink)">
-        <div class="mc-bar">
-          <div class="mc-bar__pair">
-            <span class="mc-bar__price">24.800 €</span>
-            <span class="mc-bar__km">184.000 km</span>
+    <div class="bb-el__stage bb-el__stage--band">
+      <div class="bb-el__stage--twin">
+        <div class="ph">
+          <div class="ph__status"><span>9:41</span><i></i></div>
+          <div class="ph__screen" style="height:300px;overflow:hidden">
+            <div class="pg-sec" style="opacity:.45">
+              <h2 class="pg-h">Los datos</h2>
+              <dl class="mc-specs">
+                <div class="mc-specs__row"><dt>Año</dt><dd>{{ $car?->year }}</dd></div>
+                <div class="mc-specs__row"><dt>Combustible</dt><dd>{{ $car?->fuel }}</dd></div>
+                <div class="mc-specs__row"><dt>Cambio</dt><dd>{{ $car?->transmission }}</dd></div>
+                <div class="mc-specs__row"><dt>Color</dt><dd>{{ $car?->color ?? 'Gris' }}</dd></div>
+              </dl>
+            </div>
+            <div class="ph__bar"><div class="mc-bar">
+              <div class="mc-bar__pair"><span class="mc-bar__price">24.800 €</span><span class="mc-bar__km">184.000 km</span></div>
+              <div class="mc-bar__act"><span class="mc-btn mc-btn--cta">WhatsApp</span><span class="mc-btn mc-btn--outline" style="padding-inline:var(--s-3)">Tel</span></div>
+            </div></div>
           </div>
-          <div class="mc-bar__act">
-            <span class="mc-btn mc-btn--cta">WhatsApp</span>
-            <span class="mc-btn mc-btn--outline" style="padding-inline:var(--s-3)">Tel</span>
-          </div>
+          <div class="ph__home"></div>
+        </div>
+        <div>
+          <span class="bb-stagecap">The budget at 390px, with the longest realistic price and mileage</span>
+          <div class="bb-scroll"><table class="bb-t" style="min-width:0">
+            <tbody>
+              <tr><td>Gutter</td><td class="bb-num-cell">16</td></tr>
+              <tr><td>Price and km</td><td class="bb-num-cell">150</td></tr>
+              <tr><td>Gap</td><td class="bb-num-cell">12</td></tr>
+              <tr><td>WhatsApp</td><td class="bb-num-cell">112</td></tr>
+              <tr><td>Gap</td><td class="bb-num-cell">12</td></tr>
+              <tr><td>Call, glyph only</td><td class="bb-num-cell">48</td></tr>
+              <tr><td>Gutter</td><td class="bb-num-cell">16</td></tr>
+              <tr><td><b>Total</b></td><td class="bb-num-cell"><b>366 of 390</b></td></tr>
+            </tbody>
+          </table></div>
         </div>
       </div>
-      <p class="bb-label" style="margin-top:var(--s-3)">Measured at 390px: 16 + 150 + 12 + 112 + 12 + 48 + 16 = 366 of 390, with the longest realistic price and mileage.</p>
     </div>
-    <p class="bb-el__why"><b>Two actions, not four.</b> Four columns at 390px give 77px of
-      usable width each, and "WhatsApp" at readable size already takes 58px. The price
-      stays in the bar: on a €15–26k purchase the buyer re-checks it constantly, and a bar
-      without it forces a scroll every time.</p>
+    <p class="bb-el__why"><b>Two actions, not four.</b> Four columns give 77px of usable width
+      each, and "WhatsApp" at readable size already takes 58px. The price stays in the bar:
+      on a €15–26k purchase the buyer re-checks it constantly, and a bar without it forces
+      a scroll every time.</p>
     <div class="bb-note" style="margin:var(--s-4);border-left-color:var(--mc-accent)">
-      <p style="margin:0"><b>This one is broken on your live site right now, and no
-      approval fixes it.</b> The page is missing <code>viewport-fit=cover</code>, which
-      means any fixed bar sits underneath the iPhone home indicator. It is one line of
-      code. <span class="bb-st bb-st--fixed">Fixed</span></p>
+      <p style="margin:0"><b>Broken on your live site today, and no approval fixes it.</b>
+      The page is missing <code>viewport-fit=cover</code>, so any fixed bar sits underneath
+      the iPhone home indicator. One line. <span class="bb-st bb-st--fixed">Fixed</span></p>
     </div>
     <div class="bb-sign"><span class="bb-label">EL-BAR-01</span>
       <span class="bb-sign__box">Aprobado</span><span class="bb-sign__box">Con cambios</span>
       <span class="bb-sign__note">Nota:</span></div>
   </article>
 
-  {{-- ---------- EL-FORM-01 ---------- --}}
+  {{-- ══ EL-FORM-01 ══ --}}
   <article class="bb-el" id="EL-FORM-01">
     <div class="bb-el__bar">
       <span class="bb-el__id">EL-FORM-01</span>
       <span class="bb-el__name">Pregúntame por este coche</span>
-      <span class="bb-el__where">Ficha de coche</span>
+      <div class="bb-el__where"><span>Ficha de coche</span></div>
     </div>
-    <div class="bb-el__stage">
-      <div class="bb-two">
-        <div>
-          <span class="bb-label" style="display:block;margin-bottom:var(--s-3)">Vacío</span>
-          <form class="mc-form" onsubmit="return false">
-            <label class="mc-field"><span class="mc-field__label">Cómo te llamas</span>
-              <input class="mc-input" type="text" autocomplete="name"></label>
-            <label class="mc-field"><span class="mc-field__label">Tu teléfono</span>
-              <input class="mc-input" type="tel" inputmode="tel" placeholder="614 753 187"></label>
-            <label class="mc-field">
-              <span class="mc-field__label">Qué quieres saber <span class="mc-field__opt">(opcional)</span></span>
-              <textarea class="mc-textarea" rows="2">Me interesa este coche. ¿Sigue disponible?</textarea></label>
-            <label class="mc-check"><input type="checkbox">
-              <span class="mc-check__t">Guardo tu nombre y tu teléfono solo para contestarte.
-                <a class="mc-link" href="#EL-FORM-01">Cómo trato tus datos</a>.</span></label>
-            <button class="mc-btn mc-btn--block" type="button">
-              <span class="mc-btn__label" data-busy="Enviando…">Preguntar por este coche</span>
-              <span class="mc-btn__prog"></span></button>
-          </form>
-        </div>
-        <div>
-          <span class="bb-label" style="display:block;margin-bottom:var(--s-3)">Con un error, y enviado</span>
-          <div class="mc-alert mc-alert--error">
-            <p class="mc-alert__t">No he podido enviarlo. Falta una cosa:</p>
-            <ul><li>Necesito un teléfono para poder contestarte.</li></ul>
+    <div class="bb-el__stage bb-el__stage--band">
+      <div class="bb-el__stage--twin" style="grid-template-columns:1fr;justify-items:center">
+        <div style="display:grid;gap:var(--s-5);grid-template-columns:repeat(auto-fit,minmax(300px,390px));justify-content:center;width:100%">
+          <div class="ph">
+            <div class="ph__status"><span>9:41</span><i></i></div>
+            <div class="ph__screen"><div class="pg-sec">
+              <h2 class="pg-h">Pregúntame por este coche</h2>
+              <form class="mc-form" onsubmit="return false">
+                <label class="mc-field"><span class="mc-field__label">Cómo te llamas</span><input class="mc-input" type="text"></label>
+                <label class="mc-field"><span class="mc-field__label">Tu teléfono</span><input class="mc-input" type="tel" placeholder="614 753 187"></label>
+                <label class="mc-field"><span class="mc-field__label">Qué quieres saber <span class="mc-field__opt">(opcional)</span></span>
+                  <textarea class="mc-textarea" rows="2">Me interesa el {{ $car?->brand }} {{ $car?->model }}. ¿Sigue disponible?</textarea></label>
+                <label class="mc-check"><input type="checkbox"><span class="mc-check__t">Guardo tu nombre y tu teléfono solo para contestarte. <a class="mc-link" href="#EL-FORM-01">Cómo trato tus datos</a>.</span></label>
+                <span class="mc-btn mc-btn--block">Preguntar por este coche</span>
+              </form>
+            </div></div>
+            <div class="ph__home"></div>
           </div>
-          <label class="mc-field"><span class="mc-field__label">Tu teléfono</span>
-            <input class="mc-input is-invalid" type="tel" value="">
-            <span class="mc-err">Necesito un teléfono para poder contestarte.</span></label>
-          <div class="mc-alert mc-alert--ok" style="margin-top:var(--s-6)">
-            <p class="mc-alert__t">Recibido. Te contesto yo, hoy o mañana por la mañana.</p>
-            <p style="margin:0">Si prefieres no esperar, escríbeme por
-              <a class="mc-link" href="#EL-FORM-01">WhatsApp</a>.</p>
-          </div>
-          <div style="margin-top:var(--s-5)">
-            <span class="bb-label" style="display:block;margin-bottom:var(--s-2)">Enviando</span>
-            <span class="mc-btn mc-btn--block is-loading">
-              <span class="mc-btn__label" data-busy="Enviando…">Preguntar por este coche</span>
-              <span class="mc-btn__prog"></span></span>
+          <div class="ph">
+            <div class="ph__status"><span>9:41</span><i></i></div>
+            <div class="ph__screen"><div class="pg-sec">
+              <div class="mc-alert mc-alert--error">
+                <p class="mc-alert__t">No he podido enviarlo. Falta una cosa:</p>
+                <ul><li>Necesito un teléfono para poder contestarte.</li></ul>
+              </div>
+              <label class="mc-field"><span class="mc-field__label">Cómo te llamas</span><input class="mc-input" type="text" value="Marta"></label>
+              <label class="mc-field"><span class="mc-field__label">Tu teléfono</span><input class="mc-input is-invalid" type="tel" value="">
+                <span class="mc-err">Necesito un teléfono para poder contestarte.</span></label>
+              <span class="mc-btn mc-btn--block is-loading"><span class="mc-btn__label" data-busy="Enviando…">Preguntar por este coche</span><span class="mc-btn__prog"></span></span>
+              <div class="mc-alert mc-alert--ok" style="margin-top:var(--s-6)">
+                <p class="mc-alert__t">Recibido. Te contesto yo, hoy o mañana por la mañana.</p>
+                <p style="margin:0">Si prefieres no esperar, escríbeme por <a class="mc-link" href="#EL-FORM-01">WhatsApp</a>.</p>
+              </div>
+            </div></div>
+            <div class="ph__home"></div>
           </div>
         </div>
       </div>
+      <span class="bb-stagecap" style="margin:var(--s-4) 0 0;text-align:center">Left: empty. Right: one field missing, then sending, then sent.</span>
     </div>
-    <p class="bb-el__why">The message box is <b>already filled in with the question the
-      buyer was going to ask</b>, and it is optional — an empty text box on a phone is where
-      enquiries die. The whole form can be finished with a name, a number and one tap.
-      Every control is 16px and 48px tall: below 16px, Safari on iPhone zooms the page when
-      you tap a field and never zooms back out.</p>
-    <div class="bb-note" style="margin:var(--s-4)">
-      <p style="margin:0">Two things were removed from your current contact form: the
-      <b>Asunto</b> dropdown (a menu of guesses that the message answers better) and the
-      <b>newsletter checkbox</b> — you have no newsletter, and a consent box for a mailing
-      that doesn't exist is a GDPR liability with no upside.
-      <span class="bb-st bb-st--prop">Proposed</span></p>
-    </div>
+    <p class="bb-el__why">The message box is <b>already filled in with the question the buyer
+      was going to ask</b>, and it is optional — an empty text box on a phone is where
+      enquiries die. Every control is 16px and 48px tall: below 16px, Safari on iPhone zooms
+      the page when you tap a field and never zooms back out. Two things were removed from
+      your current form — the <em>Asunto</em> dropdown and the newsletter checkbox, for a
+      newsletter that does not exist. <span class="bb-st bb-st--prop">Proposed</span></p>
     <div class="bb-sign"><span class="bb-label">EL-FORM-01</span>
       <span class="bb-sign__box">Aprobado</span><span class="bb-sign__box">Con cambios</span>
       <span class="bb-sign__note">Nota:</span></div>
   </article>
 
-  {{-- ---------- EL-EMPTY-01 ---------- --}}
-  <article class="bb-el" id="EL-EMPTY-01">
+  {{-- ══ EL-SMALL — the atoms, together ══ --}}
+  <article class="bb-el" id="EL-SMALL">
     <div class="bb-el__bar">
-      <span class="bb-el__id">EL-EMPTY-01</span>
-      <span class="bb-el__name">Sin coches disponibles</span>
-      <span class="bb-el__where">Catálogo, cuando se vende todo</span>
+      <span class="bb-el__id">EL-SMALL</span>
+      <span class="bb-el__name">Las piezas pequeñas</span>
+      <div class="bb-el__where"><span>Tarjeta</span><span>Ficha</span><span>Textos</span></div>
     </div>
     <div class="bb-el__stage">
-      <div class="mc-empty">
-        <p class="mc-empty__t">Ahora mismo no tengo ningún coche disponible.</p>
-        <p style="font-family:var(--f-voice);font-size:var(--t-prose);color:var(--mc-ink-2);max-width:52ch">
-          Suelo tener entre 8 y 10. Escríbeme y te aviso en cuanto entre algo que encaje
-          con lo que buscas.</p>
-        <div class="mc-cta" style="max-width:30rem">
-          <a class="mc-btn mc-btn--cta" href="#EL-EMPTY-01">WhatsApp</a>
-          <a class="mc-btn mc-btn--outline" href="#EL-EMPTY-01">Ver los {{ $inventory['sold'] }} entregados</a>
+      <div class="bb-atoms">
+        <div class="bb-atom">
+          <div class="bb-atom__n">Precio y kilómetros<small>EL-PRICE-01 · never one without the other</small></div>
+          <div class="bb-atom__s">
+            <div><div class="mc-pair"><span class="mc-price">24.800 €</span><span class="mc-km">184.000 km</span></div></div>
+            <div><div class="mc-pair"><span class="mc-price">18.500 €</span><span class="mc-km is-unknown">Km sin confirmar</span></div></div>
+          </div>
+        </div>
+        <div class="bb-atom">
+          <div class="bb-atom__n">Estado<small>EL-BADGE-01 · always the word, never colour alone</small></div>
+          <div class="bb-atom__s">
+            <span class="mc-badge mc-badge--available">Disponible</span>
+            <span class="mc-badge mc-badge--reserved">Reservado</span>
+            <span class="mc-badge mc-badge--sold">Vendido</span>
+          </div>
+        </div>
+        <div class="bb-atom">
+          <div class="bb-atom__n">Datos rápidos<small>EL-CHIP-01 · not tappable, so allowed under 44px</small></div>
+          <div class="bb-atom__s">
+            <ul class="mc-chips"><li class="mc-chip">2017</li><li class="mc-chip">Diésel</li><li class="mc-chip">Automático</li><li class="mc-chip">190 CV</li></ul>
+          </div>
+        </div>
+        <div class="bb-atom">
+          <div class="bb-atom__n">Enlaces<small>EL-LNK-01 · underlined at rest, so they work without colour</small></div>
+          <div class="bb-atom__s">
+            <span style="font-family:var(--f-voice);font-size:var(--t-prose)">Los kilómetros están en <a class="mc-link" href="#EL-SMALL">la lista de coches</a>.</span>
+            <a class="mc-go" href="#EL-SMALL">Ver el coche <span class="mc-go__arrow">&rarr;</span></a>
+          </div>
+        </div>
+        <div class="bb-atom">
+          <div class="bb-atom__n">Avisos<small>EL-ALERT-01 · success replaces the form in place, never a toast</small></div>
+          <div class="bb-atom__s" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--s-3);width:100%">
+            <div class="mc-alert mc-alert--ok" style="margin:0"><p class="mc-alert__t" style="margin:0">Recibido.</p></div>
+            <div class="mc-alert mc-alert--error" style="margin:0"><p class="mc-alert__t" style="margin:0">Falta el teléfono.</p></div>
+            <div class="mc-alert mc-alert--note" style="margin:0"><p style="margin:0">Precio orientativo.</p></div>
+          </div>
+        </div>
+        <div class="bb-atom">
+          <div class="bb-atom__n">Sin foto<small>EL-IMG-02 · never a stock silhouette</small></div>
+          <div class="bb-atom__s">
+            <div class="mc-frame mc-frame--card mc-frame--empty" style="width:160px"><span class="mc-frame__none">Sin foto</span></div>
+          </div>
         </div>
       </div>
     </div>
-    <p class="bb-el__why">Selling out is good news for a one-man dealer, so it is not drawn
-      as a failure — no sad graphic, no centred icon. It offers two ways out: message you,
-      or look at the {{ $inventory['sold'] }} cars you have already delivered.</p>
-    <div class="bb-sign"><span class="bb-label">EL-EMPTY-01</span>
+    <p class="bb-el__why">These do not each need a page. In the catalogue, where every car
+      is available, <b>the "Disponible" badge is not printed</b> — a badge on 9 of 9 cards
+      is decoration. Terracotta and green are the same grey to a red-green colourblind
+      buyer, roughly one man in twelve, so no state is ever carried by colour alone.</p>
+    <div class="bb-sign"><span class="bb-label">EL-SMALL</span>
       <span class="bb-sign__box">Aprobado</span><span class="bb-sign__box">Con cambios</span>
       <span class="bb-sign__note">Nota:</span></div>
   </article>
 
-  {{-- ---------- EL-FOOT-01 ---------- --}}
+  {{-- ══ EL-EMPTY + EL-FOOT ══ --}}
   <article class="bb-el" id="EL-FOOT-01">
     <div class="bb-el__bar">
       <span class="bb-el__id">EL-FOOT-01</span>
-      <span class="bb-el__name">Pie</span>
-      <span class="bb-el__where">Todo el sitio</span>
+      <span class="bb-el__name">Pie, y el catálogo vacío</span>
+      <div class="bb-el__where"><span>Todo el sitio</span><span>Catálogo</span></div>
     </div>
     <div class="bb-el__stage bb-el__stage--flush">
-      <div class="mc-foot-demo on-navy">
+      <div class="mc-foot-demo on-navy" style="padding-inline:var(--s-5)">
         <div class="mc-foot-demo__cols">
           <div>
             <p style="margin:0 0 var(--s-2);font-size:var(--t-h3);font-weight:600;color:var(--mc-on-navy)">IV MOTORCLASS</p>
@@ -800,15 +923,26 @@
         </div>
       </div>
     </div>
+    <div class="bb-el__stage">
+      <span class="bb-stagecap">When everything is sold — good news for a one-man dealer, so it is not drawn as a failure</span>
+      <div class="mc-empty">
+        <p class="mc-empty__t">Ahora mismo no tengo ningún coche disponible.</p>
+        <p style="font-family:var(--f-voice);font-size:var(--t-prose);color:var(--mc-ink-2);max-width:52ch">Suelo tener entre 8 y 10. Escríbeme y te aviso en cuanto entre algo que encaje con lo que buscas.</p>
+        <div class="mc-cta" style="max-width:30rem">
+          <span class="mc-btn mc-btn--cta">WhatsApp</span>
+          <span class="mc-btn mc-btn--outline">Ver los {{ $inventory['sold'] }} entregados</span>
+        </div>
+      </div>
+    </div>
     <p class="bb-el__why">On a phone the footer links become <b>48px rows with hairlines</b>,
-      not a stack of small text — a mobile footer is where unhittable targets breed. The
-      address, phone and hours are real text, never an image, because that block is what
-      Google reads to place you in Málaga.</p>
+      not a stack of small text. The address, phone and hours are real text, never an image
+      — that block is what Google reads to place you in Málaga.</p>
     <div class="bb-sign"><span class="bb-label">EL-FOOT-01</span>
       <span class="bb-sign__box">Aprobado</span><span class="bb-sign__box">Con cambios</span>
       <span class="bb-sign__note">Nota:</span></div>
   </article>
 </section>
+
 
 {{-- ════════════════════════════════════════════════ 3 WALL ══ --}}
 <section class="bb-section" id="wall">
@@ -1311,17 +1445,13 @@
     <thead><tr><th>ID</th><th>Element</th><th>Where</th><th class="bb-num-cell">Aprobado</th><th class="bb-num-cell">Con cambios</th></tr></thead>
     <tbody>
       @foreach([
-        ['EL-BTN-01','Botón principal','Todo el sitio'],
-        ['EL-BTN-02','WhatsApp y Llamar','Cabecera, ficha, barra, pie'],
         ['EL-CARD-01','Tarjeta de coche','Home, catálogo, 404'],
-        ['EL-PRICE-01','Precio y kilómetros','Tarjeta, ficha, barra'],
-        ['EL-BADGE-01','Estado y datos rápidos','Tarjeta'],
-        ['EL-SPEC-01','Los datos','Ficha'],
+        ['EL-BTN-01','Botones — azul, WhatsApp, Llamar, discreto','Todo el sitio'],
         ['EL-HDR-01','Cabecera y menú','Todo el sitio'],
         ['EL-BAR-01','Barra fija inferior','Ficha, móvil'],
         ['EL-FORM-01','Pregúntame por este coche','Ficha'],
-        ['EL-EMPTY-01','Sin coches','Catálogo'],
-        ['EL-FOOT-01','Pie','Todo el sitio'],
+        ['EL-SMALL','Precio·km, estado, datos, enlaces, avisos, sin foto','Tarjeta, ficha'],
+        ['EL-FOOT-01','Pie, y el catálogo vacío','Todo el sitio'],
       ] as [$id,$name,$where])
         <tr>
           <td><code>{{ $id }}</code></td><td><b>{{ $name }}</b></td><td>{{ $where }}</td>

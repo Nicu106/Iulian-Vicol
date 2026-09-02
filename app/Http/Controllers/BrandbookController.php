@@ -37,6 +37,7 @@ class BrandbookController extends Controller
             'inventory' => $this->inventory(),
             'sample'    => Testimonial::where('is_active', true)->orderBy('order_index')->get(),
             'car'       => Vehicle::where('status', 'available')->first(),
+            'cars'      => Vehicle::where('status', 'available')->orderBy('priority', 'desc')->take(3)->get(),
             'sold'      => Vehicle::where('status', 'sold')->first(),
         ]);
     }

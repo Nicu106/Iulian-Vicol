@@ -466,3 +466,107 @@ table.bb-t .bb-mono{ overflow-wrap:anywhere; }
     transition-duration:.01ms!important; scroll-behavior:auto!important; }
   .mc-pair-under{ transform:scaleX(1); }
 }
+
+/* ============================================================
+   THE PHONE — a 390px frame that reads as a phone without leaving
+   the system: ink border, status strip, home indicator, no radius.
+   Everything inside is mobile layout written explicitly, because a
+   media query inside a narrow div still resolves against the page.
+   ============================================================ */
+.ph{ width:390px; max-width:100%; background:var(--mc-bg);
+  border:1px solid var(--mc-ink); position:relative; overflow:hidden; }
+.ph__status{ height:28px; display:flex; align-items:center; justify-content:space-between;
+  padding:0 var(--s-4); background:var(--mc-surface); border-bottom:1px solid var(--mc-hairline);
+  font-size:var(--t-label); font-weight:500; color:var(--mc-ink-2);
+  font-variant-numeric:tabular-nums; }
+.ph__status i{ display:inline-block; width:26px; height:10px; border:1px solid var(--mc-ink-2);
+  padding:1px; }
+.ph__status i::before{ content:""; display:block; height:100%; width:78%; background:var(--mc-ink-2); }
+.ph__home{ height:22px; display:flex; align-items:center; justify-content:center;
+  background:var(--mc-surface); border-top:1px solid var(--mc-hairline); }
+.ph__home::before{ content:""; width:120px; height:4px; background:var(--mc-ink); }
+.ph__screen{ position:relative; }
+.ph--clip .ph__screen{ height:1180px; overflow:hidden; }
+.ph--clip .ph__screen::after{ content:""; position:absolute; left:0; right:0; bottom:0;
+  height:120px; background:linear-gradient(to bottom, transparent, var(--mc-bg)); }
+.ph__fold{ position:absolute; left:0; right:0; top:759px; z-index:2; height:0;
+  border-top:1px dashed var(--mc-accent); }
+.ph__fold span{ position:absolute; right:0; top:-1px; transform:translateY(-100%);
+  padding:2px var(--s-2); background:var(--mc-accent); color:var(--mc-surface);
+  font-size:var(--t-label); font-weight:500; }
+.ph__bar{ position:absolute; left:0; right:0; bottom:0; z-index:3; }
+
+/* the assembled page, mobile-first and explicit */
+.pg-sec{ padding:var(--s-6) var(--s-4); }
+.pg-sec + .pg-sec{ border-top:1px solid var(--mc-rule); }
+.pg-sec--band{ background:var(--mc-band); }
+.pg-sec--navy{ background:var(--mc-navy); color:var(--mc-on-navy-2); }
+.pg-h{ margin:0 0 var(--s-3); font-size:var(--t-h2); font-weight:600; line-height:1.16;
+  font-stretch:94%; letter-spacing:-.022em; color:var(--mc-ink); text-wrap:balance; }
+.pg-h::after{ content:""; display:block; height:2px; background:var(--mc-ink); margin-top:var(--s-3); }
+.pg-sec--navy .pg-h{ color:var(--mc-on-navy); } .pg-sec--navy .pg-h::after{ background:var(--mc-navy-line); }
+.pg-eyebrow{ display:block; margin-bottom:var(--s-2); font-size:var(--t-label); font-weight:500;
+  letter-spacing:.010em; color:var(--mc-ink-3); }
+.pg-h1{ margin:0 0 var(--s-3); font-size:var(--t-h1); line-height:1.08; font-stretch:92%;
+  letter-spacing:-.028em; font-weight:600; color:var(--mc-ink); text-wrap:balance; }
+.pg-lead{ margin:0 0 var(--s-4); font-family:var(--f-voice); font-size:var(--t-prose);
+  line-height:1.5; color:var(--mc-ink-2); }
+.pg-proof{ display:flex; flex-wrap:wrap; gap:var(--s-2) var(--s-3); margin:0 0 var(--s-5);
+  font-size:var(--t-small); color:var(--mc-ink-2); font-variant-numeric:tabular-nums; }
+.pg-proof b{ color:var(--mc-ink); font-weight:600; }
+.pg-prose{ font-family:var(--f-voice); font-size:var(--t-prose); line-height:1.6;
+  color:var(--mc-ink-2); }
+.pg-prose p{ margin:0 0 var(--s-3); }
+.pg-note{ margin:var(--s-3) 0 0; font-family:var(--f-voice); font-size:var(--t-small);
+  color:var(--mc-ink-3); }
+
+.ph .mc-cardgrid{ grid-template-columns:1fr; gap:var(--s-4); }
+.ph .tt-list{ grid-template-columns:1fr; }
+.ph .tt-row{ grid-template-columns:120px minmax(0,1fr); gap:var(--s-3); }
+.ph .tt-quote{ font-size:var(--t-small); }
+.ph .mc-specs{ display:block; }
+.ph .mc-head__in{ padding:0 var(--s-4); }
+.ph .mc-bar{ padding-bottom:calc(var(--s-2) + 14px); } /* stands in for the safe-area inset */
+
+/* gallery strip inside the vehicle page */
+.pg-gal{ display:flex; gap:var(--s-2); margin-top:var(--s-2); overflow:hidden; }
+.pg-gal > div{ position:relative; flex:0 0 92px; aspect-ratio:var(--ar-card);
+  background:var(--mc-band); overflow:hidden; }
+.pg-gal > div.is-on::after{ content:""; position:absolute; left:0; right:0; bottom:0;
+  height:3px; background:var(--mc-blue); }
+.pg-gal__tag{ position:absolute; left:0; bottom:0; padding:2px var(--s-2);
+  background:var(--mc-ink); color:var(--mc-surface); font-size:var(--t-label); font-weight:500; }
+
+/* ============================================================
+   SPECIMEN CHROME, refined: caption under the state, chips for
+   "where", a quieter sign-off row.
+   ============================================================ */
+.bb-el__where{ display:flex; flex-wrap:wrap; gap:var(--s-1); margin-left:auto; }
+.bb-el__where span{ padding:2px var(--s-2); border:1px solid var(--mc-rule);
+  font-size:var(--t-label); color:var(--mc-ink-2); white-space:nowrap; }
+.bb-state{ gap:0; padding:0; }
+.bb-state > *:first-child:not(.bb-label){ margin:var(--s-4); }
+.bb-state .bb-cap{ margin-top:auto; width:100%; padding:var(--s-2) var(--s-4);
+  border-top:1px solid var(--mc-hairline); font-size:var(--t-label); color:var(--mc-ink-3); }
+.bb-state--wide{ grid-column:1 / -1; }
+.bb-el__stage--band{ background:var(--mc-band); }
+.bb-el__stage--twin{ display:grid; gap:var(--s-5); grid-template-columns:1fr; align-items:start; }
+@media (min-width:900px){ .bb-el__stage--twin{ grid-template-columns:1fr auto; } }
+.bb-el__stage--twin > *{ min-width:0; }
+.bb-stagecap{ display:block; margin-bottom:var(--s-3); font-size:var(--t-label);
+  color:var(--mc-ink-3); }
+
+/* the two assembled phones */
+.bb-phones{ display:grid; gap:var(--s-6); grid-template-columns:1fr; justify-items:center; }
+@media (min-width:860px){ .bb-phones{ grid-template-columns:1fr 1fr; align-items:start; } }
+.bb-phones > div{ min-width:0; width:100%; max-width:390px; }
+.bb-phones .bb-label{ display:block; margin-bottom:var(--s-3); }
+
+/* small parts: a tight table of atoms, not a card each */
+.bb-atoms{ display:grid; grid-template-columns:1fr; gap:0; border-top:1px solid var(--mc-rule); }
+.bb-atom{ display:grid; grid-template-columns:1fr; gap:var(--s-3); padding:var(--s-4) 0;
+  border-bottom:1px solid var(--mc-hairline); align-items:center; }
+@media (min-width:640px){ .bb-atom{ grid-template-columns:16ch 1fr; } }
+.bb-atom__n{ font-size:var(--t-small); font-weight:500; color:var(--mc-ink); }
+.bb-atom__n small{ display:block; font-weight:400; color:var(--mc-ink-3); font-size:var(--t-label); }
+.bb-atom__s{ display:flex; flex-wrap:wrap; gap:var(--s-3); align-items:center; min-width:0; }
