@@ -1,0 +1,107 @@
+/* ============================================================
+   MOTORCLASS — "LA PRUEBA" design system
+   Canonical token file. Single source of truth.
+   The /brandbook page parses THIS file at runtime, so anything
+   changed here is documented automatically. Do not duplicate
+   these values anywhere else.
+   ============================================================ */
+
+:root{
+  color-scheme: light;
+
+  /* ---- GROUND — warm paper ------------------------------- */
+  --mc-paper:      #F4F1E9;   /* global page background */
+  --mc-paper-2:    #FBFAF5;   /* raised surfaces: inputs, quick spec panel */
+  --mc-paper-3:    #E7E2D6;   /* alternating bands, hover, pressed */
+
+  /* ---- INK ----------------------------------------------- */
+  --mc-ink:        #16181A;   /* body text, figures, heavy rules */
+  --mc-ink-2:      #4A4F52;   /* long prose, secondary text */
+  --mc-ink-3:      #5E6367;   /* labels, meta. Lightest text allowed */
+
+  /* ---- RULES --------------------------------------------- */
+  --mc-rule:       #D9D3C6;   /* decorative hairline: table rows */
+  --mc-rule-2:     #B3AC9C;   /* structural separation between blocks */
+  --mc-rule-3:     #868074;   /* legal minimum for control borders (3:1) */
+  --mc-rule-heavy: #16181A;   /* 2px, section boundary only */
+
+  /* ---- SIGNAL — rust. One only, spent where money moves --- */
+  --mc-signal:     #A33B22;   /* passes as text AND as fill */
+  --mc-signal-up:  #E0724F;   /* the same signal ON dark ground */
+  --mc-wash:       #F6E4DC;   /* ground of the negative/note. NEVER without a rule */
+
+  /* ---- DARK SURFACE — green-black, not navy --------------- */
+  --mc-deep:       #101A16;   /* footer, fixed bottom bar, photo viewer */
+  --mc-deep-2:     #1B2A24;   /* elevation inside the dark zone */
+  --mc-on-deep:    #F4F1E9;
+  --mc-on-deep-2:  #A2A9A4;
+  --mc-on-deep-rule:#2C3833;
+
+  /* ---- STATE — two, literal, never Bootstrap's ------------ */
+  --mc-ok:         #1F5B4A;   /* "it does have it", validated field */
+  --mc-note:       #7A5C0E;   /* "indicative", "estimated" */
+
+  /* ---- TYPEFACES ----------------------------------------- */
+  --f-ui:    "Archivo","Archivo Fallback","Helvetica Neue",Arial,sans-serif;
+  --f-voice: "Source Serif 4","Serif Fallback",Georgia,"Times New Roman",serif;
+
+  /* ---- TYPE SCALE — fluid 390px → 1200px, base 16px ------- */
+  --t-display: clamp(2.125rem,1.60rem + 2.35vw,3.25rem);   /* 34 → 52 */
+  --t-h1:      clamp(1.75rem,1.45rem + 1.55vw,2.5rem);     /* 28 → 40 */
+  --t-h2:      clamp(1.375rem,1.24rem + 0.60vw,1.75rem);   /* 22 → 28 */
+  --t-h3:      1.125rem;                                    /* 18 fixed */
+  --t-price:   clamp(1.75rem,1.45rem + 1.30vw,2.25rem);    /* 28 → 36 */
+  --t-km:      clamp(1.375rem,1.16rem + 0.95vw,1.75rem);   /* 22 → 28 */
+  --t-prose:   clamp(1.0625rem,1.03rem + 0.15vw,1.125rem); /* 17 → 18 */
+  --t-body:    1rem;                                        /* 16 fixed */
+  --t-ui:      1rem;                                        /* 16 fixed */
+  --t-value:   1.0625rem;                                   /* 17 fixed */
+  --t-small:   0.875rem;                                    /* 14 fixed */
+  --t-label:   0.8125rem;                                   /* 13 fixed — system floor */
+  --t-caption: 0.875rem;                                    /* 14 fixed, italic */
+
+  /* ---- SHAPE --------------------------------------------- */
+  --mc-r: 0px;              /* exists only so it can be audited */
+
+  /* ---- SPACING — 4px base, 10 values, no others ----------- */
+  --s-1:.25rem;  --s-2:.5rem;   --s-3:.75rem;  --s-4:1rem;    --s-5:1.5rem;
+  --s-6:2rem;    --s-7:3rem;    --s-8:4rem;    --s-9:6rem;    --s-10:8rem;
+
+  /* ---- ASPECT RATIOS ------------------------------------- */
+  --ar-card:      4 / 3;    /* vehicle card, gallery thumb */
+  --ar-hero-m:    4 / 3;    /* detail lead photo, mobile */
+  --ar-hero-d:    3 / 2;    /* detail lead photo, desktop */
+  --ar-portrait:  4 / 5;    /* testimonial, default */
+  --ar-tall:      5 / 7;    /* tall-tail testimonial (ratio < 0.62). 3/4 was measured
+                               against the real library and FAILS the 25% rule
+                               on 1 file (27.6%); 5/7 gives 23.9% worst case. */
+  --ar-wide:      4 / 3;    /* landscape testimonial */
+  --ar-editorial: 3 / 2;    /* section imagery */
+  --ar-social:   40 / 21;   /* 1200×630 OG, generated, never displayed */
+
+  /* ---- MOTION -------------------------------------------- */
+  --m-instant:  80ms;   /* press down */
+  --m-tap:     160ms;   /* release */
+  --m-quick:   160ms;   /* colour, border, opacity */
+  --m-state:   220ms;   /* focus, header state */
+  --m-move:    280ms;   /* THE STROKE, accordion, panel */
+  --m-reveal:  420ms;   /* the single scroll reveal */
+
+  --e-out:   cubic-bezier(.22,.61,.36,1);
+  --e-inout: cubic-bezier(.4,0,.2,1);
+  --e-in:    cubic-bezier(.4,0,1,1);
+  --e-line:  cubic-bezier(.65,0,.35,1);   /* the stroke: drawn, not thrown */
+
+  /* ---- LAYOUT -------------------------------------------- */
+  --mc-container: 1200px;
+  --mc-gutter-m:  1rem;
+  --mc-gutter-d:  2rem;
+  --mc-tap:       44px;    /* absolute minimum touch target */
+  --mc-tap-pref:  48px;    /* preferred touch target */
+}
+
+/* Metric-matched fallbacks: the page does not reflow when the webfont lands */
+@font-face{ font-family:"Archivo Fallback"; src:local("Arial"),local("Helvetica Neue");
+  size-adjust:97%; ascent-override:92%; descent-override:24%; line-gap-override:0%; }
+@font-face{ font-family:"Serif Fallback"; src:local("Georgia"),local("Times New Roman");
+  size-adjust:94%; ascent-override:95%; descent-override:27%; line-gap-override:0%; }

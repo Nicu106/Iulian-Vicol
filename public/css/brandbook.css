@@ -1,0 +1,242 @@
+/* ============================================================
+   /brandbook — rendered in the system it documents.
+   No value below is a literal: everything comes from mc-tokens.css.
+   ============================================================ */
+
+*,*::before,*::after{ box-sizing:border-box; border-radius:var(--mc-r); }
+
+html{ font-size:100%; -webkit-text-size-adjust:100%; }
+
+body.bb{
+  margin:0;
+  font-family:var(--f-ui);
+  font-stretch:100%;
+  font-weight:400;
+  font-size:var(--t-body);
+  line-height:1.55;
+  color:var(--mc-ink-2);
+  background:var(--mc-paper);
+  font-optical-sizing:auto;
+  text-rendering:optimizeLegibility;
+}
+
+/* THE VISIBLE GRID — two 1px rules at the container edges, continuous
+   from header to footer. Painted on body, so nothing interrupts it. */
+@media (min-width:1000px){
+  body.bb{
+    background-image:
+      linear-gradient(var(--mc-rule-2),var(--mc-rule-2)),
+      linear-gradient(var(--mc-rule-2),var(--mc-rule-2));
+    background-size:1px 100%,1px 100%;
+    background-position:calc(50% - var(--mc-container)/2) 0, calc(50% + var(--mc-container)/2) 0;
+    background-repeat:no-repeat;
+    background-attachment:local;
+  }
+}
+
+.bb-wrap{ max-width:var(--mc-container); margin:0 auto; padding:0 var(--mc-gutter-m); }
+@media (min-width:768px){ .bb-wrap{ padding:0 var(--mc-gutter-d); } }
+
+/* ---- type ------------------------------------------------ */
+h1,h2,h3{ font-family:var(--f-ui); font-weight:600; color:var(--mc-ink); margin:0; }
+h1{ font-size:var(--t-h1);      line-height:1.08; font-stretch:92%; letter-spacing:-.028em; }
+h2{ font-size:var(--t-h2);      line-height:1.16; font-stretch:94%; letter-spacing:-.022em; }
+h3{ font-size:var(--t-h3);      line-height:1.30; font-stretch:100%; letter-spacing:-.012em; }
+.bb-display{ font-size:var(--t-display); line-height:1.04; font-stretch:92%;
+  letter-spacing:-.035em; font-weight:600; color:var(--mc-ink); margin:0; }
+
+p{ margin:0 0 var(--s-4); }
+.bb-prose{ font-family:var(--f-voice); font-size:var(--t-prose); line-height:1.62;
+  color:var(--mc-ink-2); max-width:62ch; }
+.bb-caption{ font-family:var(--f-voice); font-style:italic; font-size:var(--t-caption);
+  line-height:1.45; color:var(--mc-ink-3); }
+.bb-label{ font-size:var(--t-label); line-height:1.30; font-weight:500;
+  letter-spacing:.010em; color:var(--mc-ink-3); }
+.bb-small{ font-size:var(--t-small); line-height:1.45; }
+code,.bb-mono{ font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  font-size:var(--t-small); color:var(--mc-ink); }
+
+/* ---- section boundaries: 2px, always UNDER the h2 --------- */
+.bb-section{ padding:var(--s-8) 0; border-top:1px solid var(--mc-rule-2); }
+.bb-section:first-of-type{ border-top:0; }
+.bb-head{ margin-bottom:var(--s-6); }
+.bb-head h2{ margin-bottom:var(--s-4); }
+.bb-head::after{ content:""; display:block; height:2px; background:var(--mc-ink); }
+.bb-num{ display:block; margin-bottom:var(--s-2); }
+
+/* ---- header ---------------------------------------------- */
+.bb-top{ background:var(--mc-deep); color:var(--mc-on-deep); padding:var(--s-7) 0 var(--s-8); }
+.bb-top .bb-display,.bb-top h1{ color:var(--mc-on-deep); }
+.bb-top .bb-prose{ color:var(--mc-on-deep-2); }
+.bb-top .bb-label{ color:var(--mc-on-deep-2); }
+.bb-meta{ display:flex; flex-wrap:wrap; gap:var(--s-5); margin-top:var(--s-6);
+  padding-top:var(--s-5); border-top:1px solid var(--mc-on-deep-rule); }
+.bb-meta div{ min-width:0; }
+.bb-meta b{ display:block; font-size:var(--t-value); font-weight:600; color:var(--mc-on-deep); }
+
+/* ---- contents -------------------------------------------- */
+.bb-toc{ display:grid; gap:0; margin:0; padding:0; list-style:none;
+  grid-template-columns:1fr; }
+@media (min-width:640px){ .bb-toc{ grid-template-columns:1fr 1fr; } }
+@media (min-width:1000px){ .bb-toc{ grid-template-columns:repeat(3,1fr); } }
+.bb-toc a{ display:flex; gap:var(--s-3); align-items:baseline;
+  min-height:var(--mc-tap); padding:var(--s-3) 0;
+  border-bottom:1px solid var(--mc-rule); color:var(--mc-ink); text-decoration:none;
+  touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+  transition:color var(--m-quick) var(--e-out); }
+.bb-toc a:hover{ color:var(--mc-signal); }
+@media (min-width:640px){ .bb-toc a{ padding-right:var(--s-5); } }
+
+/* ---- swatches -------------------------------------------- */
+.bb-grid{ display:grid; gap:var(--s-4); grid-template-columns:1fr; }
+@media (min-width:560px){ .bb-grid{ grid-template-columns:1fr 1fr; } }
+@media (min-width:960px){ .bb-grid{ grid-template-columns:repeat(3,1fr); } }
+.bb-sw{ border:1px solid var(--mc-rule-2); background:var(--mc-paper-2); }
+.bb-sw-chip{ height:96px; display:flex; align-items:flex-end; padding:var(--s-3);
+  font-size:var(--t-label); font-weight:500; }
+.bb-sw-body{ padding:var(--s-3); border-top:1px solid var(--mc-rule); }
+.bb-sw-body code{ display:block; margin-bottom:var(--s-1); }
+.bb-sw-body p{ margin:0; font-size:var(--t-small); color:var(--mc-ink-3); }
+
+/* ---- tables ---------------------------------------------- */
+.bb-scroll{ overflow-x:auto; -webkit-overflow-scrolling:touch;
+  overscroll-behavior-x:contain; }
+table.bb-t{ width:100%; min-width:560px; border-collapse:collapse;
+  font-size:var(--t-small); }
+table.bb-t th,table.bb-t td{ text-align:left; padding:var(--s-3) var(--s-3) var(--s-3) 0;
+  border-bottom:1px solid var(--mc-rule); vertical-align:top; }
+table.bb-t th{ font-size:var(--t-label); font-weight:500; color:var(--mc-ink-3);
+  border-bottom:1px solid var(--mc-rule-2); white-space:nowrap; }
+table.bb-t td b{ font-weight:600; color:var(--mc-ink); }
+table.bb-t tr:last-child td{ border-bottom:0; }
+.bb-num-cell{ font-variant-numeric:tabular-nums; white-space:nowrap; }
+
+.bb-pass{ color:var(--mc-ok); font-weight:600; }
+.bb-fail{ color:var(--mc-signal); font-weight:600; }
+.bb-exempt{ color:var(--mc-ink-3); }
+
+.bb-pair{ display:inline-flex; align-items:center; padding:var(--s-1) var(--s-2);
+  border:1px solid var(--mc-rule-2); font-size:var(--t-label); white-space:nowrap; }
+
+/* ---- THE PAIR — price · mileage, one typographic unit ----- */
+.mc-pair{ display:inline-flex; align-items:baseline; gap:var(--s-3); }
+.mc-pair .mc-price{ font-size:var(--t-price); line-height:1; font-weight:600;
+  font-stretch:96%; letter-spacing:-.020em; color:var(--mc-ink);
+  font-variant-numeric:tabular-nums; }
+.mc-pair .mc-km{ font-size:var(--t-km); line-height:1; font-weight:600;
+  font-stretch:96%; letter-spacing:-.015em; color:var(--mc-ink);
+  font-variant-numeric:tabular-nums; padding-left:var(--s-3);
+  border-left:1px solid var(--mc-ink); }
+.mc-pair .mc-km.is-unknown{ font-size:var(--t-value); color:var(--mc-ink-3); font-weight:500; }
+.mc-pair-under{ display:block; height:3px; background:var(--mc-signal);
+  transform:scaleX(0); transform-origin:left center; }
+.js .mc-pair-under.is-drawn{ transform:scaleX(1);
+  transition:transform var(--m-move) var(--e-line); }
+
+/* ---- THE NEGATIVE ---------------------------------------- */
+.mc-negative{ background:var(--mc-wash); border-left:3px solid var(--mc-signal);
+  padding:var(--s-4) var(--s-5); }
+.mc-negative h3{ font-size:var(--t-h3); margin-bottom:var(--s-2); }
+.mc-negative p{ font-family:var(--f-voice); font-style:italic;
+  font-size:var(--t-prose); line-height:1.62; color:var(--mc-ink); margin:0; }
+
+/* ---- THE MOSAIC ------------------------------------------
+   Multi-column flow, not grid. A grid row is as tall as its tallest cell, so
+   variant frames leave gaps under the shorter ones — which reads as a mistake
+   rather than as an editorial rhythm. Column flow packs them tight. */
+.mc-mosaic{ column-count:3; column-gap:var(--s-2); }
+@media (min-width:560px){ .mc-mosaic{ column-count:5; } }
+.mc-mosaic figure{ margin:0 0 var(--s-2); break-inside:avoid; }
+.mc-portrait{ aspect-ratio:var(--ar-portrait); background:var(--mc-paper-3);
+  overflow:hidden; display:block; }
+.mc-portrait.is-tall{ aspect-ratio:var(--ar-tall); }
+.mc-portrait.is-wide{ aspect-ratio:var(--ar-wide); }
+.mc-img{ display:block; width:100%; height:100%; object-fit:cover;
+  background:var(--mc-paper-3); }
+.mc-img--portrait{ object-position:50% 28%; }
+.mc-img--vehicle{ object-position:50% 42%; }
+
+/* ---- buttons --------------------------------------------- */
+.mc-btn{ display:inline-flex; align-items:center; justify-content:center;
+  min-height:var(--mc-tap-pref); padding:var(--s-3) var(--s-5);
+  font-family:var(--f-ui); font-size:var(--t-ui); font-weight:500;
+  letter-spacing:.002em; border:1px solid var(--mc-ink); background:var(--mc-ink);
+  color:var(--mc-paper); text-decoration:none; cursor:pointer;
+  touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+  transition:background var(--m-quick) var(--e-out),color var(--m-quick) var(--e-out); }
+.mc-btn:hover{ background:var(--mc-signal); border-color:var(--mc-signal); }
+.mc-btn:active{ transform:none; background:var(--mc-signal); }
+.mc-btn--ghost{ background:transparent; color:var(--mc-ink); border-color:var(--mc-rule-3); }
+.mc-btn--ghost:hover{ background:var(--mc-paper-3); color:var(--mc-ink);
+  border-color:var(--mc-ink); }
+
+:where(a,button,input,select,textarea,summary):focus-visible{
+  outline:2px solid var(--mc-ink); outline-offset:2px; }
+
+/* ---- the ruler ------------------------------------------- */
+.bb-ruler{ display:flex; align-items:flex-end; gap:var(--s-2); flex-wrap:wrap; }
+.bb-ruler div{ text-align:center; }
+.bb-ruler span{ display:block; background:var(--mc-ink); height:24px; }
+.bb-ruler .bb-label{ margin-top:var(--s-1); }
+
+/* ---- do / don't ------------------------------------------ */
+.bb-two{ display:grid; gap:var(--s-5); grid-template-columns:1fr; }
+@media (min-width:760px){ .bb-two{ grid-template-columns:1fr 1fr; } }
+.bb-do,.bb-dont{ padding:var(--s-4) var(--s-5); border:1px solid var(--mc-rule-2);
+  background:var(--mc-paper-2); }
+.bb-do{ border-left:3px solid var(--mc-ok); }
+.bb-dont{ border-left:3px solid var(--mc-signal); }
+.bb-do ul,.bb-dont ul{ margin:0; padding-left:1.1em; }
+.bb-do li,.bb-dont li{ margin-bottom:var(--s-2); font-size:var(--t-small); }
+.bb-do li:last-child,.bb-dont li:last-child{ margin-bottom:0; }
+
+/* ---- callout --------------------------------------------- */
+.bb-note{ border:1px solid var(--mc-rule-2); border-left:3px solid var(--mc-note);
+  background:var(--mc-paper-2); padding:var(--s-4) var(--s-5); }
+.bb-note p:last-child{ margin-bottom:0; }
+
+/* ---- phone frame for the mobile section ------------------ */
+.bb-phone{ width:390px; max-width:100%; border:1px solid var(--mc-ink);
+  background:var(--mc-paper); }
+.bb-band{ display:flex; align-items:center; gap:var(--s-3); padding:var(--s-3) var(--s-4);
+  border-bottom:1px solid var(--mc-rule); font-size:var(--t-small); }
+.bb-band:last-child{ border-bottom:0; }
+.bb-band b{ font-variant-numeric:tabular-nums; color:var(--mc-ink); white-space:nowrap; }
+
+/* ---- footer ---------------------------------------------- */
+.bb-foot{ background:var(--mc-deep); color:var(--mc-on-deep-2);
+  padding:var(--s-8) 0 var(--s-6); margin-top:var(--s-8); }
+.bb-foot h2{ color:var(--mc-on-deep); }
+.bb-foot .bb-head::after{ background:var(--mc-on-deep-rule); }
+.bb-mark{ font-size:clamp(3rem,14vw,11rem); line-height:.86; font-weight:600;
+  font-stretch:92%; letter-spacing:-.045em; color:var(--mc-deep-2);
+  margin:var(--s-7) 0 0; overflow:hidden; }
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{ animation-duration:.01ms!important; animation-iteration-count:1!important;
+    transition-duration:.01ms!important; scroll-behavior:auto!important; }
+}
+
+/* Grid and flex children default to min-width:auto, which lets a wide table
+   push the whole track past the viewport. The scroll container can only do its
+   job if every ancestor is allowed to shrink. Measured: without this the page
+   overflows the 320px viewport by 9px. */
+.bb-two > *, .bb-grid > *, .bb-toc > *{ min-width:0; }
+.bb-scroll{ max-width:100%; min-width:0; }
+table.bb-t .bb-mono{ overflow-wrap:anywhere; }
+
+/* code inherits --mc-ink, which is invisible on the deep surfaces */
+.bb-top code, .bb-foot code{ color:var(--mc-on-deep); }
+.bb-band[style*="deep"] code{ color:var(--mc-on-deep); }
+
+/* The deep band inherits its colour, but .bb-band b sets --mc-ink explicitly,
+   which is invisible on green-black. Scope the override to the band itself. */
+.bb-band.is-deep{ background:var(--mc-deep); color:var(--mc-on-deep-2); }
+.bb-band.is-deep b{ color:var(--mc-on-deep); }
+
+/* The contrast chip used to paint its own text in the pair being measured, which
+   made the decorative rows unreadable by definition. Swatches carry the colour;
+   the label stays legible. */
+.bb-pair i{ display:inline-block; width:14px; height:14px; margin-right:var(--s-1);
+  border:1px solid var(--mc-rule-2); flex:0 0 auto; }
+.bb-pair i + i{ margin-right:var(--s-2); }
