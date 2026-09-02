@@ -134,7 +134,7 @@
     <tbody>
       <tr><td>Blue as ink and edges, not as fields</td><td><b>Yes</b> <span class="bb-st bb-st--fixed">Fixed</span></td><td>Measured on their site: 46 text uses to 2 fills. It is also what lets your photographs stay the loudest thing on the page.</td></tr>
       <tr><td>Navy footer</td><td><b>Yes</b> <span class="bb-st bb-st--prop">Proposed</span></td><td>It signals where the page ends. Ours is slightly lighter than theirs on purpose — see the colour section.</td></tr>
-      <tr><td>Square corners</td><td><b>Yes</b> <span class="bb-st bb-st--prop">Proposed</span></td><td>Their images measure 0px rounding on 100% of 57 photos. You noticed this yourself.</td></tr>
+      <tr><td>Soft corners, measured</td><td><b>Yes</b> <span class="bb-st bb-st--prop">Proposed</span></td><td>Their filled buttons are 10px in 100% of cases, cards 22px in 26 of 26, chips 4px. Only the photographs and bare text links are square. An earlier draft took "square" to every element, and it read as old-school — so this now follows their numbers: 4 / 10 / 16.</td></tr>
       <tr><td>Clean header, grid of cars, long detail page, fixed bar on mobile</td><td><b>Yes</b> <span class="bb-st bb-st--fixed">Fixed</span></td><td>This is the structure you asked for, and it is the right one.</td></tr>
       <tr><td>A warm red-orange accent</td><td><b>Yes, corrected</b> <span class="bb-st bb-st--prop">Proposed</span></td><td>Their coral fails legibility at 3.59:1. We keep the relationship and fix the number — ours is 5.36:1.</td></tr>
       <tr><td>Filters, search and sort</td><td><b>Not yet</b> <span class="bb-st bb-st--you">Your call</span></td><td>They have thousands of cars. You have {{ $inventory['available'] }}. A filter panel over {{ $inventory['available'] }} cars advertises stock that isn't there. If you plan to hold 25+, we build it — say so and it goes in.</td></tr>
@@ -470,6 +470,7 @@
 
           <div class="pg-sec">
             <h2 class="pg-h">Disponibles hoy</h2>
+            <p class="pg-sub">Los he comprado y conducido yo.</p>
             <div class="mc-cardgrid">
               @foreach($cars->take(2) as $v){!! $cardFor($v) !!}@endforeach
             </div>
@@ -477,7 +478,7 @@
 
           <div class="pg-sec pg-sec--band">
             <h2 class="pg-h">{{ $inventory['testimonials'] }} personas se hicieron la foto</h2>
-            <p class="pg-note" style="margin:0 0 var(--s-4)">No pedí ninguna. Están todas.</p>
+            <p class="pg-sub">No pedí ninguna. Están todas.</p>
             <div class="tt-list">
               @foreach($goodQuotes->take(2) as $t){!! $rowFor($t) !!}@endforeach
             </div>
@@ -628,7 +629,7 @@
       <div class="bb-el__where"><span>Todo el sitio</span></div>
     </div>
     <div class="bb-el__stage">
-      <span class="bb-stagecap">The whole family, at rest. One blue, one terracotta, one outlined, one quiet.</span>
+      <span class="bb-stagecap">The whole family, at rest. One blue, one WhatsApp green, one outlined, one quiet.</span>
       <div style="display:flex;flex-wrap:wrap;gap:var(--s-3);align-items:center">
         <span class="mc-btn">Ver los coches</span>
         <span class="mc-btn mc-btn--cta">WhatsApp</span>
@@ -645,17 +646,19 @@
       <div class="bb-state"><span class="mc-btn is-loading"><span class="mc-btn__label" data-busy="Enviando…">Ver los coches</span><span class="mc-btn__prog"></span></span><span class="bb-cap">Enviando — la línea se dibuja</span></div>
     </div>
     <div class="bb-el__stage bb-el__stage--navy on-navy">
-      <span class="bb-stagecap" style="color:var(--mc-on-navy-2)">In the footer the same two flip — terracotta on navy measures 2.53:1 and cannot be fixed by recolouring</span>
+      <span class="bb-stagecap" style="color:var(--mc-on-navy-2)">In the footer the same two flip to white — a green fill on navy has no contrast at its edge, and no recolouring fixes that</span>
       <div style="display:flex;flex-wrap:wrap;gap:var(--s-3)">
         <span class="mc-btn mc-btn--cta">WhatsApp</span>
         <span class="mc-btn mc-btn--outline">Llamar</span>
       </div>
     </div>
     <p class="bb-el__why">Blue appears <b>once per screen</b> — if there are two, neither is
-      the main action. WhatsApp is terracotta everywhere and Call is outlined everywhere.
-      It is <b>not WhatsApp green</b>: the name already carries the recognition, and a
-      second brand's colour would break the rule that makes the price stand out.
-      <span class="bb-st bb-st--you">Your call</span> if you want the green anyway.</p>
+      the main action. WhatsApp is <b>green with its own mark</b> everywhere, and Call is
+      outlined in blue everywhere — the distribution car-planet uses. It is not the bright
+      brand green: white text on <code>#25D366</code> measures 1.98:1 and fails everywhere,
+      including on their own site. This is WhatsApp's hue at the lightness that clears
+      4.5:1, so it is recognisably WhatsApp and still legible in sun.
+      <span class="bb-st bb-st--prop">Proposed</span></p>
     <div class="bb-sign"><span class="bb-label">EL-BTN-01</span>
       <span class="bb-sign__box">Aprobado</span><span class="bb-sign__box">Con cambios</span>
       <span class="bb-sign__note">Nota:</span></div>
@@ -896,7 +899,7 @@
     </div>
     <p class="bb-el__why">These do not each need a page. In the catalogue, where every car
       is available, <b>the "Disponible" badge is not printed</b> — a badge on 9 of 9 cards
-      is decoration. Terracotta and green are the same grey to a red-green colourblind
+      is decoration. Coral and green are the same grey to a red-green colourblind
       buyer, roughly one man in twelve, so no state is ever carried by colour alone.</p>
     <div class="bb-sign"><span class="bb-label">EL-SMALL</span>
       <span class="bb-sign__box">Aprobado</span><span class="bb-sign__box">Con cambios</span>
@@ -1096,9 +1099,9 @@
     <h2>Colour</h2>
   </div>
   <p class="bb-prose">
-    A blue that reads as competent rather than corporate, one warm accent for the two
-    things that matter — the price and the contact button — and a lot of quiet neutral in
-    between so your photographs stay the loudest thing on the page.
+    A clean blue used the way car-planet uses it — as ink and edges, rarely as a field —
+    a coral for the price, WhatsApp's green for the one button that matters, and a lot of
+    white in between so your photographs stay the loudest thing on the page.
   </p>
 
   <div class="bb-note">
@@ -1137,7 +1140,8 @@
       <tr><td><b>Neutral</b></td><td class="bb-num-cell">~55%</td><td>Everything else. This is the palette.</td></tr>
       <tr><td><b>Navy</b></td><td class="bb-num-cell">~6%</td><td>Footer only</td></tr>
       <tr><td><b>Blue</b></td><td class="bb-num-cell">~4%</td><td>Links, active menu item, outline buttons, one tinted section per page</td></tr>
-      <tr><td><b>Terracotta</b></td><td class="bb-num-cell">~2%</td><td>One contact button per screen, and the price</td></tr>
+      <tr><td><b>Coral</b></td><td class="bb-num-cell">~1%</td><td>The price, and nothing else</td></tr>
+      <tr><td><b>WhatsApp green</b></td><td class="bb-num-cell">~1%</td><td>The WhatsApp button, and a sent-message confirmation. Nothing else</td></tr>
     </tbody>
   </table>
   </div>
@@ -1148,9 +1152,9 @@
       <ul>
         <li><b>The price.</b> Blue on a number reads as a link, and a price that looks
           tappable but isn't is the most damaging small failure on a car card.</li>
-        <li><b>The contact button.</b> That is terracotta on every page. If blue and
-          terracotta are both filled buttons on one screen, the accent has stopped meaning
-          "this is the action".</li>
+        <li><b>The WhatsApp button.</b> That is green on every page. If blue and green
+          are both filled buttons on one screen, the green has stopped meaning "message
+          him".</li>
         <li><b>Behind or over a photograph.</b> No blue hero behind a car, no tint overlay
           on the customer wall. Anything laid over a real photo reads as retouching.</li>
         <li><b>Spec values.</b> Blue in a data table implies everything is filterable.</li>
@@ -1158,7 +1162,7 @@
     </div>
     <div class="bb-note">
       <h3>One honest limitation</h3>
-      <p>Terracotta and the green confirmation colour are the same brightness. To a
+      <p>Coral and the WhatsApp green are close in brightness. To a
       red-green colourblind buyer — roughly one man in twelve — they are the same grey.</p>
       <p style="margin-bottom:0">So green is used <b>only</b> for confirmations ("message
       sent"), never for "available", and every status always carries the Spanish word.
@@ -1467,7 +1471,7 @@
       <h3>Waiting on you <span class="bb-st bb-st--you">Your call</span></h3>
       <ul style="margin:0;padding-left:1.1em">
         <li>The three legal and commercial sentences in §8.</li>
-        <li>Whether WhatsApp keeps the site's terracotta or takes its own green.</li>
+        <li>Whether the WhatsApp green stays at the legible <code>#017B37</code> or moves to the brand's brighter <code>#25D366</code> with dark text on it.</li>
         <li>Whether we build filters now or wait until the stock passes about 25 cars.</li>
         <li>Whether the fabricated star ratings come off the testimonials.</li>
       </ul>
@@ -1554,8 +1558,8 @@
       <li>The input border passed on the page but failed at 2.79:1 inside a grey band. It
         was re-solved against the darkest surface it can land on and now clears 3:1 on all
         four.</li>
-      <li>A terracotta button on navy measured 2.53:1, and no recolouring fixes it without
-        turning navy black. So on navy the button flips to a white fill.</li>
+      <li>A coloured button on navy has no usable contrast at its edge, and no recolouring
+        fixes it without turning navy black. So on navy the button flips to a white fill.</li>
     </ul>
   </div>
 </section>

@@ -44,24 +44,41 @@
      Below 220 to stay out of the OLED violet shift; above 208 to stay out
      of municipal cyan. At 37% lightness one value does two jobs: 7.13:1 as
      link text AND as a button fill with a white label. */
-  --mc-blue:       #0E56AC;  /* PRIMARY. 7.13:1 on white */
+  --mc-blue:       #1558D6;  /* PRIMARY. Hue 219, under the 220 OLED ceiling.
+                                6.18:1 white label, 5.71 on bg, 5.26 on band.
+                                Was #0E56AC, which measured as navy next to
+                                car-planet's #1B55EC. */
   --mc-blue-dark:  #093E7D;  /* hover, pressed, large headings. 9.72:1 on bg */
   --mc-blue-light: #6CAAE7;  /* links and icons ON NAVY ONLY. 5.52:1 on navy.
                                 Forbidden on light: 2.46:1 */
-  --mc-blue-100:   #C8D9EF;  /* blue chip fill */
+  --mc-blue-100:   #EBF1FA;  /* blue chip fill. Was #C8D9EF, on which blue text
+                                measured 4.30:1; this is 5.44 */
 
   /* ---- ACCENT — terracotta, hue 14. The only non-blue -----
      Two jobs: the contact CTA, and the price. Nothing else.
      car-planet pairs its blue with a warm red-orange (#E65848) that fails
      at 3.59:1 both ways; this keeps the relationship and fixes the contrast. */
-  --mc-accent:      #C03D15;  /* 5.36:1 white-on-fill */
+  --mc-accent:      #C03D15;  /* 13-16px text, error borders. 5.36:1 */
+  --mc-price:       #D5392D;  /* the price. car-planet's coral hue (OKLCH 29°)
+                                at a lightness that still passes: 4.72 white,
+                                4.36 bg, 4.01 band. Was --mc-accent, 9° browner
+                                and 11 points darker, which is exactly "rust". */
   --mc-accent-dark: #9D3110;  /* hover; label colour when a CTA sits on navy */
   --mc-accent-tint: #FBEAE5;  /* price chip ground */
 
   /* ---- STATE — exactly two, neither a Bootstrap default --- */
-  --mc-ok:        #0A7A4B;  /* confirmation only: message sent, WhatsApp opened.
-                               NOT "disponible" — see the colour-blindness note */
-  --mc-ok-tint:   #E3F7EF;
+  /* ---- WHATSAPP — the channel colour, and the system's ONE green ----
+     "One accent only" is restated: one brand accent (price, errors) plus one
+     channel colour reserved for the WhatsApp affordance and for send/opened
+     confirmations. That is car-planet's distribution exactly.
+     White on the brand #25D366 is 1.98:1 and fails everywhere, including on
+     their own site. This is WhatsApp's hue (OKLCH ~150°) at the lightness
+     that clears 4.5:1 with a white 16px label. */
+  --mc-wa:        #017B37;  /* 5.40:1 white label; 4.99 vs bg, 4.59 vs band */
+  --mc-wa-dark:   #006E30;  /* hover; label colour when the CTA sits on navy (6.42 on white) */
+  --mc-wa-tint:   #E3F7EF;  /* confirmation ground. 4.87:1 with --mc-wa text */
+  --mc-ok:        #017B37;  /* = --mc-wa. Confirmation only, never "disponible" */
+  --mc-ok-tint:   var(--mc-wa-tint);
   --mc-warn:      #7B5200;  /* indicative: "precio orientativo", "km aprox." */
   --mc-warn-tint: #FDF4E3;
 
@@ -82,8 +99,9 @@
 
   /* ---- TYPE SCALE — fluid 390px → 1200px, base 16px ------- */
   --t-display: clamp(2.125rem,1.60rem + 2.35vw,3.25rem);   /* 34 → 52 */
-  --t-h1:      clamp(1.75rem,1.45rem + 1.55vw,2.5rem);     /* 28 → 40 */
-  --t-h2:      clamp(1.375rem,1.24rem + 0.60vw,1.75rem);   /* 22 → 28 */
+  --t-h1:      clamp(2.125rem,1.60rem + 2.35vw,3.25rem);   /* 34 → 52 */
+  --t-h2:      clamp(1.75rem,1.45rem + 1.55vw,2.5rem);     /* 28 → 40. car-planet's h2 is 40 */
+  --t-sub:     1.125rem;                                    /* 18. the grey line under an h2 */
   --t-h3:      1.125rem;                                    /* 18 fixed */
   --t-price:   clamp(1.75rem,1.45rem + 1.30vw,2.25rem);    /* 28 → 36 */
   --t-km:      clamp(1.375rem,1.16rem + 0.95vw,1.75rem);   /* 22 → 28 */
@@ -95,8 +113,22 @@
   --t-label:   0.8125rem;                                   /* 13 fixed — system floor */
   --t-caption: 0.875rem;                                    /* 14 fixed, italic */
 
-  /* ---- SHAPE --------------------------------------------- */
-  --mc-r: 0px;              /* exists only so it can be audited */
+  /* ---- SHAPE — measured on car-planet, not assumed ---------
+     Their filled and outlined CTAs are 10px in 100% of cases, cards 22px in
+     26/26, chips 4px in 144/169. The earlier "0px everywhere" held only for
+     photographs and bare text links, and it read as old-school. */
+  --mc-r-s:    4px;      /* chips, badges, small tabs, spec rows */
+  --mc-r:     10px;      /* buttons, inputs */
+  --mc-r-l:   16px;      /* cards, panels. car-planet is 22; 16 keeps the car's
+                            corners inside a 4/3 photo */
+  --mc-r-pill: 999px;    /* icon discs only */
+
+  /* ---- ELEVATION — shadow PLUS hairline, never instead of ----
+     car-planet's exact card shadow. Shadows fade in glare, so the hairline
+     stays as the fallback edge. */
+  --mc-shadow-1: 0 0 12px rgba(16,24,40,.10);
+  --mc-shadow-2: 0 4px 12px rgba(16,24,40,.10);
+  --mc-shadow-up: 0 -4px 12px rgba(16,24,40,.08);
 
   /* ---- SPACING — 4px base, 10 values, no others ----------- */
   --s-1:.25rem;  --s-2:.5rem;   --s-3:.75rem;  --s-4:1rem;    --s-5:1.5rem;

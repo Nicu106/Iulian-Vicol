@@ -79,10 +79,15 @@ class BrandbookController extends Controller
                 ['--mc-on-navy',   'Text on navy.'],
                 ['--mc-on-navy-2', 'Secondary text on navy. Never on a light surface.'],
             ],
-            'Accent' => [
-                ['--mc-accent',      'Terracotta. The one non-blue, for the contact action and the price. Nothing else.'],
-                ['--mc-accent-dark', 'Hover, and the label colour when a call-to-action sits on navy.'],
-                ['--mc-accent-tint', 'Price chip ground.'],
+            'Price' => [
+                ['--mc-price',       'Coral, on car-planet\'s hue, for the price and nothing else. Passes 4.5:1 on every ground.'],
+                ['--mc-accent',      'The darker step: small text, error borders, the failing mark in this book.'],
+                ['--mc-accent-tint', 'Error-field ground.'],
+            ],
+            'WhatsApp' => [
+                ['--mc-wa',      'The channel colour. WhatsApp\'s hue at the lightness that clears 4.5:1 with a white label — the brand #25D366 measures 1.98:1.'],
+                ['--mc-wa-dark', 'Hover, and the label colour when the button sits on navy.'],
+                ['--mc-wa-tint', 'Sent-message confirmation ground.'],
             ],
             'Ink' => [
                 ['--mc-ink',   'Headings, body, spec values. Never pure black — #000 haloes in direct sun.'],
@@ -95,7 +100,7 @@ class BrandbookController extends Controller
                 ['--mc-control',  'Inputs, outline buttons, checkboxes. Must clear 3:1 on every ground.'],
             ],
             'State' => [
-                ['--mc-ok',   'Confirmation only — message sent. Not "available"; see the colour-vision note.'],
+                ['--mc-ok',   'Same value as the WhatsApp green — the system has one green. Confirmation only, never "available".'],
                 ['--mc-warn', 'Indicative: "precio orientativo", "km aprox."'],
             ],
         ];
@@ -174,12 +179,17 @@ class BrandbookController extends Controller
             ['--mc-surface',    '--mc-blue',      'text',    'White label on the blue button'],
             ['--mc-surface',    '--mc-blue-dark', 'text',    'White label, button pressed'],
             // accent
-            ['--mc-accent',     '--mc-surface',   'text',    'Price on a card'],
-            ['--mc-accent',     '--mc-band',      'text',    'Price on a band, worst case'],
-            ['--mc-accent',     '--mc-accent-tint','text',   'Price on its own chip'],
-            ['--mc-surface',    '--mc-accent',    'text',    'White label on the contact button'],
-            ['--mc-surface',    '--mc-accent-dark','text',   'White label, button pressed'],
-            ['--mc-accent',     '--mc-surface',   'graphic', 'Accent 3px rule or button edge'],
+            ['--mc-price',      '--mc-surface',   'text',    'Price on a card'],
+            ['--mc-price',      '--mc-band',      'large',   'Price on a band — always >=24px bold, so large text'],
+            ['--mc-accent',     '--mc-surface',   'text',    'Error text on a card'],
+            ['--mc-accent',     '--mc-accent-tint','text',   'Error text on the error-field ground'],
+            ['--mc-surface',    '--mc-wa',        'text',    'White label on the WhatsApp button'],
+            ['--mc-surface',    '--mc-wa-dark',   'text',    'White label, WhatsApp pressed'],
+            ['--mc-wa',         '--mc-surface',   'graphic', 'WhatsApp button edge on white'],
+            ['--mc-wa',         '--mc-band',      'graphic', 'WhatsApp button edge on a band'],
+            ['--mc-wa-dark',    '--mc-surface',   'text',    'WhatsApp label on the white footer button'],
+            ['--mc-wa',         '--mc-wa-tint',   'text',    'Confirmation text on its ground'],
+            ['--mc-blue',       '--mc-surface',   'text',    'Outlined Call button, label and edge'],
             // borders
             ['--mc-control',    '--mc-bg',        'graphic', 'Input border on the page'],
             ['--mc-control',    '--mc-band',      'graphic', 'Input border on a band, worst case'],
@@ -202,11 +212,13 @@ class BrandbookController extends Controller
             ['--mc-blue',       '--mc-navy',    'Primary blue on navy',            '--mc-blue-light on navy'],
             ['--mc-blue-dark',  '--mc-navy',    'Dark blue on navy',               '--mc-on-navy'],
             ['--mc-blue-light', '--mc-surface', 'Light blue on any light surface', '--mc-blue'],
-            ['--mc-accent',     '--mc-navy',    'Accent button on navy, unringed', 'ring it in white, or use a white fill with an accent-dark label'],
+            ['--mc-wa',         '--mc-navy',    'Green WhatsApp fill on navy',    'a white fill with the dark-green label'],
+            ['#FFFFFF',         '#25D366',      'White text on the brand green',  '--mc-wa, or dark text if the bright green is insisted on'],
             ['--mc-ink-3',      '--mc-navy',    'Lightest ink on navy',            '--mc-on-navy-2'],
         ];
 
-        $thresholds = ['text' => 4.5, 'graphic' => 3.0, 'none' => 0.0];
+        // 'large' is WCAG's large-text threshold: >=24px, or >=18.66px bold.
+        $thresholds = ['text' => 4.5, 'large' => 3.0, 'graphic' => 3.0, 'none' => 0.0];
 
         $rows = [];
         foreach ($pairs as [$fg, $bg, $kind, $use]) {
@@ -218,16 +230,18 @@ class BrandbookController extends Controller
                 'use'   => $use,  'kind'  => $kind,
                 'ratio' => $r,    'need'  => $need,
                 'pass'  => $kind === 'none' ? null : $r >= $need,
-                'aaa'   => $kind === 'text' && $r >= 7.0,
+                'aaa'   => ($kind === 'text' && $r >= 7.0) || ($kind === 'large' && $r >= 4.5),
             ];
         }
 
         $bad = [];
         foreach ($forbidden as [$fg, $bg, $use, $instead]) {
+            $fgHex = str_starts_with($fg, '#') ? $fg : ($t[$fg] ?? '#000');
+            $bgHex = str_starts_with($bg, '#') ? $bg : ($t[$bg] ?? '#fff');
             $bad[] = [
-                'fgHex'   => strtoupper($t[$fg] ?? ''), 'bgHex' => strtoupper($t[$bg] ?? ''),
+                'fgHex'   => strtoupper($fgHex), 'bgHex' => strtoupper($bgHex),
                 'use'     => $use,
-                'ratio'   => $this->ratio($t[$fg] ?? '#000', $t[$bg] ?? '#fff'),
+                'ratio'   => $this->ratio($fgHex, $bgHex),
                 'instead' => $instead,
             ];
         }
