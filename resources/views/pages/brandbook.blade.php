@@ -1182,8 +1182,13 @@
     then actually measured it — 40,000 pixels sampled per photo, sorted by depth.</p>
     <p><b>Faces are at 20–50% down, peaking at 30–40%. Only 8.8% of skin is in the top
     fifth</b>, which is sky and warehouse ceiling. Favouring the top preserved empty
-    headroom and ate the car and the certificate. The framing is now
+    headroom and ate the car and the certificate. The framing here is now
     <code>{{ $tokens['--pos-portrait'] ?? '50% 40%' }}</code>, measured rather than assumed.</p>
+    <p><b>Your live site still carries the wrong value.</b> When you asked me not to cut
+    people's faces, I set the framing to <code>center 25%</code> on the home page. Faces
+    are not cut at 25% — but it keeps empty sky and loses the bottom of the car and the
+    certificate people are holding. Changing one value to <code>center 40%</code> fixes
+    it. <span class="bb-st bb-st--fixed">Fixed</span></p>
     <p style="margin-bottom:0"><b>No frame may crop more than 25% of a photo's height.</b>
     Audited live against all {{ $crops['n'] }} of your customer photos:
     worst case <b>{{ $crops['worst'] }}%</b>,
@@ -1341,8 +1346,11 @@
       <h3>Broken today, regardless of any decision <span class="bb-st bb-st--fixed">Fixed</span></h3>
       <ul style="margin:0;padding-left:1.1em">
         <li><code>viewport-fit=cover</code> is missing — any fixed bar sits under the
-          iPhone home indicator.</li>
-        <li>About 180 car photographs are served rotated 90°.</li>
+          iPhone home indicator. One line.</li>
+        <li>About 180 car photographs are served rotated 90°. Roughly fifteen lines,
+          already written and tested here.</li>
+        <li>Customer photos are framed at <code>center 25%</code> instead of
+          <code>center 40%</code> — my error, one value.</li>
         <li>113 targets across three pages are too small to tap reliably.</li>
       </ul>
     </div>
@@ -1487,7 +1495,10 @@
       Generated from <code>public/css/mc-tokens.css</code> ·
       {{ count($tokens) }} values · {{ count($contrast) }} contrast pairs ·
       {{ $crops['n'] }} photographs audited</p>
-    <p class="bb-small">A working document, not a public page. Mark it up and send it back.</p>
+    <p class="bb-small">A working document, not a public page. Mark it up and send it back.<br>
+      <b>Nothing in this book has been applied to ivmotorclass.com.</b> Every element here
+      lives only on this design copy; the live site is untouched until you sign each line
+      of §10.</p>
     <p class="bb-mark" aria-hidden="true">MOTORCLASS</p>
   </div>
 </footer>
