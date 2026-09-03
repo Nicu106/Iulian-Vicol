@@ -454,7 +454,7 @@
           <div class="mc-head">
             <div class="mc-head__in">
               <a class="mc-logo" href="#elements">IV&nbsp;MOTORCLASS</a>
-              <span class="mc-btn mc-btn--cta" style="padding-inline:var(--s-3)">WhatsApp</span>
+              <span class="mc-btn mc-btn--cta">WhatsApp</span>
               <span class="mc-burger"><span class="mc-burger__bars"></span></span>
             </div>
           </div>
@@ -691,7 +691,7 @@
           <div class="ph__screen">
             <div class="mc-head"><div class="mc-head__in">
               <a class="mc-logo" href="#EL-HDR-01">IV&nbsp;MOTORCLASS</a>
-              <span class="mc-btn mc-btn--cta" style="padding-inline:var(--s-3)">WhatsApp</span>
+              <span class="mc-btn mc-btn--cta">WhatsApp</span>
               <span class="mc-burger"><span class="mc-burger__bars"></span></span>
             </div></div>
             <div style="height:120px"></div>
@@ -702,7 +702,7 @@
           <div class="ph__screen">
             <div class="mc-head"><div class="mc-head__in">
               <a class="mc-logo" href="#EL-HDR-01">IV&nbsp;MOTORCLASS</a>
-              <span class="mc-btn mc-btn--cta" style="padding-inline:var(--s-3)">WhatsApp</span>
+              <span class="mc-btn mc-btn--cta">WhatsApp</span>
               <span class="mc-burger" style="border-color:var(--mc-ink)"><span class="mc-burger__bars"></span></span>
             </div></div>
             <div style="padding:var(--s-2) var(--s-4) var(--s-4);background:var(--mc-surface)">
@@ -746,7 +746,7 @@
               </dl>
             </div>
             <div class="ph__bar"><div class="mc-bar">
-              <div class="mc-bar__pair"><span class="mc-bar__price">24.800 €</span><span class="mc-bar__km">184.000 km</span></div>
+              <div class="mc-bar__pair"><span class="mc-bar__price">{{ $euros($maxPrice) }}</span><span class="mc-bar__km">184.000 km</span></div>
               <div class="mc-bar__act"><span class="mc-btn mc-btn--cta">WhatsApp</span><span class="mc-btn mc-btn--outline" style="padding-inline:var(--s-3)">Tel</span></div>
             </div></div>
           </div>
@@ -854,7 +854,7 @@
         <div class="bb-atom">
           <div class="bb-atom__n">Precio y kilómetros<small>EL-PRICE-01 · never one without the other</small></div>
           <div class="bb-atom__s">
-            <div><div class="mc-pair"><span class="mc-price">24.800 €</span><span class="mc-km">184.000 km</span></div></div>
+            <div><div class="mc-pair"><span class="mc-price">{{ $euros($maxPrice) }}</span><span class="mc-km">{{ $km($maxKm) }}</span></div></div>
             <div><div class="mc-pair"><span class="mc-price">14.800 €</span><span class="mc-km is-unknown">Km sin confirmar</span></div></div>
           </div>
         </div>
@@ -1193,7 +1193,7 @@
       typeface car-planet renders on 485 of its 509 measured text nodes, taken deliberately
       on your instruction to get as close to their register as possible. One family, no
       serif — exactly as they do it.</p>
-      <p class="mc-pair" style="margin-top:0"><span class="mc-price">24.800 €</span><span class="mc-km">184.000 km</span></p>
+      <p class="mc-pair" style="margin-top:0"><span class="mc-price">{{ $euros($maxPrice) }}</span><span class="mc-km">{{ $km($maxKm) }}</span></p>
     </div>
     <div>
       <h3>The customer's voice — italic, same family</h3>

@@ -37,6 +37,8 @@ class BrandbookController extends Controller
             'inventory' => $this->inventory(),
             'sample'    => Testimonial::where('is_active', true)->orderBy('order_index')->get(),
             'car'       => Vehicle::where('status', 'available')->first(),
+            'maxPrice'  => (int) Vehicle::where('status', 'available')->max('price'),
+            'maxKm'     => (int) Vehicle::where('status', 'available')->max('mileage'),
             'carOdo'    => (function () {
                 $v = Vehicle::where('status', 'available')->first();
                 $g = $v?->gallery_images; if (is_string($g)) { $g = json_decode($g, true); }
