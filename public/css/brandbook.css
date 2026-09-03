@@ -38,6 +38,7 @@ p{ margin:0 0 var(--s-4); }
 .bb-label{ font-size:var(--t-label); line-height:1.30; font-weight:500;
   letter-spacing:.010em; color:var(--mc-ink-3); }
 .bb-small{ font-size:var(--t-small); line-height:1.45; }
+.bb-section > p.bb-small{ max-width:62ch; }
 /* one family. Code is the same face, medium weight, tabular — not the viewer's OS mono */
 code,.bb-mono{ font-family:var(--f-ui); font-weight:500; font-variant-numeric:tabular-nums;
   font-size:var(--t-small); color:var(--mc-ink); }
@@ -105,6 +106,7 @@ code,.bb-mono{ font-family:var(--f-ui); font-weight:500; font-variant-numeric:ta
   overscroll-behavior-x:contain; max-width:100%; min-width:0; }
 table.bb-t{ width:100%; min-width:560px; border-collapse:collapse; font-size:var(--t-small); line-height:1.45; }
 #colour table.bb-t,#type table.bb-t,#voice table.bb-t,#appendix table.bb-t,#wall table.bb-t,.bb-note table.bb-t{ min-width:0; }
+@media (max-width:600px){ #wall table.bb-t th{ white-space:normal; } }
 #type table.bb-t td:first-child{ white-space:nowrap; }
 @media (max-width:600px){ #type table.bb-t th:nth-child(2){ white-space:normal; } }
 #signoff table.bb-t td:first-child{ white-space:nowrap; }
@@ -137,7 +139,8 @@ table.bb-t th,table.bb-t td{ text-align:left; padding:var(--s-3) var(--s-3) var(
 table.bb-t th{ font-size:var(--t-label); font-weight:500; line-height:1.3; letter-spacing:.010em;
   color:var(--mc-ink-3); border-bottom:1px solid var(--mc-rule); white-space:nowrap; }
 table.bb-t td b{ font-weight:600; color:var(--mc-ink); }
-#order table.bb-t td:nth-child(3) b{ font-weight:500; }
+@media (min-width:601px){ #order table.bb-t{ width:auto; max-width:100%; } }
+#order table.bb-t td .bb-st{ display:flex; width:max-content; margin-top:var(--s-1); }   /* prose columns hold 62ch, not 133 */
 /* specificity: table.bb-t td (0,1,2) outranked .bb-num-cell (0,1,0), so right-align never applied */
 table.bb-t .bb-num-cell,.bb-num-cell{ font-variant-numeric:tabular-nums; white-space:nowrap; text-align:right; }
 .bb-pass{ color:var(--mc-ok); font-weight:600; }
@@ -493,7 +496,8 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
 .tt-list{ display:grid; grid-template-columns:1fr; gap:0; }
 .tt-row{ display:grid; grid-template-columns:140px minmax(0,1fr); gap:var(--s-4);
   align-items:start; padding:var(--s-4) 0; border-bottom:1px solid var(--mc-hairline); }
-.tt-row:last-child{ border-bottom:0; }
+.tt-row{ border-top:1px solid var(--mc-hairline); border-bottom:0; }
+.tt-row:first-child{ border-top:0; }
 .tt-photo{ aspect-ratio:var(--ar-portrait); overflow:hidden; background:var(--mc-band); border-radius:var(--mc-r); }
 .tt-photo.is-tall{ aspect-ratio:var(--ar-tall); }
 .tt-photo.is-wide{ aspect-ratio:var(--ar-wide); }
@@ -504,11 +508,14 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
   -webkit-line-clamp:9; line-clamp:9; overflow:hidden; }
 .tt-more{ align-self:flex-start; min-height:var(--mc-tap); padding:var(--s-2) 0;
   background:none; border:0; font:inherit; font-size:var(--t-ui); font-weight:500;
-  color:var(--mc-blue); text-decoration:underline; cursor:pointer; }
-.tt-attr{ font-size:var(--t-label); font-weight:500; letter-spacing:.010em; color:var(--mc-ink-3); }
+  color:var(--mc-blue); text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:.16em; cursor:pointer;
+  transition:color var(--m-quick) var(--e-out), text-decoration-thickness var(--m-quick) var(--e-out); }
+.tt-more:hover{ color:var(--mc-ink); text-decoration-thickness:2px; }
+.tt-attr{ font-size:var(--t-label); font-weight:500; letter-spacing:.010em; line-height:1.3; color:var(--mc-ink-3); }
 .tt-attr b{ color:var(--mc-ink); font-weight:600; }
 @media (min-width:992px){
   .tt-list{ grid-template-columns:1fr 1fr; column-gap:var(--s-7); }
+  .tt-row:nth-child(-n+2){ border-top:0; }
   .tt-row{ grid-template-columns:200px minmax(0,1fr); gap:var(--s-5); }
 }
 
