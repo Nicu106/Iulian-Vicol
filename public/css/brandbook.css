@@ -617,9 +617,12 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
 .bb-el__stage--twin > .ph{ width:390px; max-width:100%; }
 @media (max-width:421px){
   .bb-el{ margin-inline:calc(var(--mc-gutter-m) * -1); border-inline-width:0; border-radius:0; }
-  .bb-el__stage--band{ padding-inline:0; }
-  .bb-el__stage--band > .bb-stagecap,.bb-el__stage--twin > :not(.ph){ padding-inline:var(--s-4); }
   .bb-el__stage{ padding:var(--s-4); }
+  /* the twin stages bleed to the frame edge; only the captions keep the gutter.
+     Declared after .bb-el__stage so it wins, and the form's inner two-up drops its own padding. */
+  .bb-el__stage.bb-el__stage--band{ padding-inline:0; }
+  .bb-el__stage--band > .bb-stagecap,.bb-el__stage--twin > :not(.ph,div){ padding-inline:var(--s-4); }
+  .bb-el__stage--twin > div{ padding-inline:0 !important; }
   .bb-phones .bb-label,.bb-phones .bb-small{ padding-inline:var(--mc-gutter-m); }
 }
 @media (min-width:900px){ .bb-el__stage--twin{ grid-template-columns:1fr auto; } }
