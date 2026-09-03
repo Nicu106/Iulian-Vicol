@@ -79,7 +79,7 @@ class BrandbookController extends Controller
             'Surfaces' => [
                 ['--mc-bg',         'The page. A cool near-white, not pure white.'],
                 ['--mc-surface',    'Vehicle cards and forms. Pure white, so a card lifts off the page without a shadow — shadows disappear in glare.'],
-                ['--mc-band',       'Alternating section band. The darkest light surface, so every text colour is proven against this one.'],
+                ['--mc-band',       'Placeholder and disabled ground: empty frames, the disabled button, the menu button. The darkest light surface, so every text colour is proven against this one.'],
                 ['--mc-blue-tint',  'Blue wash: one band per page at most, spec rows, and chip fill.'],
             ],
             'Blue' => [
@@ -88,7 +88,7 @@ class BrandbookController extends Controller
                 ['--mc-blue-light', 'Links and icons on navy only. Forbidden on light — 2.46:1.'],
             ],
             'Navy' => [
-                ['--mc-navy',      'Footer only. Held at 1.55:1 from pure black so it survives a cheap phone panel.'],
+                ['--mc-navy',      'Footer, the sold badge, and a button while pressed. Held at 1.55:1 from pure black so it survives a cheap phone panel.'],
                 ['--mc-navy-line', 'Hairline inside navy. Decorative.'],
                 ['--mc-on-navy',   'Text on navy.'],
                 ['--mc-on-navy-2', 'Secondary text on navy. Never on a light surface.'],
@@ -104,13 +104,13 @@ class BrandbookController extends Controller
                 ['--mc-wa-tint', 'Sent-message confirmation ground.'],
             ],
             'Ink' => [
-                ['--mc-ink',   'Headings, body, spec values. Never pure black — #000 haloes in direct sun.'],
-                ['--mc-ink-2', 'Labels, captions, metadata.'],
-                ['--mc-ink-3', 'The lightest text the system permits.'],
+                ['--mc-ink',   'Headings, the customer\'s words, spec values, field labels. Never pure black — #000 haloes in direct sun.'],
+                ['--mc-ink-2', 'Body copy, the mileage, subtitles.'],
+                ['--mc-ink-3', 'Labels, captions, table heads, metadata. The lightest text the system permits.'],
             ],
             'Borders' => [
                 ['--mc-hairline', 'Decorative: list separators, and the card\'s fallback edge under its shadow.'],
-                ['--mc-rule',     'Structural: section divider, table head rule, the phone frame.'],
+                ['--mc-rule',     'Structural: table head rule, the phone frame, the specimen\'s state grid.'],
                 ['--mc-control',  'Inputs, outline buttons, checkboxes. Must clear 3:1 on every ground.'],
             ],
             'State' => [

@@ -1145,7 +1145,7 @@
     <tbody>
       <tr><td><b>Photographs</b></td><td class="bb-num-cell">30–35%</td><td>Cards, gallery, the customer wall</td></tr>
       <tr><td><b>Neutral</b></td><td class="bb-num-cell">~55%</td><td>Everything else. This is the palette.</td></tr>
-      <tr><td><b>Navy</b></td><td class="bb-num-cell">~6%</td><td>Footer only</td></tr>
+      <tr><td><b>Navy</b></td><td class="bb-num-cell">~6%</td><td>Footer, the sold badge, pressed buttons</td></tr>
       <tr><td><b>Blue</b></td><td class="bb-num-cell">~4%</td><td>Links, active menu item, outline buttons, the form's one filled button, one tinted section per page</td></tr>
       <tr><td><b>Coral</b></td><td class="bb-num-cell">~1%</td><td>The price, and nothing else</td></tr>
       <tr><td><b>WhatsApp green</b></td><td class="bb-num-cell">~1%</td><td>The WhatsApp button, and a sent-message confirmation. Nothing else</td></tr>
@@ -1153,7 +1153,7 @@
   </table>
   </div>
 
-  <div class="bb-two" style="margin-top:var(--s-5)">
+  <div class="bb-two" style="margin-top:var(--s-6)">
     <div class="bb-dont">
       <h3>Blue is never used for</h3>
       <ul>
@@ -1200,8 +1200,7 @@
       <p class="bb-small">An earlier draft set the customer quotes in a serif. That was a
       second typeface to load and a large part of what read as old-school. The quotes keep
       a distinct voice with DM Sans italic instead — a different speaker, no second font.</p>
-      <p class="tt-quote" style="margin-top:var(--s-4)">Compramos el coche
-      para nuestra hija. Nos gustó el estado impecable y el historial claro.</p>
+      <p class="tt-quote" style="margin-top:var(--s-4)">{{ $sample->firstWhere('id', 11)?->quote ?? $sample->first()?->quote }}</p>
     </div>
   </div>
 
