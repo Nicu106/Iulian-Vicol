@@ -110,7 +110,8 @@ table.bb-t{ width:100%; min-width:560px; border-collapse:collapse; font-size:var
 #contrast table.bb-t td:last-child{ white-space:nowrap; }
 #signoff table.bb-t th:nth-child(n+4){ text-align:center; }
 #photos table.bb-t{ min-width:0; } #photos table.bb-t th:last-child{ white-space:normal; }
-@media (max-width:600px){ #signoff table.bb-t{ min-width:0; } #signoff table.bb-t th:nth-child(3),#signoff table.bb-t td:nth-child(3){ display:none; } }
+@media (max-width:600px){ #signoff table.bb-t{ min-width:0; } #signoff table.bb-t th:nth-child(3),#signoff table.bb-t td:nth-child(3){ display:none; }
+  #signoff table.bb-t th,#signoff table.bb-t td{ padding-right:var(--s-2); }   /* 360 → under 358: the last 2px were cell padding */ }
 /* the order tables carry a 19-line prose column; on a phone they stack instead of scroll */
 @media (max-width:600px){
   #order table.bb-t{ min-width:0; }
