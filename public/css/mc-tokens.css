@@ -127,6 +127,12 @@
   --mc-r:     10px;      /* buttons, inputs */
   --mc-r-l:   22px;      /* cards, panels — car-planet's exact card radius (26/26) */
   --mc-r-pill: 999px;    /* icon discs only */
+  --mc-r-card:  0px;     /* the car card and everything inside it: frame, price box,
+                            badge. Square, because on a full-bleed marque field a
+                            rounded card pulls the eye into itself while a square one
+                            lets the colour hold the row — and because sharp corners
+                            read as serious where rounded read as friendly. One token,
+                            so the card cannot go half-square by accident. */
 
   /* ---- ELEVATION — shadow PLUS hairline, never instead of ----
      car-planet's exact card shadow. Shadows fade in glare, so the hairline

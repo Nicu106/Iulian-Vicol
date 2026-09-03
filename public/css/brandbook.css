@@ -354,7 +354,7 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
 @media (min-width:960px){ .mc-cardgrid{ grid-template-columns:repeat(3,1fr); } }
 .mc-cardgrid > *{ min-width:0; }
 .mc-card{ position:relative; background:var(--mc-surface); border:1px solid var(--mc-hairline);
-  border-radius:var(--mc-r-l); box-shadow:var(--mc-shadow-1); overflow:hidden;
+  border-radius:var(--mc-r-card); box-shadow:var(--mc-shadow-1); overflow:hidden;
   transition:box-shadow var(--m-quick) var(--e-out), border-color var(--m-quick) var(--e-out); }
 .mc-card__link{ display:block; color:inherit; text-decoration:none; }
 .mc-card__body{ padding:var(--s-3) var(--s-4) var(--s-4); display:flex; flex-direction:column; gap:var(--s-3); }
@@ -365,7 +365,10 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
   font-size:1.75rem; }
 .mc-card .mc-km{ font-size:1.375rem; }
 .mc-card .mc-pair{
-  background:var(--mc-blue-tint); border-radius:var(--mc-r-s); }
+  background:var(--mc-blue-tint); border-radius:var(--mc-r-card); }
+/* a chip inside a card is part of the card, so it follows the card. Outside one —
+   a filter, a tag on a band — it keeps the 4px of the small ladder. */
+.mc-card .mc-chip{ border-radius:var(--mc-r-card); }
 .mc-card__go{ display:inline-flex; align-items:center; gap:var(--s-2);
   min-height:0; margin-top:auto; font-size:var(--t-ui); font-weight:500;
   color:var(--mc-ink); transition:color var(--m-quick) var(--e-out); }
@@ -398,7 +401,7 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
   background:var(--mc-blue-100); font-size:var(--t-label); font-weight:500; line-height:1.2;
   color:var(--mc-ink-2); white-space:nowrap; }
 
-.mc-badge{ display:inline-flex; align-items:center; min-height:var(--s-5); border:1px solid transparent;  border-radius:var(--mc-r-s);
+.mc-badge{ display:inline-flex; align-items:center; min-height:var(--s-5); border:1px solid transparent;  border-radius:var(--mc-r-card);
   padding:0 var(--s-3); font-size:var(--t-label); font-weight:500;
   letter-spacing:.010em; line-height:1.2; }
 .mc-badge--available{ background:var(--mc-blue-tint); color:var(--mc-blue); }

@@ -166,6 +166,20 @@
     @endforeach
 </main>
 
+{{-- Over 60% of car shopping happens on a phone, and the one action worth having
+     always to hand belongs in the lower half of the screen, not in a header that
+     scrolls away. Phone only: on a desktop the header's own button is always
+     visible. --}}
+<div class="cat-dock" role="complementary" aria-label="Contacto">
+  <div class="mc-bar">
+    <span class="cat-dock__t">¿Buscas algo concreto?<b>Te lo busco yo</b></span>
+    <span class="mc-bar__act">
+      <a class="mc-btn mc-btn--cta" href="https://wa.me/34614753187">WhatsApp</a>
+      <a class="mc-btn mc-btn--ghost" href="tel:+34614753187" aria-label="Llamar">Tel</a>
+    </span>
+  </div>
+</div>
+
 <script>
 (function () {
   document.documentElement.className += ' js';
