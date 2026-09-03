@@ -225,6 +225,8 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
 .bb-el__stage{ background:var(--mc-bg); padding:var(--s-5); }
 .bb-el__stage--navy{ background:var(--mc-navy); }
 .bb-el__stage--flush{ padding:0; }
+/* gap:1px over a rule-coloured ground draws the hairlines between state cells — this is
+   a border technique, not a spacing value, and it is the only 1px gap in the system */
 .bb-el__states{ display:grid; gap:1px; background:var(--mc-rule);
   border-top:1px solid var(--mc-rule);
   grid-template-columns:repeat(3,minmax(0,1fr)); }
@@ -427,7 +429,7 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
   font-family:var(--f-ui);
   font-size:var(--t-ui);        /* 16px floor. Below this Safari iOS zooms on
                                    focus and never zooms back out. */
-  line-height:1.4; color:var(--mc-ink); background:var(--mc-surface);
+  line-height:1.55; color:var(--mc-ink); background:var(--mc-surface);   /* on the ladder; the single-line input is centred by min-height, the textarea needs the leading */
   border:1px solid var(--mc-control); border-radius:var(--mc-r);
   -webkit-appearance:none; appearance:none;
   transition:border-color var(--m-quick) var(--e-out); }
