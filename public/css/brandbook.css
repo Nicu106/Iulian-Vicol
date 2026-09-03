@@ -197,11 +197,12 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
 .bb-el__stage--flush{ padding:0; }
 .bb-el__states{ display:grid; gap:1px; background:var(--mc-rule);
   border-top:1px solid var(--mc-rule);
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); }
+  grid-template-columns:repeat(3,minmax(0,1fr)); }
+@media (max-width:640px){ .bb-el__states{ grid-template-columns:1fr; } }
 .bb-state .mc-btn{ white-space:nowrap; }
 .bb-state{ display:flex; flex-direction:column; align-items:flex-start; gap:var(--s-3);
   padding:var(--s-4); background:var(--mc-surface); min-width:0; }
-.bb-el__why{ margin:0; padding:var(--s-4); border-top:1px solid var(--mc-hairline);
+.bb-el__why{ margin:0; padding:var(--s-4); border-top:1px solid var(--mc-hairline); display:grid; grid-template-columns:minmax(0,72ch);
   background:var(--mc-bg);
   font-size:var(--t-small); line-height:1.55; color:var(--mc-ink-2); }
 .bb-el__why b{ color:var(--mc-ink); font-weight:600; }
@@ -246,8 +247,8 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
 .mc-btn:focus-visible,.mc-btn.is-focus{
   outline:3px solid var(--mc-focus); outline-offset:var(--s-1); }
 .mc-btn:focus-visible::after,.mc-btn.is-focus::after{
-  content:""; position:absolute; inset:-3px;
-  border:3px solid var(--mc-focus-inner); pointer-events:none; }
+  content:""; position:absolute; inset:calc(-1px - var(--s-1));
+  border:var(--s-1) solid var(--mc-focus-inner); pointer-events:none; }
 .mc-btn[disabled],.mc-btn.is-disabled{
   --btn-bg:var(--mc-band); --btn-fg:var(--mc-ink-3); --btn-bd:var(--mc-rule);
   cursor:not-allowed; }
@@ -274,7 +275,7 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
 
 /* loading: a line drawn along the bottom edge, not a spinner */
 .mc-btn__label{ display:inline-block; }
-.mc-btn__prog{ position:absolute; left:0; right:0; bottom:0; height:2px;
+.mc-btn__prog{ position:absolute; left:var(--mc-r); right:var(--mc-r); bottom:0; height:2px;
   background:currentColor; opacity:0; transform:scaleX(0); transform-origin:left center; }
 .mc-btn.is-loading{ cursor:progress; }
 .mc-btn.is-loading .mc-btn__label{ visibility:hidden; }
@@ -305,7 +306,7 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
 .mc-go:hover .mc-go__arrow,.mc-go.is-hover .mc-go__arrow{ transform:translateX(4px); }
 
 /* ---- THE PAIR — price and mileage as one unit ------------ */
-.mc-pair{ display:inline-flex; flex-wrap:wrap; align-items:baseline; gap:var(--s-2) var(--s-3);
+.mc-pair{ display:flex; width:fit-content; flex-wrap:wrap; align-items:baseline; gap:var(--s-2) var(--s-3);
   font-size:var(--t-price); }
 .mc-price,.mc-km{ white-space:nowrap; }
 .mc-price{ font-size:1em; line-height:1; font-weight:700;
@@ -327,7 +328,10 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
 .mc-card__title{ margin:0; font-size:var(--t-h3); font-weight:600; line-height:1.3;
   color:var(--mc-ink); }
 /* car-planet sets the card price inside a pale box. Same device, on the ramp. */
-.mc-card .mc-pair{ display:inline-flex; padding:var(--s-2) var(--s-3);
+.mc-card .mc-pair{ display:flex; width:fit-content; padding:var(--s-2) var(--s-3);
+  font-size:1.75rem; }
+.mc-card .mc-km{ font-size:1.375rem; }
+.mc-card .mc-pair{
   background:var(--mc-blue-tint); border-radius:var(--mc-r-s); }
 .mc-card__go{ display:inline-flex; align-items:center; gap:var(--s-2);
   min-height:0; margin-top:auto; font-size:var(--t-ui); font-weight:500;
@@ -360,12 +364,12 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
   background:var(--mc-blue-100); font-size:var(--t-label); font-weight:500; line-height:1.2;
   color:var(--mc-ink-2); white-space:nowrap; }
 
-.mc-badge{ display:inline-flex; align-items:center; min-height:var(--s-5); border-radius:var(--mc-r-s);
+.mc-badge{ display:inline-flex; align-items:center; min-height:var(--s-5); border:1px solid transparent; padding-block:0; border-radius:var(--mc-r-s);
   padding:var(--s-1) var(--s-3); font-size:var(--t-label); font-weight:500;
   letter-spacing:.010em; line-height:1.2; }
 .mc-badge--available{ background:var(--mc-blue-tint); color:var(--mc-blue); }
 .mc-badge--reserved { background:var(--mc-warn-tint); color:var(--mc-warn);
-  border:1px solid var(--mc-warn); }
+  border-color:var(--mc-warn); }
 .mc-badge--sold     { background:var(--mc-navy);   color:var(--mc-on-navy); }
 .mc-frame .mc-badge{ position:absolute; left:var(--s-2); top:var(--s-2); z-index:1; }
 
@@ -386,6 +390,7 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
 .mc-field__label{ display:block; margin-bottom:var(--s-2); font-size:var(--t-label); letter-spacing:.010em;
   font-weight:500; color:var(--mc-ink); }
 .mc-field__opt{ font-weight:400; color:var(--mc-ink-3); }
+.mc-input{ padding-block:0; }
 .mc-input,.mc-textarea{
   display:block; width:100%; min-height:var(--mc-tap-pref); padding:var(--s-3);
   font-family:var(--f-ui);
@@ -420,7 +425,7 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
 .mc-alert__t{ margin:0 0 var(--s-2); font-size:var(--t-value); font-weight:600; line-height:1.3;
   color:var(--mc-ink); }
 .mc-alert p:last-child,.mc-alert ul:last-child{ margin-bottom:0; }
-.mc-alert ul{ margin:0; padding-left:1.1em; }
+.mc-alert ul{ margin:0; padding-left:var(--s-4); }
 .mc-alert--error{ border-left-color:var(--mc-accent); background:var(--mc-accent-tint); }
 .mc-alert--ok{ border-left-color:var(--mc-ok); background:var(--mc-ok-tint); }
 .mc-alert--note{ border-left-color:var(--mc-warn); background:var(--mc-warn-tint); }
@@ -438,9 +443,11 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
   text-decoration:none; }
 .mc-nav__i.is-current{ color:var(--mc-blue); font-weight:600; }
 .mc-nav__i:hover{ color:var(--mc-blue); }
+@media (max-width:899px){ #EL-HDR-01 .bb-el__stage--flush{ display:none; } }
+@media (max-width:399px){ .mc-head .mc-btn--cta{ font-size:0; gap:0; padding-inline:var(--s-3); } }
 .mc-burger{ display:inline-flex; align-items:center; gap:var(--s-2);
   min-height:var(--mc-tap-pref); min-width:var(--mc-tap-pref); padding:var(--s-2) var(--s-3);
-  background:var(--mc-band); border:0; border-radius:var(--mc-r); color:var(--mc-ink);
+  background:var(--mc-band); border:1px solid var(--mc-band); border-radius:var(--mc-r); color:var(--mc-ink);
   font-family:var(--f-ui); font-size:var(--t-small); cursor:pointer; }
 .mc-burger__bars,.mc-burger__bars::before,.mc-burger__bars::after{
   display:block; width:18px; height:2px; background:currentColor; }
@@ -535,7 +542,7 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
   height:120px; background:linear-gradient(to bottom, transparent, var(--mc-surface)); }
 .ph__fold{ position:absolute; left:0; right:0; top:759px; z-index:2; height:0;
   border-top:1px dashed var(--mc-ink); }
-.ph__fold span{ position:absolute; right:0; top:-1px; transform:translateY(-100%);
+.ph__fold span{ position:absolute; right:0; top:-1px; transform:translateY(-100%); line-height:1.2; min-height:var(--s-5); display:inline-flex; align-items:center;
   padding:var(--s-1) var(--s-2); background:var(--mc-ink); color:var(--mc-surface);
   border-radius:var(--mc-r-s) var(--mc-r-s) 0 0; font-size:var(--t-label); font-weight:500; letter-spacing:.010em; }
 .ph__bar{ position:absolute; left:0; right:0; bottom:0; z-index:3; }
@@ -589,7 +596,7 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
   background:var(--mc-band); overflow:hidden; border-radius:var(--mc-r-s); }
 .pg-gal > div.is-on::after{ content:""; position:absolute; left:0; right:0; bottom:0;
   height:3px; background:var(--mc-blue); }
-.pg-gal__tag{ position:absolute; left:0; bottom:0; padding:2px var(--s-2);
+.pg-gal__tag{ position:absolute; left:0; bottom:0; line-height:1.2; min-height:var(--s-5); display:inline-flex; align-items:center; padding:2px var(--s-2);
   background:var(--mc-ink); color:var(--mc-surface); font-size:var(--t-label); font-weight:500; padding:var(--s-1) var(--s-2); letter-spacing:.010em; }
 
 /* ============================================================
@@ -597,16 +604,24 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
    "where", a quieter sign-off row.
    ============================================================ */
 .bb-el__where{ display:flex; flex-wrap:wrap; gap:var(--s-1); margin-left:auto; }
-.bb-el__where span{ padding:var(--s-1) var(--s-2); letter-spacing:.010em; border-radius:var(--mc-r-s); background:var(--mc-band);
+.bb-el__where span{ padding:var(--s-1) var(--s-2); line-height:1.2; min-height:var(--s-5); letter-spacing:.010em; border-radius:var(--mc-r-s); background:var(--mc-band);
   font-size:var(--t-label); color:var(--mc-ink-2); white-space:nowrap; }
 .bb-state{ gap:0; padding:0; }
+.bb-state > .mc-card{ align-self:stretch; }
 .bb-state > *:first-child:not(.bb-label){ margin:var(--s-4); }
 .bb-state .bb-cap{ margin-top:auto; width:100%; padding:var(--s-2) var(--s-4);
   border-top:1px solid var(--mc-hairline); font-size:var(--t-label); letter-spacing:.010em; color:var(--mc-ink-3); }
 .bb-state--wide{ grid-column:1 / -1; }
 .bb-el__stage--band{ background:var(--mc-blue-tint); }
 .bb-el__stage--twin{ display:grid; gap:var(--s-5); grid-template-columns:minmax(0,1fr); align-items:start; }
-.bb-el__stage--twin > .ph{ width:100%; max-width:390px; }
+.bb-el__stage--twin > .ph{ width:390px; max-width:100%; }
+@media (max-width:421px){
+  .bb-el{ margin-inline:calc(var(--mc-gutter-m) * -1); border-inline-width:0; border-radius:0; }
+  .bb-el__stage--band{ padding-inline:0; }
+  .bb-el__stage--band > .bb-stagecap,.bb-el__stage--twin > :not(.ph){ padding-inline:var(--s-4); }
+  .bb-el__stage{ padding:var(--s-4); }
+  .bb-phones .bb-label,.bb-phones .bb-small{ padding-inline:var(--mc-gutter-m); }
+}
 @media (min-width:900px){ .bb-el__stage--twin{ grid-template-columns:1fr auto; } }
 .bb-el__stage--twin > *{ min-width:0; }
 .bb-stagecap{ display:block; margin-bottom:var(--s-3); font-size:var(--t-label); letter-spacing:.010em;

@@ -515,7 +515,7 @@
           </div>
 
           <div class="pg-sec" style="padding-top:var(--s-3)">
-            <a class="mc-go" href="#elements" style="border:0;color:var(--mc-ink-2);font-size:var(--t-small)"><span class="mc-go__arrow">&larr;</span> Todos los coches</a>
+            <a class="mc-go" href="#elements"><span class="mc-go__arrow">&larr;</span> Todos los coches</a>
             <p class="pg-h1" style="margin-top:var(--s-2)">{{ $car?->brand }} {{ $car?->model }} {{ $car?->year }}</p>
             <div class="mc-pair">
               <span class="mc-price">{{ $car ? $euros($car->price) : '—' }}</span>
@@ -703,11 +703,11 @@
             <div class="mc-head"><div class="mc-head__in">
               <a class="mc-logo" href="#EL-HDR-01">IV&nbsp;MOTORCLASS</a>
               <span class="mc-btn mc-btn--cta" style="padding-inline:var(--s-3)">WhatsApp</span>
-              <span class="mc-burger" style="background:var(--mc-band);border-color:var(--mc-ink)"><span class="mc-burger__bars"></span></span>
+              <span class="mc-burger" style="border-color:var(--mc-ink)"><span class="mc-burger__bars"></span></span>
             </div></div>
-            <div style="padding:0 var(--s-4) var(--s-4);background:var(--mc-surface)">
+            <div style="padding:var(--s-2) var(--s-4) var(--s-4);background:var(--mc-surface)">
               @foreach([['Coches',true],['Entregados',false],['Quién soy',false],['Contacto',false]] as [$l,$cur])
-                <a class="mc-nav__i" href="#EL-HDR-01" style="display:flex;min-height:var(--mc-tap-pref);padding-block:var(--s-1);border-bottom:1px solid var(--mc-hairline);font-size:var(--t-h3);text-decoration:none{{ $cur ? ';border-left:3px solid var(--mc-blue);padding-left:var(--s-3);font-weight:600' : '' }}">{{ $l }}</a>
+                <a href="#EL-HDR-01" class="mc-nav__i{{ $cur ? ' is-current' : '' }}" style="display:flex;min-height:var(--mc-tap-pref);padding-block:var(--s-1);border-bottom:1px solid var(--mc-hairline);font-size:var(--t-h3);text-decoration:none">{{ $l }}</a>
               @endforeach
             </div>
           </div>
@@ -736,7 +736,7 @@
         <div class="ph">
           <div class="ph__status"><span>9:41</span><i></i></div>
           <div class="ph__screen" style="height:300px;overflow:hidden">
-            <div class="pg-sec" style="opacity:.45">
+            <div class="pg-sec">
               <h2 class="pg-h">Los datos</h2>
               <dl class="mc-specs">
                 <div class="mc-specs__row"><dt>Año</dt><dd>{{ $car?->year }}</dd></div>
@@ -769,8 +769,8 @@
         </div>
       </div>
     </div>
-    <p class="bb-el__why"><b>Two actions, not four.</b> Four columns give 77px of usable width
-      each, and "WhatsApp" at readable size already takes 58px. The price stays in the bar:
+    <p class="bb-el__why"><b>Two actions, not four.</b> Four columns give 80px of usable width
+      each, and "WhatsApp" at readable size already takes 83px. The price stays in the bar:
       on a €15–26k purchase the buyer re-checks it constantly, and a bar without it forces
       a scroll every time.</p>
     <div class="bb-note" style="margin:var(--s-4);border-left-color:var(--mc-accent)">
@@ -803,7 +803,7 @@
                 <label class="mc-field"><span class="mc-field__label">Qué quieres saber <span class="mc-field__opt">(opcional)</span></span>
                   <textarea class="mc-textarea" rows="2">Me interesa el {{ $car?->brand }} {{ $car?->model }}. ¿Sigue disponible?</textarea></label>
                 <label class="mc-check"><input type="checkbox"><span class="mc-check__t">Guardo tu nombre y tu teléfono solo para contestarte.</span></label>
-                <a class="mc-go" href="#EL-FORM-01" style="font-size:var(--t-small);margin-bottom:var(--s-4)">Cómo trato tus datos <span class="mc-go__arrow">&rarr;</span></a>
+                <a class="mc-go" href="#EL-FORM-01" style="margin-bottom:var(--s-4)">Cómo trato tus datos <span class="mc-go__arrow">&rarr;</span></a>
                 <span class="mc-btn mc-btn--block">Preguntar por este coche</span>
               </form>
             </div></div>
@@ -820,7 +820,7 @@
               <label class="mc-field"><span class="mc-field__label">Tu teléfono</span><input class="mc-input is-invalid" type="tel" value="">
                 <span class="mc-err">Necesito un teléfono para poder contestarte.</span></label>
               <span class="mc-btn mc-btn--block is-loading"><span class="mc-btn__label" data-busy="Enviando…">Preguntar por este coche</span><span class="mc-btn__prog"></span></span>
-              <div class="mc-alert mc-alert--ok" style="margin-top:var(--s-6)">
+              <div class="mc-alert mc-alert--ok" style="margin-top:var(--s-6);margin-bottom:0">
                 <p class="mc-alert__t">Recibido. Te contesto yo, hoy o mañana por la mañana.</p>
                 <p style="margin:0">Si prefieres no esperar, escríbeme por <a class="mc-link" href="#EL-FORM-01">WhatsApp</a>.</p>
               </div>
@@ -915,7 +915,7 @@
       <div class="mc-foot-demo on-navy" style="padding-inline:var(--s-5)">
         <div class="mc-foot-demo__cols">
           <div>
-            <p style="margin:0 0 var(--s-2);font-size:var(--t-h3);font-weight:600;color:var(--mc-on-navy)">IV MOTORCLASS</p>
+            <p style="margin:0 0 var(--s-2);font-size:var(--t-h3);font-weight:600;letter-spacing:-.012em;line-height:1.3;color:var(--mc-on-navy)">IV MOTORCLASS</p>
             <p style="margin:0 0 var(--s-2);font-size:var(--t-small)">Málaga, España</p>
             <p style="margin:0;font-size:var(--t-small)">Lun–Vie 10:00–19:00 · Sábado 10:00–14:00 · Domingo, consultar</p>
           </div>
