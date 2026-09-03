@@ -179,7 +179,7 @@
       </tbody>
     </table>
     </div>
-    <p style="margin-bottom:0">Nothing but the hero is visible on the first screen. And what
+    <p style="margin:var(--s-4) 0 0">Nothing but the hero is visible on the first screen. And what
       is on it is a <b>stock photograph of a car that is not yours</b>, the sentence
       <em>Tu coche perfecto te espera</em>, a search box for nine cars, and a badge
       reading <em>Garantía</em>. Eye-tracking puts <b>57% of viewing time above the fold
@@ -190,7 +190,7 @@
   <h3>Home page — the recommended order</h3>
   <div class="bb-scroll">
   <table class="bb-t">
-    <thead><tr><th style="width:3ch">#</th><th style="width:22ch">Section</th><th style="width:62ch">Why it sits here</th><th style="width:20ch">Evidence</th></tr></thead>
+    <thead><tr><th style="width:3ch">#</th><th style="width:22ch">Section</th><th style="width:52ch">Why it sits here</th><th style="width:20ch">Evidence</th></tr></thead>
     <tbody>
       <tr><td class="bb-num-cell">1</td><td><b>Header: name, Málaga, phone, WhatsApp</b></td>
         <td>Contact details are the highest-scoring credibility signal measured for an unknown seller. A physical address scored 1.86 and a phone number 1.71 on a −3…+3 scale — against 0.69 for photos of your own people.</td>
@@ -232,7 +232,7 @@
   <h3>Vehicle page — where the money decision happens</h3>
   <div class="bb-scroll">
   <table class="bb-t">
-    <thead><tr><th style="width:3ch">#</th><th style="width:22ch">Section</th><th style="width:62ch">Why it sits here</th><th style="width:20ch">Evidence</th></tr></thead>
+    <thead><tr><th style="width:3ch">#</th><th style="width:22ch">Section</th><th style="width:52ch">Why it sits here</th><th style="width:20ch">Evidence</th></tr></thead>
     <tbody>
       <tr><td class="bb-num-cell">0</td><td><b>Fixed bar: WhatsApp + Call</b></td>
         <td>Present from the first paint. 49% of phone use is one-handed and thumbs drive 75% of interactions; the bottom strip is the only reliably reachable zone. <b>Your site has no such bar today.</b></td>
@@ -319,7 +319,7 @@
   </p>
   <div class="bb-scroll">
   <table class="bb-t">
-    <thead><tr><th style="width:22ch">Where</th><th>What</th><th style="width:62ch">Why</th></tr></thead>
+    <thead><tr><th style="width:22ch">Where</th><th style="width:30ch">What</th><th style="width:52ch">Why</th></tr></thead>
     <tbody>
       <tr><td><b>High, in or under the hero</b></td><td>One line: <em>{{ $inventory['sold'] }} coches entregados · {{ $inventory['testimonials'] }} reseñas con foto · Málaga</em></td><td>Costs almost no vertical space, and sits where attention actually is. Keep it to one line — more than two trust signals measurably <em>lowers</em> completion.</td></tr>
       <tr><td><b>Mid-page, home</b></td><td>The full wall of {{ $inventory['testimonials'] }}</td><td>High enough to fall inside the first two screens; low enough to corroborate the cars instead of preceding them.</td></tr>
@@ -346,8 +346,8 @@
   <p class="bb-prose">These are judgement calls, and I am flagging them as mine rather than
   presenting them as findings.</p>
   <div class="bb-scroll">
-  <table class="bb-t">
-    <thead><tr><th>Question</th><th style="width:62ch">Status</th></tr></thead>
+  <table class="bb-t bb-t--qa">
+    <thead><tr><th>Question</th><th style="width:52ch">Status</th></tr></thead>
     <tbody>
       <tr><td>Testimonials high on the page or low</td><td><b>No study varies it.</b> Both positions are inferred from adjacent evidence. The three-way split above is a reconciliation, not a finding.</td></tr>
       <tr><td>Photographs attached to testimonials versus text alone</td><td><b>No study found.</b> Any percentage lift claimed for testimonial headshots is unsupported.</td></tr>
@@ -988,7 +988,7 @@
           @php
             // The verdict is computed, not typed: what does each extra step actually buy?
             $gain  = $prev === null ? null : (int) $pctShown - (int) $prev;
-            $lines = $prevCap === null ? 0 : (int) ceil(($cap - $prevCap) / 34);   // 34 chars per line at desktop width
+            $lines = $prevCap === null ? 0 : (int) ceil(($cap - $prevCap) / 42);   // 42 chars per line, measured in the 320px quote column
             $prev = $pctShown; $prevCap = $cap;
           @endphp
           <tr>
@@ -1009,13 +1009,13 @@
     </div>
     <p class="bb-small" style="margin-top:var(--s-3);color:var(--mc-ink-3)">
       Nine lines lands on that knee on a phone — about 240 characters at 390px. On a
-      desktop the same nine lines hold about 340, so the limit is nine lines rather than a
+      desktop the same nine lines hold about 380, so the limit is nine lines rather than a
       fixed character count: it adapts to the width instead of cutting words in half.</p>
   @endif
 
   <h3>The layout: photo left, words right</h3>
   <p class="bb-prose">
-    <b>Between 208 and 244px per customer on a phone, instead of 745px</b> — 295 on a row
+    <b>Between 208 and 241px per customer on a phone, instead of 745px</b> — 293 on a row
     that carries a <em>Ver más</em> — roughly three
     times denser than the slider you have, so two or three people are on screen at once
     instead of one. And the photograph stays large enough to be a photograph of a person
@@ -1024,7 +1024,7 @@
   <p class="bb-prose">
     The reason it works: the photo already forces a certain height, and nine lines of text
     fits inside roughly that same height. For most of your comments the words cost nothing
-    beyond the photograph; the longest ones in the band add about 36px.
+    beyond the photograph; the longest ones in the band add about 33px.
   </p>
 
   @if($sample->count())
