@@ -398,7 +398,6 @@
                 <?php if ($v?->mileage): ?><span class="mc-km"><?= $km($v->mileage) ?></span>
                 <?php else: ?><span class="mc-km is-unknown">Km sin confirmar</span><?php endif; ?>
               </div>
-              <span class="mc-pair-under" style="max-width:11rem"></span>
             </div>
             <ul class="mc-chips">
               <li class="mc-chip"><?= e($v?->year) ?></li>
@@ -522,7 +521,6 @@
               <span class="mc-price">{{ $car ? $euros($car->price) : '—' }}</span>
               <span class="mc-km">{{ $car?->mileage ? $km($car->mileage) : '—' }}</span>
             </div>
-            <span class="mc-pair-under is-drawn" style="max-width:12rem;margin-top:var(--s-2)"></span>
             <p class="pg-note">Precio para particular. Transferencia no incluida.</p>
 
             <div class="mc-frame mc-frame--card" style="margin-top:var(--s-4)">

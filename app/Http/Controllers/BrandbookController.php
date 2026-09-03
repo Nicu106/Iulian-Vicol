@@ -320,7 +320,7 @@ class BrandbookController extends Controller
             '--e-out'   => 'Anything entering or settling',
             '--e-inout' => 'Anything that moves and stops in place',
             '--e-in'    => 'Anything leaving',
-            '--e-line'  => 'THE STROKE only — drawn, not thrown',
+            '--e-line'  => 'The sending button\'s line only — drawn, not thrown',
         ];
 
         return [

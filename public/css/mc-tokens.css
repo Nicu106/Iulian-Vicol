@@ -54,7 +54,7 @@
   --mc-blue-100:   #EBF1FA;  /* blue chip fill. Was #C8D9EF, on which blue text
                                 measured 4.30:1; this is 5.44 */
 
-  /* ---- ACCENT — terracotta, hue 14. The only non-blue -----
+  /* ---- ACCENT — the darker red step, for small text and errors ----
      Two jobs: the contact CTA, and the price. Nothing else.
      car-planet pairs its blue with a warm red-orange (#E65848) that fails
      at 3.59:1 both ways; this keeps the relationship and fixes the contrast. */
@@ -160,7 +160,7 @@
   --m-tap:     160ms;   /* release */
   --m-quick:   160ms;   /* colour, border, opacity */
   --m-state:   220ms;   /* focus, header state */
-  --m-move:    280ms;   /* THE STROKE, accordion, panel */
+  --m-move:    280ms;   /* the sending button's line, accordion, panel */
   --m-reveal:  420ms;   /* the single scroll reveal */
 
   --e-out:   cubic-bezier(.22,.61,.36,1);
