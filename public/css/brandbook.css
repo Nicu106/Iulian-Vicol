@@ -112,6 +112,7 @@ table.bb-t{ width:100%; min-width:560px; border-collapse:collapse; font-size:var
 #signoff table.bb-t td:first-child{ white-space:nowrap; }
 #contrast table.bb-t td:last-child{ white-space:nowrap; }
 #signoff table.bb-t th:nth-child(n+4){ text-align:center; }
+#signoff table.bb-t td{ vertical-align:middle; }   /* the 48px checkbox rows centre; the ID must sit with them */
 #photos table.bb-t{ min-width:0; } #photos table.bb-t th:last-child{ white-space:normal; }
 @media (max-width:600px){ #signoff table.bb-t{ min-width:0; } #signoff table.bb-t th:nth-child(3),#signoff table.bb-t td:nth-child(3){ display:none; }
   #signoff table.bb-t th,#signoff table.bb-t td{ padding-right:var(--s-2); }   /* 360 → under 358: the last 2px were cell padding */ }
@@ -133,7 +134,7 @@ table.bb-t{ width:100%; min-width:560px; border-collapse:collapse; font-size:var
 /* a five-column table that must scroll says so at its edge */
 /* the fade signals overflow. It is applied only to containers that scroll, by a
    3-line script at the foot of the page (a class, not a selector guess). */
-.bb-scroll.is-overflowing{ mask-image:linear-gradient(90deg,#000 calc(100% - var(--s-6)),transparent); }
+.bb-scroll.is-overflowing,.bb-ruler.is-overflowing{ mask-image:linear-gradient(90deg,#000 calc(100% - var(--s-6)),transparent); }
 table.bb-t th,table.bb-t td{ text-align:left; padding:var(--s-3) var(--s-3) var(--s-3) 0;
   border-bottom:1px solid var(--mc-hairline); vertical-align:top; }
 table.bb-t th{ font-size:var(--t-label); font-weight:500; line-height:1.3; letter-spacing:.010em;

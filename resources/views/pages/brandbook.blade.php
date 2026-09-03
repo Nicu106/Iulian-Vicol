@@ -1660,7 +1660,7 @@
     });
   });
   // the scroll fade exists only where a table actually overflows
-  function fade(){ document.querySelectorAll('.bb-scroll').forEach(function(s){ s.classList.toggle('is-overflowing', s.scrollWidth > s.clientWidth + 1); }); }
+  function fade(){ document.querySelectorAll('.bb-scroll,.bb-ruler').forEach(function(s){ s.classList.toggle('is-overflowing', s.scrollWidth > s.clientWidth + 1); }); }
   fade(); window.addEventListener('resize', fade);
   // desktop nav in the header specimen only appears above 900px on the real site
   function nav(){
