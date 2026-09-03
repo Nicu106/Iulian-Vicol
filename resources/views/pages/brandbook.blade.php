@@ -16,18 +16,18 @@
 
 @php
   $sections = [
-    ['1','What we take from car-planet','ref'],
-    ['2','The order of the page','order'],
-    ['3','Elements — what it will look like','elements'],
-    ['4','The customer wall','wall'],
-    ['5','Colour','colour'],
-    ['6','Type','type'],
-    ['7','Mobile','mobile'],
-    ['8','Photographs','photos'],
-    ['9','Voice','voice'],
+    ['01','What we take from car-planet','ref'],
+    ['02','The order of the page','order'],
+    ['03','Elements — what it will look like','elements'],
+    ['04','The customer wall','wall'],
+    ['05','Colour','colour'],
+    ['06','Type','type'],
+    ['07','Mobile','mobile'],
+    ['08','Photographs','photos'],
+    ['09','Voice','voice'],
     ['10','Sign-off sheet','signoff'],
-    ['A','Appendix — the contrast maths','contrast'],
-    ['B','Appendix — space, motion, build order','appendix'],
+    ['Appendix A','The contrast maths','contrast'],
+    ['Appendix B','Space, motion, build order','appendix'],
   ];
   $fmt   = fn($n) => number_format($n);
   $euros = fn($n) => number_format($n, 0, ',', '.').' €';
@@ -39,9 +39,9 @@
 {{-- ══════════════════════════════════════════════ MASTHEAD ══ --}}
 <header class="bb-top">
   <div class="bb-wrap">
-    <span class="bb-label">IV MOTORCLASS · Málaga · design system, draft 2</span>
-    <p class="bb-display" style="margin-top:var(--s-3)">Your website, before it is built</p>
-    <p class="bb-prose" style="margin-top:var(--s-5)">
+    <span class="bb-num bb-label">IV MOTORCLASS · Málaga · design system, draft 3</span>
+    <p class="bb-display">Your website, before it is built</p>
+    <p class="bb-prose" style="margin-top:var(--s-6)">
       This is not an essay about design. It is a picture of every part of your site, at
       real size, in the real code — so you can look at each one and say yes, or say what
       you want changed, before anybody spends a day building it.
@@ -100,7 +100,7 @@
 
   <ul class="bb-toc" style="margin-top:var(--s-6);list-style:none;padding:0">
     @foreach($sections as [$n,$title,$id])
-      <li><a href="#{{ $id }}"><span class="bb-label" style="min-width:2ch">{{ $n }}</span><span>{{ $title }}</span></a></li>
+      <li><a href="#{{ $id }}"><span class="bb-label">{{ $n }}</span><span>{{ $title }}</span></a></li>
     @endforeach
   </ul>
 </section>
@@ -164,17 +164,17 @@
     comes to you.
   </p>
 
-  <div class="bb-note" style="border-left-color:var(--mc-accent)">
+  <div class="bb-dont">
     <h3>What your site does today, measured on your live pages</h3>
-    <p>Measured 2 September 2026 with a real browser at 390&nbsp;×&nbsp;759px — a normal
-      phone.</p>
+    <p>Measured 2 September 2026 with a real browser at 390&nbsp;×&nbsp;785px — a normal
+      phone with the browser bar collapsed.</p>
     <div class="bb-scroll">
     <table class="bb-t" style="min-width:0">
       <tbody>
-        <tr><td>The hero occupies</td><td class="bb-num-cell"><b>701px of 785</b> — 89% of the screen</td></tr>
-        <tr><td>First photo of a real car</td><td class="bb-num-cell"><b>3.1 screens down</b></td></tr>
-        <tr><td>Customer testimonials</td><td class="bb-num-cell"><b>6.2 screens down</b></td></tr>
-        <tr><td>Whole page</td><td class="bb-num-cell">9,048px — about 11.5 screens</td></tr>
+        <tr><td>The hero occupies</td><td><b>701px of 785</b> — 89% of the screen</td></tr>
+        <tr><td>First photo of a real car</td><td><b>3.1 screens down</b></td></tr>
+        <tr><td>Customer testimonials</td><td><b>6.2 screens down</b></td></tr>
+        <tr><td>Whole page</td><td>9,048px — about 11.5 screens</td></tr>
       </tbody>
     </table>
     </div>
@@ -186,7 +186,7 @@
       customers, sits almost entirely outside where people look.</p>
   </div>
 
-  <h3 style="margin:var(--s-7) 0 var(--s-4)">Home page — the recommended order</h3>
+  <h3>Home page — the recommended order</h3>
   <div class="bb-scroll">
   <table class="bb-t">
     <thead><tr><th style="width:3ch">#</th><th style="width:22ch">Section</th><th>Why it sits here</th><th style="width:20ch">Evidence</th></tr></thead>
@@ -208,13 +208,13 @@
         <td>Stanford credibility guidelines 2 &amp; 4 <span class="bb-st bb-st--prop">Proposed</span></td></tr>
       <tr><td class="bb-num-cell">6</td><td><b>Cars delivered</b></td>
         <td>Volume evidence. Genuinely optional here — it does the same job as the wall.</td>
-        <td>judgement call</td></tr>
+        <td><span class="bb-st bb-st--you">Your call</span></td></tr>
       <tr><td class="bb-num-cell">7</td><td><b>Contact</b></td>
         <td>The ask comes after the proof: do not make a demand before the trust needs below it are met. This is the second contact point — the header serves people who arrive already convinced.</td>
         <td>NN/g Hierarchy of Trust <span class="bb-st bb-st--prop">Proposed</span></td></tr>
       <tr><td class="bb-num-cell">8</td><td><b>Footer</b></td>
         <td>Used heavily as fallback navigation. Address, hours, legal identity.</td>
-        <td>NN/g, 70+ users, 100 sites</td></tr>
+        <td>NN/g, 70+ users, 100 sites <span class="bb-st bb-st--fixed">Fixed</span></td></tr>
     </tbody>
   </table>
   </div>
@@ -228,7 +228,7 @@
     </ul>
   </div>
 
-  <h3 style="margin:var(--s-7) 0 var(--s-4)">Vehicle page — where the money decision happens</h3>
+  <h3>Vehicle page — where the money decision happens</h3>
   <div class="bb-scroll">
   <table class="bb-t">
     <thead><tr><th style="width:3ch">#</th><th style="width:22ch">Section</th><th>Why it sits here</th><th style="width:20ch">Evidence</th></tr></thead>
@@ -238,39 +238,39 @@
         <td>Hoober, 1,300+ people observed <span class="bb-st bb-st--fixed">Fixed</span></td></tr>
       <tr><td class="bb-num-cell">1</td><td><b>Title — make, model, year</b></td>
         <td>The "am I on the right car?" check. People scan headings first and the first two words carry the meaning.</td>
-        <td>NN/g F-pattern research</td></tr>
+        <td>NN/g F-pattern research <span class="bb-st bb-st--fixed">Fixed</span></td></tr>
       <tr><td class="bb-num-cell">2</td><td><b>Price and kilometres</b></td>
-        <td>Researching price is the <b>single most common thing car buyers do online — 71%</b>, ahead of finding the cars themselves. And in Spain specifically, <b>41% of used-car buyers name mileage as the decisive factor.</b> With stock at 108,000–184,000 km, stating it plainly reads as confidence; burying it reads as concealment.</td>
+        <td>Researching price is the single most common thing car buyers do online — 71%, ahead of finding the cars themselves. And in Spain specifically, <b>41% of used-car buyers name mileage as the decisive factor.</b> With stock at 108,000–184,000 km, stating it plainly reads as confidence; burying it reads as concealment.</td>
         <td>Autotrader/Cox 2016 · GANVAM + DGT 2020, 700+ Spanish buyers <span class="bb-st bb-st--fixed">Fixed</span></td></tr>
       <tr><td class="bb-num-cell">3</td><td><b>Photo gallery</b></td>
         <td>Viewing car images is the top mobile action at 44%. But on a product page only 18% of viewing time goes to photos against 82% to text — photos earn attention, text carries the decision. So: facts first, then photos. <b>Put the odometer in the first three photos</b> — used-car buyers rank it the single most important image type, and almost nobody does it.</td>
         <td>Google/Millward Brown 2013 · Cox, 521 consumers <span class="bb-st bb-st--prop">Proposed</span></td></tr>
       <tr><td class="bb-num-cell">4</td><td><b>Key specs — six to eight</b></td>
         <td>Short, headed chunks are the most effective way people scan.</td>
-        <td>NN/g layer-cake research</td></tr>
+        <td>NN/g layer-cake research <span class="bb-st bb-st--prop">Proposed</span></td></tr>
       <tr><td class="bb-num-cell">5</td><td><b>Contact, inline</b></td>
         <td>The first natural decision point. Your enquiry form currently sits at line 937 of 1,485 — below the description, the spec table, the equipment list and the tags.</td>
         <td>Özpolat &amp; Jank 2015 <span class="bb-st bb-st--fixed">Fixed</span></td></tr>
       <tr><td class="bb-num-cell">6</td><td><b>Your own description</b></td>
         <td>Where a one-man dealer's voice does work no spec table can.</td>
-        <td>Baymard product-page benchmark</td></tr>
+        <td>Baymard product-page benchmark <span class="bb-st bb-st--prop">Proposed</span></td></tr>
       <tr><td class="bb-num-cell">7</td><td><b>Two or three testimonials</b></td>
-        <td>Next to the decision. A randomised field experiment across <b>250,000+ real transactions at 493 retailers</b> found trust signals work best for <em>small</em> sellers and <em>expensive</em> baskets — but in the <em>later</em> stages, not the early ones. <b>Your vehicle page has no social proof at all. This is the largest single omission on the page where the money decision is made.</b></td>
+        <td>Next to the decision. A randomised field experiment across 250,000+ real transactions at 493 retailers found trust signals work best for small sellers and expensive baskets — but in the later stages, not the early ones. <b>Your vehicle page has no social proof at all</b> — the largest single omission on the page where the money decision is made.</td>
         <td>Özpolat &amp; Jank, DSS 73 (2015) <span class="bb-st bb-st--fixed">Fixed</span></td></tr>
       <tr><td class="bb-num-cell">8</td><td><b>Full spec table, folded</b></td>
         <td>Collapse only the long tail, never the price strip. Reading comprehension on a phone measures about half the desktop level, so length has a real cost.</td>
         <td>NN/g, n=50 <span class="bb-st bb-st--prop">Proposed</span></td></tr>
       <tr><td class="bb-num-cell">9</td><td><b>Who you are + full contact</b></td>
         <td>The form goes here, not higher — people do not want a form replacing a phone number.</td>
-        <td>NN/g contact-page research</td></tr>
+        <td>NN/g contact-page research <span class="bb-st bb-st--prop">Proposed</span></td></tr>
       <tr><td class="bb-num-cell">10</td><td><b>Other cars</b></td>
         <td>After the ask. Placed above it, it invites the buyer to leave the car they were about to enquire about.</td>
-        <td>Baymard cross-sell research</td></tr>
+        <td>Baymard cross-sell research <span class="bb-st bb-st--prop">Proposed</span></td></tr>
     </tbody>
   </table>
   </div>
 
-  <h3 style="margin:var(--s-7) 0 var(--s-4)">Where the testimonials go — and an honest correction</h3>
+  <h3>Where the testimonials go — and an honest correction</h3>
   <p class="bb-prose">
     I told you earlier that your 25 photographs are your strongest asset because a
     photograph cannot be faked the way a written review can. <b>The research does not
@@ -341,7 +341,7 @@
     is the one lever available to a nine-car dealer, and it is why this document exists.</p>
   </div>
 
-  <h3 style="margin:var(--s-7) 0 var(--s-4)">Where the research does not decide</h3>
+  <h3>Where the research does not decide</h3>
   <p class="bb-prose">These are judgement calls, and I am flagging them as mine rather than
   presenting them as findings.</p>
   <div class="bb-scroll">
@@ -401,8 +401,8 @@
             </div>
             <ul class="mc-chips">
               <li class="mc-chip"><?= e($v?->year) ?></li>
-              <li class="mc-chip"><?= e($v?->fuel) ?></li>
-              <li class="mc-chip"><?= e($v?->transmission) ?></li>
+              <li class="mc-chip"><?= e($v?->fuel_es) ?></li>
+              <li class="mc-chip"><?= e($v?->transmission_es) ?></li>
             </ul>
             <span class="mc-card__go">Ver el coche <span class="mc-card__arrow">&rarr;</span></span>
           </div>
@@ -467,7 +467,7 @@
               <span>·</span>
               <span><b>{{ $inventory['testimonials'] }}</b> reseñas con foto</span>
             </div>
-            <span class="mc-btn mc-btn--block">Ver los coches</span>
+            <span class="mc-btn mc-btn--outline mc-btn--block">Ver los coches</span>
           </div>
 
           <div class="pg-sec">
@@ -509,7 +509,6 @@
           <div class="mc-head">
             <div class="mc-head__in">
               <a class="mc-logo" href="#elements">IV&nbsp;MOTORCLASS</a>
-              <span class="mc-btn mc-btn--cta" style="padding-inline:var(--s-3)">WhatsApp</span>
               <span class="mc-burger"><span class="mc-burger__bars"></span></span>
             </div>
           </div>
@@ -528,7 +527,7 @@
             </div>
             <div class="pg-gal">
               <div class="is-on">@if($carImg)<img class="mc-img mc-img--vehicle" src="{{ $carImg }}" alt="" width="200" height="150" loading="lazy">@endif</div>
-              <div><span class="pg-gal__tag">Odómetro</span></div>
+              <div>@if($carOdo ?? null)<img class="mc-img mc-img--vehicle" src="{{ $carOdo }}" alt="" width="200" height="150" loading="lazy">@endif<span class="pg-gal__tag">Odómetro</span></div>
               <div></div><div></div>
             </div>
           </div>
@@ -538,18 +537,14 @@
             <dl class="mc-specs">
               <div class="mc-specs__row"><dt>Año</dt><dd>{{ $car?->year }}</dd></div>
               <div class="mc-specs__row"><dt>Kilómetros</dt><dd>{{ $car?->mileage ? $km($car->mileage) : '—' }}</dd></div>
-              <div class="mc-specs__row"><dt>Combustible</dt><dd>{{ $car?->fuel }}</dd></div>
-              <div class="mc-specs__row"><dt>Cambio</dt><dd>{{ $car?->transmission }}</dd></div>
+              <div class="mc-specs__row"><dt>Combustible</dt><dd>{{ $car?->fuel_es }}</dd></div>
+              <div class="mc-specs__row"><dt>Cambio</dt><dd>{{ $car?->transmission_es }}</dd></div>
               <div class="mc-specs__row"><dt>Dónde está</dt><dd>Málaga</dd></div>
             </dl>
           </div>
 
           <div class="pg-sec pg-sec--band">
-            <div class="mc-cta">
-              <span class="mc-btn mc-btn--cta">WhatsApp</span>
-              <span class="mc-btn mc-btn--outline">Llamar</span>
-            </div>
-            <p class="pg-note">Contesto yo. Suelo tardar unas horas, no unos minutos.</p>
+            <p class="pg-note" style="margin:0">Contesto yo. Suelo tardar unas horas, no unos minutos. Los dos botones están abajo.</p>
           </div>
 
           <div class="pg-sec">
@@ -581,7 +576,7 @@
         <div class="ph__home"></div>
       </div>
       <p class="bb-small" style="margin-top:var(--s-3);color:var(--mc-ink-3)">
-        Price and kilometres before the gallery; the odometer photo in the first three; the
+        Price and kilometres before the gallery; the odometer slot in the first three; the
         bar with WhatsApp and Call pinned from the first paint. Today this page has neither
         the bar nor a single testimonial.</p>
     </div>
@@ -609,9 +604,9 @@
       </div>
     </div>
     <div class="bb-el__states">
-      <div class="bb-state">{!! $cardFor($car, 'is-hover') !!}<span class="bb-cap">Ratón encima — el borde se oscurece y la línea se dibuja</span></div>
-      <div class="bb-state">{!! $cardFor($car, 'is-focus') !!}<span class="bb-cap">Con el teclado — anillo y regla azul arriba</span></div>
-      <div class="bb-state">{!! $cardFor($sold ?? $car, 'mc-card--sold') !!}<span class="bb-cap">Vendido — una variante, no un error</span></div>
+      <div class="bb-state">{!! $cardFor($car, 'is-hover') !!}<span class="bb-cap">Hover — the shadow lifts</span></div>
+      <div class="bb-state">{!! $cardFor($car, 'is-focus') !!}<span class="bb-cap">Keyboard — the ring</span></div>
+      <div class="bb-state">{!! $cardFor($sold ?? $car, 'mc-card--sold') !!}<span class="bb-cap">Sold — a variant, not an error</span></div>
     </div>
     <p class="bb-el__why">The whole card is <b>one link</b>. A card with a title link plus a
       button plus a photo link is three targets stacked in 300px, and it is why dealer grids
@@ -639,12 +634,12 @@
       </div>
     </div>
     <div class="bb-el__states">
-      <div class="bb-state"><span class="mc-btn">Ver los coches</span><span class="bb-cap">Normal</span></div>
-      <div class="bb-state"><span class="mc-btn is-hover">Ver los coches</span><span class="bb-cap">Ratón encima</span></div>
-      <div class="bb-state"><span class="mc-btn is-focus">Ver los coches</span><span class="bb-cap">Con el teclado — dos anillos</span></div>
-      <div class="bb-state"><span class="mc-btn is-active">Ver los coches</span><span class="bb-cap">Pulsado</span></div>
-      <div class="bb-state"><span class="mc-btn is-disabled">Ver los coches</span><span class="bb-cap">Desactivado</span></div>
-      <div class="bb-state"><span class="mc-btn is-loading"><span class="mc-btn__label" data-busy="Enviando…">Ver los coches</span><span class="mc-btn__prog"></span></span><span class="bb-cap">Enviando — la línea se dibuja</span></div>
+      <div class="bb-state"><span class="mc-btn">Ver los coches</span><span class="bb-cap">Rest</span></div>
+      <div class="bb-state"><span class="mc-btn is-hover">Ver los coches</span><span class="bb-cap">Hover</span></div>
+      <div class="bb-state"><span class="mc-btn is-focus">Ver los coches</span><span class="bb-cap">Keyboard — two rings</span></div>
+      <div class="bb-state"><span class="mc-btn is-active">Ver los coches</span><span class="bb-cap">Pressed</span></div>
+      <div class="bb-state"><span class="mc-btn is-disabled">Ver los coches</span><span class="bb-cap">Disabled</span></div>
+      <div class="bb-state"><span class="mc-btn is-loading"><span class="mc-btn__label" data-busy="Enviando…">Ver los coches</span><span class="mc-btn__prog"></span></span><span class="bb-cap">Sending — the line draws</span></div>
     </div>
     <div class="bb-el__stage bb-el__stage--navy on-navy">
       <span class="bb-stagecap" style="color:var(--mc-on-navy-2)">In the footer the same two flip to white — a green fill on navy has no contrast at its edge, and no recolouring fixes that</span>
@@ -711,7 +706,7 @@
             </div></div>
             <div style="padding:0 var(--s-4) var(--s-4);background:var(--mc-surface)">
               @foreach([['Coches',true],['Entregados',false],['Quién soy',false],['Contacto',false]] as [$l,$cur])
-                <a class="mc-nav__i" href="#EL-HDR-01" style="display:flex;min-height:56px;border-bottom:1px solid var(--mc-hairline);font-size:var(--t-h3);text-decoration:none{{ $cur ? ';border-left:3px solid var(--mc-blue);padding-left:var(--s-3);font-weight:600' : '' }}">{{ $l }}</a>
+                <a class="mc-nav__i" href="#EL-HDR-01" style="display:flex;min-height:var(--mc-tap-pref);padding-block:var(--s-1);border-bottom:1px solid var(--mc-hairline);font-size:var(--t-h3);text-decoration:none{{ $cur ? ';border-left:3px solid var(--mc-blue);padding-left:var(--s-3);font-weight:600' : '' }}">{{ $l }}</a>
               @endforeach
             </div>
           </div>
@@ -744,9 +739,9 @@
               <h2 class="pg-h">Los datos</h2>
               <dl class="mc-specs">
                 <div class="mc-specs__row"><dt>Año</dt><dd>{{ $car?->year }}</dd></div>
-                <div class="mc-specs__row"><dt>Combustible</dt><dd>{{ $car?->fuel }}</dd></div>
-                <div class="mc-specs__row"><dt>Cambio</dt><dd>{{ $car?->transmission }}</dd></div>
-                <div class="mc-specs__row"><dt>Color</dt><dd>{{ $car?->color ?? 'Gris' }}</dd></div>
+                <div class="mc-specs__row"><dt>Combustible</dt><dd>{{ $car?->fuel_es }}</dd></div>
+                <div class="mc-specs__row"><dt>Cambio</dt><dd>{{ $car?->transmission_es }}</dd></div>
+                <div class="mc-specs__row"><dt>Color</dt><dd>{{ $car?->color_es ?? 'Gris' }}</dd></div>
               </dl>
             </div>
             <div class="ph__bar"><div class="mc-bar">
@@ -761,13 +756,13 @@
           <div class="bb-scroll"><table class="bb-t" style="min-width:0">
             <tbody>
               <tr><td>Gutter</td><td class="bb-num-cell">16</td></tr>
-              <tr><td>Price and km</td><td class="bb-num-cell">150</td></tr>
+              <tr><td>Price and km</td><td class="bb-num-cell">82</td></tr>
               <tr><td>Gap</td><td class="bb-num-cell">12</td></tr>
-              <tr><td>WhatsApp</td><td class="bb-num-cell">112</td></tr>
+              <tr><td>WhatsApp</td><td class="bb-num-cell">137</td></tr>
               <tr><td>Gap</td><td class="bb-num-cell">12</td></tr>
-              <tr><td>Call, glyph only</td><td class="bb-num-cell">48</td></tr>
+              <tr><td>Call, "Tel"</td><td class="bb-num-cell">48</td></tr>
               <tr><td>Gutter</td><td class="bb-num-cell">16</td></tr>
-              <tr><td><b>Total</b></td><td class="bb-num-cell"><b>366 of 390</b></td></tr>
+              <tr><td><b>Total</b></td><td class="bb-num-cell"><b>323 of 390</b></td></tr>
             </tbody>
           </table></div>
         </div>
@@ -806,7 +801,8 @@
                 <label class="mc-field"><span class="mc-field__label">Tu teléfono</span><input class="mc-input" type="tel" placeholder="614 753 187"></label>
                 <label class="mc-field"><span class="mc-field__label">Qué quieres saber <span class="mc-field__opt">(opcional)</span></span>
                   <textarea class="mc-textarea" rows="2">Me interesa el {{ $car?->brand }} {{ $car?->model }}. ¿Sigue disponible?</textarea></label>
-                <label class="mc-check"><input type="checkbox"><span class="mc-check__t">Guardo tu nombre y tu teléfono solo para contestarte. <a class="mc-link" href="#EL-FORM-01">Cómo trato tus datos</a>.</span></label>
+                <label class="mc-check"><input type="checkbox"><span class="mc-check__t">Guardo tu nombre y tu teléfono solo para contestarte.</span></label>
+                <a class="mc-go" href="#EL-FORM-01" style="font-size:var(--t-small);margin-bottom:var(--s-4)">Cómo trato tus datos <span class="mc-go__arrow">&rarr;</span></a>
                 <span class="mc-btn mc-btn--block">Preguntar por este coche</span>
               </form>
             </div></div>
@@ -832,7 +828,7 @@
           </div>
         </div>
       </div>
-      <span class="bb-stagecap" style="margin:var(--s-4) 0 0;text-align:center">Left: empty. Right: one field missing, then sending, then sent.</span>
+      <span class="bb-stagecap" style="margin:var(--s-4) 0 0;text-align:center">First: empty. Second: one field missing, then sending, then sent.</span>
     </div>
     <p class="bb-el__why">The message box is <b>already filled in with the question the buyer
       was going to ask</b>, and it is optional — an empty text box on a phone is where
@@ -858,7 +854,7 @@
           <div class="bb-atom__n">Precio y kilómetros<small>EL-PRICE-01 · never one without the other</small></div>
           <div class="bb-atom__s">
             <div><div class="mc-pair"><span class="mc-price">24.800 €</span><span class="mc-km">184.000 km</span></div></div>
-            <div><div class="mc-pair"><span class="mc-price">18.500 €</span><span class="mc-km is-unknown">Km sin confirmar</span></div></div>
+            <div><div class="mc-pair"><span class="mc-price">14.800 €</span><span class="mc-km is-unknown">Km sin confirmar</span></div></div>
           </div>
         </div>
         <div class="bb-atom">
@@ -872,7 +868,7 @@
         <div class="bb-atom">
           <div class="bb-atom__n">Datos rápidos<small>EL-CHIP-01 · not tappable, so allowed under 44px</small></div>
           <div class="bb-atom__s">
-            <ul class="mc-chips"><li class="mc-chip">2017</li><li class="mc-chip">Diésel</li><li class="mc-chip">Automático</li><li class="mc-chip">190 CV</li></ul>
+            <ul class="mc-chips"><li class="mc-chip">{{ $car?->year }}</li><li class="mc-chip">{{ $car?->fuel_es }}</li><li class="mc-chip">{{ $car?->transmission_es }}</li></ul>
           </div>
         </div>
         <div class="bb-atom">
@@ -931,7 +927,7 @@
       <span class="bb-stagecap">When everything is sold — good news for a one-man dealer, so it is not drawn as a failure</span>
       <div class="mc-empty">
         <p class="mc-empty__t">Ahora mismo no tengo ningún coche disponible.</p>
-        <p style="font-family:var(--f-voice);font-size:var(--t-prose);color:var(--mc-ink-2);max-width:52ch">Suelo tener entre 8 y 10. Escríbeme y te aviso en cuanto entre algo que encaje con lo que buscas.</p>
+        <p style="font-family:var(--f-voice);font-size:var(--t-prose);line-height:1.62;color:var(--mc-ink-2);max-width:52ch">Suelo tener entre 8 y 10. Escríbeme y te aviso en cuanto entre algo que encaje con lo que buscas.</p>
         <div class="mc-cta" style="max-width:30rem">
           <span class="mc-btn mc-btn--cta">WhatsApp</span>
           <span class="mc-btn mc-btn--outline">Ver los {{ $inventory['sold'] }} entregados</span>
@@ -975,22 +971,23 @@
     </div>
 
     <p class="bb-prose" style="margin-top:var(--s-5)">
-      The important part is not the average — it is the <b>gap</b>. Sixteen of your comments
-      sit tightly between 133 and 245 characters, then there is nothing at all until a tail
-      of five long ones. That gap decides the design:
+      The important part is not the average — it is the <b>gap</b>. {{ $quotes['band'] }} of
+      your {{ $quotes['n'] }} comments sit between 133 and 245 characters; the other
+      {{ $quotes['tail'] }} run long, and the first of them is a full step away. That gap
+      decides the design:
     </p>
 
     <div class="bb-scroll">
     <table class="bb-t">
       <thead><tr><th>If we show up to…</th><th class="bb-num-cell">…shown in full</th><th class="bb-num-cell">Gain</th><th>What the extra step buys</th></tr></thead>
       <tbody>
-        @php $prev = null; $best = null; @endphp
+        @php $prev = null; $prevCap = null; @endphp
         @foreach($quotes['caps'] as $cap => $pctShown)
           @php
             // The verdict is computed, not typed: what does each extra step actually buy?
-            $gain = $prev === null ? null : $pctShown - $prev;
-            $prev = $pctShown;
-            if ($gain !== null && $gain === 0 && $best === null) { $best = true; }
+            $gain  = $prev === null ? null : (int) $pctShown - (int) $prev;
+            $lines = $prevCap === null ? 0 : (int) ceil(($cap - $prevCap) / 34);   // 34 chars per line at desktop width
+            $prev = $pctShown; $prevCap = $cap;
           @endphp
           <tr>
             <td>{{ $cap }} characters</td>
@@ -1001,34 +998,36 @@
               @elseif($cap == 250)<span class="bb-pass">the knee — last cheap step</span>
               @elseif($gain !== null && $gain >= 20)<span class="bb-exempt">still climbing</span>
               @elseif($gain === null)<span class="bb-exempt">starting point</span>
-              @else<span class="bb-exempt">{{ $gain }} points, at 3 more lines on every row</span>@endif
+              @else<span class="bb-exempt">{{ $gain }} points, at {{ $lines }} more line{{ $lines === 1 ? '' : 's' }} on every row</span>@endif
             </td>
           </tr>
         @endforeach
       </tbody>
     </table>
     </div>
-    <p class="bb-small" style="color:var(--mc-ink-3)">
+    <p class="bb-small" style="margin-top:var(--s-3);color:var(--mc-ink-3)">
       Nine lines of text lands on that knee at every screen width, so the limit is nine
       lines rather than a fixed character count — that way it adapts instead of cutting
       words in half.</p>
   @endif
 
-  <h3 style="margin:var(--s-7) 0 var(--s-4)">The layout: photo left, words right</h3>
+  <h3>The layout: photo left, words right</h3>
   <p class="bb-prose">
-    <b>261px per customer instead of 745px</b> — 2.9 times denser than the slider you have,
-    so two or three people are on screen at once instead of one. And the photograph stays
-    large enough to be a photograph of a person next to a car, not a round avatar.
+    <b>Between 208 and 256px per customer on a phone, instead of 745px</b> — roughly three
+    times denser than the slider you have, so two or three people are on screen at once
+    instead of one. And the photograph stays large enough to be a photograph of a person
+    next to a car, not a round avatar.
   </p>
   <p class="bb-prose">
-    The reason it works: the photo already forces a certain height. Nine lines of text fits
-    inside roughly that same height. So for three quarters of your comments,
-    <b>showing the words costs nothing at all.</b>
+    The reason it works: the photo already forces a certain height, and nine lines of text
+    fits inside roughly that same height. For most of your comments the words cost nothing
+    beyond the photograph; the longest ones in the band add at most about 50px.
   </p>
 
   @if($sample->count())
     <div class="tt-list" style="margin-top:var(--s-5)">
-      @foreach($sample->take(4) as $t)
+      @php $wallSample = $sample->take(3)->push($sample->first(fn($t) => mb_strlen(trim((string)$t->quote)) > 260)); @endphp
+      @foreach($wallSample as $t)
         @php
           $rel = ltrim(preg_replace('#^/?storage/#', '', $t->image_path ?? ''), '/');
           $src = $rel ? asset('storage/'.$rel) : null;
@@ -1043,12 +1042,13 @@
         <article class="tt-row">
           <div class="tt-photo {{ $cls }}">
             @if($src)<img class="mc-img mc-img--portrait" src="{{ $src }}"
-              alt="{{ $t->author_name }}" loading="lazy" decoding="async" width="400" height="500">@endif
+              alt="{{ str_replace('&', ' y ', $t->author_name) }}" loading="lazy" decoding="async"
+              width="400" height="{{ $cls === 'is-tall' ? 560 : ($cls === 'is-wide' ? 300 : 500) }}">@endif
           </div>
           <div class="tt-body">
             @if(mb_strlen($q) > 2)
               <p class="tt-quote is-clamped">{{ $q }}</p>
-              @if(mb_strlen($q) > 260)<button class="tt-more" type="button">Ver más</button>@endif
+              @if(mb_strlen($q) > 220)<button class="tt-more" type="button" aria-expanded="false">Ver más</button>@endif
             @endif
             <span class="tt-attr"><b>{{ str_replace('&', ' y ', $t->author_name) }}</b>
               @if($t->author_location) · {{ $t->author_location }}@endif</span>
@@ -1080,9 +1080,12 @@
     <div class="bb-do">
       <h3>Three things worth surfacing</h3>
       <ul>
-        <li><b>Where people came from.</b> Six of your {{ $inventory['testimonials'] }}
-          customers travelled from Málaga, Granada and Sevilla. Nobody crosses the country
-          for a car unless they trust the seller. Right now that is greyed-out small print.</li>
+        <li><b>Where people came from.</b> The photographs were taken in
+          {{ $quotes['home'] }}, and {{ $quotes['awayN'] }} of your
+          {{ $inventory['testimonials'] }} customers came to you from
+          {{ implode(', ', array_slice($quotes['awayCities'], 0, -1)) }}{{ count($quotes['awayCities']) > 1 ? ' and ' : '' }}{{ end($quotes['awayCities']) }}.
+          Nobody crosses the country for a car unless they trust the seller. Right now that
+          is greyed-out small print.</li>
         <li><b>One testimonial is broken</b> — the comment is a single comma. Worth editing
           or hiding.</li>
         <li><b>Four comments contain paragraph breaks</b> that the current page flattens
@@ -1118,7 +1121,7 @@
   </div>
 
   @foreach($colors as $group => $rows)
-    <h3 style="margin:var(--s-6) 0 var(--s-4)">{{ $group }}</h3>
+    <h3>{{ $group }}</h3>
     <div class="bb-grid">
       @foreach($rows as $c)
         <div class="bb-sw">
@@ -1129,7 +1132,7 @@
     </div>
   @endforeach
 
-  <h3 style="margin:var(--s-7) 0 var(--s-4)">How much of each</h3>
+  <h3>How much of each</h3>
   <p class="bb-prose">On a typical page, measured as share of the screen. This is the
   proportion we measured on car-planet, and it is what lets amateur photography carry a
   page.</p>
@@ -1187,7 +1190,7 @@
       typeface car-planet renders on 485 of its 509 measured text nodes, taken deliberately
       on your instruction to get as close to their register as possible. One family, no
       serif — exactly as they do it.</p>
-      <p class="bb-display" style="margin-top:var(--s-4);color:var(--mc-accent)">24.800 €</p>
+      <p class="mc-pair" style="margin-top:var(--s-4)"><span class="mc-price">24.800 €</span><span class="mc-km">184.000 km</span></p>
     </div>
     <div>
       <h3>The customer's voice — italic, same family</h3>
@@ -1222,9 +1225,9 @@
     </div>
     <div class="bb-note">
       <h3>Fonts cost nothing here</h3>
-      <p style="margin-bottom:0">Both are free, both load from Google, and both have a
-      fallback tuned so the page does not jump when they arrive. Total added weight is
-      smaller than one of your car photographs.</p>
+      <p style="margin-bottom:0">One family, free, loaded from Google in two faces — upright
+      and italic — with a metric-matched fallback so the page does not jump when it
+      arrives. Total added weight is smaller than one of your car photographs.</p>
     </div>
   </div>
 </section>
@@ -1247,12 +1250,12 @@
     person can actually see. <span class="bb-st bb-st--fixed">Fixed</span></p>
   </div>
 
-  <h3 style="margin:var(--s-6) 0 var(--s-4)">Where the thumb reaches</h3>
+  <h3>Where the thumb reaches</h3>
   <div style="max-width:390px;border:1px solid var(--mc-ink)">
-    <div style="display:flex;gap:var(--s-3);padding:var(--s-3) var(--s-4);background:var(--mc-band);font-size:var(--t-small);border-bottom:1px solid var(--mc-hairline)"><b style="white-space:nowrap">0–180</b><span>Hard to reach. Logo, secondary links. Nothing frequent.</span></div>
-    <div style="display:flex;gap:var(--s-3);padding:var(--s-3) var(--s-4);font-size:var(--t-small);border-bottom:1px solid var(--mc-hairline)"><b style="white-space:nowrap">180–430</b><span>Reachable with effort. Main photo, headline.</span></div>
-    <div style="display:flex;gap:var(--s-3);padding:var(--s-3) var(--s-4);background:var(--mc-accent-tint);font-size:var(--t-small);border-bottom:1px solid var(--mc-hairline)"><b style="white-space:nowrap">430–660</b><span><b>Natural thumb arc.</b> The price, the contact button.</span></div>
-    <div style="display:flex;gap:var(--s-3);padding:var(--s-3) var(--s-4);font-size:var(--t-small)"><b style="white-space:nowrap">660–759</b><span>The fixed bar. WhatsApp and Call.</span></div>
+    <div style="display:flex;gap:var(--s-3);align-items:flex-start;height:180px;padding:var(--s-3) var(--s-4);background:var(--mc-band);font-size:var(--t-small);border-bottom:1px solid var(--mc-hairline)"><b style="flex:0 0 8ch">0–180</b><span>Hard to reach. Logo, secondary links. Nothing frequent.</span></div>
+    <div style="display:flex;gap:var(--s-3);align-items:flex-start;height:250px;padding:var(--s-3) var(--s-4);font-size:var(--t-small);border-bottom:1px solid var(--mc-hairline)"><b style="flex:0 0 8ch">180–430</b><span>Reachable with effort. Main photo, headline.</span></div>
+    <div style="display:flex;gap:var(--s-3);align-items:flex-start;height:230px;padding:var(--s-3) var(--s-4);background:var(--mc-blue-tint);font-size:var(--t-small);border-bottom:1px solid var(--mc-hairline)"><b style="flex:0 0 8ch">430–660</b><span><b>Natural thumb arc.</b> The price, the contact button.</span></div>
+    <div style="display:flex;gap:var(--s-3);align-items:flex-start;height:99px;padding:var(--s-3) var(--s-4);font-size:var(--t-small)"><b style="flex:0 0 8ch">660–759</b><span>The fixed bar. WhatsApp and Call.</span></div>
   </div>
 
   <div class="bb-two" style="margin-top:var(--s-5)">
@@ -1302,7 +1305,7 @@
             <td class="bb-num-cell">{{ $fmt($g['n']) }}</td>
             <td class="bb-num-cell">{{ $fmt($g['portrait']) }}</td>
             <td class="bb-num-cell">{{ $fmt($g['landscape']) }}</td>
-            <td class="bb-num-cell">{{ $g['n'] ? round($mn/$g['n']*100) : 0 }}% at {{ $mk }}</td>
+            <td class="bb-num-cell">{{ $g['n'] ? round($mn/$g['n']*100) : 0 }}% at {{ ['1.3333'=>'4:3','0.75'=>'3:4','1.5'=>'3:2','0.6667'=>'2:3','1'=>'1:1','1.7778'=>'16:9'][(string)$mk] ?? $mk }}</td>
           </tr>
         @endforeach
       </tbody>
@@ -1345,8 +1348,8 @@
       browser respects it, but the code that makes the small versions ignores it. So the
       same photo looks upright when opened directly and sideways on every card and
       thumbnail.</p>
-      <p style="margin-bottom:0">Fixed here, roughly fifteen lines. It affects about 180 of
-      your car photographs. <span class="bb-st bb-st--fixed">Fixed</span></p>
+      <p style="margin-bottom:0">Fixed here, roughly fifteen lines. It affects
+      {{ $fmt($ex['rotated']) }} of your car photographs. <span class="bb-st bb-st--fixed">Fixed</span></p>
     </div>
   @endif
 
@@ -1364,7 +1367,7 @@
       <h3>Never</h3>
       <ul>
         <li>Stock photography of any kind. It is the loudest fake signal there is, and it
-          would undo what your 25 real photographs are doing.</li>
+          would undo what your {{ $crops['n'] }} real photographs are doing.</li>
         <li>Manufacturer renders and studio cut-outs.</li>
         <li>Filters, vignettes, retouched panels.</li>
         <li>Any photo where the face is cropped.</li>
@@ -1387,7 +1390,7 @@
 
   <div class="bb-scroll">
   <table class="bb-t">
-    <thead><tr><th style="width:18ch">Rule</th><th>In practice</th></tr></thead>
+    <thead><tr><th style="width:22ch">Rule</th><th>In practice</th></tr></thead>
     <tbody>
       <tr><td><b>First person</b></td><td><em>Yo</em> for anything involving judgement or contact. Never <em>nosotros</em> — a one-man business writing "our team" is the first thing a buyer notices.</td></tr>
       <tr><td><b>A fact, not an adjective</b></td><td>Every claim carries a number, a date or a place. Adjectives without evidence are what make copy read as written by a machine.</td></tr>
@@ -1396,7 +1399,7 @@
   </table>
   </div>
 
-  <h3 style="margin:var(--s-6) 0 var(--s-4)">Ready to use, in Spanish</h3>
+  <h3>Ready to use, in Spanish</h3>
   <div class="bb-scroll">
   <table class="bb-t">
     <thead><tr><th style="width:22ch">Where</th><th>Text</th></tr></thead>
@@ -1461,18 +1464,19 @@
       ] as [$id,$name,$where])
         <tr>
           <td><code>{{ $id }}</code></td><td><b>{{ $name }}</b></td><td>{{ $where }}</td>
-          <td class="bb-num-cell">☐</td><td class="bb-num-cell">☐</td>
+          <td><label class="mc-check" style="justify-content:center"><input type="checkbox" name="{{ $id }}-ok" aria-label="Aprobado {{ $id }}"></label></td>
+          <td><label class="mc-check" style="justify-content:center"><input type="checkbox" name="{{ $id }}-chg" aria-label="Con cambios {{ $id }}"></label></td>
         </tr>
       @endforeach
     </tbody>
   </table>
   </div>
 
-  <div class="bb-two" style="margin-top:var(--s-6)">
+  <div class="bb-two" style="margin-top:var(--s-5)">
     <div class="bb-note">
       <h3>Waiting on you <span class="bb-st bb-st--you">Your call</span></h3>
-      <ul style="margin:0;padding-left:1.1em">
-        <li>The three legal and commercial sentences in §8.</li>
+      <ul>
+        <li>The three legal and commercial sentences in §9.</li>
         <li>Whether the WhatsApp green stays at the legible <code>#017B37</code> or moves to the brand's brighter <code>#25D366</code> with dark text on it.</li>
         <li>Whether we build filters now or wait until the stock passes about 25 cars.</li>
         <li>Whether the fabricated star ratings come off the testimonials.</li>
@@ -1480,11 +1484,11 @@
     </div>
     <div class="bb-note" style="border-left-color:var(--mc-accent)">
       <h3>Broken today, regardless of any decision <span class="bb-st bb-st--fixed">Fixed</span></h3>
-      <ul style="margin:0;padding-left:1.1em">
+      <ul>
         <li><code>viewport-fit=cover</code> is missing — any fixed bar sits under the
           iPhone home indicator. One line.</li>
-        <li>About 180 car photographs are served rotated 90°. Roughly fifteen lines,
-          already written and tested here.</li>
+        <li>{{ $fmt($metrics['exif']['rotated'] ?? 0) }} car photographs are served rotated 90°.
+          Roughly fifteen lines, already written and tested here.</li>
         <li>Customer photos are framed at <code>center 25%</code> instead of
           <code>center 40%</code> — my error, one value.</li>
         <li>113 targets across three pages are too small to tap reliably.</li>
@@ -1533,7 +1537,7 @@
     stays true six months from now.</p>
   </div>
 
-  <h3 style="margin:var(--s-7) 0 var(--s-4)">Combinations the code must never produce</h3>
+  <h3>Combinations the code must never produce</h3>
   <p class="bb-prose">Computed too, so the prohibition is evidence rather than opinion.</p>
   <div class="bb-scroll">
   <table class="bb-t">
@@ -1541,7 +1545,7 @@
     <tbody>
       @foreach($forbidden as $f)
         <tr>
-          <td><span class="bb-pair-chip"><i style="background:{{ $f['bgHex'] }}"></i><i style="background:{{ $f['fgHex'] }}"></i></span></td>
+          <td><span class="bb-pair-chip"><i style="background:{{ $f['bgHex'] }}"></i><i style="background:{{ $f['fgHex'] }}"></i>{{ $f['fgHex'] }} on {{ $f['bgHex'] }}</span></td>
           <td>{{ $f['use'] }}</td>
           <td class="bb-num-cell"><span class="bb-fail">{{ number_format($f['ratio'], 2) }}:1</span></td>
           <td>{{ $f['instead'] }}</td>
@@ -1554,7 +1558,7 @@
   <div class="bb-note" style="margin-top:var(--s-5)">
     <p><b>Three failures were found and fixed while building this palette</b>, which is the
     point of computing rather than eyeballing:</p>
-    <ul style="margin:0;padding-left:1.1em">
+    <ul>
       <li>The keyboard focus ring on a blue button measured 2.40:1. It is now two rings —
         a white one inside an ink one — so the dark ring only ever sits against white.</li>
       <li>The input border passed on the page but failed at 2.79:1 inside a grey band. It
@@ -1582,7 +1586,7 @@
     @endforeach
   </div>
 
-  <h3 style="margin:var(--s-6) 0 var(--s-4)">Motion</h3>
+  <h3>Motion</h3>
   <p class="bb-prose">
     Almost none, on purpose. Cards lift slightly on hover, buttons change shade, and the
     sending button draws a thin line along its bottom edge while it works. That is the whole
@@ -1591,6 +1595,7 @@
   </p>
   <div class="bb-scroll">
   <table class="bb-t">
+    <thead><tr><th>Token</th><th class="bb-num-cell">Value</th><th>Used for</th></tr></thead>
     <tbody>
       @foreach($motion['durations'] as $m)
         <tr><td><code>{{ $m['var'] }}</code></td><td class="bb-num-cell"><b>{{ $m['value'] }}</b></td><td>{{ $m['use'] }}</td></tr>
@@ -1598,12 +1603,12 @@
     </tbody>
   </table>
   </div>
-  <p class="bb-small" style="color:var(--mc-ink-3)">
+  <p class="bb-small" style="margin-top:var(--s-4);color:var(--mc-ink-3)">
     No bounce and no spring anywhere. Bounce reads as playful; this business is asking
     someone for €20,000 on trust. And anyone who has switched on "reduce motion" in their
     phone settings sees none of it — nothing here carries meaning through movement.</p>
 
-  <h3 style="margin:var(--s-6) 0 var(--s-4)">Order of work</h3>
+  <h3>Order of work</h3>
   <p class="bb-prose">Dependency order. Each step is only safe once the ones above it are done.</p>
   <div class="bb-scroll">
   <table class="bb-t">
@@ -1612,12 +1617,12 @@
       <tr><td class="bb-num-cell">1</td><td>Rotated photographs</td><td><span class="bb-pass">done here</span> · pending on the live site</td></tr>
       <tr><td class="bb-num-cell">2</td><td>Colour and type loaded before anything else</td><td><span class="bb-pass">done</span></td></tr>
       <tr><td class="bb-num-cell">3</td><td><code>viewport-fit=cover</code> on every page</td><td>Both sites</td></tr>
-      <tr><td class="bb-num-cell">4</td><td>Elements built, in sign-off order</td><td>Blocked on §9</td></tr>
+      <tr><td class="bb-num-cell">4</td><td>Elements built, in sign-off order</td><td>Blocked on §10</td></tr>
       <tr><td class="bb-num-cell">5</td><td>Vehicle card, shared by home and catalogue</td><td>After EL-CARD-01</td></tr>
       <tr><td class="bb-num-cell">6</td><td>Customer wall replaces the slider</td><td>After EL-CARD-01</td></tr>
       <tr><td class="bb-num-cell">7</td><td>Fixed bar with safe-area handling</td><td>Needs step 3, then a real iPhone</td></tr>
       <tr><td class="bb-num-cell">8</td><td>Touch-target sweep at 390px</td><td>Target: 0, from 113 today</td></tr>
-      <tr><td class="bb-num-cell">9</td><td>Spanish text pass over every page</td><td>Blocked on the three sentences in §8</td></tr>
+      <tr><td class="bb-num-cell">9</td><td>Spanish text pass over every page</td><td>Blocked on the three sentences in §9</td></tr>
     </tbody>
   </table>
   </div>
@@ -1643,6 +1648,8 @@
 <script>
 (function(){
   document.querySelectorAll('.tt-more').forEach(function(b){
+    var q0 = b.parentElement.querySelector('.tt-quote');
+    if (q0 && q0.scrollHeight <= q0.clientHeight + 1) { b.hidden = true; return; }
     b.addEventListener('click', function(){
       var q = b.parentElement.querySelector('.tt-quote');
       var open = q.classList.toggle('is-clamped') === false;

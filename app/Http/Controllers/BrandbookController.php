@@ -37,6 +37,11 @@ class BrandbookController extends Controller
             'inventory' => $this->inventory(),
             'sample'    => Testimonial::where('is_active', true)->orderBy('order_index')->get(),
             'car'       => Vehicle::where('status', 'available')->first(),
+            'carOdo'    => (function () {
+                $v = Vehicle::where('status', 'available')->first();
+                $g = $v?->gallery_images; if (is_string($g)) { $g = json_decode($g, true); }
+                return (is_array($g) && count($g) > 1) ? $v->thumbUrlFor($g[1], 300) : null;
+            })(),
             'cars'      => Vehicle::where('status', 'available')->orderBy('priority', 'desc')->take(3)->get(),
             'sold'      => Vehicle::where('status', 'sold')->first(),
         ]);
@@ -55,6 +60,16 @@ class BrandbookController extends Controller
             $out[trim($t[1])] = trim(preg_replace('/\s+/', ' ', $t[2]));
         }
 
+        // A token may alias another: --mc-blue-100: var(--mc-blue-tint). Resolve so
+        // every consumer, the contrast maths included, sees the hex.
+        foreach ($out as $k => $v) {
+            $guard = 0;
+            while (preg_match('/^var\((--[a-z0-9-]+)\)$/i', $v, $mm) && isset($out[$mm[1]]) && $guard++ < 5) {
+                $v = $out[$mm[1]];
+            }
+            $out[$k] = $v;
+        }
+
         return $out;
     }
 
@@ -65,13 +80,12 @@ class BrandbookController extends Controller
                 ['--mc-bg',         'The page. A cool near-white, not pure white.'],
                 ['--mc-surface',    'Vehicle cards and forms. Pure white, so a card lifts off the page without a shadow — shadows disappear in glare.'],
                 ['--mc-band',       'Alternating section band. The darkest light surface, so every text colour is proven against this one.'],
-                ['--mc-blue-tint',  'Blue wash. One section per page, at most.'],
+                ['--mc-blue-tint',  'Blue wash: one band per page at most, spec rows, and chip fill.'],
             ],
             'Blue' => [
-                ['--mc-blue',       'The brand. One value does two jobs: link text and button fill, both at 7.13:1.'],
+                ['--mc-blue',       'The brand. One value does two jobs: link text and button fill, both at '.$this->ratio($t['--mc-blue'] ?? '#1558D6', '#FFFFFF').':1.'],
                 ['--mc-blue-dark',  'Hover, pressed, and large headings.'],
                 ['--mc-blue-light', 'Links and icons on navy only. Forbidden on light — 2.46:1.'],
-                ['--mc-blue-100',   'Chip fill.'],
             ],
             'Navy' => [
                 ['--mc-navy',      'Footer and any fixed bar. Held at 1.55:1 from pure black so it survives a cheap phone panel.'],
@@ -80,7 +94,7 @@ class BrandbookController extends Controller
                 ['--mc-on-navy-2', 'Secondary text on navy. Never on a light surface.'],
             ],
             'Price' => [
-                ['--mc-price',       'Coral, on car-planet\'s hue, for the price and nothing else. Passes 4.5:1 on every ground.'],
+                ['--mc-price',       'Coral, on car-planet\'s hue, for the price and nothing else. '.$this->ratio($t['--mc-price'] ?? '#C6352A', $t['--mc-band'] ?? '#E8EDF5').':1 on the darkest ground it can land on.'],
                 ['--mc-accent',      'The darker step: small text, error borders, the failing mark in this book.'],
                 ['--mc-accent-tint', 'Error-field ground.'],
             ],
@@ -257,17 +271,17 @@ class BrandbookController extends Controller
         return [
             ['--t-display', '34 → 52', 1.04, 600, '100%', '−0.035em', 'ui',    'The one line at the top of the site.'],
             ['--t-h1',      '34 → 52', 1.06, 700, '100%', '−0.03em',  'ui',    'Page title.'],
-            ['--t-h2',      '28 → 40', 1.10, 600, '100%', '−0.03em',  'ui',    'Section title, with an 18px grey subtitle under it — the reference\'s size.'],
+            ['--t-h2',      '28 → 40', 1.10, 700, '100%', '−0.05em',  'ui',    'Section title, with an 18px grey subtitle under it — the reference\'s size and tracking.'],
             ['--t-h3',      '18',      1.30, 600, '100%', '−0.012em', 'ui',    'Card title, block heading.'],
             ['--t-price',   '28 → 36', 1.00, 700, '100%', '−0.02em',  'ui',    'The price, in coral. Never appears without the mileage.'],
             ['--t-km',      '22 → 28', 1.00, 500, '100%', '−0.01em',  'ui',    'The mileage. 78% of the price, beside it, in the secondary ink.'],
             ['--t-prose',   '17 → 18', 1.62, 400, '100%', '0',        'ui',    'Descriptions and longer copy. One sans, like the reference.'],
             ['--t-body',    '16',      1.55, 400, '100%', '0',        'ui',    'Interface body copy.'],
-            ['--t-ui',      '16',      1.20, 500, '100%', '+0.002em', 'ui',    'Buttons and controls. 16px is non-negotiable.'],
-            ['--t-value',   '17',      1.30, 600, '100%', '0',        'ui',    'A spec value in the data table.'],
+            ['--t-ui',      '16',      1.20, 700, '100%', '0',        'ui',    'Buttons and controls. 16px is non-negotiable; 700 is the reference\'s weight.'],
+            ['--t-value',   '17',      1.30, 600, '100%', '0',        'ui',    'A spec value in the data table. Tabular figures.'],
             ['--t-small',   '14',      1.45, 400, '100%', '0',        'ui',    'Fine print that still has to be read.'],
             ['--t-label',   '13',      1.30, 500, '100%', '+0.010em', 'ui',    'Field label. The floor of the system.'],
-            ['--t-caption', '14',      1.45, 400, '100%', '0',        'voice', 'A customer\'s own words in the wall. Italic, same family.'],
+            ['--t-caption', '14 → 16', 1.45, 400, '100%', '0',        'voice', 'A customer\'s own words in the wall. Italic, same family.'],
         ];
     }
 
@@ -404,10 +418,19 @@ class BrandbookController extends Controller
             $caps[$c] = round(count(array_filter($lens, fn ($l) => $l <= $c)) / $n * 100);
         }
 
+        $locs = Testimonial::where('is_active', true)->pluck('author_location')
+            ->map(fn ($l) => trim((string) $l))->filter()->countBy()->sortDesc();
+        $home = $locs->keys()->first();          // where the photographs were taken
+        $away = $locs->except($home);
+
         return [
             'n' => $n, 'min' => $lens[0], 'max' => $lens[$n - 1],
             'p10' => $pct(.10), 'median' => $pct(.50), 'p90' => $pct(.90),
             'buckets' => $buckets, 'caps' => $caps,
+            'band' => count(array_filter($lens, fn ($l) => $l >= 133 && $l <= 245)),
+            'tail' => count(array_filter($lens, fn ($l) => $l > 245)),
+            'over' => count(array_filter($lens, fn ($l) => $l > 220)),
+            'home' => $home, 'awayN' => $away->sum(), 'awayCities' => $away->keys()->all(),
         ];
     }
 

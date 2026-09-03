@@ -51,17 +51,16 @@
   --mc-blue-dark:  #093E7D;  /* hover, pressed, large headings. 9.72:1 on bg */
   --mc-blue-light: #6CAAE7;  /* links and icons ON NAVY ONLY. 5.52:1 on navy.
                                 Forbidden on light: 2.46:1 */
-  --mc-blue-100:   #EBF1FA;  /* blue chip fill. Was #C8D9EF, on which blue text
-                                measured 4.30:1; this is 5.44 */
+  --mc-blue-100:   var(--mc-blue-tint);  /* chips share the wash. One value, one name */
 
   /* ---- ACCENT — the darker red step, for small text and errors ----
      Two jobs: the contact CTA, and the price. Nothing else.
      car-planet pairs its blue with a warm red-orange (#E65848) that fails
      at 3.59:1 both ways; this keeps the relationship and fixes the contrast. */
   --mc-accent:      #C03D15;  /* 13-16px text, error borders. 5.36:1 */
-  --mc-price:       #D5392D;  /* the price. car-planet's coral hue (OKLCH 29°)
-                                at a lightness that still passes: 4.72 white,
-                                4.36 bg, 4.01 band. Was --mc-accent, 9° browner
+  --mc-price:       #C6352A;  /* the price. car-planet's coral hue (OKLCH 29°)
+                                at the lightness that passes 4.5 on EVERY ground:
+                                5.32 white, 4.92 bg, 4.53 band, 4.69 tint. Was --mc-accent, 9° browner
                                 and 11 points darker, which is exactly "rust". */
   --mc-accent-dark: #9D3110;  /* hover; label colour when a CTA sits on navy */
   --mc-accent-tint: #FBEAE5;  /* price chip ground */
@@ -101,20 +100,21 @@
   --f-voice: "DM Sans","DM Sans Fallback","Helvetica Neue",Arial,sans-serif;
 
   /* ---- TYPE SCALE — fluid 390px → 1200px, base 16px ------- */
-  --t-display: clamp(2.125rem,1.60rem + 2.35vw,3.25rem);   /* 34 → 52 */
-  --t-h1:      clamp(2.125rem,1.60rem + 2.35vw,3.25rem);   /* 34 → 52 */
-  --t-h2:      clamp(1.75rem,1.45rem + 1.55vw,2.5rem);     /* 28 → 40. car-planet's h2 is 40 */
+  /* slopes solved for exactly 390px → 1200px, so a 390px phone renders the floor */
+  --t-display: clamp(2.125rem,1.5833rem + 2.2222vw,3.25rem);   /* 34 → 52 */
+  --t-h1:      clamp(2.125rem,1.5833rem + 2.2222vw,3.25rem);   /* 34 → 52 */
+  --t-h2:      clamp(1.75rem,1.3889rem + 1.4815vw,2.5rem);     /* 28 → 40. car-planet's h2 is 40 */
   --t-sub:     1.125rem;                                    /* 18. the grey line under an h2 */
   --t-h3:      1.125rem;                                    /* 18 fixed */
-  --t-price:   clamp(1.75rem,1.45rem + 1.30vw,2.25rem);    /* 28 → 36 */
-  --t-km:      clamp(1.375rem,1.16rem + 0.95vw,1.75rem);   /* 22 → 28 */
-  --t-prose:   clamp(1.0625rem,1.03rem + 0.15vw,1.125rem); /* 17 → 18 */
+  --t-price:   clamp(1.75rem,1.5093rem + 0.9877vw,2.25rem);    /* 28 → 36 */
+  --t-km:      clamp(1.375rem,1.1944rem + 0.7407vw,1.75rem);   /* 22 → 28 */
+  --t-prose:   clamp(1.0625rem,1.0324rem + 0.1235vw,1.125rem); /* 17 → 18 */
   --t-body:    1rem;                                        /* 16 fixed */
   --t-ui:      1rem;                                        /* 16 fixed */
   --t-value:   1.0625rem;                                   /* 17 fixed */
   --t-small:   0.875rem;                                    /* 14 fixed */
   --t-label:   0.8125rem;                                   /* 13 fixed — system floor */
-  --t-caption: 0.875rem;                                    /* 14 fixed, italic */
+  --t-caption: clamp(0.875rem,0.7546rem + 0.4938vw,1rem);   /* 14 → 16, italic. the customer's words */
 
   /* ---- SHAPE — measured on car-planet, not assumed ---------
      Their filled and outlined CTAs are 10px in 100% of cases, cards 22px in

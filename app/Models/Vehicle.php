@@ -132,6 +132,26 @@ class Vehicle extends Model
     }
 
     /** URL redimensionada para una imagen local; devuelve la original si es remota. */
+    /** Resize URL for an arbitrary stored path (gallery entries). */
+    public function thumbUrlFor(string $path, int $w = 600): string
+    {
+        return route('img.resize', ['w' => $w, 'p' => $path]);
+    }
+
+    /** Spanish-normalised enum values: the admin form collected drift ("Diesel", "Diésel", "Automática"). */
+    public function getFuelEsAttribute(): string
+    {
+        return ['diesel' => 'Diésel', 'diésel' => 'Diésel', 'gasolina' => 'Gasolina', 'hibrido' => 'Híbrido', 'híbrido' => 'Híbrido', 'electrico' => 'Eléctrico', 'eléctrico' => 'Eléctrico'][mb_strtolower(trim((string) $this->fuel))] ?? (string) $this->fuel;
+    }
+    public function getTransmissionEsAttribute(): string
+    {
+        return ['manual' => 'Manual', 'automático' => 'Automático', 'automatico' => 'Automático', 'automática' => 'Automático', 'automatica' => 'Automático'][mb_strtolower(trim((string) $this->transmission))] ?? (string) $this->transmission;
+    }
+    public function getColorEsAttribute(): string
+    {
+        return ['nardo grey' => 'Gris Nardo', 'alpine white' => 'Blanco Alpine', 'black' => 'Negro', 'white' => 'Blanco', 'grey' => 'Gris', 'gray' => 'Gris', 'silver' => 'Plata', 'blue' => 'Azul', 'red' => 'Rojo'][mb_strtolower(trim((string) $this->color))] ?? (string) $this->color;
+    }
+
     public function thumbUrl(int $w = 600): ?string
     {
         $img = $this->primary_image;
