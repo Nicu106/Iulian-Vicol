@@ -397,3 +397,86 @@
 
 /* every header link is a target in its own right, not just a word */
 .mc-head .mc-nav__i{ min-width:44px; padding-inline:var(--s-2); text-align:center; }
+
+/* ============================================================================
+   The swipe hint
+   A rail says nothing about itself: the row continues past the edge of the
+   screen and there is no mark on screen that says so. A card cut at 72vw leaves
+   a sliver of the next one showing, which helps, but the gesture itself is not
+   discoverable — so the hand is shown once, on the first rail that actually has
+   something hidden.
+
+   Rules it obeys:
+     - once per visit, and never again (the script remembers)
+     - only where the rail exists, and only if scrollWidth exceeds clientWidth
+     - gone the instant a finger touches the rail, or the rail is scrolled
+     - never in the way: pointer-events none, so it cannot swallow the very
+       gesture it is asking for
+     - not the only way through: "Ver todos" opens the same cars without a swipe
+   ========================================================================= */
+.cat-row__rail{ position:relative; }
+
+.cat-hint{
+  position:absolute; z-index:3; inset:0 0 auto auto; pointer-events:none;
+  top:38%; right:12%; translate:0 -50%;
+  width:76px; height:76px;
+  opacity:0;
+}
+.cat-hint.is-on{ animation:hint-life 3.9s var(--e-inout) forwards; }
+
+/* the disc is the contact: it lands, travels, and lifts with the hand */
+.cat-hint__disc{
+  position:absolute; inset:auto 14px 10px auto;
+  width:46px; height:46px; border-radius:var(--mc-r-pill);
+  background:rgba(255,255,255,.30);
+  box-shadow:0 0 0 1px rgba(255,255,255,.45) inset;
+}
+.cat-hint__hand{
+  position:absolute; inset:0; color:#FFFFFF;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,.35));
+}
+
+/* --- frame by frame, one stroke ------------------------------------------
+   0      the hand fades in on the right, slightly large, not yet touching
+   12%    it settles: contact
+   22%    it presses (the disc tightens)
+   26-58% it travels left, 88px, carrying the disc with it
+   64%    it lifts
+   70%    it is back on the right, invisible
+   70-100 the whole thing again, once, then gone for good                   */
+@keyframes hint-life{
+  0%   { opacity:0; translate:0 -50%; scale:1.06; }
+  8%   { opacity:1; }
+  12%  { scale:1; }
+  26%  { opacity:1; translate:0 -50%; }
+  58%  { opacity:1; translate:-88px -50%; }
+  66%  { opacity:0; translate:-88px -50%; }
+  67%  { opacity:0; translate:0 -50%; }
+  72%  { opacity:1; translate:0 -50%; }
+  94%  { opacity:1; translate:-88px -50%; }
+  100% { opacity:0; translate:-88px -50%; }
+}
+@keyframes hint-press{
+  0%,10%   { scale:1;   background:rgba(255,255,255,.30); }
+  20%,58%  { scale:.86; background:rgba(255,255,255,.46); }
+  66%,72%  { scale:1;   background:rgba(255,255,255,.30); }
+  80%,94%  { scale:.86; background:rgba(255,255,255,.46); }
+  100%     { scale:1; }
+}
+.cat-hint.is-on .cat-hint__disc{ animation:hint-press 3.9s var(--e-inout) forwards; }
+
+/* Reduced motion: the hint still has to exist — the gesture is no more
+   discoverable for someone who dislikes movement — so it appears, holds, and
+   fades, without travelling. */
+@media (prefers-reduced-motion:reduce){
+  .cat-hint.is-on{ animation:hint-still 2.6s var(--e-out) forwards; }
+  .cat-hint.is-on .cat-hint__disc{ animation:none; }
+  @keyframes hint-still{ 0%{opacity:0} 12%{opacity:1} 76%{opacity:1} 100%{opacity:0} }
+}
+/* it belongs to the rail, so it goes when the rail does */
+@media (min-width:769px){
+  .cat-hint{ display:none; }
+}
+@media (max-height:520px) and (orientation:landscape){
+  .cat-hint{ display:block; }
+}

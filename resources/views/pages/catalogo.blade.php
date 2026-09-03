@@ -88,6 +88,12 @@
           </div>
 
           @if($row['n'] || $row['delivered']->count() || $row['demo'])
+            {{-- A rail's content scent is weak: nothing on screen says the row
+                 continues past the edge. Shown once per visit, on the first rail
+                 that has anything hidden, and only where the rail exists at all.
+                 Written by the script, so it never appears without JavaScript and
+                 never appears on a rail that fits. --}}
+            <div class="cat-row__rail">
             <div class="cat-row__cars" id="cars-{{ $row['key'] }}"
                  style="--n:{{ $row['cars']->count() + $row['delivered']->count() + count($row['demo']) }}">
               @foreach($row['cars'] as $car)
@@ -146,6 +152,7 @@
                 </article>
               @endforeach
             </div>
+            </div>
           @else
             <div class="cat-row__none">
               <p>Todavía no he tenido ninguno aquí. Si buscas uno concreto, dímelo y lo busco.</p>
@@ -202,14 +209,24 @@
 
     function close(compensate) {
       if (!row.classList.contains('is-open')) return;
-      var before = row.getBoundingClientRect().height;
+      // Read the scroll position BEFORE the row shrinks. Closing it shortens the
+      // document, and the browser clamps the scroll to the new maximum on the spot —
+      // so a relative scrollBy afterwards is applied to an already-corrected position
+      // and compensates twice. On a phone, where an open marque is ~3600px tall, that
+      // sent the reader from 3749 to 0: back to the top of the page.
+      // Anchor on what comes after the row, not on the row's own height: closing it
+      // also turns its grid back into a rail, and the height difference that produces
+      // is not the height difference the document sees. Measuring the next section on
+      // both sides of the change gives the exact distance the page moved under the
+      // reader — and reading it after the browser has clamped the scroll means the
+      // clamp is already accounted for.
+      var anchor = row.nextElementSibling || row.parentElement.nextElementSibling;
+      var refBefore = anchor ? anchor.getBoundingClientRect().top : null;
       row.classList.remove('is-open');
       setLabel(false);
-      if (compensate) {
-        // the section just lost height above the viewport, so everything below it
-        // jumped up by exactly that much; take the same amount out of the scroll
-        var after = row.getBoundingClientRect().height;
-        window.scrollBy(0, after - before);
+      if (compensate && refBefore !== null) {
+        var refAfter = anchor.getBoundingClientRect().top;
+        window.scrollTo(0, Math.max(0, window.pageYOffset + (refAfter - refBefore)));
       }
     }
 
@@ -266,6 +283,99 @@
       }, { threshold: 0 }).observe(row);
     }
   });
+
+  /* ---- the swipe hint ---------------------------------------------------
+     Shown once per visit, on the first rail that actually has cars past the edge.
+     It is built here rather than in the markup so it can never appear without
+     JavaScript, and never on a rail that fits on the screen. */
+  (function () {
+    var SEEN = 'mc-rail-hint';
+    try { if (sessionStorage.getItem(SEEN)) return; } catch (e) { /* private mode: just show it */ }
+
+    var HAND = '<svg class="cat-hint__hand" viewBox="0 0 24 24" fill="none" aria-hidden="true">'
+      + '<path d="M12 2.6a1.9 1.9 0 0 0-1.9 1.9v8.7L8.3 11.4a1.9 1.9 0 1 0-2.7 2.7l4.6 4.6c.6.6 1.4.9 2.2.9h4.4a2.9 2.9 0 0 0 2.9-2.5l.6-4.6a1.9 1.9 0 0 0-1.9-2.1h-4.5V4.5A1.9 1.9 0 0 0 12 2.6Z"'
+      + ' fill="currentColor" fill-opacity=".92" stroke="rgba(0,0,0,.28)" stroke-width=".7"/></svg>';
+
+    function railIsLive(grid) {
+      return getComputedStyle(grid).display === 'flex'   // the rail, not the grid
+          && grid.scrollWidth > grid.clientWidth + 24;   // and something is past the edge
+    }
+
+    var shown = false;
+    function show(grid) {
+      if (shown || !railIsLive(grid)) return;
+      // It has to be somewhere a thumb can see. The rail can satisfy the observer
+      // while its middle sits behind the dock, which is where the first attempt put
+      // the hand: at y 782 on an 844 screen, under a 64px bar.
+      var r = grid.getBoundingClientRect();
+      var dock = document.querySelector('.cat-dock');
+      var floor = window.innerHeight - (dock ? dock.getBoundingClientRect().height : 0) - 40;
+      var at = r.top + r.height * 0.38;
+      if (at < 80 || at > floor) return;   // not yet: the observer will offer it again
+      shown = true;
+      try { sessionStorage.setItem(SEEN, '1'); } catch (e) {}
+
+      var hint = document.createElement('span');
+      hint.className = 'cat-hint';
+      hint.setAttribute('aria-hidden', 'true');
+      hint.innerHTML = '<span class="cat-hint__disc"></span>' + HAND;
+      grid.parentNode.appendChild(hint);
+      // one frame later, so the animation starts from its own first keyframe
+      requestAnimationFrame(function () { hint.classList.add('is-on'); });
+
+      function done() {
+        grid.removeEventListener('scroll', onScroll);
+        if (hint.parentNode) hint.parentNode.removeChild(hint);
+      }
+      // A scroll-snap rail fires a scroll event as it settles its own layout, with
+      // scrollLeft unchanged. Taking that for a gesture killed the hint on the frame
+      // it was born. Only a real movement counts.
+      var from = grid.scrollLeft;
+      function onScroll() { if (Math.abs(grid.scrollLeft - from) > 4) done(); }
+      grid.addEventListener('scroll', onScroll, { passive: true });
+      grid.addEventListener('touchstart', done, { once: true, passive: true });
+      hint.addEventListener('animationend', done);
+      window.setTimeout(done, 4600);
+    }
+
+    var rails = document.querySelectorAll('.cat-row__cars');
+    if (!('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        // wait until the row is properly on screen, and until its own colour has landed
+        if (e.intersectionRatio < 0.45) return;
+        window.setTimeout(function () {
+          show(e.target);
+          if (shown) io.disconnect();
+        }, 900);
+      });
+    }, { threshold: [0.45, 0.75, 1] });
+    Array.prototype.forEach.call(rails, function (g) { io.observe(g); });
+  })();
+
+  /* A scroller has to be reachable without a finger. Chrome only makes an
+     overflow container focusable when it has no focusable children, and these
+     are full of links, so say it explicitly while the rail is a rail. */
+  (function () {
+    function sync() {
+      Array.prototype.forEach.call(document.querySelectorAll('.cat-row__cars'), function (g) {
+        var rail = getComputedStyle(g).display === 'flex';
+        if (rail && g.scrollWidth > g.clientWidth + 24) {
+          g.setAttribute('tabindex', '0');
+          g.setAttribute('role', 'group');
+          g.setAttribute('aria-label', 'Coches de la marca, desplazable');
+        } else {
+          g.removeAttribute('tabindex');
+          g.removeAttribute('role');
+          g.removeAttribute('aria-label');
+        }
+      });
+    }
+    sync();
+    var t; window.addEventListener('resize', function () {
+      window.clearTimeout(t); t = window.setTimeout(sync, 180);
+    });
+  })();
 
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Escape') return;
