@@ -24,6 +24,7 @@ class BrandbookOnly
     private const ALLOW = [
         'brandbook',
         'brandbook/*',
+        'catalogo',      // the catalogue page, in design
         'img',        // the /img/{w} resize service — vehicle and customer photos
         'img/*',
         'up',         // the health check

@@ -1,0 +1,164 @@
+/* ============================================================
+   CATÁLOGO — one row per marque, no filter bar.
+   Loads after mc-tokens.css and brandbook.css (which carries the
+   mc-* components). At build time those move to site.css.
+   ============================================================ */
+
+:root{
+  --m-sweep: 640ms;   /* the colour crossing a full row. Longer than --m-reveal
+                         because it travels ~1100px: at 420ms it reads as a flash,
+                         at 640 as a deliberate stroke. */
+  --cat-band-h: 92px;
+}
+
+/* ---- page ------------------------------------------------ */
+.cat{ background:var(--mc-surface); }
+.cat-wrap{ max-width:var(--mc-container); margin:0 auto; padding:0 var(--mc-gutter-m); }
+@media (min-width:768px){ .cat-wrap{ padding:0 var(--mc-gutter-d); } }
+
+.cat-head{ padding:var(--s-8) 0 var(--s-6); }
+.cat-head h1{ margin:0 0 var(--s-3); font-size:var(--t-h1); line-height:1.06;
+  letter-spacing:-.03em; font-weight:700; color:var(--mc-ink); text-wrap:balance; }
+.cat-head p{ margin:0; font-size:var(--t-sub); color:var(--mc-ink-2); max-width:44ch; }
+.cat-head__count{ display:block; margin-bottom:var(--s-2); font-size:var(--t-label);
+  font-weight:500; letter-spacing:.010em; line-height:1.3; color:var(--mc-ink-3); }
+
+/* ---- a marque row ----------------------------------------
+   The colour IS the row: painted behind everything, clipped from one edge, and
+   sweeping across. The inner grid is repeated inside the fill carrying a white
+   wordmark, so the letters light up exactly as the colour reaches them — same
+   grid, same padding, same height, so the two copies cannot drift apart. */
+.cat-row{ position:relative; overflow:hidden; border-top:1px solid var(--mc-hairline); }
+.cat-row:first-of-type{ border-top:0; }
+
+.cat-row__fill{
+  position:absolute; inset:0; z-index:0; background:var(--brand);
+  clip-path:inset(0);          /* the finished state IS the base state: without JS the
+                                  colour is simply there, and the white text sits on it */
+}
+.cat-row__fill .cat-row__inner{ position:absolute; inset:0; }
+.cat-row.is-live .cat-row__fill .cat-row__mark{ color:#FFFFFF; }   /* 4 classes: outranks .cat-row.is-live .cat-row__mark, which is 3 */
+.cat-row__fill .cat-row__mark{ color:#FFFFFF; }
+.cat-row__fill .cat-row__lead{ visibility:hidden; }
+
+/* the nib: a 2px edge travelling at the head of the colour, like a pen */
+.cat-row__fill::after{
+  content:""; position:absolute; top:0; bottom:0; right:0; width:2px;
+  background:#FFFFFF; opacity:.55;
+}
+.cat-row--rtl .cat-row__fill::after{ right:auto; left:0; }
+
+.cat-row__inner{
+  position:relative; z-index:1;
+  display:grid; grid-template-columns:14rem minmax(0,1fr); gap:var(--s-6);
+  /* start, not center: the fill's copy spans the whole row (note included) while the
+     real grid spans only its own content, so centring would place the two wordmarks
+     48px apart. Anchored to the top, they cannot drift. */
+  align-items:start; padding:var(--s-6) var(--s-5);
+}
+.cat-row--rtl .cat-row__inner{ grid-template-columns:minmax(0,1fr) 14rem; }
+.cat-row--rtl .cat-row__id{ grid-column:2; grid-row:1; text-align:right; }
+.cat-row--rtl .cat-row__cars,
+.cat-row--rtl .cat-row__none{ grid-column:1; grid-row:1; }
+
+.cat-row__mark{
+  display:block; margin:0;
+  font-size:clamp(1.75rem,1.39rem + 1.48vw,2.5rem);   /* the h2 step */
+  font-weight:700; letter-spacing:-.05em; line-height:1.1;
+  color:var(--mc-ink-3); white-space:nowrap;
+}
+.cat-row__logo{ display:block; height:36px; width:auto; }   /* slot for a real logo file */
+
+.cat-row__lead{
+  display:block; margin-top:var(--s-2);
+  font-size:var(--t-small); color:var(--mc-ink-2);
+  font-variant-numeric:tabular-nums;
+}
+.cat-row__lead b{ color:var(--mc-ink); font-weight:600; }
+/* Everything over the colour is white by default. The wordmark is transparent so the
+   white copy inside the fill shows through — that is what makes the letters light up as
+   the colour reaches them. Only with JS, and only until the row has run, is it grey. */
+.cat-row__lead{ color:rgba(255,255,255,.82); }
+.cat-row__lead b{ color:#FFFFFF; }
+.cat-row__mark{ color:transparent; }
+.js .cat-row:not(.is-live) .cat-row__lead{ color:var(--mc-ink-2); }
+.js .cat-row:not(.is-live) .cat-row__lead b{ color:var(--mc-ink); }
+.js .cat-row:not(.is-live) .cat-row__mark{ color:var(--mc-ink-3); }
+
+/* ---- the cars in a row ----------------------------------- */
+.cat-row__cars{ display:grid; gap:var(--s-4); grid-template-columns:1fr; }
+@media (min-width:560px){ .cat-row__cars{ grid-template-columns:1fr 1fr; } }
+@media (min-width:1100px){ .cat-row__cars{ grid-template-columns:repeat(4,1fr); } }
+.cat-row__cars > *{ min-width:0; }
+
+.cat-row__none{ display:flex; flex-wrap:wrap; align-items:center; gap:var(--s-3) var(--s-5); }
+.cat-row__none p{ margin:0; font-size:var(--t-prose); color:#FFFFFF; max-width:44ch; }
+
+.cat-row__note{ position:relative; z-index:1; margin:0; padding:0 var(--s-5) var(--s-6);
+  font-size:var(--t-small); line-height:1.45; color:rgba(255,255,255,.82); max-width:56ch; }
+.cat-row__note b{ color:#FFFFFF; font-weight:600; }
+.cat-row__note .mc-link{ color:#FFFFFF; }
+
+/* ============================================================
+   THE SEQUENCE — frame by frame
+   Nothing below runs without .js, so the page is complete without it.
+   ============================================================ */
+.js .cat-row .cat-row__fill{ clip-path:inset(0 100% 0 0); }
+.js .cat-row--rtl .cat-row__fill{ clip-path:inset(0 0 0 100%); }
+.js .cat-row .cat-row__lead{ opacity:0; }
+.js .cat-row .cat-row__note{ opacity:0; }
+/* the cards follow the stroke: they arrive from the side it came from, 16px out,
+   so the row reads left-to-right or right-to-left as one movement */
+.js .cat-row__cars > *,
+.js .cat-row__none > *{ opacity:0; transform:translate(-16px, 10px); }
+.js .cat-row--rtl .cat-row__cars > *,
+.js .cat-row--rtl .cat-row__none > *{ transform:translate(16px, 10px); }
+
+/* 0 → 640ms · the colour crosses the row.
+   --e-inout, not --e-line: --e-line is calibrated for the 160px rule under a button,
+   and over 1100px it puts three quarters of the travel in the last third — measured
+   2.4% done at the halfway point, which reads as a jolt rather than a stroke. */
+.js .cat-row.is-live .cat-row__fill{
+  clip-path:inset(0 0 0 0);
+  transition:clip-path var(--m-sweep) var(--e-inout);
+}
+/* 560 → 640ms · the nib fades out as the colour lands, so nothing is left mid-stroke */
+.js .cat-row.is-live .cat-row__fill::after{
+  opacity:0; transition:opacity var(--m-quick) var(--e-out) calc(var(--m-sweep) - var(--m-quick));
+}
+/* 640 → 860ms · the count arrives once the row is whole */
+.js .cat-row.is-live .cat-row__lead,
+.js .cat-row.is-live .cat-row__note{
+  opacity:1; transition:opacity var(--m-state) var(--e-out) var(--m-sweep);
+}
+/* 700ms + 70ms each · the cards follow the stroke, from the side it came from */
+.js .cat-row.is-live .cat-row__cars > *,
+.js .cat-row.is-live .cat-row__none > *{
+  opacity:1; transform:none;
+  transition:opacity var(--m-move) var(--e-out) var(--d),
+             transform var(--m-move) var(--e-out) var(--d);
+}
+
+@media (prefers-reduced-motion:reduce){
+  .js .cat-row .cat-row__fill{ clip-path:inset(0 0 0 0); }
+  .js .cat-row .cat-row__lead{ opacity:1; }
+  .js .cat-row__cars > *,.js .cat-row__none > *{ opacity:1; transform:none; }
+  .js .cat-row .cat-row__fill::after{ opacity:0; }
+}
+
+/* ---- mobile: the band shrinks, the stroke stays ----------- */
+@media (max-width:559px){
+  :root{ --cat-band-h:72px; }
+  .cat-row__inner{ grid-template-columns:minmax(0,1fr); gap:var(--s-4); padding:var(--s-5) var(--s-4); }
+  .cat-row--rtl .cat-row__inner{ grid-template-columns:minmax(0,1fr); }
+  .cat-row--rtl .cat-row__id,.cat-row--rtl .cat-row__cars,.cat-row--rtl .cat-row__none{ grid-column:1; grid-row:auto; text-align:left; }
+  .cat-row__note{ padding-inline:var(--s-4); }
+}
+
+/* ---- an example card, never mistakable for stock ---------- */
+.mc-badge--demo{ background:var(--mc-accent); color:#FFFFFF; }
+.mc-card--demo{ border-style:dashed; border-color:var(--mc-accent); }
+.mc-card--demo .mc-frame img{ filter:saturate(.9); }
+.cat-row__note{ margin:calc(var(--s-5) * -1) 0 var(--s-7); font-size:var(--t-small);
+  line-height:1.45; color:var(--mc-ink-2); max-width:52ch; }
+.cat-row__note b{ color:var(--mc-ink); font-weight:600; }
