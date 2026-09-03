@@ -917,7 +917,7 @@
           <div>
             <p style="margin:0 0 var(--s-2);font-size:var(--t-h3);font-weight:600;letter-spacing:-.012em;line-height:1.3;color:var(--mc-on-navy)">IV MOTORCLASS</p>
             <p style="margin:0 0 var(--s-2);font-size:var(--t-small)">Málaga, España</p>
-            <p style="margin:0;font-size:var(--t-small)">Lun–Vie 10:00–19:00 · Sábado 10:00–14:00 · Domingo, consultar</p>
+            <p style="margin:0;font-size:var(--t-small)">Lun–Vie 10:00–19:00 · Sábado 10:00–14:00 · Domingo, <a class="mc-link" href="#EL-FOOT-01">consultar</a></p>
           </div>
           <div><h4>Coches</h4><a href="#EL-FOOT-01">Disponibles</a><a href="#EL-FOOT-01">Entregados</a></div>
           <div><h4>Contacto</h4><a href="#EL-FOOT-01">WhatsApp</a><a href="#EL-FOOT-01">614 753 187</a></div>
@@ -1209,7 +1209,7 @@
     <thead><tr><th>Size</th><th class="bb-num-cell">Phone → desktop</th><th>Used for</th></tr></thead>
     <tbody>
       @foreach($type as [$var,$px,$lh,$wt,$wd,$tr,$fam,$use])
-        <tr><td><code>{{ $var }}</code></td><td class="bb-num-cell"><b>{{ $px }}</b></td><td>{{ $use }}</td></tr>
+        <tr><td><code>{{ $var }}</code></td><td class="bb-num-cell">{{ $px }}</td><td>{{ $use }}</td></tr>
       @endforeach
     </tbody>
   </table>

@@ -78,18 +78,18 @@ class BrandbookController extends Controller
         $groups = [
             'Surfaces' => [
                 ['--mc-bg',         'The page. A cool near-white, not pure white.'],
-                ['--mc-surface',    'Vehicle cards and forms. Pure white, so a card lifts off the page without a shadow — shadows disappear in glare.'],
+                ['--mc-surface',    'Vehicle cards and forms. Pure white on the near-white page, lifted by --mc-shadow-1 with a hairline as the glare fallback.'],
                 ['--mc-band',       'Placeholder and disabled ground: empty frames, the disabled button, the menu button. The darkest light surface, so every text colour is proven against this one.'],
                 ['--mc-blue-tint',  'Blue wash: one band per page at most, spec rows, and chip fill.'],
             ],
             'Blue' => [
-                ['--mc-blue',       'The brand. One value does two jobs: link text and button fill, both at '.$this->ratio($t['--mc-blue'] ?? '#1558D6', '#FFFFFF').':1.'],
+                ['--mc-blue',       'The brand. Link text on a card and button fill, both at '.$this->ratio($t['--mc-blue'] ?? '#1558D6', '#FFFFFF').':1; '.$this->ratio($t['--mc-blue'] ?? '#1558D6', $t['--mc-bg'] ?? '#F4F6FA').':1 as a link on the page ground.'],
                 ['--mc-blue-dark',  'Hover fill, and the outlined button\'s hover label.'],
-                ['--mc-blue-light', 'Links and icons on navy only. Forbidden on light — 2.46:1.'],
+                ['--mc-blue-light', 'A link inside running text on navy — footer navigation stays --mc-on-navy. Forbidden on light: 2.46:1.'],
             ],
             'Navy' => [
                 ['--mc-navy',      'Footer, the sold badge, and a button while pressed. Held at 1.55:1 from pure black so it survives a cheap phone panel.'],
-                ['--mc-navy-line', 'Hairline inside navy. Decorative.'],
+                ['--mc-navy-line', 'Hairline inside navy, and the 1.56:1 watermark under the book\'s footer. Decorative — never carries text.'],
                 ['--mc-on-navy',   'Text on navy.'],
                 ['--mc-on-navy-2', 'Secondary text on navy. Never on a light surface.'],
             ],
@@ -111,11 +111,11 @@ class BrandbookController extends Controller
             'Borders' => [
                 ['--mc-hairline', 'Decorative: list separators, and the card\'s fallback edge under its shadow.'],
                 ['--mc-rule',     'Structural: table head rule, the phone frame, the specimen\'s state grid.'],
-                ['--mc-control',  'Inputs, outline buttons, checkboxes. Must clear 3:1 on every ground.'],
+                ['--mc-control',  'Inputs and textareas, the sign-off box, and the Fixed status chip. Must clear 3:1 on every ground.'],
             ],
             'State' => [
                 ['--mc-ok',   'Same value as the WhatsApp green — the system has one green. Confirmation only, never "available".'],
-                ['--mc-warn', 'Indicative: "precio orientativo", "km aprox."'],
+                ['--mc-warn', 'Indicative: the Reservado badge, the "precio orientativo" note, and the note edge in this book.'],
             ],
         ];
 
@@ -267,8 +267,7 @@ class BrandbookController extends Controller
     {
         // family: which of the two voices speaks. wdth: the variable width axis.
         return [
-            ['--t-display', '34 → 52', 1.04, 600, '100%', '−0.035em', 'ui',    'The one line at the top of the site.'],
-            ['--t-h1',      '34 → 52', 1.06, 700, '100%', '−0.03em',  'ui',    'Page title.'],
+            ['--t-h1',      '34 → 52', 1.06, 700, '100%', '−0.03em',  'ui',    'Page title — the one line at the top of every page, and of this book.'],
             ['--t-sub',     '18',      1.55, 400, '100%', '0',        'ui',    'The grey line under a section title.'],
             ['--t-h2',      '28 → 40', 1.10, 700, '100%', '−0.05em',  'ui',    'Section title, with an 18px grey subtitle under it — the reference\'s size and tracking.'],
             ['--t-h3',      '18',      1.30, 600, '100%', '−0.012em', 'ui',    'Card title, block heading.'],

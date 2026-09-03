@@ -11,7 +11,8 @@
 
   /* ---- SURFACES ------------------------------------------
      Cool near-white page, pure white cards. Cards lift off the page
-     without a shadow, which matters because shadows disappear in glare. */
+     with the reference's 12px shadow, and a hairline as the fallback edge because
+     shadows fade in glare. */
   --mc-bg:        #F4F6FA;  /* page ground */
   --mc-surface:   #FFFFFF;  /* raised: vehicle cards, forms */
   --mc-band:      #E8EDF5;  /* alternating section band. Darkest light surface
@@ -37,7 +38,7 @@
   /* ---- BORDERS — three tiers ------------------------------ */
   --mc-hairline:  #E3E8F0;  /* decorative: list separators */
   --mc-rule:      #C9D2DF;  /* structural: card edge, section divider */
-  --mc-control:   #7A889B;  /* MUST-PASS: inputs, outline buttons, checkboxes.
+  --mc-control:   #7A889B;  /* MUST-PASS: inputs, textareas, the sign-off box.
                                >=3:1 on all four grounds (3.33/3.61/3.07/3.76) */
 
   /* ---- BLUE — the brand, hue 213 --------------------------
@@ -103,7 +104,7 @@
 
   /* ---- TYPE SCALE — fluid 390px → 1200px, base 16px ------- */
   /* slopes solved for exactly 390px → 1200px, so a 390px phone renders the floor */
-  --t-display: clamp(2.125rem,1.5833rem + 2.2222vw,3.25rem);   /* 34 → 52 */
+  --t-display: var(--t-h1);   /* one 34 → 52 step; two names would be two ladders */
   --t-h1:      clamp(2.125rem,1.5833rem + 2.2222vw,3.25rem);   /* 34 → 52 */
   --t-h2:      clamp(1.75rem,1.3889rem + 1.4815vw,2.5rem);     /* 28 → 40. car-planet's h2 is 40 */
   --t-sub:     1.125rem;                                    /* 18. the grey line under an h2 */

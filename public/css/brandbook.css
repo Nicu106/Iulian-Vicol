@@ -30,8 +30,8 @@ h1{ font-size:var(--t-h1); line-height:1.06; letter-spacing:-.03em; text-wrap:ba
 h2{ font-size:var(--t-h2); font-weight:700; line-height:1.1; letter-spacing:-.05em; text-wrap:balance; }  /* car-planet's 40px h2: 700, -0.05em */
 h3{ font-size:var(--t-h3); line-height:1.30; letter-spacing:-.012em; }
 h4{ font-size:var(--t-value); line-height:1.3; }
-.bb-display{ font-size:var(--t-display); line-height:1.04;
-  letter-spacing:-.035em; font-weight:600; color:var(--mc-ink); margin:0; }
+.bb-display{ font-size:var(--t-display); line-height:1.06; font-weight:700;
+  letter-spacing:-.03em;  color:var(--mc-ink); margin:0; }
 p{ margin:0 0 var(--s-4); }
 .bb-prose{ font-size:var(--t-prose); line-height:1.62;
   color:var(--mc-ink-2); max-width:62ch; }
@@ -75,7 +75,7 @@ code,.bb-mono{ font-family:var(--f-ui); font-weight:500; font-variant-numeric:ta
 .bb-foot h2{ color:var(--mc-on-navy); }
 
 .bb-mark{ font-size:clamp(3rem,14vw,11rem); line-height:.86; font-weight:600;
-  letter-spacing:-.045em; color:#183A66; margin:var(--s-7) 0 0;
+  letter-spacing:-.045em; margin:var(--s-7) 0 0;
   overflow:hidden; }
 
 /* ---- contents -------------------------------------------- */
@@ -98,7 +98,7 @@ code,.bb-mono{ font-family:var(--f-ui); font-weight:500; font-variant-numeric:ta
 .bb-sw-chip{ height:var(--s-9); display:flex; align-items:flex-end; padding:var(--s-3);
   font-size:var(--t-label); font-weight:500; line-height:1.3; letter-spacing:.010em; }
 .bb-sw-body{ padding:var(--s-3); border-top:1px solid var(--mc-hairline); }
-.bb-sw-body code{ display:block; margin-bottom:var(--s-1); }
+.bb-sw-body code{ display:block; margin-bottom:var(--s-1); line-height:1.45; }
 .bb-sw-body p{ margin:0; font-size:var(--t-small); line-height:1.45; color:var(--mc-ink-3); }
 
 /* ---- tables ---------------------------------------------- */
@@ -144,7 +144,7 @@ table.bb-t td b{ font-weight:600; color:var(--mc-ink); }
 #order table.bb-t td .bb-st{ display:flex; width:max-content; margin-top:var(--s-1); }   /* prose columns hold 62ch, not 133 */
 /* specificity: table.bb-t td (0,1,2) outranked .bb-num-cell (0,1,0), so right-align never applied */
 table.bb-t .bb-num-cell,.bb-num-cell{ font-variant-numeric:tabular-nums; white-space:nowrap; text-align:right; }
-.bb-pass{ color:var(--mc-ok); font-weight:600; }
+.bb-pass{ color:var(--mc-ink); font-weight:600; }
 .bb-fail{ color:var(--mc-accent); font-weight:600; }
 .bb-exempt{ color:var(--mc-ink-3); }
 .bb-pair-chip{ display:inline-flex; align-items:center; font-size:var(--t-small); font-weight:500; font-variant-numeric:tabular-nums; white-space:nowrap; }
@@ -159,7 +159,7 @@ table.bb-t .bb-mono{ overflow-wrap:anywhere; }
 .bb-two > *{ min-width:0; }
 .bb-do,.bb-dont,.bb-note{ padding:var(--s-4) var(--s-5); border-radius:var(--mc-r-l);
   border:1px solid var(--mc-hairline); background:var(--mc-bg); }
-.bb-do{ border-left:3px solid var(--mc-ok); }
+.bb-do{ border-left:3px solid var(--mc-blue); }
 .bb-dont{ border-left:3px solid var(--mc-accent); }
 .bb-note{ border-left:3px solid var(--mc-warn); }
 .bb-do ul,.bb-dont ul{ margin:0; padding-left:var(--s-4); }
