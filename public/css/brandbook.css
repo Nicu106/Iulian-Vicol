@@ -21,7 +21,7 @@ body.bb{
 a,button,input,select,textarea,summary,label,[role="button"]{
   touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
 :where(a,button,input,select,textarea,summary):focus-visible{
-  outline:2px solid var(--mc-focus); outline-offset:2px; }
+  outline:3px solid var(--mc-focus); outline-offset:var(--s-1); }
 .on-navy :focus-visible{ outline-color:var(--mc-on-navy); }
 
 /* ---- type ------------------------------------------------ */
@@ -67,9 +67,10 @@ code,.bb-mono{ font-family:var(--f-ui); font-weight:500; font-variant-numeric:ta
 .bb-top .bb-prose,.bb-top .bb-label{ color:var(--mc-on-navy-2); }
 .bb-meta{ display:flex; flex-wrap:wrap; gap:var(--s-5); margin-top:var(--s-6);
   padding-top:var(--s-5); border-top:1px solid var(--mc-navy-line); }
-.bb-meta b{ display:block; font-size:var(--t-value); font-weight:600; color:var(--mc-on-navy); }
+.bb-meta b{ display:block; font-size:var(--t-value); font-weight:600; line-height:1.3; color:var(--mc-on-navy); }
+.bb-toc .bb-label{ flex:0 0 2ch; font-variant-numeric:tabular-nums; }
 .bb-foot{ background:var(--mc-navy); color:var(--mc-on-navy-2);
-  padding:var(--s-8) 0 var(--s-6); margin-top:var(--s-8); }
+  padding:var(--s-8) 0 var(--s-6); margin-top:0; }
 .bb-foot h2{ color:var(--mc-on-navy); }
 
 .bb-mark{ font-size:clamp(3rem,14vw,11rem); line-height:.86; font-weight:600;
@@ -105,6 +106,11 @@ code,.bb-mono{ font-family:var(--f-ui); font-weight:500; font-variant-numeric:ta
 table.bb-t{ width:100%; min-width:560px; border-collapse:collapse; font-size:var(--t-small); line-height:1.45; }
 #colour table.bb-t,#type table.bb-t,#voice table.bb-t,#appendix table.bb-t,#wall table.bb-t,.bb-note table.bb-t{ min-width:0; }
 #type table.bb-t td:first-child{ white-space:nowrap; }
+#signoff table.bb-t td:first-child{ white-space:nowrap; }
+#contrast table.bb-t td:last-child{ white-space:nowrap; }
+#signoff table.bb-t th:nth-child(n+4){ text-align:center; }
+#photos table.bb-t{ min-width:0; } #photos table.bb-t th:last-child{ white-space:normal; }
+@media (max-width:600px){ #signoff table.bb-t{ min-width:0; } #signoff table.bb-t th:nth-child(3),#signoff table.bb-t td:nth-child(3){ display:none; } }
 /* the order tables carry a 19-line prose column; on a phone they stack instead of scroll */
 @media (max-width:600px){
   #order table.bb-t{ min-width:0; }
@@ -135,7 +141,7 @@ table.bb-t .bb-num-cell,.bb-num-cell{ font-variant-numeric:tabular-nums; white-s
 .bb-pass{ color:var(--mc-ok); font-weight:600; }
 .bb-fail{ color:var(--mc-accent); font-weight:600; }
 .bb-exempt{ color:var(--mc-ink-3); }
-.bb-pair-chip{ display:inline-flex; align-items:center; font-size:var(--t-label); white-space:nowrap; }
+.bb-pair-chip{ display:inline-flex; align-items:center; font-size:var(--t-small); font-weight:500; font-variant-numeric:tabular-nums; white-space:nowrap; }
 .bb-pair-chip i{ display:inline-block; width:14px; height:14px; margin-right:var(--s-1);
   border:1px solid var(--mc-rule); flex:0 0 auto; }
 .bb-pair-chip i + i{ margin-right:var(--s-2); }
@@ -161,15 +167,16 @@ h3 .bb-st{ line-height:1; }   /* a chip sits inside the heading line; it does no
 .bb-section > h3{ margin:var(--s-6) 0 var(--s-4); }
 b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:var(--mc-on-navy); }
 .bb-display,h3{ text-wrap:balance; }
-#ref table.bb-t td:nth-child(2){ white-space:nowrap; }
+#ref table.bb-t th:nth-child(2){ width:9ch; }
 .bb-toc{ row-gap:var(--s-2); } .bb-toc a:hover .bb-label{ color:inherit; }
-.bb-ruler{ flex-wrap:nowrap; overflow-x:auto; }
 .bb-stagecap{ font-weight:500; }
 .bb-mark{ color:var(--mc-navy-line); }
-@media (max-width:639px){ .bb-meta{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s-4) var(--s-5); } }
+@media (max-width:639px){ .bb-meta{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s-4) var(--s-5); }
+  .bb-meta > div:last-child:nth-child(odd){ grid-column:1 / -1; } }
 .bb-note p:last-child,.bb-do li:last-child,.bb-dont li:last-child{ margin-bottom:0; }
-.bb-ruler{ display:flex; align-items:flex-end; gap:var(--s-2); flex-wrap:wrap; }
-.bb-ruler div{ text-align:center; }
+.bb-ruler{ display:flex; align-items:flex-end; gap:var(--s-2); flex-wrap:nowrap; overflow-x:auto; padding-bottom:calc(var(--s-4) + var(--s-1)); }
+.bb-ruler div{ position:relative; flex:0 0 auto; }
+.bb-ruler .bb-label{ position:absolute; left:0; top:24px; }
 .bb-ruler span:first-child{ display:block; background:var(--mc-ink); height:24px; }
 
 /* ============================================================
@@ -272,7 +279,7 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
 .mc-btn.is-loading .mc-btn__label{ visibility:hidden; }
 .mc-btn.is-loading .mc-btn__label::after{ content:attr(data-busy); visibility:visible;
   position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
-.mc-btn.is-loading .mc-btn__prog{ opacity:.7; animation:mc-draw var(--m-reveal) var(--e-line) infinite alternate; }
+.mc-btn.is-loading .mc-btn__prog{ opacity:.7; animation:mc-draw var(--m-move) var(--e-line) infinite alternate; }
 @keyframes mc-draw{ from{ transform:scaleX(0); } to{ transform:scaleX(1); } }
 
 /* on navy the fill flips to white — accent on navy is 2.53:1 and cannot be fixed

@@ -26,9 +26,10 @@
     ['08','Photographs','photos'],
     ['09','Voice','voice'],
     ['10','Sign-off sheet','signoff'],
-    ['Appendix A','The contrast maths','contrast'],
-    ['Appendix B','Space, motion, build order','appendix'],
+    ['A','Appendix — the contrast maths','contrast'],
+    ['B','Appendix — space, motion, build order','appendix'],
   ];
+  $draft = 3;
   $fmt   = fn($n) => number_format($n);
   $euros = fn($n) => number_format($n, 0, ',', '.').' €';
   $km    = fn($n) => number_format($n, 0, ',', '.').' km';   // Spanish, for everything that mimics the site
@@ -39,8 +40,8 @@
 {{-- ══════════════════════════════════════════════ MASTHEAD ══ --}}
 <header class="bb-top">
   <div class="bb-wrap">
-    <span class="bb-num bb-label">IV MOTORCLASS · Málaga · design system, draft 3</span>
-    <p class="bb-display">Your website, before it is built</p>
+    <span class="bb-num bb-label">IV MOTORCLASS · Málaga · design system, draft {{ $draft }}</span>
+    <h1 class="bb-display">Your website, before it is built</h1>
     <p class="bb-prose" style="margin-top:var(--s-6)">
       This is not an essay about design. It is a picture of every part of your site, at
       real size, in the real code — so you can look at each one and say yes, or say what
@@ -123,7 +124,7 @@
     background at all. We counted the references in their own stylesheet:
     <b>text in blue appears 46 times; a blue-filled area appears twice.</b> The only large
     blue surfaces on the whole site are the footer and one card. Everything that
-    <em>feels</em> blue is a pale wash — around 90 of them.</p>
+    <em>feels</em> blue is a pale wash — 71 of them.</p>
     <p style="margin-bottom:0">So what you liked is not a lot of blue. It is blue used with
     discipline. That is what we copy.</p>
   </div>
@@ -139,7 +140,7 @@
       <tr><td>The price in a pale box on the card</td><td><b>Yes</b> <span class="bb-st bb-st--prop">Proposed</span></td><td>Their card sets the price at 24px bold inside a tinted box. Same device, with the kilometres beside it.</td></tr>
       <tr><td>Pale blue, everywhere it counts</td><td><b>Yes</b> <span class="bb-st bb-st--prop">Proposed</span></td><td>They paint pale blue 71 times against 48 saturated fills. Bands, spec rows and stages here lean blue, not grey.</td></tr>
       <tr><td>Clean header, grid of cars, long detail page, fixed bar on mobile</td><td><b>Yes</b> <span class="bb-st bb-st--fixed">Fixed</span></td><td>This is the structure you asked for, and it is the right one.</td></tr>
-      <tr><td>A coral price</td><td><b>Yes, corrected</b> <span class="bb-st bb-st--prop">Proposed</span></td><td>Their coral fails legibility at 3.59:1 as 16px text. Ours keeps their hue at a lightness that passes — 4.72:1 on white — and uses it only on the price, which is always large.</td></tr>
+      <tr><td>A coral price</td><td><b>Yes, corrected</b> <span class="bb-st bb-st--prop">Proposed</span></td><td>Their coral fails legibility at 3.59:1 as 16px text. Ours keeps their hue at a lightness that passes — {{ number_format(collect($contrast)->firstWhere('use','Price on a card')['ratio'] ?? 0, 2) }}:1 on white — and uses it only on the price, which is always large.</td></tr>
       <tr><td>Filters, search and sort</td><td><b>Not yet</b> <span class="bb-st bb-st--you">Your call</span></td><td>They have thousands of cars. You have {{ $inventory['available'] }}. A filter panel over {{ $inventory['available'] }} cars advertises stock that isn't there. If you plan to hold 25+, we build it — say so and it goes in.</td></tr>
       <tr><td>A gradient in the header</td><td><b>No</b> <span class="bb-st bb-st--prop">Proposed</span></td><td>Gradients band visibly on mid-range Android screens, which is most of your traffic. A banded header on a €20,000 purchase looks cheap.</td></tr>
       <tr><td>Their ink is 1.08:1 from pure black</td><td><b>No</b> <span class="bb-st bb-st--fixed">Fixed</span></td><td>Their "navy" is black in practice, and in Málaga sun on a cheap screen it reads as black. Ours holds 1.55:1 so it stays navy.</td></tr>
@@ -460,7 +461,7 @@
 
           <div class="pg-sec">
             <span class="pg-eyebrow">Málaga</span>
-            <h1 class="pg-h1">{{ ['','Un','Dos','Tres','Cuatro','Cinco','Seis','Siete','Ocho','Nueve','Diez'][$inventory['available']] ?? $inventory['available'] }} coches. Los he conducido todos yo.</h1>
+            <p class="pg-h1">{{ ['','Un','Dos','Tres','Cuatro','Cinco','Seis','Siete','Ocho','Nueve','Diez'][$inventory['available']] ?? $inventory['available'] }} coches. Los he conducido todos yo.</p>
             <p class="pg-lead">Los kilómetros están a la vista, y también lo que no me gusta de cada uno.</p>
             <div class="pg-proof">
               <span><b>{{ $inventory['sold'] }}</b> coches entregados</span>
@@ -515,7 +516,7 @@
 
           <div class="pg-sec" style="padding-top:var(--s-3)">
             <a class="mc-go" href="#elements" style="border:0;color:var(--mc-ink-2);font-size:var(--t-small)"><span class="mc-go__arrow">&larr;</span> Todos los coches</a>
-            <h1 class="pg-h1" style="margin-top:var(--s-2)">{{ $car?->brand }} {{ $car?->model }} {{ $car?->year }}</h1>
+            <p class="pg-h1" style="margin-top:var(--s-2)">{{ $car?->brand }} {{ $car?->model }} {{ $car?->year }}</p>
             <div class="mc-pair">
               <span class="mc-price">{{ $car ? $euros($car->price) : '—' }}</span>
               <span class="mc-km">{{ $car?->mileage ? $km($car->mileage) : '—' }}</span>
@@ -1253,11 +1254,11 @@
   </div>
 
   <h3>Where the thumb reaches</h3>
-  <div style="max-width:390px;border:1px solid var(--mc-ink)">
-    <div style="display:flex;gap:var(--s-3);align-items:flex-start;height:180px;padding:var(--s-3) var(--s-4);background:var(--mc-band);font-size:var(--t-small);border-bottom:1px solid var(--mc-hairline)"><b style="flex:0 0 8ch">0–180</b><span>Hard to reach. Logo, secondary links. Nothing frequent.</span></div>
-    <div style="display:flex;gap:var(--s-3);align-items:flex-start;height:250px;padding:var(--s-3) var(--s-4);font-size:var(--t-small);border-bottom:1px solid var(--mc-hairline)"><b style="flex:0 0 8ch">180–430</b><span>Reachable with effort. Main photo, headline.</span></div>
-    <div style="display:flex;gap:var(--s-3);align-items:flex-start;height:230px;padding:var(--s-3) var(--s-4);background:var(--mc-blue-tint);font-size:var(--t-small);border-bottom:1px solid var(--mc-hairline)"><b style="flex:0 0 8ch">430–660</b><span><b>Natural thumb arc.</b> The price, the contact button.</span></div>
-    <div style="display:flex;gap:var(--s-3);align-items:flex-start;height:99px;padding:var(--s-3) var(--s-4);font-size:var(--t-small)"><b style="flex:0 0 8ch">660–759</b><span>The fixed bar. WhatsApp and Call.</span></div>
+  <div style="max-width:390px;border:1px solid var(--mc-rule);border-radius:var(--mc-r-l);overflow:hidden">
+    <div style="display:flex;gap:var(--s-3);align-items:flex-start;height:180px;padding:var(--s-3) var(--s-4);background:var(--mc-band);font-size:var(--t-small);border-bottom:1px solid var(--mc-hairline)"><b style="flex:0 0 8ch;font-variant-numeric:tabular-nums">0–180</b><span>Hard to reach. Logo, secondary links. Nothing frequent.</span></div>
+    <div style="display:flex;gap:var(--s-3);align-items:flex-start;height:250px;padding:var(--s-3) var(--s-4);font-size:var(--t-small);border-bottom:1px solid var(--mc-hairline)"><b style="flex:0 0 8ch;font-variant-numeric:tabular-nums">180–430</b><span>Reachable with effort. Main photo, headline.</span></div>
+    <div style="display:flex;gap:var(--s-3);align-items:flex-start;height:230px;padding:var(--s-3) var(--s-4);background:var(--mc-blue-tint);font-size:var(--t-small);border-bottom:1px solid var(--mc-hairline)"><b style="flex:0 0 8ch;font-variant-numeric:tabular-nums">430–660</b><span><b>Natural thumb arc.</b> The price, the contact button.</span></div>
+    <div style="display:flex;gap:var(--s-3);align-items:flex-start;height:99px;padding:var(--s-3) var(--s-4);font-size:var(--t-small)"><b style="flex:0 0 8ch;font-variant-numeric:tabular-nums">660–759</b><span>The fixed bar. WhatsApp and Call.</span></div>
   </div>
 
   <div class="bb-two" style="margin-top:var(--s-5)">
@@ -1345,7 +1346,7 @@
     @php $ex = $metrics['exif']; $pct = $ex['total'] ? round($ex['rotated']/$ex['total']*100,1) : 0; @endphp
     <div class="bb-note" style="border-left-color:var(--mc-accent);margin-top:var(--s-5)">
       <h3>A bug that is live on your site right now</h3>
-      <p><b>{{ $fmt($ex['rotated']) }} of {{ $fmt($ex['total']) }} photos ({{ $pct }}%) are
+      <p><b>{{ $fmt($ex['rotated']) }} of the {{ $fmt($ex['total']) }} files that carry orientation data ({{ $pct }}%) are
       being served rotated 90°.</b> The camera writes the orientation into the file; the
       browser respects it, but the code that makes the small versions ignores it. So the
       same photo looks upright when opened directly and sideways on every card and
@@ -1392,7 +1393,7 @@
 
   <div class="bb-scroll">
   <table class="bb-t">
-    <thead><tr><th style="width:22ch">Rule</th><th>In practice</th></tr></thead>
+    <thead><tr><th style="width:min(22ch,35%)">Rule</th><th>In practice</th></tr></thead>
     <tbody>
       <tr><td><b>First person</b></td><td><em>Yo</em> for anything involving judgement or contact. Never <em>nosotros</em> — a one-man business writing "our team" is the first thing a buyer notices.</td></tr>
       <tr><td><b>A fact, not an adjective</b></td><td>Every claim carries a number, a date or a place. Adjectives without evidence are what make copy read as written by a machine.</td></tr>
@@ -1404,7 +1405,7 @@
   <h3>Ready to use, in Spanish</h3>
   <div class="bb-scroll">
   <table class="bb-t">
-    <thead><tr><th style="width:22ch">Where</th><th>Text</th></tr></thead>
+    <thead><tr><th style="width:min(22ch,35%)">Where</th><th>Text</th></tr></thead>
     <tbody>
       <tr><td>Under the contact buttons</td><td>Contesto yo. Suelo tardar unas horas, no unos minutos.</td></tr>
       <tr><td>Catalogue standfirst</td><td>Los he comprado y conducido yo. Si preguntas por uno, te contesto yo.</td></tr>
@@ -1453,7 +1454,7 @@
 
   <div class="bb-scroll">
   <table class="bb-t">
-    <thead><tr><th>ID</th><th>Element</th><th>Where</th><th class="bb-num-cell">Aprobado</th><th class="bb-num-cell">Con cambios</th></tr></thead>
+    <thead><tr><th>ID</th><th>Element</th><th>Where</th><th>Approved</th><th>With changes</th></tr></thead>
     <tbody>
       @foreach([
         ['EL-CARD-01','Tarjeta de coche','Home, catálogo, 404'],
@@ -1614,7 +1615,7 @@
   <p class="bb-prose">Dependency order. Each step is only safe once the ones above it are done.</p>
   <div class="bb-scroll">
   <table class="bb-t">
-    <thead><tr><th style="width:3ch">#</th><th>Step</th><th>Status</th></tr></thead>
+    <thead><tr><th class="bb-num-cell" style="width:3ch">#</th><th>Step</th><th>Status</th></tr></thead>
     <tbody>
       <tr><td class="bb-num-cell">1</td><td>Rotated photographs</td><td><span class="bb-pass">done here</span> · pending on the live site</td></tr>
       <tr><td class="bb-num-cell">2</td><td>Colour and type loaded before anything else</td><td><span class="bb-pass">done</span></td></tr>
@@ -1635,7 +1636,7 @@
 <footer class="bb-foot on-navy">
   <div class="bb-wrap">
     <div class="bb-head"><h2>IV MOTORCLASS</h2></div>
-    <p class="bb-small">Design system draft 2 · Málaga, España<br>
+    <p class="bb-small">Design system draft {{ $draft }} · Málaga, España<br>
       Generated from <code>public/css/mc-tokens.css</code> ·
       {{ count($tokens) }} values · {{ count($contrast) }} contrast pairs ·
       {{ $crops['n'] }} photographs audited</p>

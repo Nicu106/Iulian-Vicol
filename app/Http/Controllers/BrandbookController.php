@@ -184,10 +184,9 @@ class BrandbookController extends Controller
             ['--mc-ink-2',      '--mc-bg',        'text',    'Labels and metadata'],
             ['--mc-ink-3',      '--mc-band',      'text',    'Lightest permitted text, worst case'],
             // blue
-            ['--mc-blue',       '--mc-surface',   'text',    'Link on a card'],
+            ['--mc-blue',       '--mc-surface',   'text',    'Link on a card; outlined Call button label and edge'],
             ['--mc-blue',       '--mc-band',      'text',    'Link on a band'],
-            ['--mc-blue',       '--mc-blue-tint', 'text',    'Link on the blue wash'],
-            ['--mc-blue',       '--mc-blue-100',  'text',    'Text on a blue chip'],
+            ['--mc-blue',       '--mc-blue-tint', 'text',    'Link on the blue wash; text on a blue chip'],
             ['--mc-blue-dark',  '--mc-surface',   'text',    'Outlined button hover label'],
             ['--mc-blue',       '--mc-surface',   'graphic', 'Blue 3px rule or button edge'],
             ['--mc-surface',    '--mc-blue',      'text',    'White label on the blue button'],
@@ -203,7 +202,6 @@ class BrandbookController extends Controller
             ['--mc-wa',         '--mc-band',      'graphic', 'WhatsApp button edge on a band'],
             ['--mc-wa-dark',    '--mc-surface',   'text',    'WhatsApp label on the white footer button'],
             ['--mc-wa',         '--mc-wa-tint',   'text',    'Confirmation text on its ground'],
-            ['--mc-blue',       '--mc-surface',   'text',    'Outlined Call button, label and edge'],
             // borders
             ['--mc-control',    '--mc-bg',        'graphic', 'Input border on the page'],
             ['--mc-control',    '--mc-band',      'graphic', 'Input border on a band, worst case'],
