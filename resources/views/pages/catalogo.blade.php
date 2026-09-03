@@ -39,8 +39,7 @@
        uno te contesto yo.</p>
   </div>
 
-  <div class="cat-wrap">
-    @foreach($rows as $i => $row)
+  @foreach($rows as $i => $row)
       <section class="cat-row {{ $i % 2 ? 'cat-row--rtl' : '' }}"
                style="--brand:{{ $row['colour'] }}"
                aria-labelledby="marque-{{ $row['key'] }}">
@@ -51,9 +50,7 @@
         <div class="cat-row__fill" aria-hidden="true">
           <div class="cat-row__inner">
             <div class="cat-row__id">
-              <span class="cat-row__mark">{{ $row['name'] }}</span>
-              {{-- the same supporting line, hidden: it is what centres the wordmark, so
-                   without it the copy sits 15px above the original --}}
+              <span class="cat-row__logo" style="--logo:url('{{ asset('img/marques/'.$row['key'].'.svg') }}')"></span>
               <span class="cat-row__lead">&nbsp;</span>
             </div>
           </div>
@@ -61,7 +58,10 @@
 
         <div class="cat-row__inner">
           <div class="cat-row__id">
-            <h2 class="cat-row__mark" id="marque-{{ $row['key'] }}">{{ $row['name'] }}</h2>
+            <h2 class="cat-row__name" id="marque-{{ $row['key'] }}">
+              <span class="cat-row__logo" style="--logo:url('{{ asset('img/marques/'.$row['key'].'.svg') }}')"></span>
+              <span class="mc-vh">{{ $row['name'] }}</span>
+            </h2>
             <span class="cat-row__lead">
               @if($row['n'])
                 <b>{{ $row['n'] }}</b> {{ $row['n'] === 1 ? 'coche' : 'coches' }} · desde <b>{{ $euros($row['from']) }}</b>
@@ -74,7 +74,7 @@
           </div>
 
           @if($row['n'] || $row['delivered']->count() || $row['demo'])
-            <div class="cat-row__cars">
+            <div class="cat-row__cars" style="--n:{{ $row['cars']->count() + $row['delivered']->count() + count($row['demo']) }}">
               @foreach($row['cars'] as $car)
                 <article class="mc-card">
                   <a class="mc-card__link" href="#{{ $car->slug }}">
@@ -84,18 +84,12 @@
                            width="800" height="600" loading="lazy" decoding="async">
                     </div>
                     <div class="mc-card__body">
-                      <h3 class="mc-card__title">{{ $car->model }}</h3>
+                      <h3 class="mc-card__title">{{ $car->model }} <span>{{ $car->year }}</span></h3>
                       <div class="mc-pair">
                         <span class="mc-price">{{ $euros($car->price) }}</span>
                         @if($car->mileage)<span class="mc-km">{{ $km($car->mileage) }}</span>
                         @else<span class="mc-km is-unknown">Km sin confirmar</span>@endif
                       </div>
-                      <ul class="mc-chips">
-                        @foreach(array_filter([$car->year, $car->fuel_es, $car->transmission_es]) as $chip)
-                          <li class="mc-chip">{{ $chip }}</li>
-                        @endforeach
-                      </ul>
-                      <span class="mc-card__go">Ver el coche <span class="mc-card__arrow">&rarr;</span></span>
                     </div>
                   </a>
                 </article>
@@ -110,16 +104,11 @@
                     <span class="mc-badge mc-badge--sold">Entregado</span>
                   </div>
                   <div class="mc-card__body">
-                    <h3 class="mc-card__title">{{ $car->model }}</h3>
+                    <h3 class="mc-card__title">{{ $car->model }} <span>{{ $car->year }}</span></h3>
                     <div class="mc-pair">
                       <span class="mc-price">{{ $euros($car->price) }}</span>
                       @if($car->mileage)<span class="mc-km">{{ $km($car->mileage) }}</span>@endif
                     </div>
-                    <ul class="mc-chips">
-                      @foreach(array_filter([$car->year, $car->fuel_es, $car->transmission_es]) as $chip)
-                        <li class="mc-chip">{{ $chip }}</li>
-                      @endforeach
-                    </ul>
                   </div>
                 </article>
               @endforeach
@@ -133,14 +122,11 @@
                     <span class="mc-badge mc-badge--demo">Ejemplo</span>
                   </div>
                   <div class="mc-card__body">
-                    <h3 class="mc-card__title">{{ $d['model'] }}</h3>
+                    <h3 class="mc-card__title">{{ $d['model'] }} <span>{{ $d['year'] }}</span></h3>
                     <div class="mc-pair">
                       <span class="mc-price">{{ $euros($d['price']) }}</span>
                       <span class="mc-km">{{ $km($d['km']) }}</span>
                     </div>
-                    <ul class="mc-chips">
-                      <li class="mc-chip">{{ $d['year'] }}</li><li class="mc-chip">{{ $d['fuel'] }}</li><li class="mc-chip">{{ $d['gear'] }}</li>
-                    </ul>
                   </div>
                 </article>
               @endforeach
@@ -154,16 +140,15 @@
         </div>
 
         @if($row['delivered']->count())
-          <p class="cat-row__note">Ninguno disponible ahora mismo. Estos ya los entregué.
-            <a class="mc-link" href="https://wa.me/34614753187">Avísame cuando entre uno</a>.</p>
+          <p class="cat-row__note"><span>Ninguno disponible ahora mismo. Estos ya los entregué.
+            <a class="mc-link" href="https://wa.me/34614753187">Avísame cuando entre uno</a>.</span></p>
         @elseif($row['demo'])
-          <p class="cat-row__note"><b>Estas dos fichas son un ejemplo de maquetación</b>, no coches
-            en venta: todavía no he tenido ningún Porsche. Fotografías de Unsplash.
-            <a class="mc-link" href="https://wa.me/34614753187">Si buscas uno, dímelo</a>.</p>
+          <p class="cat-row__note"><span><b>Estas dos fichas son un ejemplo de maquetación</b>, no
+            coches en venta: todavía no he tenido ningún Porsche. Fotografías de Unsplash.
+            <a class="mc-link" href="https://wa.me/34614753187">Si buscas uno, dímelo</a>.</span></p>
         @endif
       </section>
     @endforeach
-  </div>
 </main>
 
 <script>

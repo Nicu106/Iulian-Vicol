@@ -24,22 +24,17 @@
   font-weight:500; letter-spacing:.010em; line-height:1.3; color:var(--mc-ink-3); }
 
 /* ---- a marque row ----------------------------------------
-   The colour IS the row: painted behind everything, clipped from one edge, and
-   sweeping across. The inner grid is repeated inside the fill carrying a white
-   wordmark, so the letters light up exactly as the colour reaches them — same
-   grid, same padding, same height, so the two copies cannot drift apart. */
-.cat-row{ position:relative; overflow:hidden; border-top:1px solid var(--mc-hairline); }
-.cat-row:first-of-type{ border-top:0; }
+   The row runs edge to edge; the grid inside keeps the container measure. The colour is
+   painted behind everything and clipped from one side. The inner grid is repeated inside
+   the fill carrying a white logo, so the mark lights up as the colour reaches it. */
+.cat-row{ position:relative; overflow:hidden; }
 
 .cat-row__fill{
   position:absolute; inset:0; z-index:0; background:var(--brand);
   clip-path:inset(0);          /* the finished state IS the base state: without JS the
-                                  colour is simply there, and the white text sits on it */
+                                  colour is simply there, and the white marks sit on it */
 }
 .cat-row__fill .cat-row__inner{ position:absolute; inset:0; }
-.cat-row.is-live .cat-row__fill .cat-row__mark{ color:#FFFFFF; }   /* 4 classes: outranks .cat-row.is-live .cat-row__mark, which is 3 */
-.cat-row__fill .cat-row__mark{ color:#FFFFFF; }
-.cat-row__fill .cat-row__lead{ visibility:hidden; }
 
 /* the nib: a 2px edge travelling at the head of the colour, like a pen */
 .cat-row__fill::after{
@@ -50,54 +45,72 @@
 
 .cat-row__inner{
   position:relative; z-index:1;
-  display:grid; grid-template-columns:14rem minmax(0,1fr); gap:var(--s-6);
-  /* start, not center: the fill's copy spans the whole row (note included) while the
-     real grid spans only its own content, so centring would place the two wordmarks
-     48px apart. Anchored to the top, they cannot drift. */
-  align-items:start; padding:var(--s-6) var(--s-5);
+  max-width:var(--mc-container); margin:0 auto;
+  display:grid; grid-template-columns:14rem minmax(0,1fr); gap:var(--s-7);
+  /* start, not center: the fill's copy spans the whole row while the real grid spans
+     only its content, so centring would put the two logos apart */
+  align-items:start; padding:var(--s-7) var(--mc-gutter-d);
 }
 .cat-row--rtl .cat-row__inner{ grid-template-columns:minmax(0,1fr) 14rem; }
-.cat-row--rtl .cat-row__id{ grid-column:2; grid-row:1; text-align:right; }
+.cat-row--rtl .cat-row__id{ grid-column:2; grid-row:1; }
 .cat-row--rtl .cat-row__cars,
 .cat-row--rtl .cat-row__none{ grid-column:1; grid-row:1; }
 
-.cat-row__mark{
-  display:block; margin:0;
-  font-size:clamp(1.75rem,1.39rem + 1.48vw,2.5rem);   /* the h2 step */
-  font-weight:700; letter-spacing:-.05em; line-height:1.1;
-  color:var(--mc-ink-3); white-space:nowrap;
+/* ---- the marque mark ------------------------------------- */
+.cat-row__name{ margin:0; }
+.cat-row__logo{
+  display:block; width:100%; max-width:14rem; aspect-ratio:1;
+  background:transparent;                       /* the white copy inside the fill shows through */
+  -webkit-mask:var(--logo) center/contain no-repeat;
+          mask:var(--logo) center/contain no-repeat;
 }
-.cat-row__logo{ display:block; height:36px; width:auto; }   /* slot for a real logo file */
+.cat-row__fill .cat-row__logo{ background:#FFFFFF; }
+.js .cat-row:not(.is-live) .cat-row__logo{ background:var(--mc-rule); }
 
 .cat-row__lead{
-  display:block; margin-top:var(--s-2);
-  font-size:var(--t-small); color:var(--mc-ink-2);
+  display:block; margin-top:var(--s-4);
+  font-size:var(--t-small); color:rgba(255,255,255,.82);
   font-variant-numeric:tabular-nums;
 }
-.cat-row__lead b{ color:var(--mc-ink); font-weight:600; }
-/* Everything over the colour is white by default. The wordmark is transparent so the
-   white copy inside the fill shows through — that is what makes the letters light up as
-   the colour reaches them. Only with JS, and only until the row has run, is it grey. */
-.cat-row__lead{ color:rgba(255,255,255,.82); }
-.cat-row__lead b{ color:#FFFFFF; }
-.cat-row__mark{ color:transparent; }
+.cat-row__lead b{ color:#FFFFFF; font-weight:600; }
+.cat-row__fill .cat-row__lead{ visibility:hidden; }
 .js .cat-row:not(.is-live) .cat-row__lead{ color:var(--mc-ink-2); }
 .js .cat-row:not(.is-live) .cat-row__lead b{ color:var(--mc-ink); }
-.js .cat-row:not(.is-live) .cat-row__mark{ color:var(--mc-ink-3); }
 
 /* ---- the cars in a row ----------------------------------- */
 .cat-row__cars{ display:grid; gap:var(--s-4); grid-template-columns:1fr; }
 @media (min-width:560px){ .cat-row__cars{ grid-template-columns:1fr 1fr; } }
-@media (min-width:1100px){ .cat-row__cars{ grid-template-columns:repeat(4,1fr); } }
+@media (min-width:1100px){
+  .cat-row__cars{ grid-template-columns:repeat(4,1fr); }
+  /* a row with fewer than four cars: on a mirrored row, start far enough along
+     that the last card finishes beside the logo, instead of leaving a gap there */
+  .cat-row--rtl .cat-row__cars > :first-child{ grid-column-start:calc(5 - var(--n, 4)); }
+}
 .cat-row__cars > *{ min-width:0; }
+
+/* simpler card here than in the brandbook: photograph, model and year, price and
+   mileage. Nothing else — the row already says the marque. */
+.cat-row .mc-card__body{ padding:var(--s-3) var(--s-4) var(--s-4); gap:var(--s-2); }
+.cat-row .mc-card__title span{ color:var(--mc-ink-3); font-weight:500; }
+/* two lines' worth reserved, so a model name that wraps does not push its price
+   below the price of the card beside it. Only where cards sit side by side —
+   stacked on a phone there is nothing to align, and the reserve reads as a hole */
+@media (min-width:560px){ .cat-row .mc-card__title{ min-height:2.6em; } }
 
 .cat-row__none{ display:flex; flex-wrap:wrap; align-items:center; gap:var(--s-3) var(--s-5); }
 .cat-row__none p{ margin:0; font-size:var(--t-prose); color:#FFFFFF; max-width:44ch; }
 
-.cat-row__note{ position:relative; z-index:1; margin:0; padding:0 var(--s-5) var(--s-6);
-  font-size:var(--t-small); line-height:1.45; color:rgba(255,255,255,.82); max-width:56ch; }
+.cat-row__note{ position:relative; z-index:1; max-width:var(--mc-container); margin:0 auto;
+  padding:0 var(--mc-gutter-d) var(--s-6); font-size:var(--t-small); line-height:1.45;
+  color:rgba(255,255,255,.92); }
+.cat-row__note > span{ display:block; max-width:52ch; }
+.js .cat-row:not(.is-live) .cat-row__note{ color:var(--mc-ink-2); }
+.js .cat-row:not(.is-live) .cat-row__note b,
+.js .cat-row:not(.is-live) .cat-row__note .mc-link{ color:var(--mc-ink); }
 .cat-row__note b{ color:#FFFFFF; font-weight:600; }
 .cat-row__note .mc-link{ color:#FFFFFF; }
+
+.mc-vh{ position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
 
 /* ============================================================
    THE SEQUENCE — frame by frame
@@ -149,7 +162,9 @@
 /* ---- mobile: the band shrinks, the stroke stays ----------- */
 @media (max-width:559px){
   :root{ --cat-band-h:72px; }
-  .cat-row__inner{ grid-template-columns:minmax(0,1fr); gap:var(--s-4); padding:var(--s-5) var(--s-4); }
+  .cat-row__inner{ grid-template-columns:minmax(0,1fr); gap:var(--s-5); padding:var(--s-6) var(--mc-gutter-m); }
+  .cat-row__logo{ max-width:5.5rem; }
+  .cat-row__note{ padding-inline:var(--mc-gutter-m); }
   .cat-row--rtl .cat-row__inner{ grid-template-columns:minmax(0,1fr); }
   .cat-row--rtl .cat-row__id,.cat-row--rtl .cat-row__cars,.cat-row--rtl .cat-row__none{ grid-column:1; grid-row:auto; text-align:left; }
   .cat-row__note{ padding-inline:var(--s-4); }
@@ -159,6 +174,4 @@
 .mc-badge--demo{ background:var(--mc-accent); color:#FFFFFF; }
 .mc-card--demo{ border-style:dashed; border-color:var(--mc-accent); }
 .mc-card--demo .mc-frame img{ filter:saturate(.9); }
-.cat-row__note{ margin:calc(var(--s-5) * -1) 0 var(--s-7); font-size:var(--t-small);
-  line-height:1.45; color:var(--mc-ink-2); max-width:52ch; }
-.cat-row__note b{ color:var(--mc-ink); font-weight:600; }
+
