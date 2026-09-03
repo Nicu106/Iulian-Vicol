@@ -1392,7 +1392,7 @@
 
   <div class="bb-scroll">
   <table class="bb-t">
-    <thead><tr><th style="width:min(22ch,35%)">Rule</th><th>In practice</th></tr></thead>
+    <thead><tr><th style="width:22ch">Rule</th><th>In practice</th></tr></thead>
     <tbody>
       <tr><td><b>First person</b></td><td><em>Yo</em> for anything involving judgement or contact. Never <em>nosotros</em> — a one-man business writing "our team" is the first thing a buyer notices.</td></tr>
       <tr><td><b>A fact, not an adjective</b></td><td>Every claim carries a number, a date or a place. Adjectives without evidence are what make copy read as written by a machine.</td></tr>
@@ -1404,7 +1404,7 @@
   <h3>Ready to use, in Spanish</h3>
   <div class="bb-scroll">
   <table class="bb-t">
-    <thead><tr><th style="width:min(22ch,35%)">Where</th><th>Text</th></tr></thead>
+    <thead><tr><th style="width:22ch">Where</th><th>Text</th></tr></thead>
     <tbody>
       <tr><td>Under the contact buttons</td><td>Contesto yo. Suelo tardar unas horas, no unos minutos.</td></tr>
       <tr><td>Catalogue standfirst</td><td>Los he comprado y conducido yo. Si preguntas por uno, te contesto yo.</td></tr>

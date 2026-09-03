@@ -89,7 +89,7 @@ class BrandbookController extends Controller
             ],
             'Navy' => [
                 ['--mc-navy',      'Footer, the sold badge, and a button while pressed. Held at 1.55:1 from pure black so it survives a cheap phone panel.'],
-                ['--mc-navy-line', 'Hairline inside navy, and the 1.56:1 watermark under the book\'s footer. Decorative — never carries text.'],
+                ['--mc-navy-line', 'Hairline inside navy, and the 1.56:1 watermark under the book\'s footer. Decorative — never under text, and the watermark is aria-hidden.'],
                 ['--mc-on-navy',   'Text on navy.'],
                 ['--mc-on-navy-2', 'Secondary text on navy. Never on a light surface.'],
             ],
