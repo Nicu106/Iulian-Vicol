@@ -972,8 +972,9 @@
 
     <p class="bb-prose" style="margin-top:var(--s-5)">
       The important part is not the average — it is the <b>gap</b>. {{ $quotes['band'] }} of
-      your {{ $quotes['n'] }} comments sit between 133 and 245 characters; the other
-      {{ $quotes['tail'] }} run long, and the first of them is a full step away. That gap
+      your {{ $quotes['n'] }} comments sit between 133 and 245 characters;
+      {{ $quotes['n'] - $quotes['band'] - $quotes['tail'] }} are shorter, and
+      {{ $quotes['tail'] }} run long — and the first long one is a full step away. That gap
       decides the design:
     </p>
 
@@ -1006,14 +1007,15 @@
     </table>
     </div>
     <p class="bb-small" style="margin-top:var(--s-3);color:var(--mc-ink-3)">
-      Nine lines of text lands on that knee at every screen width, so the limit is nine
-      lines rather than a fixed character count — that way it adapts instead of cutting
-      words in half.</p>
+      Nine lines lands on that knee on a phone — about 240 characters at 390px. On a
+      desktop the same nine lines hold about 340, so the limit is nine lines rather than a
+      fixed character count: it adapts to the width instead of cutting words in half.</p>
   @endif
 
   <h3>The layout: photo left, words right</h3>
   <p class="bb-prose">
-    <b>Between 208 and 256px per customer on a phone, instead of 745px</b> — roughly three
+    <b>Between 208 and 244px per customer on a phone, instead of 745px</b> — 295 on a row
+    that carries a <em>Ver más</em> — roughly three
     times denser than the slider you have, so two or three people are on screen at once
     instead of one. And the photograph stays large enough to be a photograph of a person
     next to a car, not a round avatar.
@@ -1021,12 +1023,12 @@
   <p class="bb-prose">
     The reason it works: the photo already forces a certain height, and nine lines of text
     fits inside roughly that same height. For most of your comments the words cost nothing
-    beyond the photograph; the longest ones in the band add at most about 50px.
+    beyond the photograph; the longest ones in the band add about 36px.
   </p>
 
   @if($sample->count())
     <div class="tt-list" style="margin-top:var(--s-5)">
-      @php $wallSample = $sample->take(3)->push($sample->first(fn($t) => mb_strlen(trim((string)$t->quote)) > 260)); @endphp
+      @php $wallSample = $sample->take(3)->push($sample->first(fn($t) => mb_strlen(trim((string)$t->quote)) > 360)); @endphp
       @foreach($wallSample as $t)
         @php
           $rel = ltrim(preg_replace('#^/?storage/#', '', $t->image_path ?? ''), '/');
@@ -1081,11 +1083,11 @@
       <h3>Three things worth surfacing</h3>
       <ul>
         <li><b>Where people came from.</b> The photographs were taken in
-          {{ $quotes['home'] }}, and {{ $quotes['awayN'] }} of your
-          {{ $inventory['testimonials'] }} customers came to you from
-          {{ implode(', ', array_slice($quotes['awayCities'], 0, -1)) }}{{ count($quotes['awayCities']) > 1 ? ' and ' : '' }}{{ end($quotes['awayCities']) }}.
-          Nobody crosses the country for a car unless they trust the seller. Right now that
-          is greyed-out small print.</li>
+          {{ $quotes['home'] }} — that is what the location column says for
+          {{ $quotes['n'] + 1 - $quotes['awayN'] }} of them — and
+          {{ $quotes['awayN'] }} of your {{ $inventory['testimonials'] }} customers are recorded
+          elsewhere: {{ implode(', ', $quotes['awayCities']) }}. Right now that is greyed-out
+          small print; a customer's city is the cheapest verifiable detail the row carries.</li>
         <li><b>One testimonial is broken</b> — the comment is a single comma. Worth editing
           or hiding.</li>
         <li><b>Four comments contain paragraph breaks</b> that the current page flattens
