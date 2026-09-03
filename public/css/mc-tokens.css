@@ -166,7 +166,7 @@
   --e-out:   cubic-bezier(.22,.61,.36,1);
   --e-inout: cubic-bezier(.4,0,.2,1);
   --e-in:    cubic-bezier(.4,0,1,1);
-  --e-line:  cubic-bezier(.65,0,.35,1);   /* the stroke: drawn, not thrown */
+  --e-line:  cubic-bezier(.65,0,.35,1);   /* the sending line: drawn, not thrown */
 
   /* ---- LAYOUT -------------------------------------------- */
   --mc-container: 1200px;
