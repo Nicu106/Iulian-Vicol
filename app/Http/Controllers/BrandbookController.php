@@ -324,8 +324,7 @@ class BrandbookController extends Controller
     {
         $labels = [
             '--m-instant' => 'Press down',
-            '--m-tap'     => 'Release',
-            '--m-quick'   => 'Colour, border, opacity',
+            '--m-quick'   => 'Release, colour, border, opacity',
             '--m-state'   => 'Focus, header state change',
             '--m-move'    => 'The sending button\'s line, an accordion, a panel',
             '--m-reveal'  => 'Reserved. Nothing on the site reveals on scroll',

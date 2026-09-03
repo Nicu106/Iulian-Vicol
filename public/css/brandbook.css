@@ -42,7 +42,13 @@ p{ margin:0 0 var(--s-4); }
   letter-spacing:.010em; color:var(--mc-ink-3); }
 .bb-small{ font-size:var(--t-small); line-height:1.45; }
 .bb-section > p.bb-small,.bb-foot p.bb-small{ max-width:44ch; }
-#voice table.bb-t{ table-layout:fixed; } #voice .bb-note table.bb-t td:first-child{ width:22ch; }
+#voice table.bb-t{ table-layout:fixed; width:auto; max-width:100%; }
+#voice table.bb-t th:first-child{ width:13.15rem; }   /* 22ch at the table's own 14px */
+#voice table.bb-t th:last-child{ width:26.3rem; }     /* 44ch, the book's prose measure */
+/* the table inside a note lives in a 471px box, so 210 + 421 cannot fit: it shares the
+   ratio instead of the absolute widths */
+#voice .bb-note table.bb-t{ width:100%; }
+#voice .bb-note table.bb-t td:first-child{ width:33%; }
 @media (max-width:600px){ #voice table.bb-t th:first-child,#voice .bb-note table.bb-t td:first-child{ width:35%; } }
 .bb-note table.bb-t tr:last-child td{ border-bottom:0; }
 /* one family. Code is the same face, medium weight, tabular — not the viewer's OS mono */
@@ -91,7 +97,7 @@ code,.bb-mono{ font-family:var(--f-ui); font-weight:500; font-variant-numeric:ta
 @media (min-width:1000px){ .bb-toc{ grid-template-columns:repeat(3,1fr); } }
 .bb-toc > *{ min-width:0; }
 .bb-toc a{ display:flex; gap:var(--s-3); align-items:baseline; min-height:var(--mc-tap);
-  padding:var(--s-3) var(--s-5) var(--s-3) 0; border-bottom:1px solid var(--mc-hairline);
+  padding:var(--s-3) 0; border-bottom:1px solid var(--mc-hairline);
   color:var(--mc-ink); text-decoration:none;
   transition:color var(--m-quick) var(--e-out); }
 .bb-toc a:hover{ color:var(--mc-blue); }
@@ -119,6 +125,10 @@ table.bb-t{ width:100%; min-width:560px; border-collapse:collapse; font-size:var
 #signoff table.bb-t td:first-child{ white-space:nowrap; }
 #contrast table.bb-t td:last-child{ white-space:nowrap; }
 #signoff table.bb-t th:nth-child(n+4){ text-align:center; }
+/* vertical-align:middle cannot centre a block-level flex child, so the row does it */
+#signoff table.bb-t td:nth-child(n+4){ padding:0; }
+#signoff .mc-check{ align-items:center; height:100%; margin:0; padding:0; min-height:var(--mc-tap-pref); }
+#signoff .mc-check input{ margin:0; }
 #signoff table.bb-t td{ vertical-align:middle; }   /* the 48px checkbox rows centre; the ID must sit with them */
 #photos table.bb-t{ min-width:0; } #photos table.bb-t th:last-child{ white-space:normal; }
 @media (max-width:600px){ #signoff table.bb-t{ min-width:0; } #signoff table.bb-t th:nth-child(3),#signoff table.bb-t td:nth-child(3){ display:none; }
@@ -158,13 +168,13 @@ table.bb-t .bb-num-cell,.bb-num-cell{ font-variant-numeric:tabular-nums; white-s
 .bb-exempt{ color:var(--mc-ink-3); }
 .bb-pair-chip{ display:inline-flex; align-items:center; font-size:var(--t-small); font-weight:500; font-variant-numeric:tabular-nums; white-space:nowrap; }
 .bb-pair-chip i{ display:inline-block; width:var(--s-4); height:var(--s-4); margin-right:var(--s-1);
-  border:1px solid var(--mc-rule); flex:0 0 auto; }
+  border:1px solid var(--mc-control); flex:0 0 auto; }   /* 3.61:1 — 20 of these swatches are white */
 .bb-pair-chip i + i{ margin-right:var(--s-2); }
 table.bb-t .bb-mono{ overflow-wrap:anywhere; }
 
 /* ---- do / don't / note ----------------------------------- */
 .bb-two{ display:grid; gap:var(--s-5); grid-template-columns:1fr; }
-@media (min-width:760px){ .bb-two{ grid-template-columns:1fr 1fr; } }
+@media (min-width:760px){ .bb-two{ grid-template-columns:repeat(2,minmax(0,471px)); } }
 .bb-two > *{ min-width:0; }
 .bb-section > .bb-do,.bb-section > .bb-dont,.bb-section > .bb-note{ max-width:471px; }   /* the 44ch measure + padding + borders */
 .bb-do,.bb-dont,.bb-note{ position:relative; padding:var(--s-4) var(--s-5); border-radius:var(--mc-r-l);
@@ -176,6 +186,7 @@ table.bb-t .bb-mono{ overflow-wrap:anywhere; }
 .bb-do::before{ background:var(--mc-blue); }
 .bb-dont::before{ background:var(--mc-accent); }
 .bb-note::before{ background:var(--mc-warn); }
+.bb-note--bad::before{ background:var(--mc-accent); }   /* a live defect, not an advisory */
 .bb-do ul,.bb-dont ul{ margin:0; padding-left:var(--s-4); }
 .bb-do li,.bb-dont li{ margin-bottom:var(--s-2); font-size:var(--t-small); line-height:1.45; }
 .bb-two h3,.bb-do h3,.bb-dont h3,.bb-note h3{ margin-bottom:var(--s-4); }
@@ -188,7 +199,7 @@ table.bb-t .bb-mono{ overflow-wrap:anywhere; }
 b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:var(--mc-on-navy); }
 .bb-display,h3{ text-wrap:balance; }
 #ref table.bb-t th:nth-child(2){ width:9ch; }
-.bb-toc{ row-gap:var(--s-2); } .bb-toc a:hover .bb-label{ color:inherit; }
+.bb-toc{ row-gap:var(--s-2); column-gap:var(--s-5); } .bb-toc a:hover .bb-label{ color:inherit; }
 .bb-stagecap{ font-weight:500; }
 .bb-mark{ color:var(--mc-navy-line); }
 @media (max-width:639px){ .bb-meta{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s-4) var(--s-5); }

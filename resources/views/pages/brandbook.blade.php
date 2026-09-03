@@ -773,7 +773,7 @@
       each, and "WhatsApp" at readable size already takes 83px. The price stays in the bar:
       on a €15–26k purchase the buyer re-checks it constantly, and a bar without it forces
       a scroll every time.</p>
-    <div class="bb-note" style="margin:var(--s-4);border-left-color:var(--mc-accent)">
+    <div class="bb-note bb-note--bad" style="margin:var(--s-4)">
       <p style="margin:0"><b>Broken on your live site today, and no approval fixes it.</b>
       The page is missing <code>viewport-fit=cover</code>, so any fixed bar sits underneath
       the iPhone home indicator. One line. <span class="bb-st bb-st--fixed">Fixed</span></p>
@@ -1261,7 +1261,7 @@
   </div>
 
   <div class="bb-two" style="margin-top:var(--s-5)">
-    <div class="bb-note" style="border-left-color:var(--mc-accent)">
+    <div class="bb-note bb-note--bad">
       <h3>The biggest problem on your site today</h3>
       <p>Measured at 390px on the live pages: <b>45 things too small to tap reliably on the
       home page, 41 in the catalogue, 27 on a car page.</b> The minimum is 44×44px.</p>
@@ -1343,7 +1343,7 @@
 
   @if(!empty($metrics['exif']))
     @php $ex = $metrics['exif']; $pct = $ex['total'] ? round($ex['rotated']/$ex['total']*100,1) : 0; @endphp
-    <div class="bb-note" style="border-left-color:var(--mc-accent);margin-top:var(--s-5)">
+    <div class="bb-note bb-note--bad" style="margin-top:var(--s-5)">
       <h3>A bug that is live on your site right now</h3>
       <p><b>{{ $fmt($ex['rotated']) }} of the {{ $fmt($ex['total']) }} files that carry orientation data ({{ $pct }}%) are
       being served rotated 90°.</b> The camera writes the orientation into the file; the
@@ -1392,7 +1392,7 @@
 
   <div class="bb-scroll">
   <table class="bb-t">
-    <thead><tr><th style="width:22ch">Rule</th><th>In practice</th></tr></thead>
+    <thead><tr><th>Rule</th><th>In practice</th></tr></thead>
     <tbody>
       <tr><td><b>First person</b></td><td><em>Yo</em> for anything involving judgement or contact. Never <em>nosotros</em> — a one-man business writing "our team" is the first thing a buyer notices.</td></tr>
       <tr><td><b>A fact, not an adjective</b></td><td>Every claim carries a number, a date or a place. Adjectives without evidence are what make copy read as written by a machine.</td></tr>
@@ -1404,7 +1404,7 @@
   <h3>Ready to use, in Spanish</h3>
   <div class="bb-scroll">
   <table class="bb-t">
-    <thead><tr><th style="width:22ch">Where</th><th>Text</th></tr></thead>
+    <thead><tr><th>Where</th><th>Text</th></tr></thead>
     <tbody>
       <tr><td>Under the contact buttons</td><td>Contesto yo. Suelo tardar unas horas, no unos minutos.</td></tr>
       <tr><td>Catalogue standfirst</td><td>Los he comprado y conducido yo. Si preguntas por uno, te contesto yo.</td></tr>
@@ -1484,7 +1484,7 @@
         <li>Whether the fabricated star ratings come off the testimonials.</li>
       </ul>
     </div>
-    <div class="bb-note" style="border-left-color:var(--mc-accent)">
+    <div class="bb-note bb-note--bad">
       <h3>Broken today, regardless of any decision <span class="bb-st bb-st--fixed">Fixed</span></h3>
       <ul>
         <li><code>viewport-fit=cover</code> is missing — any fixed bar sits under the

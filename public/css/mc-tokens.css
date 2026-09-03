@@ -160,7 +160,6 @@
 
   /* ---- MOTION -------------------------------------------- */
   --m-instant:  80ms;   /* press down */
-  --m-tap:     160ms;   /* release */
   --m-quick:   160ms;   /* colour, border, opacity */
   --m-state:   220ms;   /* focus, header state */
   --m-move:    280ms;   /* the sending button's line, accordion, panel */
