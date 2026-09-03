@@ -47,6 +47,9 @@
         {{-- the colour is the row. It is painted behind everything and clipped from
              one edge; the inner grid is repeated inside it carrying a white wordmark, so
              the letters light up exactly as the colour reaches them. --}}
+        <span class="cat-row__watermark" aria-hidden="true"
+              style="--logo:url('{{ asset('img/marques/'.$row['key'].'.svg') }}')"></span>
+
         <div class="cat-row__fill" aria-hidden="true">
           <div class="cat-row__inner">
             <div class="cat-row__id">
@@ -64,17 +67,29 @@
             </h2>
             <span class="cat-row__lead">
               @if($row['n'])
-                <b>{{ $row['n'] }}</b> {{ $row['n'] === 1 ? 'coche' : 'coches' }} · desde <b>{{ $euros($row['from']) }}</b>
+<span class="nw"><b>{{ $row['n'] }}</b> {{ $row['n'] === 1 ? 'disponible' : 'disponibles' }}</span> ·
+                <span class="nw">desde <b>{{ $euros($row['from']) }}</b></span>@if($row['delivered']->count()) ·
+                <span class="nw"><b>{{ $row['delivered']->count() }}</b> entregados</span>@endif
               @elseif($row['sold'])
-                <b>{{ $row['sold'] }}</b> entregados · ninguno ahora
+                <span class="nw"><b>{{ $row['sold'] }}</b> entregados</span> · <span class="nw">ninguno ahora</span>
               @else
                 Bajo pedido · ejemplo de ficha
               @endif
             </span>
+
+            @if($row['n'] || $row['delivered']->count() || $row['demo'])
+              {{-- Opens the marque to the full screen. Without JavaScript it is not
+                   rendered at all, because there would be nothing for it to do. --}}
+              <button class="cat-row__all" type="button" hidden
+                      aria-expanded="false" aria-controls="cars-{{ $row['key'] }}"
+                      data-open="{{ $row['total'] > 4 ? 'Ver los '.$row['total'] : 'Ver todos' }}"
+                      data-close="Cerrar">{{ $row['total'] > 4 ? 'Ver los '.$row['total'] : 'Ver todos' }}</button>
+            @endif
           </div>
 
           @if($row['n'] || $row['delivered']->count() || $row['demo'])
-            <div class="cat-row__cars" style="--n:{{ $row['cars']->count() + $row['delivered']->count() + count($row['demo']) }}">
+            <div class="cat-row__cars" id="cars-{{ $row['key'] }}"
+                 style="--n:{{ $row['cars']->count() + $row['delivered']->count() + count($row['demo']) }}">
               @foreach($row['cars'] as $car)
                 <article class="mc-card">
                   <a class="mc-card__link" href="#{{ $car->slug }}">
@@ -139,7 +154,7 @@
           @endif
         </div>
 
-        @if($row['delivered']->count())
+        @if(!$row['n'] && $row['delivered']->count())
           <p class="cat-row__note"><span>Ninguno disponible ahora mismo. Estos ya los entregué.
             <a class="mc-link" href="https://wa.me/34614753187">Avísame cuando entre uno</a>.</span></p>
         @elseif($row['demo'])
@@ -158,11 +173,106 @@
   var rows = Array.prototype.slice.call(document.querySelectorAll('.cat-row'));
   if (!rows.length) return;
 
+  /* ---- opening a marque to the full screen ------------------------------
+     The button exists only here: without JavaScript there is nothing for it to
+     do, so it is never shown rather than shown and dead. */
+  rows.forEach(function (row) {
+    var btn = row.querySelector('.cat-row__all');
+    if (!btn) return;
+    btn.hidden = false;
+
+    function setLabel(open) {
+      btn.textContent = open ? btn.getAttribute('data-close') : btn.getAttribute('data-open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
+    function close(compensate) {
+      if (!row.classList.contains('is-open')) return;
+      var before = row.getBoundingClientRect().height;
+      row.classList.remove('is-open');
+      setLabel(false);
+      if (compensate) {
+        // the section just lost height above the viewport, so everything below it
+        // jumped up by exactly that much; take the same amount out of the scroll
+        var after = row.getBoundingClientRect().height;
+        window.scrollBy(0, after - before);
+      }
+    }
+
+    btn.addEventListener('click', function () {
+      var opening = !row.classList.contains('is-open');
+      // only one marque open at a time: two full screens of colour is noise
+      rows.forEach(function (r) {
+        if (r !== row && r.classList.contains('is-open')) {
+          r.classList.remove('is-open');
+          var b = r.querySelector('.cat-row__all');
+          if (b) { b.textContent = b.getAttribute('data-open'); b.setAttribute('aria-expanded', 'false'); }
+        }
+      });
+      if (opening) {
+        // Measure both ends, then animate between them. The upper edge is carried
+        // to the top of the screen and stops there; the lower edge is the one that
+        // travels, down to the bottom. Two edges converging on the two edges of the
+        // screen is what "this is opening to fill the screen" looks like.
+        var startH = row.getBoundingClientRect().height;
+        row.classList.add('is-open');
+        setLabel(true);
+        var endH = row.getBoundingClientRect().height;
+
+        var top = row.getBoundingClientRect().top + window.pageYOffset;
+        window.scrollTo({ top: top, behavior: reduced() ? 'auto' : 'smooth' });
+
+        if (!reduced() && endH > startH) {
+          row.style.height = startH + 'px';
+          row.classList.add('is-sizing');
+          void row.offsetHeight;                       // commit the start height
+          row.style.height = endH + 'px';
+          var done = function (e) {
+            if (e && e.propertyName !== 'height') return;
+            row.style.height = '';                     // hand the height back to the content
+            row.classList.remove('is-sizing');
+            row.removeEventListener('transitionend', done);
+          };
+          row.addEventListener('transitionend', done);
+          window.setTimeout(done, 900);                // in case the transition never fires
+        }
+      } else {
+        close(false);
+      }
+    });
+
+    // scrolling past the last car ends the marque: it returns to its band and the
+    // next one follows. Only once the section is fully above the fold, so nothing
+    // collapses under the reader's eyes.
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (!e.isIntersecting && e.boundingClientRect.bottom < 0) close(true);
+        });
+      }, { threshold: 0 }).observe(row);
+    }
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    var open = document.querySelector('.cat-row.is-open');
+    if (!open) return;
+    var btn = open.querySelector('.cat-row__all');
+    if (btn) btn.click();
+  });
+
+  function reduced() {
+    return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
   // Each card waits for the stroke to land (640ms) plus its place in the row.
   rows.forEach(function (row) {
     var items = row.querySelectorAll('.cat-row__cars > *, .cat-row__none > *');
     Array.prototype.forEach.call(items, function (el, i) {
       el.style.setProperty('--d', (700 + i * 70) + 'ms');
+      // the cards the compact band hides need their own index, counted from the
+      // first hidden one, so they arrive 60ms apart when the row opens
+      if (i >= 4) el.style.setProperty('--i', i - 4);
     });
   });
 

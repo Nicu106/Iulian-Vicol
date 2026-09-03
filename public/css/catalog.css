@@ -8,6 +8,9 @@
   --m-sweep: 640ms;   /* the colour crossing a full row. Longer than --m-reveal
                          because it travels ~1100px: at 420ms it reads as a flash,
                          at 640 as a deliberate stroke. */
+  --m-open: 420ms;    /* a band growing out to fill the screen. Same length as the
+                         longest step on the shared ladder: this is one movement of
+                         one edge, not a journey across the page like --m-sweep. */
   --cat-band-h: 92px;
 }
 
@@ -78,13 +81,32 @@
 .js .cat-row:not(.is-live) .cat-row__lead b{ color:var(--mc-ink); }
 
 /* ---- the cars in a row ----------------------------------- */
-.cat-row__cars{ display:grid; gap:var(--s-4); grid-template-columns:1fr; }
-@media (min-width:560px){ .cat-row__cars{ grid-template-columns:1fr 1fr; } }
-@media (min-width:1100px){
-  .cat-row__cars{ grid-template-columns:repeat(4,1fr); }
-  /* a row with fewer than four cars: on a mirrored row, start far enough along
-     that the last card finishes beside the logo, instead of leaving a gap there */
-  .cat-row--rtl .cat-row__cars > :first-child{ grid-column-start:calc(5 - var(--n, 4)); }
+.cat-row__cars{ display:grid; gap:var(--s-4); grid-template-columns:var(--cols); }
+/* --- the column ladder ----------------------------------------------------
+   Four cards, or three, decided by the width of the page and by nothing else.
+   The same ladder governs the compact band and the opened screen, so a card is
+   one size on this page rather than one size per state. */
+:root{ --cols:1fr; }                                   /* under 560: one */
+@media (min-width:560px){ :root{ --cols:1fr 1fr; } }   /* 560-899:  two */
+@media (min-width:900px){ :root{ --cols:repeat(3,1fr); } }
+@media (min-width:1200px){ :root{ --cols:repeat(4,1fr); } }
+@media (min-width:900px){
+  .cat-row__cars{ grid-template-columns:var(--cols); }
+}
+/* A mirrored row holding fewer cars than the ladder has columns starts far enough
+   along that its last card finishes beside the mark, instead of leaving a hole there.
+   max(1, …) matters: --n is the marque's whole count, so an eight-car marque asked
+   for column 5-8 = -3, which does not exist. Chrome then reflows the band into two
+   rows — the Mercedes row showing eight cars without anyone pressing "Ver los 8". */
+@media (min-width:900px) and (max-width:1199px){
+  .cat-row--rtl:not(.is-open) .cat-row__cars > :first-child{
+    grid-column-start:max(1, calc(4 - var(--n, 3)));
+  }
+}
+@media (min-width:1200px){
+  .cat-row--rtl:not(.is-open) .cat-row__cars > :first-child{
+    grid-column-start:max(1, calc(5 - var(--n, 4)));
+  }
 }
 .cat-row__cars > *{ min-width:0; }
 
@@ -186,3 +208,153 @@
   .mc-head .mc-nav{ order:3; width:100%; margin-right:0 !important; }
   .mc-head .mc-logo{ margin-right:auto; }
 }
+
+/* ============================================================================
+   The marque watermark
+   A flat rectangle of colour is a swatch. The marque's own mark, enormous and
+   barely present, turns it into a field with depth — the way a showroom wall
+   carries the badge rather than a poster of it. 7% white: visible as texture,
+   never as a second logo competing with the real one.
+   ========================================================================= */
+.cat-row__watermark{
+  position:absolute; z-index:1; pointer-events:none;   /* above the fill, below the cards */
+  top:50%; translate:0 -50%;
+  inset-inline-end:-8rem; width:34rem; aspect-ratio:1;
+  background:rgba(255,255,255,.07);
+  -webkit-mask:var(--logo) center/contain no-repeat;
+          mask:var(--logo) center/contain no-repeat;
+}
+.cat-row--rtl .cat-row__watermark{ inset-inline-end:auto; inset-inline-start:-8rem; }
+@media (max-width:900px){ .cat-row__watermark{ width:20rem; } }
+
+/* ---- "Ver todos" ---------------------------------------------------------
+   Sits under the marque's own count, in the row's own colour reversed out, so
+   it reads as part of the marque rather than as site furniture. */
+.cat-row__all{
+  display:inline-flex; align-items:center; gap:var(--s-2);
+  margin-top:var(--s-4); min-height:44px; padding:0 var(--s-4);
+  border:1px solid rgba(255,255,255,.45); border-radius:var(--mc-r-l);
+  background:transparent; color:#FFFFFF;
+  font:600 var(--t-small)/1 var(--f-ui); letter-spacing:.01em; cursor:pointer;
+  transition:background var(--m-in) var(--e-out), border-color var(--m-in) var(--e-out);
+}
+.cat-row__all::after{ content:"→"; font-weight:400; transition:translate var(--m-in) var(--e-out); }
+.cat-row__all:hover{ background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.75); }
+.cat-row__all:hover::after{ translate:3px 0; }
+.cat-row__all[aria-expanded="true"]::after{ content:"×"; }
+.cat-row__all:focus-visible{ outline:3px solid #FFFFFF; outline-offset:3px; }
+
+/* ============================================================================
+   Open: the marque takes the whole screen
+   The colour was already full-bleed; opening gives it the full height too, pins
+   the mark in the corner while its cars pass, and lets the grid run as wide as
+   it needs. Scrolling past the last car ends the section — the row returns to
+   its band and the next marque follows, which is the collapse, done by the
+   document rather than by a script fighting it.
+   ========================================================================= */
+/* ---- opening, frame by frame ---------------------------------------------
+   One edge moves, and it is obvious which. The row is first carried to the top
+   of the screen, so its upper edge is pinned against the viewport; then only the
+   lower edge travels, down to the bottom. Reading it: "this band is growing to
+   fill the screen", not "something reflowed".
+
+     0ms     the click. The row starts rising to the top of the screen.
+     0-420   min-height runs from the band's own height out to the full screen.
+             The upper edge is already at the top and stays; the lower edge is
+             the one you watch move.
+     120-    the tone deepens from the top of the field to the bottom, which is
+             what stops a screen-high rectangle of one colour from reading flat.
+     220+    the cars that the band was hiding arrive, 60ms apart, in reading order.
+
+   min-height, not height: the content still decides how tall the section really
+   is once a marque has more cars than one screen holds. */
+.cat-row.is-open{ min-height:100vh; min-height:100svh; }
+/* The travel is animated on height, from JavaScript, because min-height cannot
+   carry it: once the hidden cars are shown the content is taller than a screen,
+   so the real height jumps and min-height never transitions at all. The script
+   measures both ends and animates between the two measured values. */
+.cat-row.is-sizing{ transition:height var(--m-open) var(--e-inout); }
+
+/* the field gains depth once it is a whole screen: light stays at the top, the
+   bottom sinks. Only downward, so every contrast measured on the flat colour
+   still holds — nothing gets lighter than the colour that was checked. */
+.cat-row.is-open .cat-row__fill{
+  background:linear-gradient(180deg,
+    var(--brand) 0%,
+    color-mix(in oklab, var(--brand) 92%, #000) 58%,
+    color-mix(in oklab, var(--brand) 80%, #000) 100%);
+  transition:background var(--m-open) var(--e-out) 120ms;
+}
+/* the cars the band was hiding come in after the edge has travelled */
+@media (min-width:769px){
+  .js .cat-row.is-open .cat-row__cars > :nth-child(n+5){
+    animation:cat-arrive var(--m-move) var(--e-out) backwards;
+    animation-delay:calc(220ms + (var(--i, 0) * 60ms));
+  }
+}
+@keyframes cat-arrive{ from{ opacity:0; transform:translateY(14px); } }
+@media (prefers-reduced-motion:reduce){
+  .cat-row{ transition:none; }
+  .cat-row.is-open .cat-row__fill{ transition:none; }
+  .js .cat-row.is-open .cat-row__cars > *{ animation:none; }
+}
+.cat-row.is-open .cat-row__inner{ padding-block:var(--s-8) var(--s-9); align-items:start; }
+.cat-row.is-open .cat-row__id{
+  position:sticky; top:var(--s-7); align-self:start;
+}
+/* Never fixed: a fixed element is not clipped by the section's overflow:hidden,
+   so the open marque's watermark stayed stuck to the screen and drifted over the
+   rows below it — the Mercedes star turning up on the BMW blue. Absolute keeps it
+   inside its own marque, which is the only place it means anything. */
+.cat-row.is-open .cat-row__watermark{ position:absolute; top:50%; }
+@media (min-width:1100px){
+  .cat-row.is-open .cat-row__cars{
+    grid-template-columns:var(--cols);
+    align-content:start;
+  }
+  /* the pushed start only makes sense for a single short line of cars */
+  .cat-row.is-open.cat-row--rtl .cat-row__cars > :first-child{ grid-column-start:auto; }
+}
+.cat-row.is-open .cat-row__note{ padding-bottom:var(--s-8); }
+
+/* ============================================================================
+   The compact row on a phone: a rail, not a stack
+   Measured before changing it: five stacked rows ran 6980px — 8.3 screens for
+   14 cars, with the average row at 1.56 screens, so a marque never fitted on
+   one screen and the grouping that makes this page what it is was invisible.
+   As a rail, the mark and its cars are seen together, which is the whole idea.
+   ========================================================================= */
+@media (max-width:768px){
+  .cat-row:not(.is-open) .cat-row__cars{
+    display:flex; gap:var(--s-3);
+    overflow-x:auto; overscroll-behavior-x:contain;
+    scroll-snap-type:x mandatory;
+    /* the rail runs edge to edge, but its first card lines up with the text */
+    margin-inline:calc(var(--mc-gutter-m) * -1);
+    padding-inline:var(--mc-gutter-m);
+    padding-bottom:var(--s-3);
+    scrollbar-width:none;
+  }
+  .cat-row:not(.is-open) .cat-row__cars::-webkit-scrollbar{ display:none; }
+  .cat-row:not(.is-open) .cat-row__cars > *{
+    flex:0 0 72vw; max-width:19rem; scroll-snap-align:start;
+  }
+  .cat-row.is-open .cat-row__cars{ grid-template-columns:var(--cols); }
+  .cat-row.is-open .cat-row__id{ position:static; }
+}
+
+
+/* ---- the compact row shows the first few, "Ver todos" shows the marque -----
+   Only under .js: without JavaScript the button is not rendered, so hiding cards
+   there would hide them for good. The base state stays the finished state. */
+/* the band shows exactly one row of the ladder — four cards, or three, never a
+   ragged half-row */
+@media (min-width:900px) and (max-width:1199px){
+  .js .cat-row:not(.is-open) .cat-row__cars > :nth-child(n+4){ display:none; }
+}
+@media (min-width:1200px){
+  .js .cat-row:not(.is-open) .cat-row__cars > :nth-child(n+5){ display:none; }
+}
+
+/* a number and the word it counts are one thing; they never break apart */
+.cat-row__lead .nw{ white-space:nowrap; }

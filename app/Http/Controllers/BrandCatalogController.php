@@ -24,11 +24,11 @@ class BrandCatalogController extends Controller
      * carries their corporate black instead.
      */
     private const MARQUES = [
-        ['key' => 'volkswagen', 'name' => 'Volkswagen',    'colour' => '#001E50', 'match' => ['volkswagen', 'vw']],
-        ['key' => 'audi',       'name' => 'Audi',          'colour' => '#BB0A30', 'match' => ['audi']],
-        ['key' => 'bmw',        'name' => 'BMW',           'colour' => '#0066B1', 'match' => ['bmw']],
-        ['key' => 'mercedes',   'name' => 'Mercedes-Benz', 'colour' => '#1B1B1B', 'match' => ['mercedes', 'mercedes-benz', 'mercedes benz']],
-        ['key' => 'porsche',    'name' => 'Porsche',       'colour' => '#D5001C', 'match' => ['porsche']],
+        ['key' => 'volkswagen', 'name' => 'Volkswagen',    'colour' => '#022254', 'match' => ['volkswagen', 'vw']],
+        ['key' => 'audi',       'name' => 'Audi',          'colour' => '#930016', 'match' => ['audi']],
+        ['key' => 'bmw',        'name' => 'BMW',           'colour' => '#004086', 'match' => ['bmw']],
+        ['key' => 'mercedes',   'name' => 'Mercedes-Benz', 'colour' => '#01172E', 'match' => ['mercedes', 'mercedes-benz', 'mercedes benz']],
+        ['key' => 'porsche',    'name' => 'Porsche',       'colour' => '#C50007', 'match' => ['porsche']],
     ];
 
     /**
@@ -57,18 +57,20 @@ class BrandCatalogController extends Controller
             $cars = $available->filter($is)->values();
             $sold = $soldCount->filter($is)->count();
 
-            // A marque with nothing in stock still has to show what its row looks like.
-            // Two honest ways, in order of preference:
-            //   1. cars he actually delivered — his own photographs, marked "Entregado"
-            //   2. only where he has never had one: a marked example, so the client can
-            //      see the layout. Never presented as stock; see the brandbook on
-            //      stock photography.
-            $delivered = $cars->count() ? collect() : $soldCount->filter($is)->take(4)->values();
+            // Every car of the marque he has ever had, not only what is in stock today.
+            // Nine available cars across five marques left rows of two, which made the
+            // page look emptier than the business is: he has had 41. The delivered ones
+            // are his own photographs and carry a visible "Entregado" badge, so the row
+            // is a record of the marque rather than a shelf with two things on it.
+            //   Where he has never had one at all — Porsche — a marked example stands in,
+            //   never presented as stock; see the brandbook on stock photography.
+            $delivered = $soldCount->filter($is)->values();
 
             $rows[] = $m + [
                 'cars'      => $cars,
                 'delivered' => $delivered,
                 'demo'      => $cars->count() || $delivered->count() ? [] : (self::DEMO[$m['key']] ?? []),
+                'total'     => $cars->count() + $delivered->count() + count($cars->count() || $delivered->count() ? [] : (self::DEMO[$m['key']] ?? [])),
                 'n'         => $cars->count(),
                 'sold'      => $sold,
                 'from'      => $cars->count() ? (int) $cars->min('price') : null,
