@@ -190,7 +190,7 @@
   <h3>Home page — the recommended order</h3>
   <div class="bb-scroll">
   <table class="bb-t">
-    <thead><tr><th style="width:3ch">#</th><th style="width:22ch">Section</th><th style="width:52ch">Why it sits here</th><th style="width:20ch">Evidence</th></tr></thead>
+    <thead><tr><th style="width:3ch">#</th><th style="width:22ch">Section</th><th style="width:44ch">Why it sits here</th><th style="width:20ch">Evidence</th></tr></thead>
     <tbody>
       <tr><td class="bb-num-cell">1</td><td><b>Header: name, Málaga, phone, WhatsApp</b></td>
         <td>Contact details are the highest-scoring credibility signal measured for an unknown seller. A physical address scored 1.86 and a phone number 1.71 on a −3…+3 scale — against 0.69 for photos of your own people.</td>
@@ -232,7 +232,7 @@
   <h3>Vehicle page — where the money decision happens</h3>
   <div class="bb-scroll">
   <table class="bb-t">
-    <thead><tr><th style="width:3ch">#</th><th style="width:22ch">Section</th><th style="width:52ch">Why it sits here</th><th style="width:20ch">Evidence</th></tr></thead>
+    <thead><tr><th style="width:3ch">#</th><th style="width:22ch">Section</th><th style="width:44ch">Why it sits here</th><th style="width:20ch">Evidence</th></tr></thead>
     <tbody>
       <tr><td class="bb-num-cell">0</td><td><b>Fixed bar: WhatsApp + Call</b></td>
         <td>Present from the first paint. 49% of phone use is one-handed and thumbs drive 75% of interactions; the bottom strip is the only reliably reachable zone. <b>Your site has no such bar today.</b></td>
@@ -319,7 +319,7 @@
   </p>
   <div class="bb-scroll">
   <table class="bb-t">
-    <thead><tr><th style="width:22ch">Where</th><th style="width:30ch">What</th><th style="width:52ch">Why</th></tr></thead>
+    <thead><tr><th style="width:22ch">Where</th><th style="width:30ch">What</th><th style="width:44ch">Why</th></tr></thead>
     <tbody>
       <tr><td><b>High, in or under the hero</b></td><td>One line: <em>{{ $inventory['sold'] }} coches entregados · {{ $inventory['testimonials'] }} reseñas con foto · Málaga</em></td><td>Costs almost no vertical space, and sits where attention actually is. Keep it to one line — more than two trust signals measurably <em>lowers</em> completion.</td></tr>
       <tr><td><b>Mid-page, home</b></td><td>The full wall of {{ $inventory['testimonials'] }}</td><td>High enough to fall inside the first two screens; low enough to corroborate the cars instead of preceding them.</td></tr>
@@ -347,7 +347,7 @@
   presenting them as findings.</p>
   <div class="bb-scroll">
   <table class="bb-t bb-t--qa">
-    <thead><tr><th>Question</th><th style="width:52ch">Status</th></tr></thead>
+    <thead><tr><th>Question</th><th style="width:44ch">Status</th></tr></thead>
     <tbody>
       <tr><td>Testimonials high on the page or low</td><td><b>No study varies it.</b> Both positions are inferred from adjacent evidence. The three-way split above is a reconciliation, not a finding.</td></tr>
       <tr><td>Photographs attached to testimonials versus text alone</td><td><b>No study found.</b> Any percentage lift claimed for testimonial headshots is unsupported.</td></tr>
