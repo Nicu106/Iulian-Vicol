@@ -279,10 +279,24 @@
    bottom sinks. Only downward, so every contrast measured on the flat colour
    still holds — nothing gets lighter than the colour that was checked. */
 .cat-row.is-open .cat-row__fill{
+  /* A ramp, not a line. Five stops so the fall accelerates the way light does —
+     barely moving under the mark, steepest through the middle, settling at the
+     foot — and so a screen-high field cannot band.
+
+     The foot is at 62% of the colour. Judged by rendering 80 / 70 / 62 / 52 side
+     by side on the lightest and darkest marques: at 80 the fall is invisible on
+     the navy, and at 52 the marque is gone — Porsche's red turns brown. 62 is the
+     last step that is unmistakably deeper while still unmistakably the marque.
+
+     Downward only, always: the top of every open field is the flat colour that
+     was measured, so the floor cannot move. Down the ramp white only improves —
+     on Porsche, the lightest field, 6.22:1 at the top and 13.41:1 at the foot. */
   background:linear-gradient(180deg,
-    var(--brand) 0%,
-    color-mix(in oklab, var(--brand) 92%, #000) 58%,
-    color-mix(in oklab, var(--brand) 80%, #000) 100%);
+    var(--brand)                                 0%,
+    color-mix(in oklab, var(--brand) 96%, #000) 22%,
+    color-mix(in oklab, var(--brand) 88%, #000) 46%,
+    color-mix(in oklab, var(--brand) 76%, #000) 68%,
+    color-mix(in oklab, var(--brand) 62%, #000) 100%);
   transition:background var(--m-open) var(--e-out) 120ms;
 }
 /* the cars the band was hiding come in after the edge has travelled */
