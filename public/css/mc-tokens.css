@@ -57,7 +57,9 @@
      Two jobs: the contact CTA, and the price. Nothing else.
      car-planet pairs its blue with a warm red-orange (#E65848) that fails
      at 3.59:1 both ways; this keeps the relationship and fixes the contrast. */
-  --mc-accent:      #C03D15;  /* 13-16px text, error borders. 5.36:1 */
+  --mc-accent:      #A8330F;  /* the darker red step: 13-16px text, error borders.
+                                6.68:1 on white. 1.25:1 from --mc-price - a step the
+                                eye can see; the old #C03D15 was 1.006:1 from it */
   --mc-price:       #C6352A;  /* the price. car-planet's coral hue (OKLCH 29°)
                                 at the lightness that passes 4.5 on EVERY ground:
                                 5.32 white, 4.92 bg, 4.53 band, 4.69 tint. Was --mc-accent, 9° browner
@@ -114,7 +116,7 @@
   --t-value:   1.0625rem;                                   /* 17 fixed */
   --t-small:   0.875rem;                                    /* 14 fixed */
   --t-label:   0.8125rem;                                   /* 13 fixed — system floor */
-  --t-caption: clamp(0.875rem,0.7546rem + 0.4938vw,1rem);   /* 14 → 16, italic. the customer's words */
+  --t-caption: clamp(0.875rem,0.8148rem + 0.2469vw,1rem);   /* 14 → 16, italic. the customer's words */
 
   /* ---- SHAPE — measured on car-planet, not assumed ---------
      Their filled and outlined CTAs are 10px in 100% of cases, cards 22px in

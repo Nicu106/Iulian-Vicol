@@ -1135,9 +1135,9 @@
   @endforeach
 
   <h3>How much of each</h3>
-  <p class="bb-prose">On a typical page, measured as share of the screen. This is the
-  proportion we measured on car-planet, and it is what lets amateur photography carry a
-  page.</p>
+  <p class="bb-prose">On a typical page, as an approximate share of the screen, in the
+  proportion the reference keeps — we counted its tints and fills, not its pixels. It is
+  what lets amateur photography carry a page.</p>
   <div class="bb-scroll">
   <table class="bb-t">
     <thead><tr><th>Layer</th><th class="bb-num-cell">Share</th><th>Where it is allowed</th></tr></thead>
@@ -1145,7 +1145,7 @@
       <tr><td><b>Photographs</b></td><td class="bb-num-cell">30–35%</td><td>Cards, gallery, the customer wall</td></tr>
       <tr><td><b>Neutral</b></td><td class="bb-num-cell">~55%</td><td>Everything else. This is the palette.</td></tr>
       <tr><td><b>Navy</b></td><td class="bb-num-cell">~6%</td><td>Footer only</td></tr>
-      <tr><td><b>Blue</b></td><td class="bb-num-cell">~4%</td><td>Links, active menu item, outline buttons, one tinted section per page</td></tr>
+      <tr><td><b>Blue</b></td><td class="bb-num-cell">~4%</td><td>Links, active menu item, outline buttons, the form's one filled button, one tinted section per page</td></tr>
       <tr><td><b>Coral</b></td><td class="bb-num-cell">~1%</td><td>The price, and nothing else</td></tr>
       <tr><td><b>WhatsApp green</b></td><td class="bb-num-cell">~1%</td><td>The WhatsApp button, and a sent-message confirmation. Nothing else</td></tr>
     </tbody>
@@ -1192,14 +1192,14 @@
       typeface car-planet renders on 485 of its 509 measured text nodes, taken deliberately
       on your instruction to get as close to their register as possible. One family, no
       serif — exactly as they do it.</p>
-      <p class="mc-pair" style="margin-top:var(--s-4)"><span class="mc-price">24.800 €</span><span class="mc-km">184.000 km</span></p>
+      <p class="mc-pair" style="margin-top:0"><span class="mc-price">24.800 €</span><span class="mc-km">184.000 km</span></p>
     </div>
     <div>
       <h3>The customer's voice — italic, same family</h3>
       <p class="bb-small">An earlier draft set the customer quotes in a serif. That was a
       second typeface to load and a large part of what read as old-school. The quotes keep
       a distinct voice with DM Sans italic instead — a different speaker, no second font.</p>
-      <p class="bb-prose" style="margin-top:var(--s-4);font-style:italic">Compramos el coche
+      <p class="tt-quote" style="margin-top:var(--s-4)">Compramos el coche
       para nuestra hija. Nos gustó el estado impecable y el historial claro.</p>
     </div>
   </div>
@@ -1215,7 +1215,7 @@
   </table>
   </div>
 
-  <div class="bb-two" style="margin-top:var(--s-5)">
+  <div class="bb-two" style="margin-top:var(--s-6)">
     <div class="bb-do">
       <h3>Two hard floors <span class="bb-st bb-st--fixed">Fixed</span></h3>
       <ul>
@@ -1659,6 +1659,9 @@
       b.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
   });
+  // the scroll fade exists only where a table actually overflows
+  function fade(){ document.querySelectorAll('.bb-scroll').forEach(function(s){ s.classList.toggle('is-overflowing', s.scrollWidth > s.clientWidth + 1); }); }
+  fade(); window.addEventListener('resize', fade);
   // desktop nav in the header specimen only appears above 900px on the real site
   function nav(){
     document.querySelectorAll('[data-desk]').forEach(function(n){

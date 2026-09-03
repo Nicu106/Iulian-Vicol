@@ -84,18 +84,18 @@ class BrandbookController extends Controller
             ],
             'Blue' => [
                 ['--mc-blue',       'The brand. One value does two jobs: link text and button fill, both at '.$this->ratio($t['--mc-blue'] ?? '#1558D6', '#FFFFFF').':1.'],
-                ['--mc-blue-dark',  'Hover, pressed, and large headings.'],
+                ['--mc-blue-dark',  'Hover fill, and the outlined button\'s hover label.'],
                 ['--mc-blue-light', 'Links and icons on navy only. Forbidden on light — 2.46:1.'],
             ],
             'Navy' => [
-                ['--mc-navy',      'Footer and any fixed bar. Held at 1.55:1 from pure black so it survives a cheap phone panel.'],
+                ['--mc-navy',      'Footer only. Held at 1.55:1 from pure black so it survives a cheap phone panel.'],
                 ['--mc-navy-line', 'Hairline inside navy. Decorative.'],
                 ['--mc-on-navy',   'Text on navy.'],
                 ['--mc-on-navy-2', 'Secondary text on navy. Never on a light surface.'],
             ],
             'Price' => [
                 ['--mc-price',       'Coral, on car-planet\'s hue, for the price and nothing else. '.$this->ratio($t['--mc-price'] ?? '#C6352A', $t['--mc-band'] ?? '#E8EDF5').':1 on the darkest ground it can land on.'],
-                ['--mc-accent',      'The darker step: small text, error borders, the failing mark in this book.'],
+                ['--mc-accent',      'The darker step - '.$this->ratio($t['--mc-price'] ?? '#C6352A', $t['--mc-accent'] ?? '#A8330F').':1 from the price: small text, error borders, the failing mark in this book.'],
                 ['--mc-accent-tint', 'Error-field ground.'],
             ],
             'WhatsApp' => [
@@ -109,8 +109,8 @@ class BrandbookController extends Controller
                 ['--mc-ink-3', 'The lightest text the system permits.'],
             ],
             'Borders' => [
-                ['--mc-hairline', 'Decorative: list separators.'],
-                ['--mc-rule',     'Structural: card edge, section divider.'],
+                ['--mc-hairline', 'Decorative: list separators, and the card\'s fallback edge under its shadow.'],
+                ['--mc-rule',     'Structural: section divider, table head rule, the phone frame.'],
                 ['--mc-control',  'Inputs, outline buttons, checkboxes. Must clear 3:1 on every ground.'],
             ],
             'State' => [
@@ -188,10 +188,10 @@ class BrandbookController extends Controller
             ['--mc-blue',       '--mc-band',      'text',    'Link on a band'],
             ['--mc-blue',       '--mc-blue-tint', 'text',    'Link on the blue wash'],
             ['--mc-blue',       '--mc-blue-100',  'text',    'Text on a blue chip'],
-            ['--mc-blue-dark',  '--mc-bg',        'text',    'Large heading in blue'],
+            ['--mc-blue-dark',  '--mc-surface',   'text',    'Outlined button hover label'],
             ['--mc-blue',       '--mc-surface',   'graphic', 'Blue 3px rule or button edge'],
             ['--mc-surface',    '--mc-blue',      'text',    'White label on the blue button'],
-            ['--mc-surface',    '--mc-blue-dark', 'text',    'White label, button pressed'],
+            ['--mc-surface',    '--mc-blue-dark', 'text',    'White label on the hover fill'],
             // accent
             ['--mc-price',      '--mc-surface',   'text',    'Price on a card'],
             ['--mc-price',      '--mc-band',      'large',   'Price on a band — always >=24px bold, so large text'],
@@ -271,6 +271,7 @@ class BrandbookController extends Controller
         return [
             ['--t-display', '34 → 52', 1.04, 600, '100%', '−0.035em', 'ui',    'The one line at the top of the site.'],
             ['--t-h1',      '34 → 52', 1.06, 700, '100%', '−0.03em',  'ui',    'Page title.'],
+            ['--t-sub',     '18',      1.55, 400, '100%', '0',        'ui',    'The grey line under a section title.'],
             ['--t-h2',      '28 → 40', 1.10, 700, '100%', '−0.05em',  'ui',    'Section title, with an 18px grey subtitle under it — the reference\'s size and tracking.'],
             ['--t-h3',      '18',      1.30, 600, '100%', '−0.012em', 'ui',    'Card title, block heading.'],
             ['--t-price',   '28 → 36', 1.00, 700, '100%', '−0.02em',  'ui',    'The price, in coral. Never appears without the mileage.'],
