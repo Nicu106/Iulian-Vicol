@@ -401,9 +401,9 @@
               </div>
             </div>
             <ul class="mc-chips">
-              <li class="mc-chip"><?= e($v?->year) ?></li>
-              <li class="mc-chip"><?= e($v?->fuel_es) ?></li>
-              <li class="mc-chip"><?= e($v?->transmission_es) ?></li>
+              <?php foreach (array_filter([$v?->year, $v?->fuel_es, $v?->transmission_es]) as $c): ?>
+                <li class="mc-chip"><?= e($c) ?></li>
+              <?php endforeach; ?>
             </ul>
             <span class="mc-card__go">Ver el coche <span class="mc-card__arrow">&rarr;</span></span>
           </div>
@@ -445,7 +445,7 @@
 
     {{-- HOME --}}
     <div>
-      <span class="bb-label">Home · 390px · the first two screens</span>
+      <span class="bb-label">Home · 390px · the first screen and a half</span>
       <div class="ph ph--clip">
         <div class="ph__status"><span>9:41</span><i></i></div>
         <div class="ph__screen">
@@ -501,7 +501,7 @@
 
     {{-- VEHICLE --}}
     <div>
-      <span class="bb-label">Vehicle page · 390px · the first two screens</span>
+      <span class="bb-label">Vehicle page · 390px · the first screen and a half</span>
       <div class="ph ph--clip">
         <div class="ph__status"><span>9:41</span><i></i></div>
         <div class="ph__screen">
@@ -757,13 +757,13 @@
           <div class="bb-scroll"><table class="bb-t" style="min-width:0">
             <tbody>
               <tr><td>Gutter</td><td class="bb-num-cell">16</td></tr>
-              <tr><td>Price and km</td><td class="bb-num-cell">82</td></tr>
+              <tr><td>Price and km</td><td class="bb-num-cell">80</td></tr>
               <tr><td>Gap</td><td class="bb-num-cell">12</td></tr>
               <tr><td>WhatsApp</td><td class="bb-num-cell">137</td></tr>
               <tr><td>Gap</td><td class="bb-num-cell">12</td></tr>
               <tr><td>Call, "Tel"</td><td class="bb-num-cell">48</td></tr>
               <tr><td>Gutter</td><td class="bb-num-cell">16</td></tr>
-              <tr><td><b>Total</b></td><td class="bb-num-cell"><b>323 of 390</b></td></tr>
+              <tr><td><b>Total</b></td><td class="bb-num-cell"><b>321 of 390</b></td></tr>
             </tbody>
           </table></div>
         </div>
@@ -1649,9 +1649,16 @@
 
 <script>
 (function(){
+  // the clamp is 9 lines, so what it hides changes with width — recompute on resize,
+  // exactly as the overflow fade does, instead of deciding once at load
+  function more(){
+    document.querySelectorAll('.tt-more').forEach(function(b){
+      var q = b.parentElement.querySelector('.tt-quote');
+      if (q && q.classList.contains('is-clamped')) { b.hidden = q.scrollHeight <= q.clientHeight + 1; }
+    });
+  }
+  more(); window.addEventListener('resize', more);
   document.querySelectorAll('.tt-more').forEach(function(b){
-    var q0 = b.parentElement.querySelector('.tt-quote');
-    if (q0 && q0.scrollHeight <= q0.clientHeight + 1) { b.hidden = true; return; }
     b.addEventListener('click', function(){
       var q = b.parentElement.querySelector('.tt-quote');
       var open = q.classList.toggle('is-clamped') === false;
