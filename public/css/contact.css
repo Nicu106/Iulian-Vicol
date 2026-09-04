@@ -1,50 +1,129 @@
 /* ============================================================================
    Contact
    Ordered by what buyers do, not by what a page usually has: message, call,
-   email, then — last — a form. 70% of car buyers would rather message than call
-   or fill anything in, and 55% expect an answer inside three hours.
-   ========================================================================= */
-.ct{ padding-block:var(--s-8) var(--s-9); }
-.ct-head{ max-width:44ch; margin-bottom:var(--s-8); }
-.ct-head__eyebrow{ display:block; margin-bottom:var(--s-3);
-  font-size:var(--t-label); font-weight:500; letter-spacing:.030em; color:var(--mc-ink-2); }
-.ct-h1{ margin:0 0 var(--s-4); font-size:var(--t-display); line-height:1.02;
-  letter-spacing:-.026em; color:var(--mc-ink); }
-.ct-lead{ margin:0; font-size:var(--t-sub); line-height:1.5; color:var(--mc-ink-2); }
+   email, then — last — a form. 70%+ of car buyers would rather message than
+   call or fill anything in, 55% expect an answer inside three hours, and 80% of
+   WhatsApp messages are read within five minutes. A form lands in an inbox and
+   waits to be noticed, so it is the slowest path and comes last.
 
-/* ---- the three ways ------------------------------------------------------
-   Whole panels, not a list of links: the thing a reader is looking for on this
-   page is a way to reach him, and a way to reach him should be the size of the
-   decision. */
-.ct-ways{ display:grid; gap:var(--s-4); grid-template-columns:minmax(0,1fr); }
-@media (min-width:820px){ .ct-ways{ grid-template-columns:1.2fr 1fr 1fr; } }
-.ct-way{
-  display:flex; flex-direction:column; gap:var(--s-2);
-  padding:var(--s-6); min-height:44px; text-decoration:none;
-  background:var(--mc-surface); border:1px solid var(--mc-hairline);
-  border-radius:var(--mc-r-card); color:var(--mc-ink);
-  transition:border-color var(--m-quick) var(--e-out), transform var(--m-quick) var(--e-out);
+   The page alternates ground the way the rest of the site does — photograph,
+   band, map, deep — so it never becomes the white sheet it was.
+   ========================================================================= */
+.ct{ padding-bottom:0; }
+
+/* ============================================================================
+   The opening
+   One car, then the picture parts and behind it is the map and the card. The
+   slices are only built where they can be afforded: a wide screen, motion
+   allowed, JavaScript running. Everywhere else the same photograph sits above
+   the same map and card, still and complete.
+   ========================================================================= */
+.ct-open{ position:relative; background:var(--mc-deep-2); }
+.ct-open__pin{ position:relative; }
+.ct-open.is-live .ct-open__pin{
+  position:sticky; top:0; height:100vh; height:100svh; overflow:hidden;
 }
-.ct-way:hover{ border-color:var(--mc-control); transform:translateY(-2px); }
-.ct-way:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:2px; }
+
+/* what is underneath: the map on the left, the card on the right */
+.ct-open__under{ display:grid; grid-template-columns:minmax(0,1fr); }
+.ct-open.is-live .ct-open__under{ position:absolute; inset:0; grid-template-columns:1fr 1fr; }
+@media (min-width:900px){ .ct-open__under{ grid-template-columns:1fr 1fr; } }
+
+.ct-open__map{ position:relative; min-height:22rem; background:var(--mc-band); overflow:hidden; }
+.ct-open.is-live .ct-open__map{ min-height:0; }
+.ct-map__it{
+  position:absolute; inset:0; width:100%; height:100%; border:0; display:block;
+  /* Google's tiles are lighter than this site; a light desaturation settles them
+     into the palette without touching what they say */
+  filter:grayscale(.34) contrast(1.04) brightness(.98);
+}
+.ct-open__pinlabel{
+  position:absolute; z-index:1; left:var(--s-5); bottom:var(--s-5);
+  padding:var(--s-2) var(--s-4); border-radius:var(--mc-r);
+  background:var(--mc-ink); color:#FFFFFF;
+  font-size:var(--t-label); font-weight:600; letter-spacing:.020em;
+}
+
+.ct-open__card{
+  display:flex; flex-direction:column; justify-content:center; gap:var(--s-5);
+  padding:var(--s-8) var(--mc-gutter-d);
+  background:linear-gradient(180deg, var(--mc-deep) 0%, var(--mc-deep-2) 100%);
+  color:rgba(255,255,255,.86);
+}
+@media (max-width:899px){ .ct-open__card{ padding-inline:var(--mc-gutter-m); } }
+
+.ct-hero__eyebrow{ display:block; font-size:var(--t-label); font-weight:500;
+  letter-spacing:.030em; color:#FFFFFF; }
+.ct-h1{ margin:var(--s-2) 0 var(--s-3); font-size:var(--t-h1); line-height:1.04;
+  letter-spacing:-.024em; color:#FFFFFF; }
+.ct-lead{ margin:0; max-width:34ch; font-size:var(--t-prose); line-height:1.5;
+  color:rgba(255,255,255,.90); }
+
+/* the three ways — the content of this page, at the size of the decision */
+.ct-ways{ display:flex; flex-direction:column; gap:var(--s-2); }
+.ct-way{
+  display:flex; flex-direction:column; gap:2px;
+  padding:var(--s-3) var(--s-4); text-decoration:none;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.20);
+  border-radius:var(--mc-r-card); color:#FFFFFF;
+  transition:background var(--m-quick) var(--e-out), border-color var(--m-quick) var(--e-out),
+             transform var(--m-quick) var(--e-out);
+}
+.ct-way:hover{ background:rgba(255,255,255,.11); border-color:rgba(255,255,255,.42); transform:translateY(-2px); }
+.ct-way:focus-visible{ outline:3px solid #FFFFFF; outline-offset:3px; }
 .ct-way__k{ font-size:var(--t-label); font-weight:600; letter-spacing:.040em;
-  text-transform:uppercase; color:var(--mc-ink-3); }
-.ct-way__v{ font-size:var(--t-h3); font-weight:600; letter-spacing:-.012em;
-  overflow-wrap:anywhere; }
-.ct-way__note{ font-size:var(--t-small); line-height:1.45; color:var(--mc-ink-2); }
-/* the one people actually use, dressed as the one people actually use */
-.ct-way--wa{ background:var(--mc-wa); border-color:var(--mc-wa); color:#FFFFFF; }
+  text-transform:uppercase; color:rgba(255,255,255,.62); }
+.ct-way__v{ font-size:var(--t-ui); font-weight:600; overflow-wrap:anywhere; }
+.ct-way__note{ font-size:var(--t-label); line-height:1.4; color:rgba(255,255,255,.78); }
+.ct-way--wa{ background:var(--mc-wa); border-color:var(--mc-wa); }
 .ct-way--wa .ct-way__k{ color:#FFFFFF; }
-.ct-way--wa .ct-way__note{ color:rgba(255,255,255,.92); }
 .ct-way--wa:hover{ background:var(--mc-wa-dark); border-color:var(--mc-wa-dark); }
-.ct-way--wa:focus-visible{ outline-color:#FFFFFF; }
+
+/* the picture on top, in twelve pieces */
+.ct-open__over{ display:none; }
+.ct-open.is-live .ct-open__over{
+  display:flex; position:absolute; inset:0; z-index:2; pointer-events:none;
+}
+.ct-slice{
+  /* A hair of overlap: twelve slices of a viewport rarely divide into whole
+     pixels, and the sub-pixel seams showed as vertical lines across the car
+     before it had begun to open. */
+  flex:1 1 0; height:100%; margin-inline:-0.5px;
+  background-image:var(--hero); background-repeat:no-repeat;
+  will-change:transform; backface-visibility:hidden;
+}
+/* the same photograph, whole, for everyone who never sees the slices */
+.ct-open__plain{
+  display:block; width:100%; aspect-ratio:16 / 9; object-fit:cover; object-position:50% 50%;
+}
+.ct-open.is-live .ct-open__plain{ display:none; }
+@media (min-width:900px){ .ct-open__plain{ grid-column:1 / -1; } }
+
+/* ---- the hours ---------------------------------------------------------- */
+.ct-hours{ padding-block:var(--s-9); background:var(--mc-surface); }
+.ct-hours__in{ display:grid; gap:var(--s-6); grid-template-columns:minmax(0,1fr); }
+@media (min-width:820px){ .ct-hours__in{ grid-template-columns:1fr 1fr; gap:var(--s-8); align-items:start; } }
+.ct-hours__big{ margin:0; font-size:var(--t-h1); line-height:1.1; letter-spacing:-.02em; color:var(--mc-ink); }
+.ct-hours__big b{ font-weight:700; }
+.ct-hours__list{ margin:0; padding:0; list-style:none; }
+.ct-hours__list li{
+  display:flex; align-items:baseline; justify-content:space-between; gap:var(--s-4);
+  padding:var(--s-4) 0; border-bottom:1px solid var(--mc-hairline);
+}
+.ct-hours__list li:first-child{ border-top:1px solid var(--mc-hairline); }
+.ct-hours__list span{ font-size:var(--t-small); color:var(--mc-ink-2); }
+.ct-hours__list b{ font-size:var(--t-ui); font-weight:600; color:var(--mc-ink); text-align:right; }
+.ct-hours__note{ grid-column:1 / -1; margin:0; max-width:60ch;
+  font-size:var(--t-small); line-height:1.55; color:var(--mc-ink-2); }
 
 /* ---- sections ----------------------------------------------------------- */
-.ct-sec{ margin-top:var(--s-9); }
+.ct-sec{ padding-block:var(--s-9) 0; }
 .ct-h2{ margin:0 0 var(--s-2); font-size:var(--t-h2); letter-spacing:-.018em; color:var(--mc-ink); }
 .ct-sec__p{ margin:0 0 var(--s-5); max-width:54ch; font-size:var(--t-small);
   line-height:1.55; color:var(--mc-ink-2); }
 
+/* the reasons, on the page's own band */
+.ct-band{ margin-top:var(--s-9); padding-block:var(--s-8); background:var(--mc-band); }
 .ct-reasons{ display:flex; flex-wrap:wrap; gap:var(--s-3); margin:0; padding:0; list-style:none; }
 .ct-reason{
   display:inline-flex; align-items:center; min-height:48px; padding:0 var(--s-5);
@@ -53,29 +132,47 @@
   font-size:var(--t-ui); font-weight:500;
   transition:border-color var(--m-quick) var(--e-out), background var(--m-quick) var(--e-out);
 }
-.ct-reason:hover{ border-color:var(--mc-ink); background:var(--mc-band); }
+.ct-reason:hover{ border-color:var(--mc-ink); background:var(--mc-ink); color:#FFFFFF; }
 .ct-reason:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:2px; }
 
-.ct-when{ display:grid; gap:var(--s-7); grid-template-columns:minmax(0,1fr); }
-@media (min-width:760px){ .ct-when{ grid-template-columns:1fr 1fr; gap:var(--s-8); } }
-.ct-when__big{ margin:0 0 var(--s-3); font-size:var(--t-h3); color:var(--mc-ink); }
-.ct-when__big b{ font-weight:700; }
+/* ---- the faces ---------------------------------------------------------- */
+.ct-faces{ padding-block:var(--s-8); background:var(--mc-surface); }
+.ct-faces__lead{ margin:0 0 var(--s-5); font-size:var(--t-prose); color:var(--mc-ink-2); }
+.ct-faces__lead b{ color:var(--mc-ink); font-weight:600; }
+.ct-faces__row{ margin:0; padding:0; list-style:none; display:grid; gap:var(--s-4);
+  grid-template-columns:repeat(4,minmax(0,1fr)); }
+@media (max-width:640px){ .ct-faces__row{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+.ct-faces__row img{ width:100%; aspect-ratio:4 / 5; object-fit:cover;
+  object-position:var(--pos-portrait); display:block; border-radius:var(--mc-r-card);
+  background:var(--mc-band); }
 
-/* ---- the form, last ----------------------------------------------------- */
-.ct-form-sec{ padding:var(--s-7); background:var(--mc-band); border-radius:var(--mc-r-card); }
+/* ---- the form, on the deep ground --------------------------------------- */
+.ct-formband{
+  margin-top:var(--s-9); padding-block:var(--s-9);
+  background:linear-gradient(180deg, var(--mc-deep) 0%, var(--mc-deep-2) 100%);
+  color:rgba(255,255,255,.86);
+}
+.ct-formband .ct-h2{ color:#FFFFFF; }
+.ct-formband .ct-sec__p{ color:rgba(255,255,255,.82); }
 .ct-form{ display:grid; gap:var(--s-4); grid-template-columns:minmax(0,1fr); }
 @media (min-width:760px){ .ct-form{ grid-template-columns:1fr 1fr; } }
 .ct-f{ display:flex; flex-direction:column; gap:var(--s-2); }
 .ct-f--wide{ grid-column:1 / -1; }
-.ct-f > span{ font-size:var(--t-label); font-weight:500; color:var(--mc-ink-2); }
-.ct-f > span em{ font-style:normal; color:var(--mc-ink-3); }
+.ct-f > span{ font-size:var(--t-label); font-weight:500; color:rgba(255,255,255,.86); }
+.ct-f > span em{ font-style:normal; color:rgba(255,255,255,.58); }
+.ct-form .mc-input{ background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.34); color:#FFFFFF; }
+.ct-form .mc-input::placeholder{ color:rgba(255,255,255,.52); }
+.ct-form .mc-input:focus-visible{ outline:3px solid #FFFFFF; outline-offset:2px; border-color:#FFFFFF; }
 .ct-form textarea.mc-input{ min-height:7rem; padding-block:var(--s-3); line-height:1.5; resize:vertical; }
 .ct-form__go{ grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:var(--s-3); }
 .ct-form__go .mc-btn{ min-height:48px; }
+.ct-form__go .mc-btn--ghost{ --btn-fg:#FFFFFF; --btn-bd:rgba(255,255,255,.55); }
+.ct-form__go .mc-btn--ghost:hover{ --btn-bd:#FFFFFF; }
 .ct-form__note{ grid-column:1 / -1; margin:0; max-width:60ch;
-  font-size:var(--t-label); line-height:1.5; color:var(--mc-ink-3); }
+  font-size:var(--t-label); line-height:1.5; color:rgba(255,255,255,.62); }
 
-/* ---- what replaced "¿por qué elegirnos?" -------------------------------- */
+/* ---- the counts --------------------------------------------------------- */
+.ct-facts{ padding-block:var(--s-9); }
 .ct-facts dl{ margin:0 0 var(--s-5); display:grid; gap:var(--s-4);
   grid-template-columns:repeat(2,minmax(0,1fr)); }
 @media (min-width:760px){ .ct-facts dl{ grid-template-columns:repeat(4,minmax(0,1fr)); } }

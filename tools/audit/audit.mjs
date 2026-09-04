@@ -89,13 +89,35 @@ const PAINTED = `(el => {
     }
     return null;
   };
+  // A translucent panel is not its own colour: rgba(255,255,255,.06) over navy is
+  // near-navy, and reading it as white reported white-on-white at 1:1. Composite
+  // every semi-transparent layer onto what is behind it, in order, until opaque.
+  const composite = layers => {
+    let out = null;
+    for (let k = layers.length - 1; k >= 0; k--) {
+      const n = layers[k].match(/[\\d.]+/g).map(Number);
+      const a = n.length > 3 ? n[3] : 1;
+      const rgb = n.slice(0, 3);
+      out = out === null ? rgb : rgb.map((v, i) => Math.round(a * v + (1 - a) * out[i]));
+      if (a === 1) out = rgb.slice();
+    }
+    return 'rgb(' + out.join(', ') + ')';
+  };
+  const layers = [];
+  const take = g => {
+    if (!g) return false;
+    layers.push(g);
+    const n = g.match(/[\\d.]+/g).map(Number);
+    return (n.length > 3 ? n[3] : 1) >= 1;          // opaque: stop here
+  };
   for (const n of stack) {
     if (n === el || el.contains(n)) continue;
-    const g = ground(n); if (g) return g;
+    if (take(ground(n))) return composite(layers);
   }
   let n = el.parentElement;
-  while (n) { const g = ground(n); if (g) return g; n = n.parentElement; }
-  return 'rgb(255, 255, 255)';
+  while (n) { if (take(ground(n))) return composite(layers); n = n.parentElement; }
+  layers.push('rgb(255, 255, 255)');
+  return composite(layers);
 })`;
 
 const checks = {

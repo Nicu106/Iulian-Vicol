@@ -18,69 +18,101 @@
 
 @include('partials.head', ['current' => 'contacto'])
 
-<main class="cat-wrap ct">
+<main class="ct">
 
-  <header class="ct-head">
-    <span class="ct-head__eyebrow">Málaga · {{ $sold }} coches entregados</span>
-    <h1 class="ct-h1">Escríbeme.<br>Contesto yo.</h1>
-    <p class="ct-lead">No hay centralita ni formulario que espere a que alguien lo mire.
-      El teléfono es el mío y WhatsApp lo leo en minutos.</p>
-  </header>
+  {{-- ==================================================================
+       The opening: one car, then the picture parts and what was behind it
+       is where you reach him.
 
-  {{-- ---- the fast way, first ---------------------------------------------
-       Ordered by what people do: 70% of car buyers would rather message than call
-       or fill in a form, and 55% expect an answer inside three hours. So the
-       message comes first, the call second, and the form last. --}}
-  <section class="ct-ways" aria-label="Cómo contactar">
-    <a class="ct-way ct-way--wa" href="https://wa.me/{{ $phoneRaw }}">
-      <span class="ct-way__k">WhatsApp</span>
-      <span class="ct-way__v">{{ $phone }}</span>
-      <span class="ct-way__note">Lo leo en minutos. Puedes mandarme fotos y audios.</span>
-    </a>
-    <a class="ct-way" href="tel:+{{ $phoneRaw }}">
-      <span class="ct-way__k">Llamar</span>
-      <span class="ct-way__v">{{ $phone }}</span>
-      <span class="ct-way__note">Si estoy con un cliente no lo cojo — insiste o escríbeme.</span>
-    </a>
-    <a class="ct-way" href="mailto:{{ $email }}">
-      <span class="ct-way__k">Email</span>
-      <span class="ct-way__v">{{ $email }}</span>
-      <span class="ct-way__note">Para documentación y facturas.</span>
-    </a>
-  </section>
+       Twelve vertical slices carry one photograph between them. As the page
+       scrolls they collapse outwards from the centre — the left six toward the
+       left edge, where the map is, the right six toward the right, where the
+       card is — each one a little later than the one before it, so the picture
+       opens rather than blinking off.
 
-  {{-- ---- what the dropdown used to be ------------------------------------
-       The old page had a select with six subjects and a message box. A subject
-       chosen from a list only helps whoever sorts the inbox; these write the first
-       line for you and open the conversation already started. --}}
-  <section class="ct-sec" aria-labelledby="ct-why">
-    <h2 class="ct-h2" id="ct-why">¿Sobre qué?</h2>
-    <p class="ct-sec__p">Elige y te abro la conversación escrita.</p>
-    <ul class="ct-reasons">
-      @foreach($reasons as $label => $text)
-        <li><a class="ct-reason" href="https://wa.me/{{ $phoneRaw }}?text={{ urlencode($text) }}">{{ $label }}</a></li>
-      @endforeach
-    </ul>
-  </section>
+       Nothing is intercepted: the section is tall, its contents stick, and how
+       far the page has moved is how far the slices have gone. Without
+       JavaScript, on a narrow screen, or with reduced motion, the slices are
+       never built and the map and the card are simply there.
+       ================================================================== --}}
+  <section class="ct-open" id="open">
+    <div class="ct-open__pin">
 
-  {{-- ---- when ------------------------------------------------------------- --}}
-  <section class="ct-sec ct-when" aria-labelledby="ct-when-h">
-    <div>
-      <h2 class="ct-h2" id="ct-when-h">Cuándo</h2>
-      <p class="ct-when__big">Todos los días, <b>a convenir</b></p>
-      <p class="ct-sec__p">No tengo horario de oficina. Dime cuándo te viene bien —
-        temprano, tarde o fin de semana — y quedamos.</p>
+      <div class="ct-open__under">
+        <div class="ct-open__map">
+          <iframe class="ct-map__it" title="Málaga en el mapa" loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade" tabindex="-1" aria-hidden="true"
+                  src="https://maps.google.com/maps?q={{ $mapQuery }}&z=11&output=embed"></iframe>
+          <span class="ct-open__pinlabel">{{ $place }}</span>
+        </div>
+
+        <div class="ct-open__card">
+          <span class="ct-hero__eyebrow">Málaga · {{ $sold }} coches entregados</span>
+          <h1 class="ct-h1">Escríbeme.<br>Contesto yo.</h1>
+          <p class="ct-lead">No hay centralita. El teléfono es el mío y WhatsApp lo leo en minutos.</p>
+
+          <div class="ct-ways">
+            <a class="ct-way ct-way--wa" href="https://wa.me/{{ $phoneRaw }}">
+              <span class="ct-way__k">WhatsApp</span>
+              <span class="ct-way__v">{{ $phone }}</span>
+            </a>
+            <a class="ct-way" href="tel:+{{ $phoneRaw }}">
+              <span class="ct-way__k">Llamar</span>
+              <span class="ct-way__v">{{ $phone }}</span>
+            </a>
+            <a class="ct-way" href="mailto:{{ $email }}">
+              <span class="ct-way__k">Email</span>
+              <span class="ct-way__v">{{ $email }}</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {{-- the picture, on top, built by the script --}}
+      <div class="ct-open__over" id="slices" aria-hidden="true"
+           style="--hero:url('{{ $hero }}')"></div>
+
+      {{-- and the picture as one image, for everyone who never sees the slices --}}
+      <img class="ct-open__plain" src="{{ $hero }}" width="1600" height="822"
+           alt="Un Mercedes E350d que vendí, en Málaga" fetchpriority="high" decoding="async">
     </div>
-    <div>
-      <h2 class="ct-h2">Dónde</h2>
-      <p class="ct-when__big">Málaga</p>
-      <p class="ct-sec__p">Te digo el punto exacto cuando quedemos: depende de dónde
-        tenga el coche que quieres ver.</p>
+  </section>
+
+  {{-- ---- the hours, on their own ---------------------------------------- --}}
+  <section class="ct-hours" aria-labelledby="ct-hours-h">
+    <div class="cat-wrap ct-hours__in">
+      <div>
+        <h2 class="ct-h2" id="ct-hours-h">Cuándo</h2>
+        <p class="ct-hours__big">Todos los días,<br><b>a convenir</b></p>
+      </div>
+      <ul class="ct-hours__list">
+        <li><span>Lunes a viernes</span><b>Cuando te venga bien</b></li>
+        <li><span>Sábado</span><b>Cuando te venga bien</b></li>
+        <li><span>Domingo</span><b>Escríbeme y lo miramos</b></li>
+      </ul>
+      <p class="ct-hours__note">No tengo horario de oficina ni una tienda a la que
+        presentarse: trabajo con cita, y te digo el punto exacto de Málaga cuando
+        quedemos — depende de dónde tenga el coche que quieres ver.</p>
+    </div>
+  </section>
+
+  {{-- ---- the faces, so the map is not the only picture ------------------- --}}
+  <section class="ct-faces" aria-label="Clientes">
+    <div class="cat-wrap">
+      <p class="ct-faces__lead"><b>{{ $people }} personas</b> se hicieron la foto con el coche
+        que se llevaron. <a class="mc-link" href="/inicio#reviews">Verlas todas →</a></p>
+      <ul class="ct-faces__row">
+        @foreach($faces as $f)
+          <li><img src="{{ $f->image_path }}" alt="{{ $f->author_name }} con su coche"
+                   loading="lazy" decoding="async" width="400" height="500"></li>
+        @endforeach
+      </ul>
     </div>
   </section>
 
   {{-- ---- the slow way, last ----------------------------------------------- --}}
-  <section class="ct-sec ct-form-sec" aria-labelledby="ct-form-h">
+  <section class="ct-formband" aria-labelledby="ct-form-h">
+    <div class="cat-wrap ct-form-sec">
     <h2 class="ct-h2" id="ct-form-h">O déjalo escrito aquí</h2>
     <p class="ct-sec__p">Tres campos. Al enviar, eliges si te abro WhatsApp o el correo
       — en los dos casos el mensaje va ya redactado y lo puedes leer antes de mandarlo.</p>
@@ -114,7 +146,7 @@
        warranty, flexible finance, and 24/7 support. Counts he can stand behind
        answer it better, and the last of those four is not carried over: see the
        brandbook's sign-off table. --}}
-  <section class="ct-sec ct-facts" aria-label="En números">
+  <section class="ct-sec ct-facts cat-wrap" aria-label="En números">
     <dl>
       <div><dt>Coches entregados</dt><dd>{{ $sold }}</dd></div>
       <div><dt>Personas fotografiadas con el suyo</dt><dd>{{ $people }}</dd></div>
@@ -141,6 +173,77 @@
 <script>
 (function () {
   document.documentElement.className += ' js';
+
+  /* ---- the opening ------------------------------------------------------
+     One photograph, carried by twelve vertical slices. As the page scrolls they
+     collapse outwards from the centre — the left six toward the map, the right
+     six toward the card — each a little later than the last, so the picture
+     opens instead of blinking off.
+
+     The scroll is never touched: the section is made tall, its contents stick,
+     and how far the page has moved becomes how far the slices have gone. Every
+     input device keeps behaving as it always did. */
+  var open = document.getElementById('open');
+  var host = document.getElementById('slices');
+  if (open && host) {
+    var N = 12;
+    var wide = window.matchMedia('(min-width: 900px)');
+    var still = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var built = false, ticking = false;
+
+    function build() {
+      if (built) return;
+      host.innerHTML = '';
+      for (var i = 0; i < N; i++) {
+        var s = document.createElement('span');
+        s.className = 'ct-slice';
+        // the twelve together are one picture: each shows its own 1/12th of it
+        s.style.backgroundSize = (N * 100) + '% 100%';
+        s.style.backgroundPositionX = (i / (N - 1) * 100) + '%';
+        // it collapses toward the edge it is nearest, which is where its half lands
+        s.style.transformOrigin = i < N / 2 ? 'left center' : 'right center';
+        host.appendChild(s);
+      }
+      built = true;
+    }
+
+    function measure() {
+      if (!wide.matches || still.matches) {
+        open.classList.remove('is-live'); open.style.height = ''; return;
+      }
+      build();
+      open.classList.add('is-live');
+      // one screen to look at it, one to open it
+      open.style.height = (window.innerHeight * 2) + 'px';
+      draw();
+    }
+
+    function draw() {
+      if (!open.classList.contains('is-live')) return;
+      var top = open.getBoundingClientRect().top;
+      var run = open.offsetHeight - window.innerHeight || 1;
+      var p = Math.min(1, Math.max(0, -top / run));
+      var kids = host.children;
+      for (var i = 0; i < kids.length; i++) {
+        // slices nearer the centre go first; the outermost pair goes last
+        var fromCentre = Math.abs((i + 0.5) - N / 2) / (N / 2);   // 0 centre … 1 edge
+        var lag = fromCentre * 0.45;
+        var q = Math.min(1, Math.max(0, (p - lag) / (1 - 0.45)));
+        var e = q * q * (3 - 2 * q);                              // ease, so it settles
+        kids[i].style.transform = 'scaleX(' + (1 - e) + ')';
+      }
+    }
+
+    window.addEventListener('scroll', function () {
+      if (ticking) return; ticking = true;
+      requestAnimationFrame(function () { draw(); ticking = false; });
+    }, { passive: true });
+    window.addEventListener('resize', measure);
+    wide.addEventListener('change', measure);
+    still.addEventListener('change', measure);
+    measure();
+  }
+
   var form = document.getElementById('ct-form');
   if (!form) return;
   var PHONE = @json($phoneRaw), MAIL = @json($email);

@@ -37,6 +37,15 @@ class ContactPageController extends Controller
             'available' => Vehicle::where('status', 'available')->count(),
             'sold'      => Vehicle::where('status', 'sold')->count(),
             'people'    => Testimonial::where('is_active', true)->whereNotNull('image_path')->count(),
+            // His own photograph, not stock: the E350d cabrio with Málaga behind it.
+            'hero'      => '/storage/vehicles/mercedes-benz-e350d-bluetec-9g-2016-pg9d3/LbLEXNfUs2rDWJBJ3NDryD1d7xub6RzMBPx3Hsmx.jpg',
+            // Four faces for the strip under the map — the people he actually sold to.
+            'faces'     => Testimonial::where('is_active', true)->whereNotNull('image_path')
+                              ->orderBy('order_index')->take(4)->get(),
+            // Where the map points. A dealer who works by appointment has no shopfront,
+            // so the map is the city, not a pin on a door that is not there.
+            'place'     => 'Málaga, España',
+            'mapQuery'  => 'M%C3%A1laga, Espa%C3%B1a',
         ]);
     }
 }
