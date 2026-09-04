@@ -32,12 +32,21 @@
 </header>
 
 <main>
-  <div class="cat-wrap cat-head">
-    <span class="cat-head__count">Málaga · {{ $sold }} coches entregados</span>
-    <h1>{{ $words[$total] ?? $total }} coches. Cinco marcas alemanas.</h1>
-    <p>Sólo trabajo con estas cinco. Los he comprado y conducido yo, y si preguntas por
-       uno te contesto yo.</p>
-  </div>
+  {{-- The banner. The photograph is atmosphere, not an advert: the words on it are
+       about him, not about this car, because he has never had a Panamera. Marked as
+       a stock photograph in §10 of the brandbook, to be replaced by one of his own. --}}
+  <header class="cat-hero">
+    <img class="cat-hero__img" src="{{ asset('img/banner/panamera.jpg') }}"
+         alt="" width="1800" height="1200" fetchpriority="high" decoding="async">
+    <div class="cat-hero__in cat-wrap">
+      <span class="cat-hero__eyebrow">Málaga · {{ $sold }} coches entregados</span>
+      <h1 class="cat-hero__h"><span>{{ $words[$total] ?? $total }} coches.</span>
+        <span>Cinco marcas alemanas.</span></h1>
+      <p class="cat-hero__p">Sólo trabajo con estas cinco. Los he comprado y conducido yo,
+         y si preguntas por uno te contesto yo.</p>
+      <span class="cat-hero__credit">Foto de archivo · Unsplash</span>
+    </div>
+  </header>
 
   @foreach($rows as $i => $row)
       <section class="cat-row {{ $i % 2 ? 'cat-row--rtl' : '' }}"

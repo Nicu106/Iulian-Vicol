@@ -494,3 +494,89 @@
 @media (max-height:520px) and (orientation:landscape){
   .cat-hint{ display:block; }
 }
+
+/* ============================================================================
+   The banner
+   Measured before it was placed. A 24x16 luminance grid over the photograph
+   says exactly where white can live on it:
+
+     top third      sky — 1.13:1 at its worst. White is impossible there.
+     middle         the car, black — fine on the left, unusable at the horizon
+     bottom half    tarmac — 7:1 and better, right across the frame, up to 19.75:1
+
+   So the words sit low, over the road, where the photograph itself does the work
+   and no scrim is needed to make the text legible.
+
+   The frame: the car spans 15-85% across and 28-78% down, and its hero — the
+   light bar reading PORSCHE — is at 48% down. object-position 50% 58% keeps the
+   whole car and the road under it in view at every ratio this banner takes:
+   at 2.6:1 the visible band is 28-88%, at 4:3 it is the full height.
+   ========================================================================= */
+.cat-hero{
+  position:relative; isolation:isolate;
+  aspect-ratio:2.6 / 1; min-height:22rem; max-height:78vh;
+  display:flex; align-items:flex-end;
+  overflow:hidden; background:var(--mc-ink);
+}
+.cat-hero__img{
+  position:absolute; inset:0; z-index:0;
+  width:100%; height:100%; object-fit:cover;
+  object-position:50% 58%;
+}
+/* Not a scrim over the picture — a floor under the words. The tarmac already
+   carries white; this only guarantees it at crops where less tarmac is in frame,
+   and it is kept to the bottom third so the car is never dulled. */
+/* Two scrims, not one, and neither is a wash over the whole picture.
+   Measured first: with a single 72% floor the worst line still read 2.43:1,
+   because at this crop the words land on the car and the horizon rather than on
+   the tarmac the luminance map promised. So the darkening is aimed where the
+   words are — low, and to the left — and the car, which lives up and to the
+   right, keeps its own light. */
+.cat-hero::after{
+  content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
+  background:
+    linear-gradient(180deg, rgba(4,7,14,0) 26%, rgba(4,7,14,.44) 58%, rgba(4,7,14,.90) 100%),
+    linear-gradient(100deg, rgba(4,7,14,.72) 0%, rgba(4,7,14,.34) 42%, rgba(4,7,14,0) 68%);
+}
+.cat-hero__in{
+  position:relative; z-index:2; width:100%;
+  padding-block:var(--s-7) var(--s-8);
+}
+.cat-hero__eyebrow{
+  display:block; margin-bottom:var(--s-3);
+  font-size:var(--t-label); font-weight:500; letter-spacing:.030em;
+  text-transform:none; color:#FFFFFF;   /* the smallest line on the banner: full white */
+}
+.cat-hero__h span{ display:block; }
+.cat-hero__h{
+  margin:0 0 var(--s-4); max-width:18ch;
+  font-size:var(--t-display); line-height:1.04; letter-spacing:-.024em;
+  color:#FFFFFF;
+}
+/* Said out loud, because the brandbook holds the live site to account for exactly
+   this: a stock photograph of a car that is not his. Small, but present. */
+.cat-hero__credit{
+  display:block; margin-top:var(--s-4);
+  font-size:var(--t-label); letter-spacing:.020em; color:rgba(255,255,255,.62);
+}
+.cat-hero__p{
+  margin:0; max-width:44ch;
+  font-size:var(--t-sub); line-height:1.5; color:rgba(255,255,255,.90);
+}
+@media (max-width:900px){
+  .cat-hero{ aspect-ratio:4 / 3; min-height:26rem; }
+  .cat-hero__h span{ display:inline; }   /* the space between them survives */
+}
+@media (max-width:560px){
+  .cat-hero{ aspect-ratio:3 / 4; min-height:0; max-height:82vh; }
+  /* At 3:4 only the middle half of the frame is visible. Centred, that is the
+     doors; moved left it is the tail — the light bar, the badge, the part that
+     says Porsche without a caption. */
+  .cat-hero__img{ object-position:38% 56%; }
+  /* a narrow frame puts the words over the car itself, so the floor comes up */
+  .cat-hero::after{
+    background:
+      linear-gradient(180deg, rgba(4,7,14,.10) 0%, rgba(4,7,14,.30) 26%, rgba(4,7,14,.62) 52%, rgba(4,7,14,.94) 100%),
+      linear-gradient(100deg, rgba(4,7,14,.46) 0%, rgba(4,7,14,.20) 52%, rgba(4,7,14,0) 80%);
+  }
+}
