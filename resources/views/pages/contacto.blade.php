@@ -72,6 +72,14 @@
       <div class="ct-open__over" id="slices" aria-hidden="true"
            style="--hero:url('{{ $hero }}')"></div>
 
+      {{-- The first words, on the car, before anything moves. aria-hidden: the
+           same sentence is the card's heading underneath. --}}
+      <div class="ct-open__title" id="open-title" aria-hidden="true">
+        <span class="ct-open__kicker">Málaga · {{ $sold }} coches entregados</span>
+        <p class="ct-open__big">Escríbeme.<br>Contesto yo.</p>
+        <span class="ct-open__scroll">Baja para verlo ↓</span>
+      </div>
+
       {{-- and the picture as one image, for everyone who never sees the slices --}}
       <img class="ct-open__plain" src="{{ $hero }}" width="1600" height="822"
            alt="Un Mercedes E350d que vendí, en Málaga" fetchpriority="high" decoding="async">
@@ -174,63 +182,124 @@
 (function () {
   document.documentElement.className += ' js';
 
-  /* ---- the opening ------------------------------------------------------
-     One photograph, carried by twelve vertical slices. As the page scrolls they
-     collapse outwards from the centre — the left six toward the map, the right
-     six toward the card — each a little later than the last, so the picture
-     opens instead of blinking off.
+  /* ================================================================
+     The opening, frame by frame
 
-     The scroll is never touched: the section is made tall, its contents stick,
-     and how far the page has moved becomes how far the slices have gone. Every
-     input device keeps behaving as it always did. */
+     0.00  One car, whole, filling the screen, with the page's first words on
+           it. Nothing has moved.
+     0.00-0.18  The picture separates into twelve columns: gaps open between
+           them and the words fade, so what you are looking at stops being a
+           photograph and becomes twelve pieces of one.
+     0.18-0.30  Every other column loses its picture — it goes to the page's own
+           navy — so the frame is columns WITH the car and columns without.
+     0.24-0.62  The empty ones fall. They accelerate (t squared, the way a thing
+           falls) and they leave in order, left to right, so it reads as a
+           collapse rather than a switch.
+     0.55-1.00  The six that kept the picture divide: three gather left, three
+           gather right, each compressing toward its own edge — and behind them,
+           where they were, is the map on the left and everything you need to
+           reach him on the right.
+
+     Two things the research settles. Movement is transform and opacity only, so
+     it stays on the compositor. And the easing is LINEAR: a scroll-driven
+     animation is already eased by the hand doing the scrolling, and a curve on
+     top of that double-eases it — the previous version smoothstepped here, and
+     that is gone.
+
+     The scroll itself is never touched: the section is tall, its contents stick,
+     and page distance becomes animation distance. ==================== */
   var open = document.getElementById('open');
   var host = document.getElementById('slices');
+  var title = document.getElementById('open-title');
   if (open && host) {
     var N = 12;
     var wide = window.matchMedia('(min-width: 900px)');
     var still = window.matchMedia('(prefers-reduced-motion: reduce)');
-    var built = false, ticking = false;
+    var kids = [], ticking = false, IMG = { w: 0, h: 0 };
+
+    // The picture's own proportions, so the twelve pieces are a photograph and
+    // not a stretched one. A percentage pair on background-size forces BOTH axes:
+    // the previous version painted a 0.75 portrait into a 1.57 box.
+    var probe = new Image();
+    probe.onload = function () { IMG.w = probe.naturalWidth; IMG.h = probe.naturalHeight; measure(); };
+    probe.src = @json($hero);
 
     function build() {
-      if (built) return;
-      host.innerHTML = '';
+      host.innerHTML = ''; kids = [];
       for (var i = 0; i < N; i++) {
         var s = document.createElement('span');
-        s.className = 'ct-slice';
-        // the twelve together are one picture: each shows its own 1/12th of it
-        s.style.backgroundSize = (N * 100) + '% 100%';
-        s.style.backgroundPositionX = (i / (N - 1) * 100) + '%';
-        // it collapses toward the edge it is nearest, which is where its half lands
-        s.style.transformOrigin = i < N / 2 ? 'left center' : 'right center';
-        host.appendChild(s);
+        s.className = 'ct-slice' + (i % 2 ? ' is-empty' : ' is-photo');
+        host.appendChild(s); kids.push(s);
       }
-      built = true;
+    }
+
+    function frame() {
+      // cover, computed rather than declared: the picture is scaled to fill the
+      // screen at its own aspect, then each column shows its own strip of it
+      if (!IMG.w || !kids.length) return;
+      var vw = window.innerWidth, vh = host.clientHeight || window.innerHeight;
+      var scale = Math.max(vw / IMG.w, vh / IMG.h);
+      var dw = IMG.w * scale, dh = IMG.h * scale;
+      var ox = (vw - dw) / 2, oy = (vh - dh) * 0.52;   // 52% down, where the car sits
+      var col = vw / N;
+      for (var i = 0; i < N; i++) {
+        kids[i].style.backgroundSize = dw + 'px ' + dh + 'px';
+        kids[i].style.backgroundPosition = (ox - i * col) + 'px ' + oy + 'px';
+      }
     }
 
     function measure() {
-      if (!wide.matches || still.matches) {
+      if (!wide.matches || still.matches || !IMG.w) {
         open.classList.remove('is-live'); open.style.height = ''; return;
       }
-      build();
+      if (!kids.length) build();
       open.classList.add('is-live');
-      // one screen to look at it, one to open it
-      open.style.height = (window.innerHeight * 2) + 'px';
-      draw();
+      open.style.height = (window.innerHeight * 2.6) + 'px';
+      frame(); draw();
     }
+
+    var clamp = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
+    var span  = function (p, a, b) { return clamp((p - a) / (b - a)); };
 
     function draw() {
       if (!open.classList.contains('is-live')) return;
       var top = open.getBoundingClientRect().top;
       var run = open.offsetHeight - window.innerHeight || 1;
-      var p = Math.min(1, Math.max(0, -top / run));
-      var kids = host.children;
-      for (var i = 0; i < kids.length; i++) {
-        // slices nearer the centre go first; the outermost pair goes last
-        var fromCentre = Math.abs((i + 0.5) - N / 2) / (N / 2);   // 0 centre … 1 edge
-        var lag = fromCentre * 0.45;
-        var q = Math.min(1, Math.max(0, (p - lag) / (1 - 0.45)));
-        var e = q * q * (3 - 2 * q);                              // ease, so it settles
-        kids[i].style.transform = 'scaleX(' + (1 - e) + ')';
+      var p = clamp(-top / run);
+      var vw = window.innerWidth, vh = window.innerHeight;
+
+      if (title) title.style.opacity = String(1 - span(p, 0.04, 0.16));
+
+      // What is behind stays hidden until the columns are actually leaving. Without
+      // this the map and the card showed through the falling gaps and the middle of
+      // the sequence was a jumble of tarmac, road names and half a phone number.
+      var under = open.querySelector('.ct-open__under');
+      if (under) under.style.opacity = String(span(p, 0.58, 0.86));
+
+      var part  = span(p, 0.00, 0.18);
+      var drop  = span(p, 0.24, 0.62);
+      var split = span(p, 0.55, 1.00);
+
+      for (var i = 0; i < N; i++) {
+        var k = kids[i], x = (i - (N - 1) / 2) * (part * 10), y = 0, sx = 1, op = 1;
+
+        if (k.classList.contains('is-empty')) {
+          k.style.setProperty('--photo', String(1 - span(p, 0.18, 0.30)));
+          var lag = (i / N) * 0.30;
+          var t = clamp((drop - lag) / (1 - 0.30));
+          y = t * t * (vh * 1.35);
+          op = 1 - span(t, 0.75, 1);
+        } else {
+          var left = i < N / 2;
+          var order = left ? (N / 2 - 1 - i) : (i - N / 2);
+          var t2 = clamp((split - order * 0.10) / (1 - 0.25));
+          var edge = left ? -(i + 1) * (vw / N) : (N - i) * (vw / N);
+          x += t2 * edge;
+          sx = 1 - t2 * 0.92;
+          op = 1 - span(t2, 0.82, 1);
+        }
+        k.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0) scaleX(' + sx + ')';
+        k.style.opacity = String(op);
       }
     }
 
