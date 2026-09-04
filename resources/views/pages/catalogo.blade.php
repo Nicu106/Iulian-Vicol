@@ -344,6 +344,21 @@
     });
   })();
 
+  /* ---- arriving on a marque from its logo --------------------------------
+     A hash lands the browser with the target flush against the top edge, which
+     puts the marque's mark under the header line and the rest of the row below
+     the eye. Land it in the middle instead: the whole row, with its colour and
+     its cars, is what the click asked for. */
+  (function () {
+    var m = location.hash.match(/^#marque-([a-z-]+)$/);
+    if (!m) return;
+    var row = document.querySelector('.cat-row[aria-labelledby="marque-' + m[1] + '"]');
+    if (!row) return;
+    var land = function () { row.scrollIntoView({ block: 'center', behavior: 'auto' }); };
+    // once now, and once after the browser's own jump and the images' first layout
+    land(); requestAnimationFrame(land); window.setTimeout(land, 250);
+  })();
+
   /* ---- arriving from the home page's search ------------------------------
      ?marca opens that marque to the full screen; ?modelo and ?max hide the cards
      that do not fit. Nothing is removed from the page — a car hidden here is one
