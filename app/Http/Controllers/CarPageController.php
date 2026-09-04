@@ -57,16 +57,41 @@ class CarPageController extends Controller
             'photos' => $photos,
             'groups' => self::GROUPS,
             'counts' => $counts,
+            // The short list, beside the price: what decides a viewing.
             'specs'  => array_filter([
                 'Año'          => $car->year,
                 'Kilómetros'   => $car->mileage ? number_format($car->mileage, 0, ',', '.') . ' km' : null,
                 'Combustible'  => $car->fuel ?: $car->fuel_type,
                 'Cambio'       => $car->transmission,
-                'Potencia'     => $car->power,
-                'Motor'        => $car->engine ?: $car->engine_capacity,
-                'Color'        => $car->color,
+                'Potencia'     => $car->power ? $car->power . ' CV' : null,
                 'Estado'       => $car->condition,
             ]),
+
+            // The long list, further down: everything else that is known.
+            'tech'   => array_filter([
+                'Marca'                  => $car->brand,
+                'Modelo'                 => $car->model,
+                'Motor'                  => $car->engine ?: $car->engine_capacity,
+                'Carrocería'             => $car->body_type,
+                'Tracción'               => $car->drivetrain,
+                'Color'                  => $car->color,
+                'Etiqueta medioambiental'=> $car->vin,   // the DGT label lives in this column
+                'Ubicación'              => $car->location,
+            ]),
+
+            // Price. Only what is true: what it costs, and what it cost before if that
+            // is recorded. The live site puts a "market average" beside this, generated
+            // with random_int(1200,1800) — a number invented on every page load. It is
+            // not carried over; see the brandbook's sign-off table.
+            'price'  => [
+                'now'    => (int) $car->price,
+                'before' => $car->original_price && $car->original_price > $car->price
+                                ? (int) $car->original_price : null,
+                'off'    => $car->original_price && $car->original_price > $car->price
+                                ? (int) $car->original_price - (int) $car->price : null,
+            ],
+
+            'tags'   => is_array($car->tags) ? $car->tags : [],
             'euros'  => fn ($n) => number_format((int) $n, 0, ',', '.') . ' €',
         ]);
     }

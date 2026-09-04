@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="{{ asset('css/mc-tokens.css') }}">
 <link rel="stylesheet" href="{{ asset('css/brandbook.css') }}">
 <link rel="stylesheet" href="{{ asset('css/catalog.css') }}">
+<link rel="stylesheet" href="{{ asset('css/foot.css') }}">
 </head>
 <body class="bb cat">
 
@@ -114,7 +115,11 @@
                            width="800" height="600" loading="lazy" decoding="async">
                     </div>
                     <div class="mc-card__body">
-                      <h3 class="mc-card__title">{{ $car->model }} <span>{{ $car->year }}</span></h3>
+                      <h3 class="mc-card__title">{{ $car->model }}</h3>
+                      @if($sub($car))<p class="mc-card__sub">{{ $sub($car) }}</p>@endif
+                      <ul class="mc-chips">
+                        @foreach($chips($car) as $c)<li class="mc-chip">{{ $c }}</li>@endforeach
+                      </ul>
                       <div class="mc-pair">
                         <span class="mc-price">{{ $euros($car->price) }}</span>
                         @if($car->mileage)<span class="mc-km">{{ $km($car->mileage) }}</span>
@@ -134,7 +139,11 @@
                     <span class="mc-badge mc-badge--sold">Entregado</span>
                   </div>
                   <div class="mc-card__body">
-                    <h3 class="mc-card__title">{{ $car->model }} <span>{{ $car->year }}</span></h3>
+                    <h3 class="mc-card__title">{{ $car->model }}</h3>
+                    @if($sub($car))<p class="mc-card__sub">{{ $sub($car) }}</p>@endif
+                    <ul class="mc-chips">
+                      @foreach($chips($car) as $c)<li class="mc-chip">{{ $c }}</li>@endforeach
+                    </ul>
                     <div class="mc-pair">
                       <span class="mc-price">{{ $euros($car->price) }}</span>
                       @if($car->mileage)<span class="mc-km">{{ $km($car->mileage) }}</span>@endif
@@ -152,7 +161,11 @@
                     <span class="mc-badge mc-badge--demo">Ejemplo</span>
                   </div>
                   <div class="mc-card__body">
-                    <h3 class="mc-card__title">{{ $d['model'] }} <span>{{ $d['year'] }}</span></h3>
+                    <h3 class="mc-card__title">{{ $d['model'] }}</h3>
+                    @if($sub($d))<p class="mc-card__sub">{{ $sub($d) }}</p>@endif
+                    <ul class="mc-chips">
+                      @foreach($chips($d) as $c)<li class="mc-chip">{{ $c }}</li>@endforeach
+                    </ul>
                     <div class="mc-pair">
                       <span class="mc-price">{{ $euros($d['price']) }}</span>
                       <span class="mc-km">{{ $km($d['km']) }}</span>
@@ -186,6 +199,8 @@
      always to hand belongs in the lower half of the screen, not in a header that
      scrolls away. Phone only: on a desktop the header's own button is always
      visible. --}}
+@include('partials.foot')
+
 <div class="cat-dock" role="complementary" aria-label="Contacto">
   <div class="mc-bar">
     <span class="cat-dock__t">¿Buscas algo concreto?<b>Te lo busco yo</b></span>

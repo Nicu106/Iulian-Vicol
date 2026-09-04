@@ -1,0 +1,134 @@
+/* ============================================================================
+   The footer
+   Navy, because the page above it is white and the marques below are five
+   colours: a dark foot ends the document without competing with any of them.
+   ========================================================================= */
+/* No margin above it: the marque rows are full-bleed colour and end at their own
+   edge, so a white gap between the last one and the footer reads as a mistake. */
+.mc-foot{
+  position:relative; overflow:hidden;
+  /* Downward only, like every open marque field above it: the top of the foot is
+     the lighter stop, so it meets the last row without a step, and it sinks
+     toward the name. Nothing on the page is deeper than the bottom of this. */
+  background:linear-gradient(180deg, var(--mc-deep) 0%, var(--mc-deep) 38%, var(--mc-deep-2) 100%);
+  color:rgba(255,255,255,.82);
+}
+.mc-foot__in{
+  display:grid; gap:var(--s-7);
+  grid-template-columns:minmax(0,1fr);
+  padding-block:var(--s-9) var(--s-8);
+  position:relative; z-index:1;
+}
+@media (min-width:760px){
+  .mc-foot__in{ grid-template-columns:1.6fr 1fr 1fr 1fr; gap:var(--s-6); }
+}
+
+.mc-foot__logo{
+  display:inline-block; margin-bottom:var(--s-4);
+  font-size:var(--t-h3); font-weight:700; letter-spacing:-.010em;
+  color:#FFFFFF; text-decoration:none;
+}
+.mc-foot__say{
+  margin:0 0 var(--s-5); max-width:38ch;
+  font-size:var(--t-small); line-height:1.6; color:rgba(255,255,255,.78);
+}
+.mc-foot__lead .mc-btn{ min-height:44px; }
+
+.mc-foot__h{
+  margin:0 0 var(--s-4);
+  font-size:var(--t-label); font-weight:600; letter-spacing:.060em;
+  text-transform:uppercase; color:rgba(255,255,255,.52);
+}
+.mc-foot__col ul{ margin:0; padding:0; list-style:none;
+  display:flex; flex-direction:column; gap:var(--s-1); }
+.mc-foot__col a, .mc-foot__col span{
+  font-size:var(--t-small); line-height:1.4; color:rgba(255,255,255,.86);
+  text-decoration:none;
+}
+.mc-foot__col a{
+  /* a link in a footer still has to look like a link: an underline that is there
+     from the start, not one that appears when a mouse happens to arrive */
+  text-decoration:underline; text-decoration-color:rgba(255,255,255,.28);
+  text-underline-offset:3px; text-decoration-thickness:1px;
+  transition:text-decoration-color var(--m-quick) var(--e-out), color var(--m-quick) var(--e-out);
+  display:inline-flex; align-items:center; min-height:44px;
+}
+.mc-foot__col a:hover{ color:#FFFFFF; text-decoration-color:#FFFFFF; }
+.mc-foot__col a:focus-visible{ outline:3px solid #FFFFFF; outline-offset:3px; }
+.mc-foot__col b{ color:#FFFFFF; font-weight:600; }
+.mc-foot__quiet{ color:rgba(255,255,255,.56) !important; max-width:26ch; }
+
+/* ---- the signature -------------------------------------------------------
+   Not an ornament dropped in a corner: the name set to the exact width of the
+   container and cropped by the foot of the page, the way a building carries its
+   name cut into the wall. The size is driven by the container, not guessed —
+   1em of this face at this tracking measures ~0.5 of the string's width, so
+   the clamp below lands within a few pixels of the gutters at every width, and
+   the crop hides the rest.
+   ========================================================================= */
+.mc-foot__sign{
+  --gut:var(--mc-gutter-d);
+  position:relative; z-index:0;
+  max-width:var(--mc-container); margin:0 auto;
+  padding-inline:var(--mc-gutter-d);
+  height:clamp(3.2rem, 8.2vw, 8.6rem);   /* the visible slice of the letters */
+  overflow:hidden;
+}
+.mc-foot__mark{
+  display:block; white-space:nowrap;
+  /* Measured, not guessed. At this face and this tracking the string "IV MOTORCLASS"
+     renders 7.0126px wide for every 1px of font-size — so dividing the width that is
+     actually available by that number sets the type to the exact measure of the text
+     above it. Change the string or the tracking and this ratio has to be measured
+     again; it is the one number here that is not free. */
+  --gut:var(--mc-gutter-d);
+  --fit-ratio: 7.0126;
+  font-size:calc((min(100vw, var(--mc-container)) - 2 * var(--gut, 32px)) / var(--fit-ratio));
+  line-height:.78;
+  font-weight:700; letter-spacing:-.045em;
+
+  /* Cut into the wall, not drawn on it. An outline reads as line-work — letters
+     made of wire; this is the opposite move: the type is *darker* than the navy
+     it sits in, as though the surface had been carved away, with a single hair of
+     light caught on the lower edge where a real cut would catch it.
+     The whole thing then fades downward through a mask, so the name sinks into the
+     foot of the page instead of stopping at a border. */
+  color:color-mix(in oklab, var(--mc-deep-2) 46%, #000);
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.11),           /* the lit edge — the one line that says "cut" */
+    0 2px 0 rgba(255,255,255,.035),          /* its fall-off */
+    0 -1px 0 rgba(0,0,0,.55);                /* the shadow the upper edge throws */
+  -webkit-mask-image:linear-gradient(180deg, #000 0%, rgba(0,0,0,.78) 60%, rgba(0,0,0,.30) 100%);
+          mask-image:linear-gradient(180deg, #000 0%, rgba(0,0,0,.78) 60%, rgba(0,0,0,.30) 100%);
+}
+@media (max-width:760px){
+  .mc-foot__sign{ padding-inline:var(--mc-gutter-m); }
+  .mc-foot__mark{ --gut:var(--mc-gutter-m); }
+}
+
+.mc-foot__legal{
+  position:relative; z-index:1;
+  display:flex; flex-wrap:wrap; align-items:center; gap:var(--s-2) var(--s-3);
+  padding-block:var(--s-3) var(--s-4);
+  border-top:1px solid rgba(255,255,255,.10);
+  font-size:var(--t-label); color:rgba(255,255,255,.60);
+}
+.mc-foot__legal a{
+  color:rgba(255,255,255,.78); text-decoration:underline;
+  text-decoration-color:rgba(255,255,255,.24); text-underline-offset:3px;
+  display:inline-flex; align-items:center; min-height:44px;
+}
+.mc-foot__legal a:hover{ color:#FFFFFF; text-decoration-color:#FFFFFF; }
+.mc-foot__legal-sep{ opacity:.4; }
+
+/* The phone dock sits over the very bottom of the page. The clearance goes on
+   the footer itself, under the legal line, as ground — not as padding inside the
+   legal block, which made a 12px line 209px tall and pushed the name to a 51px
+   sliver: the one thing to be seen, the least seen. */
+@media (max-width:768px), (max-height:520px) and (orientation:landscape){
+  body:has(.cat-dock) .mc-foot{
+    padding-bottom:calc(var(--mc-bar-h) + env(safe-area-inset-bottom, 0px));
+  }
+  .mc-foot__in{ padding-block:var(--s-8) var(--s-6); gap:var(--s-6); }
+  .mc-foot__sign{ height:clamp(3.4rem, 15vw, 6rem); }
+}

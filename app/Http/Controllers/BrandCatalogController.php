@@ -38,8 +38,8 @@ class BrandCatalogController extends Controller
      */
     private const DEMO = [
         'porsche' => [
-            ['model' => '911 GT3', 'year' => 2019, 'price' => 139000, 'km' => 41000, 'fuel' => 'Gasolina', 'gear' => 'PDK', 'img' => 'demo/porsche-911-gt3.jpg'],
-            ['model' => 'Panamera Turbo', 'year' => 2018, 'price' => 84500, 'km' => 96000, 'fuel' => 'Gasolina', 'gear' => 'PDK', 'img' => 'demo/porsche-panamera.jpg'],
+            ['model' => '911 GT3', 'year' => 2019, 'price' => 139000, 'km' => 41000, 'fuel' => 'Gasolina', 'gear' => 'PDK', 'power' => 510, 'engine' => '4.0', 'body_type' => 'Coupé', 'drivetrain' => 'RWD', 'img' => 'demo/porsche-911-gt3.jpg'],
+            ['model' => 'Panamera Turbo', 'year' => 2018, 'price' => 84500, 'km' => 96000, 'fuel' => 'Gasolina', 'gear' => 'PDK', 'power' => 550, 'engine' => '4.0', 'body_type' => 'Berlina', 'drivetrain' => 'AWD', 'img' => 'demo/porsche-panamera.jpg'],
         ],
     ];
 
@@ -78,7 +78,42 @@ class BrandCatalogController extends Controller
             ];
         }
 
+        // What a card says under its name. One place, so the available, delivered and
+        // example cards cannot drift apart, and so the data's spelling drift — "Diesel"
+        // and "Diésel", "Automática" and "Automático" — is settled before it is shown.
+        $get = fn ($c, $k) => is_array($c) ? ($c[$k] ?? null) : ($c->$k ?? null);
+        $tidy = function (?string $v): ?string {
+            $v = trim((string) $v);
+            if ($v === '') return null;
+            $map = ['diesel' => 'Diésel', 'diésel' => 'Diésel', 'gasolina' => 'Gasolina',
+                    'automatica' => 'Automático', 'automática' => 'Automático', 'automático' => 'Automático',
+                    'manual' => 'Manual', 'pdk' => 'PDK', 'dsg' => 'DSG'];
+            return $map[mb_strtolower($v)] ?? $v;
+        };
+        $chips = function ($c) use ($get, $tidy): array {
+            // power is stored as "258", "150cv", "170 CV" — the number is the fact,
+            // the unit is ours to add once. Without this it read "150cv CV".
+            $power = preg_replace('/\D+/', '', (string) $get($c, 'power'));
+            return array_values(array_filter([
+                $get($c, 'year'),
+                $tidy($get($c, 'fuel')),
+                $tidy($get($c, 'gear') ?? $get($c, 'transmission')),
+                $power !== '' ? $power . ' CV' : null,
+            ]));
+        };
+        // the line the reference shows under the name: what version this is
+        $sub = function ($c) use ($get): ?string {
+            $parts = array_filter([
+                $get($c, 'engine') ?: $get($c, 'engine_capacity'),
+                $get($c, 'body_type'),
+                $get($c, 'drivetrain'),
+            ]);
+            return $parts ? implode(' · ', $parts) : null;
+        };
+
         return view('pages.catalogo', [
+            'chips' => $chips,
+            'sub'   => $sub,
             'rows'  => $rows,
             'total' => $available->count(),
             'sold'  => $soldCount->count(),

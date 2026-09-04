@@ -77,14 +77,24 @@ const PAINTED = `(el => {
   // the demonstration, not a defect. Report it as occluded and let a human judge.
   const top = stack[0];
   if (top && top !== el && !el.contains(top) && !top.contains(el)) return 'OCCLUDED';
+  // A ground painted as a gradient has a transparent background-color and its colour
+  // in background-image. Take the FIRST stop: on this site every gradient only
+  // darkens downward, so the first stop is the lightest — the conservative read.
+  const ground = n => {
+    const cs = getComputedStyle(n);
+    if (cs.backgroundColor && !/rgba\\(0, 0, 0, 0\\)|transparent/.test(cs.backgroundColor)) return cs.backgroundColor;
+    if (cs.backgroundImage && cs.backgroundImage !== 'none') {
+      const m = cs.backgroundImage.match(/rgba?\\([^)]+\\)/);
+      if (m) return m[0];
+    }
+    return null;
+  };
   for (const n of stack) {
     if (n === el || el.contains(n)) continue;
-    const bg = getComputedStyle(n).backgroundColor;
-    if (bg && !/rgba\\(0, 0, 0, 0\\)|transparent/.test(bg)) return bg;
+    const g = ground(n); if (g) return g;
   }
   let n = el.parentElement;
-  while (n) { const bg = getComputedStyle(n).backgroundColor;
-    if (bg && !/rgba\\(0, 0, 0, 0\\)|transparent/.test(bg)) return bg; n = n.parentElement; }
+  while (n) { const g = ground(n); if (g) return g; n = n.parentElement; }
   return 'rgb(255, 255, 255)';
 })`;
 

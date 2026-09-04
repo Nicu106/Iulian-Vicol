@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="{{ asset('css/mc-tokens.css') }}">
 <link rel="stylesheet" href="{{ asset('css/brandbook.css') }}">
 <link rel="stylesheet" href="{{ asset('css/catalog.css') }}">
+<link rel="stylesheet" href="{{ asset('css/foot.css') }}">
 <link rel="stylesheet" href="{{ asset('css/car.css') }}">
 </head>
 <body class="bb cat">
@@ -46,6 +47,8 @@
              src="{{ $photos[0]['path'] }}"
              alt="{{ $car->brand }} {{ $car->model }} {{ $car->year }}"
              width="1600" height="1067" fetchpriority="high" decoding="async">
+        {{-- Arrows and the full-screen open are written by the script: without it the
+             stage is a photograph, which is honest, rather than dead furniture. --}}
         <figcaption class="car-stage__count"><b id="stage-n">1</b> / {{ count($photos) }}</figcaption>
       </figure>
 
@@ -83,8 +86,14 @@
     {{-- ---------------- the facts ---------------- --}}
     <aside class="car-side">
       <div class="car-price">
-        <span class="mc-price">{{ $euros($car->price) }}</span>
+        <span class="mc-price">{{ $euros($price['now']) }}</span>
         @if($car->mileage)<span class="mc-km">{{ number_format($car->mileage, 0, ',', '.') }} km</span>@endif
+        @if($price['before'])
+          <span class="car-price__was">
+            antes <s>{{ $euros($price['before']) }}</s>
+            <b>−{{ $euros($price['off']) }}</b>
+          </span>
+        @endif
       </div>
 
       <dl class="mc-specs car-specs">
@@ -101,14 +110,14 @@
   </div>
 
   @if($car->description)
-    <section class="car-text">
+    <section class="car-sec car-text">
       <h2 class="car-h2">Lo que hay que saber</h2>
       <p>{{ \Illuminate\Support\Str::of($car->description)->stripTags()->limit(700) }}</p>
     </section>
   @endif
 
   @if(is_array($car->features) && count($car->features))
-    <section class="car-text">
+    <section class="car-sec">
       <h2 class="car-h2">Equipamiento</h2>
       <ul class="car-feats">
         @foreach(array_slice($car->features, 0, 24) as $f)<li>{{ $f }}</li>@endforeach
@@ -118,7 +127,82 @@
       @endif
     </section>
   @endif
+
+  @if(count($tech))
+    <section class="car-sec">
+      <h2 class="car-h2">Especificaciones técnicas</h2>
+      <dl class="car-tech">
+        @foreach($tech as $k => $v)
+          <div class="car-tech__row"><dt>{{ $k }}</dt><dd>{{ $v }}</dd></div>
+        @endforeach
+      </dl>
+    </section>
+  @endif
+
+  @if(count($tags))
+    <section class="car-sec">
+      <h2 class="car-h2">Etiquetas</h2>
+      <ul class="car-tags">
+        @foreach($tags as $t)<li>{{ $t }}</li>@endforeach
+      </ul>
+    </section>
+  @endif
+
+  {{-- Two things a buyer does before writing: works out the monthly figure, and asks
+       to see it. Both here, both plain. The live site puts a "market average" beside
+       the price, generated with random_int(1200,1800) — a different number on every
+       load. It is not here, and the real reduction is, because that one is true. --}}
+  <section class="car-sec car-ask">
+    <div class="car-ask__col">
+      <h2 class="car-h2">Calculadora</h2>
+      <p class="car-ask__note">Orientativa. <b>No incluye intereses ni comisiones</b> —
+        el número real depende de la financiera, y te lo digo antes de firmar nada.</p>
+      <div class="car-calc">
+        <label class="car-calc__f">
+          <span>Entrada</span>
+          <input class="mc-input" type="number" id="calc-down" value="5000" min="0"
+                 max="{{ $price['now'] }}" step="500" inputmode="numeric">
+        </label>
+        <label class="car-calc__f">
+          <span>Meses</span>
+          <select class="mc-input" id="calc-months">
+            <option>24</option><option selected>48</option><option>60</option><option>72</option>
+          </select>
+        </label>
+        <p class="car-calc__out">
+          <b id="calc-sum">—</b> <span>al mes, sin intereses</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="car-ask__col">
+      <h2 class="car-h2">¿Lo quieres ver?</h2>
+      <p class="car-ask__note">Escríbeme y quedamos. Contesto yo, no un formulario.</p>
+      <form class="car-form" id="car-form">
+        <label class="car-calc__f">
+          <span>Tu nombre</span>
+          <input class="mc-input" type="text" id="f-name" autocomplete="name" placeholder="Cómo te llamas">
+        </label>
+        <label class="car-calc__f">
+          <span>Cuándo te viene bien</span>
+          <input class="mc-input" type="text" id="f-when" placeholder="Esta semana, fin de semana…">
+        </label>
+        <button class="mc-btn mc-btn--cta" type="submit">Enviar por WhatsApp</button>
+      </form>
+    </div>
+  </section>
 </main>
+
+{{-- Full screen. Built empty; the script fills and opens it. --}}
+<div class="car-view" id="view" hidden role="dialog" aria-modal="true" aria-label="Fotografía a pantalla completa">
+  <button class="car-view__x" type="button" id="view-x" aria-label="Cerrar">&times;</button>
+  <button class="car-view__nav car-view__nav--prev" type="button" id="view-prev" aria-label="Anterior"></button>
+  <img class="car-view__img" id="view-img" src="" alt="">
+  <button class="car-view__nav car-view__nav--next" type="button" id="view-next" aria-label="Siguiente"></button>
+  <span class="car-view__count" id="view-count"></span>
+</div>
+
+@include('partials.foot')
 
 <div class="cat-dock" role="complementary" aria-label="Contacto">
   <div class="mc-bar">
@@ -168,16 +252,126 @@
     pick(a);
   });
 
-  // arrow keys walk the strip, because a gallery that needs a mouse is not a gallery
-  thumbs.addEventListener('keydown', function (e) {
-    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-    var shown = Array.prototype.filter.call(thumbs.children, function (a) { return !a.hidden; });
-    var i = shown.indexOf(document.activeElement.closest('.car-thumb'));
-    if (i < 0) return;
-    var next = shown[i + (e.key === 'ArrowRight' ? 1 : -1)];
-    if (!next) return;
-    e.preventDefault(); next.focus(); pick(next);
+  /* ---- moving through the photographs -----------------------------------
+     One list, one index, used by the stage arrows and by the full-screen view,
+     so the two can never disagree about which photograph you are on. */
+  function shown() {
+    return Array.prototype.filter.call(thumbs.children, function (a) { return !a.hidden; });
+  }
+  function indexNow() {
+    var on = thumbs.querySelector('.car-thumb.is-on');
+    return Math.max(0, shown().indexOf(on));
+  }
+  function step(d) {
+    var list = shown();
+    if (list.length < 2) return;
+    var i = (indexNow() + d + list.length) % list.length;   // wraps, both ways
+    pick(list[i]);
+    if (!view.hidden) paint();
+  }
+
+  // arrows on the stage itself
+  var stageFig = stage.parentNode;
+  ['prev', 'next'].forEach(function (dir) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'car-stage__nav car-stage__nav--' + dir;
+    btn.setAttribute('aria-label', dir === 'prev' ? 'Anterior' : 'Siguiente');
+    btn.addEventListener('click', function (e) { e.stopPropagation(); step(dir === 'prev' ? -1 : 1); });
+    stageFig.appendChild(btn);
   });
+  stageFig.classList.add('is-live');
+
+  /* ---- full screen ------------------------------------------------------- */
+  var view  = document.getElementById('view');
+  var vImg  = document.getElementById('view-img');
+  var vCnt  = document.getElementById('view-count');
+  var lastFocus = null;
+
+  function paint() {
+    var list = shown(), i = indexNow(), a = list[i];
+    if (!a) return;
+    vImg.src = a.getAttribute('href');
+    vImg.alt = a.getAttribute('aria-label') || '';
+    vCnt.textContent = (i + 1) + ' / ' + list.length;
+  }
+  function open() {
+    lastFocus = document.activeElement;
+    paint();
+    view.hidden = false;
+    document.body.style.overflow = 'hidden';     // the page must not scroll behind it
+    document.getElementById('view-x').focus();
+  }
+  function close() {
+    view.hidden = true;
+    document.body.style.overflow = '';
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  stage.addEventListener('click', open);
+  stage.style.cursor = 'zoom-in';
+  document.getElementById('view-x').addEventListener('click', close);
+  document.getElementById('view-prev').addEventListener('click', function () { step(-1); });
+  document.getElementById('view-next').addEventListener('click', function () { step(1); });
+  // the backdrop closes, the photograph and the buttons do not
+  view.addEventListener('click', function (e) { if (e.target === view) close(); });
+
+  document.addEventListener('keydown', function (e) {
+    if (view.hidden) {
+      // on the page, arrows only move the gallery when the gallery has focus
+      if (!stageFig.contains(document.activeElement) && !thumbs.contains(document.activeElement)) return;
+    }
+    if (e.key === 'Escape' && !view.hidden) { e.preventDefault(); close(); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
+    else if (e.key === 'ArrowLeft')  { e.preventDefault(); step(-1); }
+  });
+
+  /* ---- the calculator ----------------------------------------------------
+     Price minus deposit, divided by months. No interest, and it says so: a
+     figure that pretends to include finance would be wrong the moment a real
+     lender quoted it. */
+  var down = document.getElementById('calc-down');
+  var mons = document.getElementById('calc-months');
+  var sum  = document.getElementById('calc-sum');
+  if (down && mons && sum) {
+    var PRICE = {{ (int) $price['now'] }};
+    var money = function (n) {
+      return new Intl.NumberFormat('es-ES', { maximumFractionDigits: 0 }).format(n) + ' €';
+    };
+    var run = function () {
+      var d = Math.min(Math.max(parseInt(down.value, 10) || 0, 0), PRICE);
+      var m = parseInt(mons.value, 10) || 48;
+      sum.textContent = money(Math.round((PRICE - d) / m));
+    };
+    down.addEventListener('input', run);
+    mons.addEventListener('change', run);
+    run();
+  }
+
+  /* The form composes a WhatsApp message rather than posting to an inbox nobody
+     reads. He answers WhatsApp; that is where the conversation actually happens. */
+  var form = document.getElementById('car-form');
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var name = (document.getElementById('f-name').value || '').trim();
+      var when = (document.getElementById('f-when').value || '').trim();
+      var text = 'Hola' + (name ? ', soy ' + name : '') + '. Me interesa el '
+               + @json($car->brand . ' ' . $car->model . ' ' . $car->year)
+               + (when ? '. ¿Podría verlo ' + when + '?' : '. ¿Cuándo puedo verlo?');
+      window.open('https://wa.me/34614753187?text=' + encodeURIComponent(text), '_blank', 'noopener');
+    });
+  }
+
+  // a swipe across the full-screen photograph, which is how a phone expects to move
+  var x0 = null;
+  view.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+  view.addEventListener('touchend', function (e) {
+    if (x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0;
+    x0 = null;
+    if (Math.abs(dx) > 45) step(dx < 0 ? 1 : -1);
+  }, { passive: true });
 
   if (tabs) {
     tabs.hidden = false;

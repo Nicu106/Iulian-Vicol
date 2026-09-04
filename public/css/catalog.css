@@ -114,10 +114,41 @@
    mileage. Nothing else — the row already says the marque. */
 .cat-row .mc-card__body{ padding:var(--s-3) var(--s-4) var(--s-4); gap:var(--s-2); }
 .cat-row .mc-card__title span{ color:var(--mc-ink-3); font-weight:500; }
-/* two lines' worth reserved, so a model name that wraps does not push its price
-   below the price of the card beside it. Only where cards sit side by side —
-   stacked on a phone there is nothing to align, and the reserve reads as a hole */
-@media (min-width:560px){ .cat-row .mc-card__title{ min-height:2.6em; } }
+/* The card's second and third lines: what version this is, then the facts a buyer
+   scans before the price — year, fuel, gearbox, power. Kilometres stay in the
+   price box, once, large: it is the figure 41% of Spanish buyers call decisive
+   and it does not get repeated as a chip. */
+.cat-row .mc-card__body{ gap:var(--s-2); }
+.cat-row .mc-card__sub{
+  margin:0; font-size:var(--t-label); line-height:1.35; color:var(--mc-ink-3);
+  display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;
+}
+.cat-row .mc-chips{ gap:var(--s-1); margin-top:var(--s-1); }
+.cat-row .mc-chip{
+  min-height:26px; padding:0 var(--s-2);
+  background:var(--mc-band); color:var(--mc-ink-2);
+  font-size:var(--t-label); font-weight:500; letter-spacing:0;
+  font-variant-numeric:tabular-nums;
+}
+.cat-row .mc-card--sold .mc-chip{ color:var(--mc-ink-3); }
+.cat-row .mc-pair{ margin-top:var(--s-2); }
+
+/* Every card in a row ends at the same line, whatever wraps inside it. The price
+   box is pinned to the foot of the body, so a long name or a third row of chips
+   pushes nothing but the space above the price. Stacked on a phone there is
+   nothing to align, so the reserve is not made there. */
+/* Cards sit side by side everywhere but one place — the opened marque on a phone,
+   where they stack in one column. So the alignment is the rule and the stack is
+   the exception, not the other way round: measured, the rail's price boxes were
+   30–53px apart with the old gate. */
+.cat-row .mc-card{ display:flex; flex-direction:column; }
+.cat-row .mc-card__link, .cat-row .mc-card__body{ display:flex; flex-direction:column; flex:1 1 auto; }
+.cat-row .mc-card__title{ min-height:2.6em; }
+.cat-row .mc-pair{ margin-top:auto; padding-top:var(--s-2); }
+@media (max-width:559px){
+  .cat-row.is-open .mc-card__title{ min-height:0; }
+  .cat-row.is-open .mc-pair{ margin-top:var(--s-2); }
+}
 
 .cat-row__none{ display:flex; flex-wrap:wrap; align-items:center; gap:var(--s-3) var(--s-5); }
 .cat-row__none p{ margin:0; font-size:var(--t-prose); color:#FFFFFF; max-width:44ch; }
