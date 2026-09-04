@@ -247,45 +247,59 @@
 }
 
 /* ---- what they wrote ----------------------------------------------------
-   A carousel whose shape is decided by the reviews, not the other way round.
-   The column width is set per review in the controller and arrives as --cell;
-   inside the column the text takes what it needs and the photograph takes what
-   is left — the height, when the review is short and the picture sits above it;
-   the width, when the review is long and the picture stands beside it.
+   One row, drifting. Its shape is decided by the reviews: the column width is
+   set per review in the controller and arrives as --cell, and inside the column
+   the text takes what it needs while the photograph takes what is left — the
+   height, when the review is short and the picture sits above it; the width,
+   when the review is long and the picture stands beside it.
 
-   --fb-h is the height every slide gets, sized for the tallest review's text
-   plus its padding and byline. Anything less and the longest review would need
-   a scrollbar inside a moving carousel. */
-.hm-fb{ padding-block:var(--s-9); background:var(--mc-band); overflow:hidden; }
+   --fb-h is the height every cell gets, sized for the tallest review's text plus
+   its padding and byline. Anything less and the longest review would need a
+   scrollbar inside a moving row. */
+.hm-fb{ padding-block:var(--s-9); background:var(--mc-band); }
 /* The measure belongs to the paragraph, not to the wrap: cat-wrap carries
    margin-inline:auto, so a max-width on that same element centred the whole
    heading block on a page that is left-aligned everywhere else. */
 .hm-fb__head{ margin-bottom:var(--s-7); }
 .hm-fb__head .hm-sec__p{ max-width:56ch; }
-.hm-fb__stage{ --fb-h:28rem; }
+
+/* The only control, and it is not there until a keyboard finds it. Moving
+   content has to be stoppable; a button parked under the row for ever is the
+   widget chrome this section exists to avoid. Same trick as a skip link. */
+.hm-fb__halt{
+  position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden;
+}
+.hm-fb__halt:focus{
+  position:static; width:auto; height:auto; overflow:visible;
+  display:inline-flex; align-items:center; min-height:44px;
+  margin:0 0 var(--s-4) var(--mc-gutter-d); padding-inline:var(--s-4);
+  background:var(--mc-surface); border:1px solid var(--mc-ink); border-radius:var(--mc-r-card);
+  font-size:var(--t-label); font-weight:600; color:var(--mc-ink);
+  outline:3px solid var(--mc-blue); outline-offset:2px;
+}
 
 .hm-fb__rail{
+  --fb-h:28rem;
   display:flex; overflow-x:auto; overflow-y:hidden;
-  scroll-snap-type:x mandatory; overscroll-behavior-x:contain;
   scrollbar-width:none; -ms-overflow-style:none;
+  overscroll-behavior-x:contain;
+  /* Not a container with the cards clipped at its edge — a window they pass
+     through. This is the detail that decides whether a moving row reads as an
+     object or as a filmstrip that got cut off. */
+  -webkit-mask-image:linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
+          mask-image:linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
 }
 .hm-fb__rail::-webkit-scrollbar{ display:none; }
-.hm-fb__rail:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:4px; }
-.hm-fb__slide{
-  flex:0 0 100%; min-width:0; scroll-snap-align:start;
-  display:flex; gap:var(--s-5); align-items:stretch; height:var(--fb-h);
-}
+.hm-fb__rail:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:-3px; }
+.hm-fb__row{ display:flex; gap:var(--s-5); padding-inline:var(--s-5) 0; }
+.hm-fb__row + .hm-fb__row{ padding-inline:var(--s-5) 0; }
 
 .fb{
   /* figure carries the UA's `margin: 1em 40px`, which took 80px out of every
-     cell — 320px off a four-cell slide — so the packing's 240px floor rendered
-     at 186px and six reviews overflowed their box. */
+     cell and 320px off a four-cell group, so the 240px floor rendered at 186px
+     and six reviews overflowed their box. */
   margin:0;
-  flex:1 1 var(--cell); min-width:0;
-  /* leftover width is shared out, but only so far: past this the measure stops
-     being a measure, which is what happens to a lone long review on its own
-     slide if you let it grow to the full 1180px — 139 characters to the line. */
-  max-width:calc(var(--cell) + 5rem);
+  flex:0 0 var(--cell); min-width:0; height:var(--fb-h);
   display:flex; flex-direction:column; overflow:hidden;
   background:var(--mc-surface); border:1px solid var(--mc-hairline);
   border-radius:var(--mc-r-card);
@@ -305,67 +319,23 @@
 .fb__q{ margin:0; font-size:var(--t-prose); line-height:1.55; color:var(--mc-ink-2); }
 .fb__by{ margin-top:auto; font-size:var(--t-label); font-weight:600; color:var(--mc-ink); }
 
-/* ---- the controls ---- */
-.hm-fb__bar{
-  display:flex; align-items:center; justify-content:center; gap:var(--s-4);
-  margin-top:var(--s-5);
-}
-.hm-fb__nav{
-  display:inline-flex; align-items:center; justify-content:center;
-  width:44px; height:44px; padding:0; cursor:pointer;
-  background:var(--mc-surface); border:1px solid var(--mc-rule); color:var(--mc-ink);
-  border-radius:var(--mc-r-card);
-  transition:border-color var(--m-quick) var(--e-out);
-}
-.hm-fb__nav:hover{ border-color:var(--mc-ink); }
-.hm-fb__nav:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:2px; }
-.hm-fb__ticks{ display:flex; align-items:center; gap:var(--s-2); margin:0; padding:0; list-style:none; }
-/* The mark is 24px of rule; the target around it is 44. Drawn at the size of the
-   target they were a row of heavy dashes, and drawn at the size of the mark they
-   were a 24x44 button — under the 24px floor entirely at 390px, where the bar
-   squeezed two of them to 20. */
-.hm-fb__ticks button{
-  display:flex; align-items:center; justify-content:center;
-  width:44px; height:44px; padding:0; border:0; background:none; cursor:pointer;
-}
-.hm-fb__ticks button::before{
-  content:""; display:block; width:24px; height:2px; background:var(--mc-rule);
-  transition:background var(--m-quick) var(--e-out);
-}
-.hm-fb__ticks button[aria-current="true"]::before{ background:var(--mc-ink); height:3px; }
-.hm-fb__count{ display:none; margin:0; font-size:var(--t-label); font-weight:600;
-  color:var(--mc-ink-2); font-variant-numeric:tabular-nums; }
-.hm-fb__ticks button:hover::before{ background:var(--mc-ink-3); }
-.hm-fb__ticks button:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:2px; }
-.hm-fb__play{
-  min-height:44px; padding-inline:var(--s-4); cursor:pointer;
-  background:none; border:1px solid var(--mc-rule); border-radius:var(--mc-r-card);
-  font-size:var(--t-label); font-weight:600; color:var(--mc-ink-2);
-  transition:border-color var(--m-quick) var(--e-out), color var(--m-quick) var(--e-out);
-}
-.hm-fb__play:hover{ border-color:var(--mc-ink); color:var(--mc-ink); }
-.hm-fb__play:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:2px; }
-
 @media (max-width:999px){
-  /* The packing was computed for a 1180px slide. There is no 1180px slide on a
-     phone, so the grouping is dissolved and every review becomes its own snap
-     unit — the rail the catalogue already uses. Left grouped, one slide held two
-     reviews and stood 2,459px tall with its own controls below the fold.
-     display:contents removes the slide's box without removing the slide from
-     the document, and the script switches its units to match. */
-  .hm-fb__stage{ --fb-h:auto; }
-  .hm-fb__rail{ gap:var(--s-4); align-items:flex-start; }
-  .hm-fb__slide{ display:contents; }
-  .fb, .fb--side{
-    flex:0 0 86%; max-width:none; scroll-snap-align:start;
-    flex-direction:column;
-  }
-  .fb__ph, .fb--side .fb__ph{ flex:0 0 auto; aspect-ratio:4 / 3; }
-}
-@media (max-width:680px){
-  /* Nine 44px targets do not fit beside two arrows and a pause button on a
-     phone, and swipe is the control anybody actually uses there. The count says
-     the same thing in the space available. */
-  .hm-fb__ticks{ display:none; }
-  .hm-fb__count{ display:block; }
+  /* The widths were computed for a desktop row. On a phone a review is as wide
+     as the screen allows and the picture goes back on top of it, because a
+     260px picture beside 100px of text is not a layout. */
+  /* Uniform height here too, and the photograph absorbs the difference exactly
+     as it does on the wide layout — ragged cards drifting past each other read
+     as a broken grid, and sized to the tallest they left 600px of nothing under
+     a 32-character review. The floor keeps a band of the picture even on the
+     901-character one, which is the only review with no room for it. */
+  .hm-fb__rail{ --fb-h:46rem;
+    -webkit-mask-image:linear-gradient(to right, #000 88%, transparent);
+            mask-image:linear-gradient(to right, #000 88%, transparent); }
+  /* align-items on the rail governs the two rows, not the cells inside them:
+     left there, every cell stretched to the tallest and a 32-character review
+     stood 1,070px high with 600px of nothing under it. */
+  .hm-fb__row{ gap:var(--s-4); padding-inline:var(--mc-gutter-m) 0; align-items:flex-start; }
+  .fb, .fb--side{ flex:0 0 86vw; max-width:22rem; height:var(--fb-h); flex-direction:column; }
+  .fb__ph, .fb--side .fb__ph{ flex:1 1 auto; min-height:4.5rem; aspect-ratio:auto; }
+  .fb--xl .fb__q{ font-size:var(--t-small); line-height:1.5; }
 }

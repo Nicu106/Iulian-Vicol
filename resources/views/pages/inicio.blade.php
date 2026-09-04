@@ -114,29 +114,24 @@
   </section>
 
   {{-- ============ what they wrote ============
-       A carousel, running on its own, holding every review in full.
+       One row, 9,469px long, drifting on its own for ever. No arrows, no dots,
+       no pause button: the movement is the invitation, and a wall of controls
+       under a testimonial rail is the thing that makes it look like a widget.
 
-       The measurements that decide the shape: 24 reviews, 6,900 characters,
-       7m25s of reading. 49% of all that text is in 5 of the 24 (494 to 901
-       characters) while 15 are under 250. One slide shape and one interval
-       cannot serve both — the first version's answer was to clamp the long ones
-       behind "Ver más", which shows a truncated review as if it were the review.
+       The cell is unchanged, because the cell was right. Each review is a column
+       as wide as it needs to be — floored so it stays readable, capped at a
+       64-character measure — and inside it the text takes what it needs while
+       the photograph takes what is left: the height when the review is short and
+       the picture sits above it, the width when the review is long and the
+       picture stands beside it. 24 reviews, 6,900 characters, nothing truncated.
 
-       So the shape follows the text. Each review is a column as wide as it needs
-       to be, floored so it stays readable and capped at a 64-character measure,
-       and the columns are packed into slides. Inside a column the text takes what
-       it needs and THE PHOTOGRAPH TAKES WHAT IS LEFT: height when the review is
-       short, width when it is long. One idea on two axes, and every one of the
-       24 photographs is used at a size it earns.
-
-       The interval follows the text too — a slide's dwell is its own character
-       count, 7 to 12 seconds, so a dense slide is not gone before a sparse one
-       has been looked at.
-
-       It stops when you touch it, when you tab into it, when the tab is hidden,
-       when it scrolls out of view, and when you press pause — and it never
-       starts at all under prefers-reduced-motion. Without JavaScript the rail is
-       a plain horizontal scroller with all nine slides in it. --}}
+       The row is printed twice. The second copy is the first copy's continuation,
+       so when the drift has travelled one row's width the scroll position is put
+       back by exactly that width and the picture on screen does not change. It is
+       carried by the browser's own scroller, which is why a trackpad, a swipe and
+       a shift-wheel all work on it without a line of code, and why a flick has
+       the platform's own momentum instead of an imitation of it.
+       ================================================================== --}}
   <section class="hm-fb" id="reviews" aria-labelledby="h-fb">
     <div class="cat-wrap hm-fb__head">
       <h2 class="hm-h2" id="h-fb">{{ $reviewCount }} personas se hicieron la foto</h2>
@@ -144,59 +139,35 @@
         y ningún texto recortado: lo que escribieron está aquí entero.</p>
     </div>
 
-    <div class="cat-wrap hm-fb__stage">
-      <div class="hm-fb__rail" id="fb-rail" tabindex="0"
-           role="group" aria-roledescription="carrusel" aria-label="Lo que escribieron los clientes">
-        @foreach($slides as $i => $row)
-          <div class="hm-fb__slide" role="group" aria-roledescription="diapositiva"
-               aria-label="{{ $i + 1 }} de {{ count($slides) }}"
-               data-chars="{{ collect($row)->sum('len') }}">
-            @foreach($row as $t)
-              @php
-                $src = fn ($w) => route('img.resize', ['w' => $w]) . '?p=' . urlencode($t->img);
-              @endphp
-              <figure class="fb {{ $t->side ? 'fb--side' : '' }}"
-                      style="--w:{{ $t->w }}px; --cell:{{ $t->cell }}px">
-                <div class="fb__ph">
-                  <img src="{{ $src(600) }}"
-                       srcset="{{ $src(400) }} 400w, {{ $src(600) }} 600w, {{ $src(900) }} 900w"
-                       sizes="(min-width:1000px) 320px, 70vw"
-                       alt="{{ $t->name }}, con su coche" loading="lazy" decoding="async">
-                </div>
-                <div class="fb__t">
-                  <blockquote class="fb__q">{{ $t->quote }}</blockquote>
-                  <figcaption class="fb__by">{{ $t->name }}</figcaption>
-                </div>
-              </figure>
-            @endforeach
-          </div>
-        @endforeach
-      </div>
+    {{-- The one control there is. It is not visible until a keyboard reaches it,
+         because moving content has to be stoppable and a permanent button would
+         be the widget chrome this section is trying not to be. --}}
+    <button class="hm-fb__halt" id="fb-halt" type="button" hidden>Detener el movimiento</button>
 
-      <div class="hm-fb__bar">
-        <button class="hm-fb__nav" type="button" data-go="-1" aria-label="Anterior">
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
-            <path d="M15 4 7 12l8 8" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="square"/></svg>
-        </button>
-
-        <p class="hm-fb__count" id="fb-count" aria-hidden="true"></p>
-
-        <ol class="hm-fb__ticks" id="fb-ticks">
-          @foreach($slides as $i => $row)
-            <li><button type="button" data-to="{{ $i }}"
-                        aria-label="Ir a la diapositiva {{ $i + 1 }}"></button></li>
+    <div class="hm-fb__rail" id="fb-rail" tabindex="0"
+         role="group" aria-roledescription="carrusel"
+         aria-label="Lo que escribieron los clientes">
+      @foreach([0, 1] as $pass)
+        <div class="hm-fb__row" @if($pass) aria-hidden="true" @endif>
+          @foreach($reviews as $t)
+            @php $src = fn ($w) => route('img.resize', ['w' => $w]) . '?p=' . urlencode($t->img); @endphp
+            <figure class="fb {{ $t->side ? 'fb--side' : '' }} {{ $t->xl ? 'fb--xl' : '' }}"
+                    style="--w:{{ $t->w }}px; --cell:{{ $t->cell }}px">
+              <div class="fb__ph">
+                <img src="{{ $src(600) }}"
+                     srcset="{{ $src(400) }} 400w, {{ $src(600) }} 600w, {{ $src(900) }} 900w"
+                     sizes="(min-width:1000px) 320px, 70vw"
+                     alt="{{ $pass ? '' : $t->name . ', con su coche' }}"
+                     loading="lazy" decoding="async">
+              </div>
+              <div class="fb__t">
+                <blockquote class="fb__q">{{ $t->quote }}</blockquote>
+                <figcaption class="fb__by">{{ $t->name }}</figcaption>
+              </div>
+            </figure>
           @endforeach
-        </ol>
-
-        <button class="hm-fb__nav" type="button" data-go="1" aria-label="Siguiente">
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
-            <path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="square"/></svg>
-        </button>
-
-        <button class="hm-fb__play" id="fb-play" type="button" hidden>Pausar</button>
-      </div>
+        </div>
+      @endforeach
     </div>
   </section>
 
@@ -292,124 +263,107 @@
 
 <script>
 (function () {
-  /* ---- the carousel -----------------------------------------------------
-     A scroll-snap rail, not a transform carousel: swipe, trackpad, keyboard and
-     the scrollbar are the browser's own and cost nothing, and with the script
-     absent the rail is still a horizontal scroller holding every slide. Autoplay
-     is then only a scrollTo on a timer.
+  /* ---- the drift --------------------------------------------------------
+     The row moves by itself, for ever, and there is nothing to press. It is the
+     browser's own scroller underneath, so a trackpad, a swipe, shift+wheel and
+     the arrow keys all work on it for free, and a flick keeps the platform's own
+     momentum rather than an imitation of it. All this adds is a constant
+     velocity on top and a wrap at the seam.
 
-     The dwell is the slide's own character count — 7s to 12s — because the
-     packing made the slides similar in reading time but not identical, and a
-     fixed interval would hand the densest slide the same seconds as the sparsest.
+     Velocity is never set, only aimed at: `v` chases `want` with a time
+     constant, so hovering does not stop the row dead — it takes it down to a
+     stop over about a quarter of a second, and lets it back up the same way.
+     A hard stop is the single thing that makes one of these feel like a widget.
 
-     It does not run when: the reader prefers reduced motion (never), the pointer
-     is over it, focus is inside it, the tab is hidden, the section is off screen,
-     or pause has been pressed. That last one is WCAG 2.2.2 — anything that moves
-     by itself for more than five seconds needs a way to stop it — and the button
-     is only shown once we know the script is here to honour it. */
+     dt-normalised, so a 120Hz screen does not run it at twice the speed.
+
+     It yields to the reader completely: any wheel, drag, touch or key inside the
+     rail suspends the drift, and it only creeps back once they have been still
+     for a moment. And it never starts at all under prefers-reduced-motion. */
   var rail = document.getElementById('fb-rail');
   if (rail) {
-    // On a wide screen a slide is a packed group; below that the grouping is
-    // dissolved in CSS and every review is its own stop. The script asks the
-    // layout which it is rather than deciding for it.
-    var groups = Array.prototype.slice.call(rail.children);
-    var cells  = Array.prototype.slice.call(rail.querySelectorAll('.fb'));
-    var packed = window.matchMedia('(min-width: 1000px)');
-    var slides = packed.matches ? groups : cells;
-    var ticks  = Array.prototype.slice.call(document.querySelectorAll('#fb-ticks button'));
-    var play   = document.getElementById('fb-play');
-    var still  = window.matchMedia('(prefers-reduced-motion: reduce)');
-    var at = 0, timer = null, paused = false, seen = true, over = false;
+    var SPEED = 34;        // px per second
+    var TAU   = 260;       // ms for the velocity to close most of a change
+    var YIELD = 1400;      // ms of stillness before the drift comes back
+    var still = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var halt  = document.getElementById('fb-halt');
 
-    function dwell(i) {
-      var n = +(slides[i].getAttribute('data-chars') || 400);
-      return Math.max(7000, Math.min(12000, n * 10.5));
-    }
-    var count = document.getElementById('fb-count');
-    function mark() {
-      var on = Math.round(at / Math.max(1, slides.length - 1) * (ticks.length - 1));
-      ticks.forEach(function (t, k) {
-        t.setAttribute('aria-current', k === on ? 'true' : 'false');
-      });
-      if (count) { count.textContent = (at + 1) + ' / ' + slides.length; }
-    }
-    function go(i, smooth) {
-      at = (i + slides.length) % slides.length;
-      rail.scrollTo({ left: slides[at].offsetLeft - slides[0].offsetLeft,
-                      behavior: smooth && !still.matches ? 'smooth' : 'auto' });
-      mark();
-    }
-    function stop() { if (timer) { clearTimeout(timer); timer = null; } }
-    function tick() {
-      stop();
-      if (still.matches || paused || over || !seen || document.hidden) { return; }
-      timer = window.setTimeout(function () { go(at + 1, true); tick(); }, dwell(at));
+    var row   = rail.firstElementChild;
+    var rowW  = 0, v = 0, over = false, stopped = false, busy = 0, last = 0, raf = 0;
+    // The drift's own position, in floating point. scrollLeft rounds, so adding
+    // 0.57px to it every frame did not move it 0.57px — it rounded up to a whole
+    // one, and the row ran at exactly one pixel per frame whatever SPEED said.
+    // Measured before the fix: 181 frames, 181px, 60.3px/s against a constant of
+    // 34. We keep the position and hand the scroller a number; when the reader
+    // takes over, we take theirs back.
+    var pos = 0, mine = 0;
+
+    function measure() { rowW = row.scrollWidth; }
+
+    function frame(now) {
+      raf = requestAnimationFrame(frame);
+      var dt = last ? Math.min(64, now - last) : 16;
+      last = now;
+      if (!rowW) { measure(); return; }
+
+      var want = (still.matches || stopped || over || now < busy) ? 0 : SPEED;
+      v += (want - v) * (1 - Math.exp(-dt / TAU));
+
+      if (v <= 0.02) { pos = rail.scrollLeft; return; }   // theirs, not ours
+      if (Math.abs(pos - rail.scrollLeft) > 2) { pos = rail.scrollLeft; }
+
+      pos += v * dt / 1000;
+      // the seam: one row on, one row back, and the picture does not change
+      if (pos >= rowW) { pos -= rowW; }
+      else if (pos < 0) { pos += rowW; }
+
+      rail.scrollLeft = pos;
+      mine = now;
     }
 
-    // the rail is the source of truth: a swipe moves it, and everything follows
-    var settle = null;
+    function yieldNow() { busy = performance.now() + YIELD; }
+    ['wheel', 'pointerdown', 'touchstart', 'keydown'].forEach(function (e) {
+      rail.addEventListener(e, yieldNow, { passive: true });
+    });
     rail.addEventListener('scroll', function () {
-      window.clearTimeout(settle);
-      settle = window.setTimeout(function () {
-        var x = rail.scrollLeft + slides[0].offsetLeft, best = 0, d = Infinity;
-        slides.forEach(function (s, k) {
-          var v = Math.abs(s.offsetLeft - x);
-          if (v < d) { d = v; best = k; }
-        });
-        if (best !== at) { at = best; mark(); }
-        tick();
-      }, 120);
+      // A scroll we did not cause is the reader's, and the drift steps aside for
+      // it. Ours fire this too, so the test is when, not whether.
+      if (performance.now() - mine > 120) { yieldNow(); }
     }, { passive: true });
 
-    document.querySelectorAll('.hm-fb__nav').forEach(function (b) {
-      b.addEventListener('click', function () { go(at + (+b.getAttribute('data-go')), true); tick(); });
-    });
-    ticks.forEach(function (t, k) {
-      t.addEventListener('click', function () {
-        go(Math.round(k / Math.max(1, ticks.length - 1) * (slides.length - 1)), true); tick();
-      });
+    var sec = document.getElementById('reviews');
+    sec.addEventListener('pointerenter', function () { over = true; });
+    sec.addEventListener('pointerleave', function () { over = false; });
+    sec.addEventListener('focusin',  function () { over = true; });
+    sec.addEventListener('focusout', function () {
+      if (!sec.contains(document.activeElement)) { over = false; }
     });
 
-    if (play) {
-      play.hidden = false;
-      play.addEventListener('click', function () {
-        paused = !paused;
-        play.textContent = paused ? 'Reanudar' : 'Pausar';
-        play.setAttribute('aria-pressed', paused ? 'true' : 'false');
-        tick();
+    if (halt) {
+      halt.hidden = false;
+      halt.addEventListener('click', function () {
+        stopped = !stopped;
+        halt.textContent = stopped ? 'Reanudar el movimiento' : 'Detener el movimiento';
+        halt.setAttribute('aria-pressed', stopped ? 'true' : 'false');
       });
-      play.setAttribute('aria-pressed', 'false');
+      halt.setAttribute('aria-pressed', 'false');
     }
 
-    var sec = document.getElementById('reviews');
-    ['pointerenter', 'focusin'].forEach(function (e) {
-      sec.addEventListener(e, function () { over = true; stop(); });
+    window.addEventListener('resize', measure);
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) { cancelAnimationFrame(raf); raf = 0; last = 0; }
+      else if (!raf) { raf = requestAnimationFrame(frame); }
     });
-    ['pointerleave', 'focusout'].forEach(function (e) {
-      sec.addEventListener(e, function () {
-        if (e === 'focusout' && sec.contains(document.activeElement)) { return; }
-        over = false; tick();
-      });
-    });
-    document.addEventListener('visibilitychange', tick);
-    still.addEventListener('change', function () { still.matches ? stop() : tick(); });
-
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(function (es) {
-        seen = es[0].isIntersecting; tick();
-      }, { threshold: 0.25 }).observe(sec);
+        if (es[0].isIntersecting) { if (!raf) { last = 0; raf = requestAnimationFrame(frame); } }
+        else { cancelAnimationFrame(raf); raf = 0; }
+      }, { threshold: 0 }).observe(sec);
+    } else {
+      raf = requestAnimationFrame(frame);
     }
-
-    function relayout() {
-      var next = packed.matches ? groups : cells;
-      if (next !== slides) { slides = next; at = Math.min(at, slides.length - 1); }
-      // the ticks count the packed groups; off the packed layout they still mark
-      // progress through the same reviews, so map the stop onto them
-      go(at, false);
-    }
-    packed.addEventListener('change', relayout);
-    window.addEventListener('resize', relayout);
-    mark(); tick();
+    window.addEventListener('load', measure);
+    measure();
   }
 
   document.documentElement.className += ' js';

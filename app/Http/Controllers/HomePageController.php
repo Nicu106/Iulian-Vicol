@@ -15,11 +15,9 @@ use Illuminate\View\View;
  */
 class HomePageController extends Controller
 {
-    /** The slide's inner width, its column gap, and the vertical room a column
-     *  gives its text before the photograph starts losing it. Kept here because
-     *  the packing has to agree with the CSS that lays the result out. */
-    private const FB_SLIDE    = 1180;
-    private const FB_GAP      = 24;
+    /** The vertical room a column gives its text before the photograph starts
+     *  losing it, and the width the photograph takes when it moves beside the
+     *  text instead. Kept here because the CSS has to lay out the same numbers. */
     private const FB_TEXT_BOX = 360;
     private const FB_PHOTO    = 260;
 
@@ -63,7 +61,7 @@ class HomePageController extends Controller
             ];
         }
 
-        // The reviews, packed into carousel slides.
+        // The reviews, as one continuous row.
         //
         // Measured: 24 reviews, 6,900 characters, 7m25s of reading at Spanish
         // reading speed. The distribution is what decides everything here —
@@ -75,9 +73,9 @@ class HomePageController extends Controller
         //
         // So the shape follows the text instead. Each review is a column whose
         // WIDTH is proportional to how much it has to say, floored so it stays
-        // readable and capped at a 64-character measure. Columns are then packed
-        // greedily into slides. A 901-character review fills a slide on its own;
-        // four short ones share one. Nothing is truncated and no slide is empty.
+        // readable and capped at a 64-character measure. There are no slides to
+        // pack them into any more: the row drifts continuously, so a review is
+        // simply as wide as it needs to be and the row is 9,469px long.
         //
         // Inside a column the text takes what it needs and THE PHOTOGRAPH TAKES
         // WHAT IS LEFT. A short review leaves a tall portrait; a long one leaves
@@ -113,34 +111,15 @@ class HomePageController extends Controller
                     'len'   => $len,
                     'w'     => $w,
                     'side'  => $side,
+                    // On a phone there is one column and no width to trade, so
+                    // the three longest reviews are set a step smaller there —
+                    // at the body size they stood 155px past a card that is
+                    // already taller than the screen.
+                    'xl'    => $len > 600,
                     'cell'  => $w + ($side ? self::FB_PHOTO + 16 : 0),
                     'img'   => $t->image_path,
                 ];
             });
-
-        // Packing. First fit in his order, but when the next review will not fit
-        // the slide, look ahead for the largest one that will rather than leaving
-        // 500px of slide empty — strict order left four slides between 54% and
-        // 71% full. Nothing is reordered further than the slide it lands on.
-        $pool = $reviews->all();
-        $slides = [];
-        while ($pool) {
-            $row = [array_shift($pool)];
-            $used = $row[0]->cell;
-            while (true) {
-                $best = null;
-                foreach ($pool as $k => $cand) {
-                    if ($used + self::FB_GAP + $cand->cell > self::FB_SLIDE) { continue; }
-                    if ($best === null || $cand->cell > $pool[$best]->cell) { $best = $k; }
-                }
-                if ($best === null) { break; }
-                $used += self::FB_GAP + $pool[$best]->cell;
-                $row[] = $pool[$best];
-                unset($pool[$best]);
-                $pool = array_values($pool);
-            }
-            $slides[] = $row;
-        }
 
         return view('pages.inicio', [
             'available' => $available,
@@ -148,7 +127,7 @@ class HomePageController extends Controller
             'marques'   => $marques,
             'total'     => $available->count(),
             'sold'      => $sold,
-            'slides'      => $slides,
+            'reviews'     => $reviews,
             'reviewCount' => $reviews->count(),
             'months'    => self::MONTHS,
             'euros'     => fn ($n) => number_format((int) $n, 0, ',', '.') . ' €',
