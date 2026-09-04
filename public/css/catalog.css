@@ -442,6 +442,10 @@
 
 /* every header link is a target in its own right, not just a word */
 .mc-head .mc-nav__i{ min-width:44px; padding-inline:var(--s-2); text-align:center; }
+/* four items and a button: the nav wraps as a unit rather than pushing the
+   button off the edge, and its own gap tightens first */
+.mc-head .mc-nav{ display:flex; flex-wrap:wrap; gap:var(--s-1) var(--s-3); margin-right:var(--s-4); }
+@media (max-width:900px){ .mc-head .mc-nav{ gap:var(--s-1) var(--s-2); margin-right:var(--s-2); } }
 
 /* ============================================================================
    The swipe hint

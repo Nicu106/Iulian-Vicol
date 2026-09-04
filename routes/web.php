@@ -27,6 +27,7 @@ Route::get('/brandbook', [App\Http\Controllers\BrandbookController::class, 'inde
 Route::get('/catalogo', [App\Http\Controllers\BrandCatalogController::class, 'index'])->name('catalogo');
 Route::get('/coche/{slug}', [App\Http\Controllers\CarPageController::class, 'show'])->name('coche');
 Route::get('/inicio', [App\Http\Controllers\HomePageController::class, 'index'])->name('inicio');
+Route::get('/contacto', [App\Http\Controllers\ContactPageController::class, 'index'])->name('contacto');
 
 Route::view('/saved-vehicles', 'pages.saved-vehicles')->name('saved-vehicles');
 

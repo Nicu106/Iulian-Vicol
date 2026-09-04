@@ -21,17 +21,7 @@
   $words = ['','Un','Dos','Tres','Cuatro','Cinco','Seis','Siete','Ocho','Nueve','Diez','Once','Doce'];
 @endphp
 
-<header class="mc-head">
-  <div class="mc-head__in cat-wrap" style="padding-block:0">
-    <a class="mc-logo" href="/inicio">IV&nbsp;MOTORCLASS</a>
-    <nav class="mc-nav" style="margin-right:var(--s-4)">
-      <a class="mc-nav__i " href="/inicio">Inicio</a>
-      <a class="mc-nav__i is-current" href="/catalogo">Coches</a>
-      <a class="mc-nav__i" href="/brandbook">Quién soy</a>
-    </nav>
-    <a class="mc-btn mc-btn--cta" href="https://wa.me/34614753187">WhatsApp</a>
-  </div>
-</header>
+@include('partials.head', ['current' => 'catalogo'])
 
 <main>
   {{-- The banner. The photograph is atmosphere, not an advert: the words on it are
