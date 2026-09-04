@@ -21,20 +21,26 @@
 <main class="ct">
 
   {{-- ==================================================================
-       The opening: the picture becomes the page
+       The opening: the picture becomes the two panels below it
 
-       One car filling the screen. As you scroll it slices into columns, the
-       columns turn WHITE, and they descend — and what they descend into is the
-       page itself, which is white. The photograph does not fade out; it is
-       converted into the surface everything below is printed on.
+       One car filling the screen. Scrolling slices it into twelve columns; the
+       photograph drains out of them left to right and leaves twelve WHITE
+       strips standing on the pale band the next section is printed on. The
+       strips then part, descend, and regroup — six on the left, six on the
+       right — onto the exact rectangles of the two panels that carry the
+       distance story. They are not animated towards a guess: every frame reads
+       the real panels' position and aims at it, so the last frame of the
+       animation and the first frame of the content are the same two shapes.
 
        The words sit lower-right, where a sliding-block scan of this photograph
        put the best position for white type: 13.62:1 at its lightest pixel,
        against 1.43:1 lower-left. No text-shadow — a line that needs one is in
        the wrong place.
        ================================================================== --}}
-  <section class="ct-open" id="open">
-    <div class="ct-open__pin">
+  <div class="ct-assemble" id="assemble">
+
+    <div class="ct-open" id="open">
+      <div class="ct-open__cut" id="cut" aria-hidden="true"></div>
       <div class="ct-open__cols" id="cols" style="--hero:url('{{ $hero }}')"></div>
 
       <img class="ct-open__plain" src="{{ $hero }}" width="2400" height="3200"
@@ -46,86 +52,115 @@
         <p class="ct-lead">No hay centralita ni formulario esperando a que alguien lo mire.</p>
       </div>
     </div>
-  </section>
+
+    {{-- the scroll the strips fall through, before the panels arrive --}}
+    <div class="ct-open__run" id="run" aria-hidden="true"></div>
+
+    {{-- ==================================================================
+         What the strips become: the two things somebody on a contact page
+         actually came for. The details on the left, where he is on the right.
+
+         Every item here is the one the live site carries — phone, WhatsApp,
+         email, Málaga, "abierto cada día, consultar disponibilidad" — nothing
+         invented and nothing dropped.
+
+         The map is Google's, embedded, and it is covered by a shield until it is
+         asked for. An embedded map that is live from the first frame eats the
+         wheel the moment the pointer crosses it, and the pointer crosses it in
+         the middle of a scroll animation. One click hands it over.
+         ================================================================== --}}
+    <section class="ct-reach" id="reach" aria-labelledby="reach-h">
+      <div class="cat-wrap ct-reach__in">
+
+        <div class="ct-panel ct-reach__card" id="panel-a">
+          <h2 class="ct-h2" id="reach-h">Escríbeme</h2>
+          <p class="ct-reach__lead">Contesto yo. No hay centralita, ni un formulario
+            esperando a que alguien lo mire mañana.</p>
+
+          <dl class="ct-reach__list">
+            <div class="ct-reach__row">
+              <dt>WhatsApp</dt>
+              <dd><a href="https://wa.me/{{ $phoneRaw }}">{{ $phone }}</a>
+                  <span>Lo leo en minutos. Te mando vídeo del coche, incluido lo que no está perfecto.</span></dd>
+            </div>
+            <div class="ct-reach__row">
+              <dt>Teléfono</dt>
+              <dd><a href="tel:+{{ $phoneRaw }}">{{ $phone }}</a>
+                  <span>Si estoy con un cliente, insiste o escríbeme.</span></dd>
+            </div>
+            <div class="ct-reach__row">
+              <dt>Email</dt>
+              <dd><a href="mailto:{{ $email }}">{{ $email }}</a>
+                  <span>Para documentación y facturas.</span></dd>
+            </div>
+            <div class="ct-reach__row">
+              <dt>Dónde</dt>
+              <dd><b>Málaga, España</b>
+                  <span>Trabajo con cita: te digo el punto exacto cuando quedemos.</span></dd>
+            </div>
+            <div class="ct-reach__row">
+              <dt>Horario</dt>
+              <dd><b>Abierto cada día</b>
+                  <span>Consultar disponibilidad. <a class="mc-link" href="#ct-hours-h">Ver el detalle</a></span></dd>
+            </div>
+          </dl>
+
+          <a class="mc-btn mc-btn--cta ct-reach__cta"
+             href="https://wa.me/{{ $phoneRaw }}?text={{ urlencode('Hola, te escribo desde la web.') }}">Abrir WhatsApp</a>
+        </div>
+
+        <figure class="ct-panel ct-gmap" id="panel-b">
+          <div class="ct-gmap__frame">
+            <iframe class="ct-gmap__f" title="Mapa de Málaga, España"
+                    src="https://maps.google.com/maps?q={{ urlencode('Málaga, España') }}&z=11&hl=es&output=embed"
+                    loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                    allowfullscreen></iframe>
+            <button class="ct-gmap__shield" type="button" id="gmap-on">
+              <span>Activar el mapa</span>
+            </button>
+          </div>
+          <figcaption class="ct-gmap__bar">
+            <span class="ct-gmap__where">Málaga, España</span>
+            <a class="mc-link" href="https://www.google.com/maps/search/?api=1&amp;query={{ urlencode('Málaga, España') }}"
+               target="_blank" rel="noopener">Abrir en Google Maps</a>
+          </figcaption>
+        </figure>
+
+      </div>
+    </section>
+  </div>
 
   {{-- ==================================================================
-       A 720 km de aquí — the one bold thing on this page
+       A 720 km de aquí
 
-       It exists only because this dealer's data allows it. He has no showroom;
-       the page says so. A pin on a map answers a question nobody asked. What
-       somebody looking at a car six hundred kilometres away actually wants to
-       know is whether they can trust it unseen — and three people already did,
-       in their own words.
-
-       The map is information, not decoration: real coordinates, projected
-       linearly over one country, and real road distances. Only cities the review
-       TEXTS name are used. The author_location column says Santander for 19 of
-       25 and contradicts its own quotes, so it is not trusted here.
+       He has no showroom, so a pin on a map answers a question nobody asked.
+       What somebody looking at a car six hundred kilometres away actually wants
+       to know is whether they can trust it unseen — and three people already did,
+       in their own words. Only cities the review TEXTS name are used: the
+       author_location column says Santander for 19 of 25 and contradicts its own
+       quotes, so it is not trusted here.
        ================================================================== --}}
   <section class="ct-far" id="far" aria-labelledby="far-h">
     <div class="cat-wrap ct-far__in">
-      <div class="ct-far__copy">
-        <h2 class="ct-h2" id="far-h">A {{ number_format(max(array_column($from,'km')),0,',','.') }} km de aquí</h2>
-        <p class="ct-far__lead">Nadie compra un coche a setecientos kilómetros por una web.
-          Lo compran porque antes hablaron con alguien. Estos condujeron hasta Málaga:</p>
+      <h2 class="ct-h2" id="far-h">A {{ number_format(max(array_column($from,'km')),0,',','.') }} km de aquí</h2>
+      <p class="ct-far__lead">Nadie compra un coche a setecientos kilómetros por una web.
+        Lo compran porque antes hablaron con alguien. Estos condujeron hasta Málaga:</p>
 
-        <ol class="ct-far__list">
-          @foreach($from as $i => $f)
-            <li class="ct-far__item" data-i="{{ $i }}">
-              <span class="ct-far__km">{{ number_format($f['km'],0,',','.') }}<i>km</i></span>
-              <span class="ct-far__who"><b>{{ $f['who'] }}</b>, desde {{ $f['city'] }}</span>
-              <span class="ct-far__said">{{ $f['said'] }}</span>
-            </li>
-          @endforeach
-        </ol>
+      <ol class="ct-far__list">
+        @foreach($from as $i => $f)
+          <li class="ct-far__item" data-i="{{ $i }}">
+            <span class="ct-far__km">{{ number_format($f['km'],0,',','.') }}<i>km</i></span>
+            <span class="ct-far__who"><b>{{ $f['who'] }}</b>, desde {{ $f['city'] }}</span>
+            <span class="ct-far__said">{{ $f['said'] }}</span>
+          </li>
+        @endforeach
+      </ol>
 
-        <p class="ct-far__note">Y {{ $delivered['who'] }} no se movió de casa:
-          «{{ $delivered['said'] }}»</p>
+      <p class="ct-far__note">Y {{ $delivered['who'] }} no se movió de casa:
+        «{{ $delivered['said'] }}»</p>
 
-        <a class="mc-btn mc-btn--cta ct-far__cta"
-           href="https://wa.me/{{ $phoneRaw }}?text={{ urlencode('Hola, estoy lejos de Málaga. ¿Cómo lo hacemos?') }}">Estoy lejos — escríbeme</a>
-      </div>
-
-      <figure class="ct-map" aria-hidden="true">
-        <svg class="ct-map__svg" viewBox="26 21 58 76" preserveAspectRatio="xMidYMid meet">
-          @foreach($from as $i => $f)
-            <line class="ct-map__road" data-i="{{ $i }}"
-                  x1="{{ $home['x'] }}" y1="{{ $home['y'] }}" x2="{{ $f['x'] }}" y2="{{ $f['y'] }}"></line>
-          @endforeach
-          @foreach($from as $i => $f)
-            <circle class="ct-map__city" data-i="{{ $i }}" cx="{{ $f['x'] }}" cy="{{ $f['y'] }}" r="1.1"></circle>
-            <text class="ct-map__label" data-i="{{ $i }}"
-                  x="{{ $f['x'] + ($f['x'] > 50 ? -3.2 : 3.2) }}" y="{{ $f['y'] - 2.4 }}"
-                  text-anchor="{{ $f['x'] > 50 ? 'end' : 'start' }}">{{ $f['city'] }}</text>
-          @endforeach
-          <circle class="ct-map__home" cx="{{ $home['x'] }}" cy="{{ $home['y'] }}" r="1.9"></circle>
-          <text class="ct-map__label ct-map__label--home"
-                x="{{ $home['x'] + 3.6 }}" y="{{ $home['y'] + 1.2 }}">Málaga</text>
-        </svg>
-        <figcaption class="ct-map__cap">Distancias por carretera. Las ciudades las nombran
-          ellos, en sus propias reseñas.</figcaption>
-      </figure>
-    </div>
-  </section>
-
-  {{-- ---- how you reach him ------------------------------------------------ --}}
-  <section class="ct-ways-sec cat-wrap" aria-label="Cómo contactar">
-    <div class="ct-ways">
-      <a class="ct-way ct-way--wa" href="https://wa.me/{{ $phoneRaw }}">
-        <span class="ct-way__k">WhatsApp</span>
-        <span class="ct-way__v">{{ $phone }}</span>
-        <span class="ct-way__note">Lo leo en minutos. Te mando vídeo del coche, incluido lo que no está perfecto.</span>
-      </a>
-      <a class="ct-way" href="tel:+{{ $phoneRaw }}">
-        <span class="ct-way__k">Llamar</span>
-        <span class="ct-way__v">{{ $phone }}</span>
-        <span class="ct-way__note">Si estoy con un cliente, insiste o escríbeme.</span>
-      </a>
-      <a class="ct-way" href="mailto:{{ $email }}">
-        <span class="ct-way__k">Email</span>
-        <span class="ct-way__v">{{ $email }}</span>
-        <span class="ct-way__note">Para documentación y facturas.</span>
-      </a>
+      <a class="mc-btn mc-btn--cta ct-far__cta"
+         href="https://wa.me/{{ $phoneRaw }}?text={{ urlencode('Hola, estoy lejos de Málaga. ¿Cómo lo hacemos?') }}">Estoy lejos — escríbeme</a>
     </div>
   </section>
 
@@ -225,36 +260,61 @@
 (function () {
   document.documentElement.className += ' js';
 
-  /* ---- the picture becomes the page ------------------------------------
-     Twelve columns carry one photograph between them — size and position are
+  /* ---- the picture becomes the two panels -------------------------------
+     Twelve strips carry one photograph between them — size and position are
      computed from the picture's own proportions, because a percentage pair on
      background-size forces both axes and would stretch it.
 
      frame by frame
        0.00        the car, whole, with the words on it
-       0.00-0.16   the columns part; the words go
-       0.14-0.42   each column turns white, left to right — the picture is being
-                   converted, not hidden
-       0.30-1.00   they descend, staggered, accelerating on t², and the white they
-                   leave behind IS the page: the section under this one is white,
-                   so the last frame of the animation and the first frame of the
-                   content are the same surface
+       0.02-0.09   the cuts are drawn — before this the picture is untouched
+       0.05-0.26   the strips part; the deep shows through the cuts; the words go
+       0.10-0.40   the photograph drains out of them left to right — the picture
+                   is being milled, not hidden
+       0.40-0.88   each strip walks to its place in one of the two panels. Six
+                   left, six right. It is not walking towards a guess: the two
+                   panels are measured every frame and the strips aim at where
+                   they actually are, so the target moves with the page and they
+                   meet it exactly.
+       0.72-0.88   the five seams inside each group fade; the two outer hairlines
+                   stay and become the panel's own edges
+       0.90-1.00   the stage is dismissed. The strips and the panels are the same
+                   two rectangles by then, so what is revealed is what was there.
+
+     The walk is LINEAR in scroll. That is not laziness: easing a scrubbed
+     transform is the one thing that makes scroll position and visual position
+     stop agreeing, and GreenSock states it as a rule for exactly this case. The
+     easing lives where it belongs — in the per-strip stagger (0.035 of the
+     window each, the scroll equivalent of the 50-80ms interval every studio
+     that publishes its numbers uses) and in the opacity curves, which are paint
+     and cannot desynchronise from anything.
 
      Transform and opacity only, so it stays on the compositor, and the scroll is
-     never intercepted: the section is tall, its contents stick, page distance
-     becomes animation distance.
+     never intercepted: the stage is sticky, the page below it is real, and page
+     distance becomes animation distance.
 
-     Below 900px, with reduced motion, or without JavaScript no columns are built
-     at all — the photograph is simply there, at its own size, and the page carries
-     on. The picture is content; the conversion is decoration. ================ */
-  var open = document.getElementById('open');
-  var host = document.getElementById('cols');
-  var words = document.getElementById('open-words');
-  if (open && host) {
-    var N = 12;
-    var wide = window.matchMedia('(min-width: 900px)');
+     Below 900px, with reduced motion, or without JavaScript no strips are built
+     at all — the photograph is simply there, at its own size, the panels are
+     simply there, and the page carries on. The picture is content; the milling
+     is decoration. ==================================================== */
+  var assemble = document.getElementById('assemble');
+  var open     = document.getElementById('open');
+  var host     = document.getElementById('cols');
+  var runEl    = document.getElementById('run');
+  var words    = document.getElementById('open-words');
+  var cut      = document.getElementById('cut');
+  var panelA   = document.getElementById('panel-a');
+  var panelB   = document.getElementById('panel-b');
+  var live     = false;
+
+  var clamp = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
+  var span  = function (p, a, b) { return clamp((p - a) / (b - a)); };
+
+  if (assemble && open && host && panelA && panelB) {
+    var N = 12, M = 6, STEP = 0.035;
+    var wide  = window.matchMedia('(min-width: 900px)');
     var still = window.matchMedia('(prefers-reduced-motion: reduce)');
-    var kids = [], ticking = false, IMG = { w: 0, h: 0 };
+    var kids = [], ticking = false, IMG = { w: 0, h: 0 }, RUN = 1;
 
     var probe = new Image();
     probe.onload = function () { IMG.w = probe.naturalWidth; IMG.h = probe.naturalHeight; measure(); };
@@ -263,68 +323,149 @@
     function build() {
       host.innerHTML = ''; kids = [];
       for (var i = 0; i < N; i++) {
-        var col = document.createElement('span');
-        col.className = 'ct-col';
-        var pic = document.createElement('span');
-        pic.className = 'ct-col__pic';
-        col.appendChild(pic);
+        var col = document.createElement('span'); col.className = 'ct-col';
+        var pic = document.createElement('span'); pic.className = 'ct-col__pic';
+        var l   = document.createElement('i');    l.className   = 'ct-col__edge ct-col__edge--l';
+        var r   = document.createElement('i');    r.className   = 'ct-col__edge ct-col__edge--r';
+        var lf  = document.createElement('i');    lf.className  = 'ct-col__lift';
+        col.appendChild(lf); col.appendChild(pic); col.appendChild(l); col.appendChild(r);
         host.appendChild(col);
-        kids.push({ col: col, pic: pic });
+        kids.push({ col: col, pic: pic, l: l, r: r, lift: lf });
       }
     }
 
+    /* everything that only changes when the window does */
     function frame() {
       if (!IMG.w || !kids.length) return;
-      var vw = window.innerWidth, vh = host.clientHeight || window.innerHeight;
+      var vw = window.innerWidth, vh = open.clientHeight || window.innerHeight;
       var scale = Math.max(vw / IMG.w, vh / IMG.h);       // cover, computed
       var dw = IMG.w * scale, dh = IMG.h * scale;
       var ox = (vw - dw) / 2, oy = (vh - dh) * 0.52;
       var colw = vw / N;
       for (var i = 0; i < N; i++) {
-        kids[i].pic.style.backgroundSize = dw + 'px ' + dh + 'px';
+        kids[i].col.style.left  = (i * colw) + 'px';
+        kids[i].col.style.width = (colw + 0.6) + 'px';    // 0.6px of overlap, so six
+        kids[i].pic.style.backgroundSize = dw + 'px ' + dh + 'px';   // strips close into one
         kids[i].pic.style.backgroundPosition = (ox - i * colw) + 'px ' + oy + 'px';
       }
     }
 
     function measure() {
       if (!wide.matches || still.matches || !IMG.w) {
-        open.classList.remove('is-live'); open.style.height = ''; return;
+        assemble.classList.remove('is-live'); live = false;
+        open.style.opacity = ''; open.style.visibility = '';
+        if (runEl) runEl.style.height = '';
+        return;
       }
       if (!kids.length) build();
-      open.classList.add('is-live');
-      // 1.9 screens: one to look at the car, 0.9 to convert it. At 2.4 the columns
-      // had all landed by 0.78 and the last fifth of the section was a blank white
-      // screen — the transition finished and then waited.
-      open.style.height = (window.innerHeight * 1.9) + 'px';
-      frame(); draw();
+      assemble.classList.add('is-live'); live = true;
+      var vh = window.innerHeight;
+      // 0.9 of a screen for the strips to travel through before the panels are
+      // where they need to be. Longer and the empty stage outstays its welcome;
+      // shorter and twelve strips have to cross the screen in a flick.
+      runEl.style.height = Math.round(vh * 0.9) + 'px';
+      frame();
+      // The scroll at which the panels sit 24% down the screen is the scroll at
+      // which the strips must be home. Everything else is a fraction of it, so
+      // the timing survives any content height, any viewport, any font.
+      var top = panelA.getBoundingClientRect().top - assemble.getBoundingClientRect().top;
+      RUN = Math.max(1, (top - vh * 0.24) / 0.88);
+      draw();
     }
 
-    var clamp = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
-    var span = function (p, a, b) { return clamp((p - a) / (b - a)); };
-
     function draw() {
-      if (!open.classList.contains('is-live')) return;
-      var top = open.getBoundingClientRect().top;
-      var run = open.offsetHeight - window.innerHeight || 1;
-      var p = clamp(-top / run);
-      var vh = window.innerHeight;
+      if (!live) return;
+      var s  = -assemble.getBoundingClientRect().top;
+      var p  = clamp(s / RUN);
+      var vw = window.innerWidth, vh = open.clientHeight || window.innerHeight;
+      var colw = vw / N;
 
-      if (words) words.style.opacity = String(1 - span(p, 0.03, 0.15));
+      // read both targets before writing anything
+      var o  = open.getBoundingClientRect();
+      var rA = panelA.getBoundingClientRect(), rB = panelB.getBoundingClientRect();
+      var T  = [
+        { x: rA.left - o.left, y: rA.top - o.top, w: rA.width, h: rA.height },
+        { x: rB.left - o.left, y: rB.top - o.top, w: rB.width, h: rB.height }
+      ];
 
-      for (var i = 0; i < N; i++) {
-        var lag = (i / N) * 0.26;
-        // The picture drains out of this column — one column at a time, left to
-        // right. With a small stagger every column bleached at once and the frame
-        // just looked washed out; the conversion has to be legible as an order.
-        var white = clamp((span(p, 0.14, 0.46) - (i / N) * 0.55) / (1 - 0.55));
-        kids[i].pic.style.opacity = String(1 - white);
-        // then the white column goes down
-        var t = clamp((span(p, 0.30, 0.96) - lag) / (1 - 0.26));
-        var gap = span(p, 0, 0.16) * 8;
-        var x = (i - (N - 1) / 2) * gap;
-        kids[i].col.style.transform =
-          'translate3d(' + x + 'px,' + (t * t * vh * 1.25) + 'px,0)';
+      if (words) {
+        words.style.opacity = String(1 - span(p, 0.03, 0.15));
+        // The stage is sticky at top:0, but the header above it is not: at rest
+        // its last header-height of pixels are below the fold, and the words were
+        // the thing in them. Anchored to the viewport rather than to the stage,
+        // they are in the right place at rest, stuck, and everywhere between.
+        var over = o.bottom - window.innerHeight;
+        words.style.bottom = (over > 0 ? over : 0) + 'px';
       }
+      // What the cuts open onto. Twelve white strips on a pale band read at
+      // 1.08:1 — the milling was happening and almost nothing showed it. The
+      // seams open onto the deep the rest of the site is built on, and it is
+      // gone again before the strips have descended far enough for it to be a
+      // dark screen rather than eleven dark lines. Cut in the dark, land in the
+      // daylight.
+      if (cut) cut.style.opacity = String(Math.min(span(p, 0.04, 0.16), 1 - span(p, 0.34, 0.52)));
+
+      var part = span(p, 0.05, 0.26) * 13;
+      // Before the cut there is no cut. The seams were drawn on the photograph
+      // from the first frame, eleven grey lines down an untouched picture.
+      var edge = span(p, 0.02, 0.09);
+      for (var i = 0; i < N; i++) {
+        var g = i < M ? 0 : 1, j = i % M, P = T[g];
+        var Li = i * colw;
+
+        // the picture drains, one strip at a time, left to right. With a small
+        // stagger every strip bleached at once and the frame just looked washed
+        // out; the milling has to be legible as an order.
+        var white = clamp((span(p, 0.10, 0.40) - (i / N) * 0.55) / (1 - 0.55));
+        kids[i].pic.style.opacity = String(1 - white);
+
+        // the two ends of each group set off first, so the block closes inwards
+        var lag = (i < M ? (M - 1 - j) : j) * STEP;
+        var f   = clamp((span(p, 0.40, 0.88) - lag) / (1 - (M - 1) * STEP));
+
+        // Horizontal is linear, because horizontal is the axis the hand is not
+        // moving and any curve on it would visibly disagree with the scroll.
+        // Vertical is f squared — a strip that lets go of the top of the screen
+        // and gathers speed is the one thing here everybody has seen before, and
+        // it keeps the strips high while the page below is still arriving instead
+        // of leaving half a screen of empty band under them.
+        var fy = f * f;         // gravity
+        var fx = f * f * f;     // width closes last
+        var tw = P.w / M;
+        var kx = 1 + (tw / colw - 1) * fx;
+        var ky = 1 + (P.h / vh - 1) * fy;
+        // A group is laid out from its own left edge with the strips butted up
+        // against each other, so the only gaps inside it are the ones the stagger
+        // and the cut are opening. Interpolating each strip to its own final
+        // rectangle instead made the group breathe apart as it narrowed — the six
+        // pieces were converging on the panel and drifting away from each other
+        // at the same time, which is not what closing up looks like.
+        var gl = g * M * colw + (P.x - g * M * colw) * f;
+        var x  = (gl + j * colw * kx - Li) + part * (i - (N - 1) / 2) * (1 - fx);
+        var y  = P.y * fy;
+
+        kids[i].col.style.transform =
+          'translate3d(' + x + 'px,' + y + 'px,0) scale(' + kx + ',' + ky + ')';
+        // Off the page while it travels, flat on the page when it arrives. Two
+        // near-whites 1.08:1 apart cannot show a strip moving; a shadow can, and
+        // it is gone by the time the strip is a panel, which has none.
+        kids[i].lift.style.opacity = String(span(f, 0.02, 0.18) * (1 - span(f, 0.72, 0.99)));
+
+        // the seams inside a group go; the outer two stay and become the panel's
+        // own left and right edge. Counter-scaled, or a hairline stops being one.
+        var seam = 1 - span(f, 0.60, 0.96);
+        kids[i].l.style.opacity = String(edge * (j === 0     ? 1 : seam));
+        kids[i].r.style.opacity = String(edge * (j === M - 1 ? 1 : seam));
+        kids[i].l.style.transform = kids[i].r.style.transform = 'scaleX(' + (1 / kx) + ')';
+      }
+
+      // The strips are home at 0.88 and the stage goes over the next tenth, not
+      // in a frame. Every studio that publishes its numbers spends the time on
+      // the arrival rather than on the debris: the destination reveal is the
+      // slowest thing in the sequence, and here it is the only thing left.
+      var out = span(p, 0.90, 1);
+      open.style.opacity    = String(1 - out);
+      open.style.visibility = out >= 1 ? 'hidden' : 'visible';
     }
 
     window.addEventListener('scroll', function () {
@@ -337,48 +478,38 @@
     measure();
   }
 
-  /* ---- the roads draw themselves --------------------------------------
-     Triggered by arrival, not tied to scroll position. Tying it to scroll meant
-     the whole thing had played out before the section was properly on screen —
-     measured: every road was already complete while the section's top was still
-     100px below the fold. An observer fires once, when a third of the section is
-     in view, and the roads then draw in their own time, furthest first, because
-     that is the one that makes the point.
+  /* ---- the map is handed over on request -------------------------------
+     An embedded Google map is live from the moment it loads, and a live map eats
+     the wheel as soon as the pointer crosses it — in the middle of a scroll
+     animation that is the pointer's most likely position. The shield sits on top
+     until somebody actually wants the map, which is also the click that starts
+     Google's session rather than having one started for every visitor who scrolls
+     past. Without JavaScript the shield is a button that does nothing and the map
+     below it is still a map: readable, just not draggable. */
+  var shield = document.getElementById('gmap-on');
+  if (shield) {
+    shield.addEventListener('click', function () {
+      shield.parentNode.classList.add('is-on');
+      shield.remove();
+    });
+  }
 
-     The drawing is stroke-dashoffset and opacity, both paint-only. Nothing is
-     pinned and no scroll is intercepted.
-
-     Without JavaScript, with reduced motion, or if the observer never fires, the
-     `is-armed` class is never added and every road, dot and name is simply there.
-     The map is information; it must not depend on the effect. */
+  /* ---- the journeys arrive as the section is read -----------------------
+     Paint-only, arrival-triggered, and if the observer never fires the rows are
+     simply there: `is-armed` is what dims them, and it is added by script. */
   var far = document.getElementById('far');
   if (far && 'IntersectionObserver' in window &&
       !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    var roads = far.querySelectorAll('.ct-map__road');
-    Array.prototype.forEach.call(roads, function (r, i) {
-      var len = r.getTotalLength ? r.getTotalLength() : 100;
-      r.style.strokeDasharray = len;
-      r.style.strokeDashoffset = len;
-      r.style.transition = 'stroke-dashoffset 1100ms cubic-bezier(.22,.61,.36,1) ' + (i * 260) + 'ms';
-    });
     far.classList.add('is-armed');
-
     new IntersectionObserver(function (entries, obs) {
       entries.forEach(function (e) {
         if (!e.isIntersecting) return;
         obs.disconnect();
-        far.classList.add('is-drawn');
-        Array.prototype.forEach.call(roads, function (r) { r.style.strokeDashoffset = '0'; });
-        // each name and each row arrives as its own road lands
         far.querySelectorAll('.ct-far__item').forEach(function (el, i) {
-          window.setTimeout(function () { el.classList.add('is-on'); }, 120 + i * 260);
-        });
-        far.querySelectorAll('.ct-map__city, .ct-map__label[data-i]').forEach(function (el) {
-          var i = +el.getAttribute('data-i');
-          window.setTimeout(function () { el.classList.add('is-on'); }, 900 + i * 260);
+          window.setTimeout(function () { el.classList.add('is-on'); }, 60 + i * 90);
         });
       });
-    }, { threshold: 0.34 }).observe(far);
+    }, { threshold: 0.25 }).observe(far);
   }
 
   var form = document.getElementById('ct-form');
