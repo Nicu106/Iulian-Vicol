@@ -372,6 +372,9 @@
              color var(--m-quick) var(--e-out), transform var(--m-instant) var(--e-out);
 }
 .hm-fb__nav:hover{ background:var(--mc-ink); border-color:var(--mc-ink); color:var(--mc-surface); }
+/* the first button is "previous" on a wide screen and "turn it over" on a phone */
+.hm-fb__glyph-flip{ display:none; }
+.hm-fb__nav[aria-pressed="true"]{ background:var(--mc-ink); border-color:var(--mc-ink); color:var(--mc-surface); }
 .hm-fb__nav:active{ transform:scale(.96); }
 .hm-fb__nav:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:2px; }
 
@@ -400,4 +403,6 @@ html:not(.js) .hm-fb__step{ display:none; }
   }
   .fb__face--back{ padding:var(--s-5); }
   html:not(.js) .fb, .hm-fb.is-static .fb{ height:auto; }
+  .hm-fb__glyph-prev{ display:none; }
+  .hm-fb__glyph-flip{ display:block; }
 }

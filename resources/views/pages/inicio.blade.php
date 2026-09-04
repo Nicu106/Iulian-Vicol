@@ -182,9 +182,12 @@
     {{-- Two, and nothing else. Each carries the next card across the middle,
          which is where a card turns over. --}}
     <div class="hm-fb__step">
-      <button class="hm-fb__nav" type="button" data-go="-1" aria-label="Anterior">
-        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+      <button class="hm-fb__nav hm-fb__nav--first" type="button" data-go="-1" aria-label="Anterior">
+        <svg class="hm-fb__glyph-prev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
           <path d="M15 4 7 12l8 8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+        <svg class="hm-fb__glyph-flip" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+          <path d="M20 12a8 8 0 1 1-2.4-5.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+          <path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
       </button>
       <button class="hm-fb__nav" type="button" data-go="1" aria-label="Siguiente">
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
@@ -319,7 +322,15 @@
     var TAU    = 150;    // ms, the damping time constant
     var GLIDE  = 780;    // ms for a button press to land the next card
 
-    var still = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var still  = window.matchMedia('(prefers-reduced-motion: reduce)');
+    // On a phone one card fits, so a card that turns over as it LEAVES the
+    // middle turns over off screen and its words are never seen. There, nothing
+    // turns by position: the first button turns the centred card in place, the
+    // second brings the next picture. The row holds still while a card is
+    // showing its words, because a review that drifts away while you read it
+    // is worse than no review.
+    var narrow = window.matchMedia('(max-width: 999px)');
+    var reading = null;      // the card turned by hand, on a phone
     var halt  = document.getElementById('fb-halt');
     var sec   = document.getElementById('reviews');
     var row   = rail.firstElementChild;
@@ -355,7 +366,8 @@
         // into its review, and brings the next picture into the middle. Turning
         // it exactly at the middle put the 90-degree moment, a card of zero
         // width, at the slowest point of the row: a hole where a review should be.
-        var f = Math.round(smooth((d - LEAD) / (2 * FLIP)) * 180);
+        var f = narrow.matches ? 0 : Math.round(smooth((d - LEAD) / (2 * FLIP)) * 180);
+        if (kids[i] === reading) { f = 180; }
         if (f !== kids[i].flip) { kids[i].flip = f; kids[i].el.style.setProperty('--flip', f + 'deg'); }
       }
       return near;
@@ -381,7 +393,7 @@
         // fast on arrival, a crawl with a card in the middle, and hovering or
         // reading with a keyboard slows it further still
         var boost = warm ? 1 + (BOOST - 1) * clamp01((warm - now) / 1500) : 1;
-        var want  = (still.matches || stopped || keyed || now < busy) ? 0
+        var want  = (still.matches || stopped || keyed || reading || now < busy) ? 0
                   : SPEED * boost * (CRAWL + (1 - CRAWL) * smooth(near / DETENT))
                           * (over ? 0.35 : 1);
         v += (want - v) * (1 - Math.exp(-dt / TAU));
@@ -408,8 +420,30 @@
       glide = { from: pos, to: pos + d, t0: performance.now() };
       v = 0;
     }
+    function centredKid() {
+      var best = null, bd = Infinity;
+      for (var i = 0; i < kids.length; i++) {
+        var a = Math.abs(kids[i].c - pos - mid);
+        if (a < bd) { bd = a; best = kids[i]; }
+      }
+      return best;
+    }
+    var first = document.querySelector('.hm-fb__nav--first');
+    function labelFirst() {
+      if (!first) { return; }
+      first.setAttribute('aria-label', !narrow.matches ? 'Anterior' : reading ? 'Ver la foto' : 'Leer la reseña');
+      first.setAttribute('aria-pressed', narrow.matches ? (reading ? 'true' : 'false') : 'false');
+    }
+    function turnCentred() {
+      var k = centredKid();
+      if (!k) { return; }
+      reading = (reading === k) ? null : k;
+      if (reading) { glideTo(k); }          // seat it exactly before it turns
+      labelFirst(); paint();
+    }
     function step(dir) {
       if (!kids.length) { return; }
+      reading = null; labelFirst();
       // measured from where a glide is GOING, so a second press during the first
       // steps two cards rather than re-targeting the one already on its way
       var at = glide ? glide.to : pos, best = 0, bd = Infinity;
@@ -420,8 +454,13 @@
       glideTo(kids[(best + dir + kids.length) % kids.length]);
     }
     document.querySelectorAll('.hm-fb__step .hm-fb__nav').forEach(function (b) {
-      b.addEventListener('click', function () { step(+b.getAttribute('data-go')); });
+      b.addEventListener('click', function () {
+        var go = +b.getAttribute('data-go');
+        if (narrow.matches && go < 0) { turnCentred(); } else { step(go); }
+      });
     });
+    narrow.addEventListener('change', function () { reading = null; labelFirst(); paint(); });
+    labelFirst();
     // A photograph you can see is a review you might want: click it and it
     // comes to the middle and turns over. The press itself has to travel less
     // than 6px, so a drag is still a drag.
@@ -432,7 +471,10 @@
       var card = e.target.closest ? e.target.closest('.fb') : null;
       if (!card || !kids.length) { return; }
       for (var i = 0; i < kids.length; i++) {
-        if (kids[i].el === card) { glideTo(kids[i]); break; }
+        if (kids[i].el !== card) { continue; }
+        if (narrow.matches && kids[i] === centredKid()) { turnCentred(); }
+        else { reading = null; labelFirst(); glideTo(kids[i]); }
+        break;
       }
     });
 
