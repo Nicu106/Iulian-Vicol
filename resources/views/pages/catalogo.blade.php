@@ -98,7 +98,7 @@
                  style="--n:{{ $row['cars']->count() + $row['delivered']->count() + count($row['demo']) }}">
               @foreach($row['cars'] as $car)
                 <article class="mc-card">
-                  <a class="mc-card__link" href="#{{ $car->slug }}">
+                  <a class="mc-card__link" href="/coche/{{ $car->slug }}">
                     <div class="mc-frame mc-frame--card">
                       <img class="mc-img mc-img--vehicle" src="{{ $car->thumbUrl(800) }}"
                            alt="{{ $car->brand }} {{ $car->model }} {{ $car->year }}"

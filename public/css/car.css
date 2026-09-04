@@ -1,0 +1,110 @@
+/* ============================================================================
+   One car
+   The photographs are the argument. Everything here is arranged so they are
+   large, quickly compared, and honestly grouped.
+   ========================================================================= */
+
+.car{ padding-block:var(--s-6) var(--s-9); }
+.car-back{ display:inline-block; margin-bottom:var(--s-4); font-size:var(--t-small); }
+.car-h{ margin:0 0 var(--s-6); font-size:var(--t-h1); line-height:1.06;
+  letter-spacing:-.022em; color:var(--mc-ink); }
+.car-h span{ color:var(--mc-ink-3); font-weight:500; }
+
+.car-grid{ display:grid; gap:var(--s-7); grid-template-columns:minmax(0,1fr); }
+@media (min-width:1000px){
+  .car-grid{ grid-template-columns:minmax(0,1fr) 21rem; align-items:start; }
+}
+
+/* ---- the stage ----------------------------------------------------------
+   3:2, which is what the camera gave. Cropping a car to a squarer frame cuts
+   the nose or the tail off exactly when the buyer is judging its shape. */
+.car-stage{ position:relative; margin:0; aspect-ratio:3 / 2; overflow:hidden;
+  background:var(--mc-band); border:1px solid var(--mc-hairline);
+  border-radius:var(--mc-r-card); }
+.car-stage__img{ width:100%; height:100%; object-fit:cover; display:block; }
+.car-stage__count{ position:absolute; right:var(--s-3); bottom:var(--s-3);
+  padding:var(--s-1) var(--s-3); border-radius:var(--mc-r-card);
+  background:rgba(17,28,46,.72); color:#FFFFFF;
+  font-size:var(--t-label); font-variant-numeric:tabular-nums; }
+.car-stage__count b{ font-weight:600; color:inherit; }
+
+/* ---- what the buyer is asking ------------------------------------------- */
+.car-tabs{ display:flex; flex-wrap:wrap; gap:var(--s-2); margin-top:var(--s-4); }
+.car-tab{
+  min-height:44px; padding:0 var(--s-4);
+  border:1px solid var(--mc-rule); border-radius:var(--mc-r);
+  background:var(--mc-surface); color:var(--mc-ink-2);
+  font:500 var(--t-ui)/1 var(--f-ui); cursor:pointer;
+  display:inline-flex; align-items:center; gap:var(--s-2);
+  transition:border-color var(--m-quick) var(--e-out), color var(--m-quick) var(--e-out),
+             background var(--m-quick) var(--e-out);
+}
+.car-tab span{ color:var(--mc-ink-3); font-variant-numeric:tabular-nums; font-weight:500; }
+.car-tab:hover{ border-color:var(--mc-control); color:var(--mc-ink); }
+.car-tab.is-on{ background:var(--mc-ink); border-color:var(--mc-ink); color:#FFFFFF; font-weight:600; }
+.car-tab.is-on span{ color:rgba(255,255,255,.72); }
+.car-tab:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:2px; }
+
+/* ---- the strip ----------------------------------------------------------
+   Scrolled, never wrapped: 58 thumbnails in a grid is a wall the buyer has to
+   read, while a strip is one they can flick through. Edge to edge on a phone,
+   so the last one is always half-visible and the strip says it continues. */
+.car-thumbs{
+  display:flex; gap:var(--s-2); margin-top:var(--s-4);
+  overflow-x:auto; overscroll-behavior-x:contain; scroll-snap-type:x proximity;
+  padding-bottom:var(--s-2); scrollbar-width:thin;
+}
+.car-thumbs[hidden]{ display:none; }   /* display:flex beats the [hidden] default */
+.car-thumbs::-webkit-scrollbar{ height:6px; }
+.car-thumbs::-webkit-scrollbar-thumb{ background:var(--mc-rule); border-radius:var(--mc-r-pill); }
+.car-thumb{
+  flex:0 0 auto; width:7.5rem; aspect-ratio:3 / 2; display:block; position:relative;
+  overflow:hidden; background:var(--mc-band);
+  border:1px solid var(--mc-hairline); border-radius:var(--mc-r-card);
+  scroll-snap-align:start; cursor:pointer;
+  transition:border-color var(--m-quick) var(--e-out), opacity var(--m-quick) var(--e-out);
+}
+.car-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+.car-thumb:hover{ border-color:var(--mc-control); }
+/* the one on the stage: a solid ink edge, not a glow — it has to survive on a
+   photograph of any colour, which a shadow does not */
+.car-thumb.is-on{ border-color:var(--mc-ink); box-shadow:inset 0 0 0 2px var(--mc-ink); }
+.car-thumb:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:2px; }
+@media (max-width:768px){
+  .car-thumbs{ margin-inline:calc(var(--mc-gutter-m) * -1); padding-inline:var(--mc-gutter-m); }
+  .car-thumb{ width:6.5rem; }
+}
+
+.car-empty{ margin:var(--s-4) 0 0; max-width:52ch; font-size:var(--t-small);
+  line-height:1.5; color:var(--mc-ink-2);
+  padding:var(--s-4); background:var(--mc-band); border-radius:var(--mc-r-card); }
+
+/* ---- the facts ---------------------------------------------------------- */
+.car-side{ display:flex; flex-direction:column; gap:var(--s-5); }
+.car-price{ display:flex; align-items:baseline; gap:var(--s-3); flex-wrap:wrap; }
+.car-price .mc-price{ font-size:var(--t-h1); font-weight:700; }
+/* One column here whatever the sheet says: the side panel is 336px, and two
+   columns of it leave 160px a row — not enough for a label and a value, which is
+   how "Diesel" ended up set one letter per line. */
+.car-specs{ margin:0; display:grid; grid-template-columns:minmax(0,1fr); gap:var(--s-2); }
+.car-specs .mc-specs__row{ grid-template-columns:minmax(9ch,11ch) minmax(0,1fr); }
+.car-act{ display:flex; gap:var(--s-3); }
+.car-act .mc-btn{ flex:1 1 auto; min-height:48px; }
+
+.car-text{ margin-top:var(--s-8); max-width:60ch; }
+.car-h2{ margin:0 0 var(--s-3); font-size:var(--t-h2); letter-spacing:-.016em; color:var(--mc-ink); }
+.car-text p{ margin:0; font-size:var(--t-prose); line-height:1.55; color:var(--mc-ink-2); }
+.car-feats{ margin:0; padding:0; list-style:none; columns:2; column-gap:var(--s-6);
+  font-size:var(--t-small); line-height:1.7; color:var(--mc-ink-2); }
+.car-feats li{ break-inside:avoid; padding-left:var(--s-4); position:relative; }
+.car-feats li::before{ content:"·"; position:absolute; left:var(--s-2); color:var(--mc-control); }
+@media (max-width:560px){ .car-feats{ columns:1; } }
+.car-more{ margin:var(--s-3) 0 0; font-size:var(--t-small); color:var(--mc-ink-3); }
+
+/* the dock is a phone thing here too */
+@media (min-width:769px){ .cat-dock{ display:none; } }
+@media (max-width:768px), (max-height:520px) and (orientation:landscape){
+  body:has(.cat-dock) main{
+    padding-bottom:calc(var(--mc-bar-h) + 1px + var(--s-5) + env(safe-area-inset-bottom, 0px));
+  }
+}

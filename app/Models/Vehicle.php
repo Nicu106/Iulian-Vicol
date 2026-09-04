@@ -14,7 +14,7 @@ class Vehicle extends Model
         'slug','brand','model','title','year','price','original_price','offer_price','has_offer','offer_expires_at',
         'offer_type','offer_description','pricing_history','status','sold_date','buyer_name','buyer_phone','featured','priority','badges',
         'mileage','fuel','transmission','engine','power','drivetrain','color','vin','condition',
-        'description','features','video_url','cover_image','gallery_images',
+        'description','features','video_url','cover_image','gallery_images','image_tags',
         'purchase_price','internal_notes','views_count','inquiries_count',
         'location','availability_schedule','meta_title','meta_description','tags',
         'fuel_type','body_type','engine_capacity','images','seller_name','seller_phone','seller_email'
@@ -23,6 +23,7 @@ class Vehicle extends Model
     protected $casts = [
         'features' => 'array',
         'gallery_images' => 'array',
+        'image_tags' => 'array',   // { "<path>": "exterior" | "interior" | "flaw" }
         'badges' => 'array',
         'availability_schedule' => 'array',
         'tags' => 'array',
