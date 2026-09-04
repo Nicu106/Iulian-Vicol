@@ -393,7 +393,8 @@ html:not(.js) .hm-fb__step{ display:none; }
   /* One card at a time. The same rule — the card is the picture's own shape —
      with the height fixed so cards do not stand ragged, and the width capped so
      a landscape picture is never wider than the screen. */
-  .hm-fb__rail{ --fade:1.5rem; --fb-h:min(64vh, 30rem); }
+  /* the browser keeps the page's vertical scroll; the horizontal swipe is ours */
+  .hm-fb__rail{ --fade:1.5rem; --fb-h:min(64vh, 30rem); touch-action:pan-y; }
   .hm-fb__row{ gap:var(--s-4); padding-inline:var(--mc-gutter-m) 0; }
   .fb{
     flex-basis:min(88vw, calc(var(--fb-h) * var(--ratio)));

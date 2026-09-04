@@ -410,7 +410,7 @@
         var t = clamp01((now - glide.t0) / GLIDE);
         var e = 1 - Math.pow(1 - t, 3);
         pos = glide.from + (glide.to - glide.from) * e;
-        if (t >= 1) { glide = null; phase = 'photo'; since = now; }
+        if (t >= 1) { glide = null; phase = reading ? 'text' : 'photo'; since = now; }
         if (pos < 0) { pos += rowW; } else if (pos >= rowW) { pos -= rowW; }
         rail.scrollLeft = pos; mine = now; paint();
         return;
@@ -470,8 +470,11 @@
       if (!kids.length) { return; }
       if (narrow.matches) {
         // next: turn, then advance, then turn. previous: the same, backwards.
-        if (dir > 0) { phase === 'photo' ? turn(centredKid()) : advance(1); }
-        else         { phase === 'text'  ? unturn()           : advance(-1); }
+        // A turn reseats the card first, so the few pixels a finger dragged it
+        // are given back while it turns.
+        var k = centredKid();
+        if (dir > 0) { if (phase === 'photo') { glideTo(k); turn(k); } else { advance(1); } }
+        else         { if (phase === 'text')  { glideTo(k); unturn(); } else { advance(-1); } }
         return;
       }
       // measured from where a glide is GOING, so a second press during the first
@@ -506,9 +509,44 @@
     /* ---- and everything that is theirs ---- */
     function yieldNow() { busy = performance.now() + 1200; }
     ['wheel', 'keydown'].forEach(function (e) { rail.addEventListener(e, yieldNow, { passive: true }); });
-    rail.addEventListener('touchstart', function () { held = true; yieldNow(); }, { passive: true });
-    ['touchend', 'touchcancel'].forEach(function (e) {
-      rail.addEventListener(e, function () { held = false; if (!swipedAt) { swipedAt = performance.now(); } }, { passive: true });
+    // On a phone a horizontal swipe is not a scroll, it is the gesture: a step
+    // of the sequence, forwards or backwards. Left alone, a swipe scrolled the
+    // row and landed on a photograph, which then waited its 2.2s to turn — so
+    // anyone swiping through saw pictures and never a word. touch-action pan-y
+    // on the rail keeps the browser from panning it; the card follows the
+    // finger a little for feel, and the step happens when the finger lifts.
+    var tx = 0, ty = 0, tPos = 0, tAxis = 0;
+    rail.addEventListener('touchstart', function (e) {
+      held = true; yieldNow();
+      // A finger takes over from any glide still running — it jumps to where
+      // the glide was going and the swipe starts from there. Left alone, a
+      // swipe that began during the reseat after a press was ignored outright:
+      // touchmove bailed on the glide, no axis was ever detected, and lifting
+      // the finger did nothing.
+      if (narrow.matches && glide) {
+        pos = (((glide.to % rowW) + rowW) % rowW); glide = null;
+        phase = reading ? 'text' : 'photo'; rail.scrollLeft = pos; mine = performance.now();
+      }
+      var t = e.touches[0]; tx = t.clientX; ty = t.clientY; tPos = pos; tAxis = 0;
+    }, { passive: true });
+    rail.addEventListener('touchmove', function (e) {
+      if (!narrow.matches) { return; }
+      var t = e.touches[0], dx = t.clientX - tx, dy = t.clientY - ty;
+      if (!tAxis && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) { tAxis = Math.abs(dx) > Math.abs(dy) ? 1 : 2; }
+      if (tAxis !== 1) { return; }
+      pos = tPos + Math.max(-40, Math.min(40, -dx * 0.25));
+      rail.scrollLeft = pos; mine = performance.now();
+    }, { passive: true });
+    ['touchend', 'touchcancel'].forEach(function (n) {
+      rail.addEventListener(n, function (e) {
+        held = false;
+        if (!narrow.matches) { if (!swipedAt) { swipedAt = performance.now(); } return; }
+        var t = e.changedTouches && e.changedTouches[0];
+        var dx = t ? t.clientX - tx : 0;
+        if (tAxis === 1 && Math.abs(dx) > 40) { step(dx < 0 ? 1 : -1); }
+        else if (Math.abs(pos - tPos) > 0.5) { glideTo(centredKid()); }   // gave up: seat it again
+        tAxis = 0;
+      }, { passive: true });
     });
     rail.addEventListener('scroll', function () {
       // A scroll we did not cause is the reader's. Wide, the drift steps aside
@@ -516,7 +554,7 @@
       // it settles.
       if (!glide && performance.now() - mine > 120) {
         yieldNow(); pos = rail.scrollLeft;
-        if (narrow.matches) { swipedAt = performance.now(); reading = null; paint(); }
+        if (narrow.matches && !held) { swipedAt = performance.now(); reading = null; paint(); }
       }
     }, { passive: true });
 
