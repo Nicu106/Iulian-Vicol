@@ -1,0 +1,206 @@
+/* ============================================================================
+   Home
+   ========================================================================= */
+
+/* ---- the hero -------------------------------------------------------------
+   A 2:3 night photograph of a 911's tail. Measured on a 24x16 grid: white text
+   holds at 7:1 or better on almost all of it — the one weak region is the lit
+   building at the top-left (1.65:1). The car's hero, the light bar, sits at
+   42% down; the wheel at 60%. So the wide crop is centred at 46% (band 32–60%
+   at 2.4:1) and the words go LOW LEFT, over the bumper and the tarmac, where
+   the photograph itself carries them; the search card sits on the black body
+   to the right, where nothing is lost under it. */
+.hm-hero{
+  position:relative; isolation:isolate; overflow:hidden;
+  background:var(--mc-deep-2);
+  min-height:34rem;
+}
+.hm-hero__img{
+  position:absolute; inset:0; z-index:0; width:100%; height:100%;
+  object-fit:cover; object-position:50% 46%;
+}
+/* a floor under the words only; the body of the car keeps its black */
+.hm-hero::after{
+  content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
+  background:
+    linear-gradient(180deg, rgba(2,6,26,.34) 0%, rgba(2,6,26,0) 30%, rgba(2,6,26,0) 55%, rgba(2,6,26,.62) 100%),
+    linear-gradient(100deg, rgba(2,6,26,.40) 0%, rgba(2,6,26,.10) 40%, rgba(2,6,26,0) 60%);
+}
+.hm-hero__in{
+  position:relative; z-index:2;
+  display:grid; grid-template-columns:minmax(0,1fr) 24rem; gap:var(--s-8);
+  align-items:end; padding-block:var(--s-8) var(--s-8); min-height:inherit;
+}
+.hm-hero__copy{ align-self:end; }
+.hm-hero__eyebrow{ display:block; margin-bottom:var(--s-3);
+  font-size:var(--t-label); font-weight:500; letter-spacing:.030em; color:#FFFFFF; }
+.hm-hero__h{ margin:0 0 var(--s-4); font-size:var(--t-display); line-height:1.02;
+  letter-spacing:-.026em; color:#FFFFFF; max-width:12ch; }
+.hm-hero__p{ margin:0; max-width:40ch; font-size:var(--t-sub); line-height:1.5; color:rgba(255,255,255,.92); }
+.hm-hero__credit{ display:block; margin-top:var(--s-4); font-size:var(--t-label);
+  letter-spacing:.020em; color:rgba(255,255,255,.62); }
+
+/* ---- the search card ------------------------------------------------------
+   The one thing on the page that looks like car-planet's, because it does what
+   theirs does. 10px: it is a cluster of controls, an action surface, and the
+   action radius is 10. */
+.hm-search{
+  background:var(--mc-surface); color:var(--mc-ink);
+  border-radius:var(--mc-r); box-shadow:var(--mc-shadow-2, 0 12px 40px rgba(0,0,0,.35));
+  padding:var(--s-5) var(--s-5) var(--s-5);
+  display:flex; flex-direction:column; gap:var(--s-4);
+}
+.hm-search__tabs{ display:flex; gap:var(--s-2); margin:calc(var(--s-5) * -1) calc(var(--s-5) * -1) 0;
+  border-bottom:1px solid var(--mc-hairline); }
+.hm-search__tab{
+  flex:1 1 auto; display:inline-flex; align-items:center; justify-content:center;
+  min-height:48px; padding:0 var(--s-4);
+  font-size:var(--t-ui); font-weight:600; color:var(--mc-ink-2); text-decoration:none;
+  border-bottom:2px solid transparent; margin-bottom:-1px;
+}
+.hm-search__tab.is-on{ color:var(--mc-ink); border-bottom-color:var(--mc-ink); }
+.hm-search__tab--link{ color:var(--mc-blue); }
+.hm-search__tab--link:hover{ text-decoration:underline; text-underline-offset:3px; }
+.hm-search__tab--link:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:-3px; }
+.hm-search__h{ margin:var(--s-1) 0 0; font-size:var(--t-h3); letter-spacing:-.012em; color:var(--mc-ink); }
+.hm-f{ display:flex; flex-direction:column; gap:var(--s-2); }
+.hm-f > span{ font-size:var(--t-label); font-weight:500; color:var(--mc-ink-2); }
+.hm-f .mc-input{ width:100%; }
+.hm-f__note{ font-size:var(--t-label); line-height:1.4; color:var(--mc-ink-3); }
+.hm-f__note b{ color:var(--mc-ink-2); font-weight:600; }
+.hm-seg{ display:grid; grid-template-columns:1fr 1fr; gap:0;
+  border:1px solid var(--mc-control); border-radius:var(--mc-r); overflow:hidden; }
+.hm-seg__o{ position:relative; display:block; }
+.hm-seg__o input{ position:absolute; inset:0; opacity:0; margin:0; cursor:pointer; }
+.hm-seg__o span{ display:flex; align-items:center; justify-content:center; min-height:44px;
+  font-size:var(--t-ui); font-weight:500; color:var(--mc-ink-2); background:var(--mc-surface);
+  transition:background var(--m-quick) var(--e-out), color var(--m-quick) var(--e-out); }
+.hm-seg__o input:checked + span{ background:var(--mc-ink); color:#FFFFFF; font-weight:600; }
+.hm-seg__o input:focus-visible + span{ outline:3px solid var(--mc-blue); outline-offset:-3px; }
+.hm-search__go{ width:100%; min-height:52px; margin-top:var(--s-1); font-size:var(--t-ui); }
+.hm-search__go b{ font-weight:700; color:inherit; }   /* a global b{} rule put ink on the blue */
+.hm-search__go[disabled]{ opacity:.55; cursor:not-allowed; }
+
+@media (max-width:900px){
+  /* The card leaves the photograph and takes the ground below it: over a tall
+     phone crop it would sit on the car itself, and the car is the point. */
+  .hm-hero{ min-height:0; display:grid; }
+  /* At 4:5 the band is 84% of the frame's height. Centred at 44% it ran 7–91%
+     and brought the white road marking (86–95% of the photograph) in under the
+     words: 3.89:1 at 900px. At 18% the band is 3–86% — the marking is out, the
+     wing (30%) and the light bar (42%) are in. */
+  /* 4:5 of a 900px tablet is a 1125px photograph before the form even starts —
+     1675px of hero. Capped at 78vh: the car is still whole (object-fit cover keeps
+     the band centred on it) and the search is reachable without a full screen of
+     scrolling first. */
+  .hm-hero__img{ position:relative; aspect-ratio:4 / 5; height:auto; max-height:78vh; width:100%; grid-area:1/1; }
+  /* measured at 900px: the sub line fell to 3.83:1 — the stacked layout puts the
+     words higher on the frame, over the wet tarmac's highlights, so the floor
+     starts earlier and lands heavier */
+  .hm-hero::after{ grid-area:1/1; position:relative; inset:auto;
+    background:linear-gradient(180deg, rgba(2,6,26,0) 28%, rgba(2,6,26,.62) 60%, rgba(2,6,26,.94) 100%); }
+  /* The wrapper dissolves (display:contents) so the copy and the card become the
+     hero's own grid items: the copy shares the photograph's cell and sits at ITS
+     foot; the card takes the row below. With the wrapper kept, its height was
+     copy + card, so the copy sat at the TOP of the frame — over the lit building
+     — which is what 2.64:1 at 900px was. */
+  .hm-hero__in{ display:contents; }
+  .hm-hero__copy{ grid-area:1/1; z-index:2; align-self:end;
+    padding:var(--s-6) var(--mc-gutter-m); width:100%; box-sizing:border-box; }
+  .hm-hero__h{ max-width:none; }
+  .hm-search{ grid-area:2/1; border-radius:0; box-shadow:none; padding-inline:var(--mc-gutter-m); }
+  .hm-search__tabs{ margin-inline:calc(var(--mc-gutter-m) * -1); }
+  .hm-hero__img{ object-position:50% 40%; }   /* the words are at the foot again: centre the band on the car */
+}
+
+/* ---- the marques -------------------------------------------------------- */
+.hm-marques{ background:var(--mc-surface); border-bottom:1px solid var(--mc-hairline); }
+.hm-marques__list{ margin:0; padding:0; list-style:none;
+  display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); }
+.hm-marques__list > li + li{ border-left:1px solid var(--mc-hairline); }
+.hm-marque{
+  display:flex; flex-direction:column; align-items:center; gap:var(--s-3);
+  padding:var(--s-7) var(--s-4); text-decoration:none; color:var(--mc-ink);
+  transition:background var(--m-quick) var(--e-out);
+}
+.hm-marque:hover{ background:var(--mc-bg); }
+.hm-marque:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:-3px; }
+.hm-marque__logo{ width:64px; height:64px; background:var(--mc-ink);
+  -webkit-mask:var(--logo) center/contain no-repeat; mask:var(--logo) center/contain no-repeat;
+  transition:transform var(--m-quick) var(--e-out); }
+.hm-marque:hover .hm-marque__logo{ transform:translateY(-2px); }
+.hm-marque__name{ font-size:var(--t-ui); font-weight:600; letter-spacing:-.006em; }
+.hm-marque__n{ font-size:var(--t-label); color:var(--mc-ink-3); font-variant-numeric:tabular-nums; }
+.hm-marque.is-empty .hm-marque__logo{ background:var(--mc-control); }
+.hm-marque.is-empty .hm-marque__name{ color:var(--mc-ink-2); }
+@media (max-width:760px){
+  .hm-marques__list{ grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .hm-marques__list > li:nth-child(4){ border-left:0; }
+  .hm-marques__list > li:nth-child(n+4){ border-top:1px solid var(--mc-hairline); }
+  .hm-marque{ padding:var(--s-5) var(--s-3); }
+  .hm-marque__logo{ width:48px; height:48px; }
+}
+
+/* ---- sections ----------------------------------------------------------- */
+.hm-sec{ padding-block:var(--s-9) 0; }
+.hm-sec__head{ display:flex; align-items:baseline; justify-content:space-between; gap:var(--s-4);
+  flex-wrap:wrap; margin-bottom:var(--s-6); }
+.hm-h2{ margin:0; font-size:var(--t-h2); letter-spacing:-.018em; color:var(--mc-ink); }
+.hm-sec__p{ margin:0; font-size:var(--t-small); color:var(--mc-ink-2); }
+.hm-sec__head .mc-link{ display:inline-flex; align-items:center; min-height:44px; }
+.hm-sec__more{ margin:var(--s-4) 0 0; font-size:var(--t-small); color:var(--mc-ink-3); }
+
+/* the rail of what is available: the catalogue's own card, scrolled */
+.home-rail{ margin-inline:calc(var(--mc-gutter-d) * -1); padding-inline:var(--mc-gutter-d); }
+.home-rail__in{ display:flex; gap:var(--s-4); overflow-x:auto; scroll-snap-type:x proximity;
+  padding-bottom:var(--s-3); scrollbar-width:thin; }
+.home-rail__in > *{ flex:0 0 15.5rem; scroll-snap-align:start; }
+@media (max-width:768px){
+  .home-rail{ margin-inline:calc(var(--mc-gutter-m) * -1); padding-inline:var(--mc-gutter-m); }
+  .home-rail__in > *{ flex:0 0 72vw; max-width:19rem; }
+}
+
+/* the people */
+.hm-wall__grid{ margin:0; padding:0; list-style:none; display:grid; gap:var(--s-5);
+  grid-template-columns:repeat(4,minmax(0,1fr)); }
+@media (max-width:900px){ .hm-wall__grid{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s-4); } }
+.hm-tile{ display:flex; flex-direction:column; gap:var(--s-2); min-width:0; }
+.hm-tile .tt-photo{ border-radius:var(--mc-r-card); }
+.hm-tile .tt-photo img{ width:100%; height:100%; object-fit:cover; object-position:var(--pos-portrait); display:block; }
+
+/* steps */
+.hm-steps__list{ margin:0; padding:0; list-style:none; counter-reset:step;
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:var(--s-5); }
+@media (max-width:760px){ .hm-steps__list{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+.hm-steps__list li{ counter-increment:step; display:flex; flex-direction:column; gap:var(--s-2);
+  padding-top:var(--s-4); border-top:2px solid var(--mc-ink); }
+.hm-steps__list li::before{ content:counter(step, decimal-leading-zero);
+  font-size:var(--t-label); font-weight:600; letter-spacing:.06em; color:var(--mc-ink-3); }
+.hm-steps__list b{ font-size:var(--t-h3); color:var(--mc-ink); }
+.hm-steps__list span{ font-size:var(--t-small); line-height:1.5; color:var(--mc-ink-2); }
+
+/* questions — left, like everything else; the measure is on the rows, not the wrap,
+   or the whole block centres itself inside the container */
+.hm-q{ max-width:60ch; }
+.hm-q{ border-top:1px solid var(--mc-hairline); }
+.hm-q:last-of-type{ border-bottom:1px solid var(--mc-hairline); }
+.hm-q summary{ cursor:pointer; list-style:none; display:flex; justify-content:space-between; gap:var(--s-4);
+  align-items:center; min-height:56px; padding:var(--s-3) 0;
+  font-size:var(--t-ui); font-weight:600; color:var(--mc-ink); }
+.hm-q summary::-webkit-details-marker{ display:none; }
+.hm-q summary::after{ content:"+"; font-weight:400; font-size:1.4em; color:var(--mc-ink-3); }
+.hm-q[open] summary::after{ content:"−"; }
+.hm-q summary:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:2px; }
+.hm-q p{ margin:0 0 var(--s-4); font-size:var(--t-prose); line-height:1.55; color:var(--mc-ink-2); max-width:52ch; }
+
+/* the ask */
+.hm-cta{ margin-top:var(--s-9); background:var(--mc-band); }
+.hm-cta__in{ padding-block:var(--s-8); display:flex; flex-direction:column; align-items:flex-start; gap:var(--s-3); }
+.hm-cta__h{ margin:0; font-size:var(--t-h2); letter-spacing:-.018em; color:var(--mc-ink); }
+.hm-cta__p{ margin:0 0 var(--s-2); max-width:48ch; font-size:var(--t-prose); color:var(--mc-ink-2); }
+
+/* the dock is a phone thing */
+@media (min-width:769px){ .cat-dock{ display:none; } }
+@media (max-width:768px), (max-height:520px) and (orientation:landscape){
+  body:has(.cat-dock) main{ padding-bottom:0; }
+}

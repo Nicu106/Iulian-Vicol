@@ -107,71 +107,13 @@
             <div class="cat-row__cars" id="cars-{{ $row['key'] }}"
                  style="--n:{{ $row['cars']->count() + $row['delivered']->count() + count($row['demo']) }}">
               @foreach($row['cars'] as $car)
-                <article class="mc-card">
-                  <a class="mc-card__link" href="/coche/{{ $car->slug }}">
-                    <div class="mc-frame mc-frame--card">
-                      <img class="mc-img mc-img--vehicle" src="{{ $car->thumbUrl(800) }}"
-                           alt="{{ $car->brand }} {{ $car->model }} {{ $car->year }}"
-                           width="800" height="600" loading="lazy" decoding="async">
-                    </div>
-                    <div class="mc-card__body">
-                      <h3 class="mc-card__title">{{ $car->model }}</h3>
-                      @if($sub($car))<p class="mc-card__sub">{{ $sub($car) }}</p>@endif
-                      <ul class="mc-chips">
-                        @foreach($chips($car) as $c)<li class="mc-chip">{{ $c }}</li>@endforeach
-                      </ul>
-                      <div class="mc-pair">
-                        <span class="mc-price">{{ $euros($car->price) }}</span>
-                        @if($car->mileage)<span class="mc-km">{{ $km($car->mileage) }}</span>
-                        @else<span class="mc-km is-unknown">Km sin confirmar</span>@endif
-                      </div>
-                    </div>
-                  </a>
-                </article>
+                @include('partials.card', ['car' => $car, 'kind' => 'available'])
               @endforeach
-
               @foreach($row['delivered'] as $car)
-                <article class="mc-card mc-card--sold">
-                  <div class="mc-frame mc-frame--card">
-                    <img class="mc-img mc-img--vehicle" src="{{ $car->thumbUrl(800) }}"
-                         alt="{{ $car->brand }} {{ $car->model }} {{ $car->year }}"
-                         width="800" height="600" loading="lazy" decoding="async">
-                    <span class="mc-badge mc-badge--sold">Entregado</span>
-                  </div>
-                  <div class="mc-card__body">
-                    <h3 class="mc-card__title">{{ $car->model }}</h3>
-                    @if($sub($car))<p class="mc-card__sub">{{ $sub($car) }}</p>@endif
-                    <ul class="mc-chips">
-                      @foreach($chips($car) as $c)<li class="mc-chip">{{ $c }}</li>@endforeach
-                    </ul>
-                    <div class="mc-pair">
-                      <span class="mc-price">{{ $euros($car->price) }}</span>
-                      @if($car->mileage)<span class="mc-km">{{ $km($car->mileage) }}</span>@endif
-                    </div>
-                  </div>
-                </article>
+                @include('partials.card', ['car' => $car, 'kind' => 'sold'])
               @endforeach
-
               @foreach($row['demo'] as $d)
-                <article class="mc-card mc-card--demo">
-                  <div class="mc-frame mc-frame--card">
-                    <img class="mc-img mc-img--vehicle" src="{{ asset('storage/'.$d['img']) }}"
-                         alt="Ejemplo de ficha — Porsche {{ $d['model'] }}"
-                         width="800" height="600" loading="lazy" decoding="async">
-                    <span class="mc-badge mc-badge--demo">Ejemplo</span>
-                  </div>
-                  <div class="mc-card__body">
-                    <h3 class="mc-card__title">{{ $d['model'] }}</h3>
-                    @if($sub($d))<p class="mc-card__sub">{{ $sub($d) }}</p>@endif
-                    <ul class="mc-chips">
-                      @foreach($chips($d) as $c)<li class="mc-chip">{{ $c }}</li>@endforeach
-                    </ul>
-                    <div class="mc-pair">
-                      <span class="mc-price">{{ $euros($d['price']) }}</span>
-                      <span class="mc-km">{{ $km($d['km']) }}</span>
-                    </div>
-                  </div>
-                </article>
+                @include('partials.card', ['car' => $d, 'kind' => 'demo'])
               @endforeach
             </div>
             </div>
@@ -399,6 +341,32 @@
     var t; window.addEventListener('resize', function () {
       window.clearTimeout(t); t = window.setTimeout(sync, 180);
     });
+  })();
+
+  /* ---- arriving from the home page's search ------------------------------
+     ?marca opens that marque to the full screen; ?modelo and ?max hide the cards
+     that do not fit. Nothing is removed from the page — a car hidden here is one
+     the reader can still reach by clearing the search. */
+  (function () {
+    var q = new URLSearchParams(location.search);
+    var marca = q.get('marca'), modelo = q.get('modelo'), max = parseInt(q.get('max'), 10), pago = q.get('pago');
+    if (!marca && !modelo && !max) return;
+    var MONTHS = 48;
+    var hid = 0;
+    rows.forEach(function (row) {
+      row.querySelectorAll('.mc-card').forEach(function (card) {
+        var t = (card.querySelector('.mc-card__title') || {}).textContent || '';
+        var p = parseInt(((card.querySelector('.mc-price') || {}).textContent || '').replace(/\D/g, ''), 10);
+        var v = pago === 'mes' ? Math.round(p / MONTHS) : p;
+        var out = (modelo && t.trim() !== modelo) || (max && v > max);
+        if (out) { card.hidden = true; hid++; }
+      });
+    });
+    if (marca) {
+      var row = document.querySelector('.cat-row[aria-labelledby="marque-' + marca + '"]');
+      var btn = row && row.querySelector('.cat-row__all');
+      if (btn) window.setTimeout(function () { btn.click(); }, 700);
+    }
   })();
 
   document.addEventListener('keydown', function (e) {

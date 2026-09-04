@@ -26,6 +26,7 @@ class BrandbookOnly
         'brandbook/*',
         'catalogo',      // the catalogue page, in design
         'coche/*',       // one car, reached from the catalogue
+        'inicio',        // the home page, in design
         'img',        // the /img/{w} resize service — vehicle and customer photos
         'img/*',
         'up',         // the health check

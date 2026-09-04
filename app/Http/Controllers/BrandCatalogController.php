@@ -78,9 +78,21 @@ class BrandCatalogController extends Controller
             ];
         }
 
-        // What a card says under its name. One place, so the available, delivered and
-        // example cards cannot drift apart, and so the data's spelling drift — "Diesel"
-        // and "Diésel", "Automática" and "Automático" — is settled before it is shown.
+        $chips = self::chips();
+        $sub   = self::sub();
+
+        return view('pages.catalogo', [
+            'chips' => $chips,
+            'sub'   => $sub,
+            'rows'  => $rows,
+            'total' => $available->count(),
+            'sold'  => $soldCount->count(),
+        ]);
+    }
+
+    /** What a chip says — one rule for every card on the site. */
+    public static function chips(): \Closure
+    {
         $get = fn ($c, $k) => is_array($c) ? ($c[$k] ?? null) : ($c->$k ?? null);
         $tidy = function (?string $v): ?string {
             $v = trim((string) $v);
@@ -90,7 +102,7 @@ class BrandCatalogController extends Controller
                     'manual' => 'Manual', 'pdk' => 'PDK', 'dsg' => 'DSG'];
             return $map[mb_strtolower($v)] ?? $v;
         };
-        $chips = function ($c) use ($get, $tidy): array {
+        return function ($c) use ($get, $tidy): array {
             // power is stored as "258", "150cv", "170 CV" — the number is the fact,
             // the unit is ours to add once. Without this it read "150cv CV".
             $power = preg_replace('/\D+/', '', (string) $get($c, 'power'));
@@ -101,8 +113,13 @@ class BrandCatalogController extends Controller
                 $power !== '' ? $power . ' CV' : null,
             ]));
         };
-        // the line the reference shows under the name: what version this is
-        $sub = function ($c) use ($get): ?string {
+    }
+
+    /** The version line under the name. */
+    public static function sub(): \Closure
+    {
+        $get = fn ($c, $k) => is_array($c) ? ($c[$k] ?? null) : ($c->$k ?? null);
+        return function ($c) use ($get): ?string {
             $parts = array_filter([
                 $get($c, 'engine') ?: $get($c, 'engine_capacity'),
                 $get($c, 'body_type'),
@@ -110,13 +127,5 @@ class BrandCatalogController extends Controller
             ]);
             return $parts ? implode(' · ', $parts) : null;
         };
-
-        return view('pages.catalogo', [
-            'chips' => $chips,
-            'sub'   => $sub,
-            'rows'  => $rows,
-            'total' => $available->count(),
-            'sold'  => $soldCount->count(),
-        ]);
     }
 }

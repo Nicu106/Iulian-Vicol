@@ -112,26 +112,26 @@
 
 /* simpler card here than in the brandbook: photograph, model and year, price and
    mileage. Nothing else — the row already says the marque. */
-.cat-row .mc-card__body{ padding:var(--s-3) var(--s-4) var(--s-4); gap:var(--s-2); }
-.cat-row .mc-card__title span{ color:var(--mc-ink-3); font-weight:500; }
+:is(.cat-row,.home-rail) .mc-card__body{ padding:var(--s-3) var(--s-4) var(--s-4); gap:var(--s-2); }
+:is(.cat-row,.home-rail) .mc-card__title span{ color:var(--mc-ink-3); font-weight:500; }
 /* The card's second and third lines: what version this is, then the facts a buyer
    scans before the price — year, fuel, gearbox, power. Kilometres stay in the
    price box, once, large: it is the figure 41% of Spanish buyers call decisive
    and it does not get repeated as a chip. */
-.cat-row .mc-card__body{ gap:var(--s-2); }
-.cat-row .mc-card__sub{
+:is(.cat-row,.home-rail) .mc-card__body{ gap:var(--s-2); }
+:is(.cat-row,.home-rail) .mc-card__sub{
   margin:0; font-size:var(--t-label); line-height:1.35; color:var(--mc-ink-3);
   display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;
 }
-.cat-row .mc-chips{ gap:var(--s-1); margin-top:var(--s-1); }
-.cat-row .mc-chip{
+:is(.cat-row,.home-rail) .mc-chips{ gap:var(--s-1); margin-top:var(--s-1); }
+:is(.cat-row,.home-rail) .mc-chip{
   min-height:26px; padding:0 var(--s-2);
   background:var(--mc-band); color:var(--mc-ink-2);
   font-size:var(--t-label); font-weight:500; letter-spacing:0;
   font-variant-numeric:tabular-nums;
 }
-.cat-row .mc-card--sold .mc-chip{ color:var(--mc-ink-3); }
-.cat-row .mc-pair{ margin-top:var(--s-2); }
+:is(.cat-row,.home-rail) .mc-card--sold .mc-chip{ color:var(--mc-ink-3); }
+:is(.cat-row,.home-rail) .mc-pair{ margin-top:var(--s-2); }
 
 /* Every card in a row ends at the same line, whatever wraps inside it. The price
    box is pinned to the foot of the body, so a long name or a third row of chips
@@ -141,10 +141,10 @@
    where they stack in one column. So the alignment is the rule and the stack is
    the exception, not the other way round: measured, the rail's price boxes were
    30–53px apart with the old gate. */
-.cat-row .mc-card{ display:flex; flex-direction:column; }
-.cat-row .mc-card__link, .cat-row .mc-card__body{ display:flex; flex-direction:column; flex:1 1 auto; }
-.cat-row .mc-card__title{ min-height:2.6em; }
-.cat-row .mc-pair{ margin-top:auto; padding-top:var(--s-2); }
+:is(.cat-row,.home-rail) .mc-card{ display:flex; flex-direction:column; }
+:is(.cat-row,.home-rail) .mc-card__link, :is(.cat-row,.home-rail) .mc-card__body{ display:flex; flex-direction:column; flex:1 1 auto; }
+:is(.cat-row,.home-rail) .mc-card__title{ min-height:2.6em; }
+:is(.cat-row,.home-rail) .mc-pair{ margin-top:auto; padding-top:var(--s-2); }
 @media (max-width:559px){
   .cat-row.is-open .mc-card__title{ min-height:0; }
   .cat-row.is-open .mc-pair{ margin-top:var(--s-2); }
