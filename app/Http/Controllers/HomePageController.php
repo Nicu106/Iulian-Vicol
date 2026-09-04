@@ -15,11 +15,18 @@ use Illuminate\View\View;
  */
 class HomePageController extends Controller
 {
-    /** The vertical room a column gives its text before the photograph starts
-     *  losing it, and the width the photograph takes when it moves beside the
-     *  text instead. Kept here because the CSS has to lay out the same numbers. */
-    private const FB_TEXT_BOX = 360;
-    private const FB_PHOTO    = 260;
+    /* The card's own dimensions, and what has to fit inside them. Kept here
+     * because the CSS lays out the same numbers, and measured against the
+     * rendered page rather than guessed. */
+    private const FB_CARD   = 448;    // the height every card gets
+    private const FB_CHROME = 88;     // its padding, plus the byline under the quote
+    private const FB_PHOTO  = 200;    // the least a photograph can be and still be one
+    private const FB_ASIDE  = 276;    // its width when it stands beside the text instead
+    private const FB_LINE   = 26;     // one line of the quote
+    private const FB_CHAR   = 10.5;   // one character of it
+    private const FB_INSET  = 50;     // the padding and borders the text sits inside
+    private const FB_W_MIN  = 240;
+    private const FB_W_MAX  = 560;
 
     private const MARQUES = [
         ['key' => 'volkswagen', 'name' => 'Volkswagen',    'match' => ['volkswagen', 'vw']],
@@ -91,32 +98,40 @@ class HomePageController extends Controller
             ->values()
             ->map(function ($t) {
                 $len = mb_strlen(trim($t->quote));
-                // 1.35 characters per pixel of column width is what one column of
-                // this type at this size holds in the height a slide gives it.
-                $w = (int) max(240, min(560, round($len / 1.35)));
-                // Characters per line at that width, then the lines they need, then
-                // whether a photograph still has somewhere to be.
-                $lines = (int) ceil($len / max(18, $w / 8.5));
-                $room  = self::FB_TEXT_BOX - $lines * 26;
-                // One idea on two axes: the photograph takes what the text does
-                // not. A short review leaves height, so the picture sits above it
-                // and fills that height. A long one leaves none, so the picture
-                // goes beside it and the cell takes the width instead — which is
-                // also what stops a lone 753-character review from growing to a
-                // 139-character line because it was the only thing on the slide.
-                $side = $room < 120;
+
+                // How many lines of quote fit ABOVE a photograph that is still
+                // worth calling one, and how many fit BESIDE it.
+                $linesTop  = (int) floor((self::FB_CARD - self::FB_CHROME - self::FB_PHOTO) / self::FB_LINE);
+                $linesSide = (int) floor((self::FB_CARD - self::FB_CHROME) / self::FB_LINE);
+                $widthFor  = fn ($lines) => (int) ceil($len * self::FB_CHAR / $lines) + self::FB_INSET;
+
+                // The column is as wide as the text needs to fit in those lines.
+                // The first version had this backwards — it sized the column so
+                // the text filled the whole card, and then gave the photograph
+                // whatever was left, which for a 241-character review was THREE
+                // PIXELS. 14 of the 24 came out under 176px. The photograph's
+                // minimum is reserved first now, and the width is solved for it.
+                $need = $widthFor($linesTop);
+                $side = $need > self::FB_W_MAX;
+                $w    = max(self::FB_W_MIN, min(self::FB_W_MAX,
+                            $side ? $widthFor($linesSide) : $need));
+
                 return (object) [
                     'name'  => $t->author_name,
                     'quote' => trim($t->quote),
                     'len'   => $len,
                     'w'     => $w,
+                    // Past the widest column a review may be, the photograph
+                    // stops sharing the height and takes the width instead: a
+                    // full-height column of its own beside the words.
                     'side'  => $side,
-                    // On a phone there is one column and no width to trade, so
-                    // the three longest reviews are set a step smaller there —
-                    // at the body size they stood 155px past a card that is
-                    // already taller than the screen.
-                    'xl'    => $len > 600,
-                    'cell'  => $w + ($side ? self::FB_PHOTO + 16 : 0),
+                    'cell'  => $w + ($side ? self::FB_ASIDE : 0),
+                    // On a phone there is one column and no width to trade at
+                    // all, so past this length the photograph changes role there
+                    // rather than shrinking: it becomes a portrait beside the
+                    // name, and the quote is set a step smaller. Measured: these
+                    // five, and only these five, were squeezing it under 160px.
+                    'xl'    => $len > 480,
                     'img'   => $t->image_path,
                 ];
             });
