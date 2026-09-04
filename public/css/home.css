@@ -246,65 +246,126 @@
   body:has(.cat-dock) main{ padding-bottom:0; }
 }
 
-/* ============================================================================
-   The people — a mosaic
-   The quotes run 32 to 901 characters and 22 of 24 photographs are portrait.
-   A uniform grid can only hold that by cutting the longest quote, which is the
-   best one he has. So: fixed width, free height, nothing clamped, and two kinds
-   of tile — a photograph with its short quote, and a long quote set as type.
-   ========================================================================= */
-.hm-people{ position:relative; margin-top:var(--s-9); }
-.hm-people__head{ padding-bottom:var(--s-6); }
-.hm-people__head .hm-h2{ margin-bottom:var(--s-2); }
+/* ---- what they wrote ----------------------------------------------------
+   A carousel whose shape is decided by the reviews, not the other way round.
+   The column width is set per review in the controller and arrives as --cell;
+   inside the column the text takes what it needs and the photograph takes what
+   is left — the height, when the review is short and the picture sits above it;
+   the width, when the review is long and the picture stands beside it.
 
-.hm-mosaic{ overflow:hidden; }
-.hm-mosaic__in{
-  /* standing still: an ordinary mosaic in columns */
-  columns:4; column-gap:var(--s-4);
-  padding-inline:var(--mc-gutter-d);
-  max-width:var(--mc-container); margin-inline:auto;
+   --fb-h is the height every slide gets, sized for the tallest review's text
+   plus its padding and byline. Anything less and the longest review would need
+   a scrollbar inside a moving carousel. */
+.hm-fb{ padding-block:var(--s-9); background:var(--mc-band); overflow:hidden; }
+/* The measure belongs to the paragraph, not to the wrap: cat-wrap carries
+   margin-inline:auto, so a max-width on that same element centred the whole
+   heading block on a page that is left-aligned everywhere else. */
+.hm-fb__head{ margin-bottom:var(--s-7); }
+.hm-fb__head .hm-sec__p{ max-width:56ch; }
+.hm-fb__stage{ --fb-h:28rem; }
+
+.hm-fb__rail{
+  display:flex; overflow-x:auto; overflow-y:hidden;
+  scroll-snap-type:x mandatory; overscroll-behavior-x:contain;
+  scrollbar-width:none; -ms-overflow-style:none;
 }
-.hm-t{
-  break-inside:avoid; margin:0 0 var(--s-4);
+.hm-fb__rail::-webkit-scrollbar{ display:none; }
+.hm-fb__rail:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:4px; }
+.hm-fb__slide{
+  flex:0 0 100%; min-width:0; scroll-snap-align:start;
+  display:flex; gap:var(--s-5); align-items:stretch; height:var(--fb-h);
+}
+
+.fb{
+  /* figure carries the UA's `margin: 1em 40px`, which took 80px out of every
+     cell — 320px off a four-cell slide — so the packing's 240px floor rendered
+     at 186px and six reviews overflowed their box. */
+  margin:0;
+  flex:1 1 var(--cell); min-width:0;
+  /* leftover width is shared out, but only so far: past this the measure stops
+     being a measure, which is what happens to a lone long review on its own
+     slide if you let it grow to the full 1180px — 139 characters to the line. */
+  max-width:calc(var(--cell) + 5rem);
+  display:flex; flex-direction:column; overflow:hidden;
   background:var(--mc-surface); border:1px solid var(--mc-hairline);
   border-radius:var(--mc-r-card);
-  display:flex; flex-direction:column; gap:var(--s-3); padding-bottom:var(--s-4);
 }
-.hm-t__ph{ aspect-ratio:4 / 5; overflow:hidden; background:var(--mc-band); }
-.hm-t__ph img{ width:100%; height:100%; object-fit:cover; object-position:var(--pos-portrait); display:block; }
-.hm-t__q{
-  margin:0; padding:0 var(--s-4);
-  font-family:var(--f-voice); font-style:italic;
-  font-size:var(--t-small); line-height:1.55; color:var(--mc-ink-2);
+.fb--side{ flex-direction:row; }
+.fb__ph{ flex:1 1 auto; min-height:0; overflow:hidden; background:var(--mc-band); }
+.fb--side .fb__ph{ flex:0 0 16.25rem; height:auto; }
+/* these are people standing beside cars, so a centred crop takes their heads
+   off in a wide band. The system already has the bias for it. */
+.fb__ph img{ display:block; width:100%; height:100%; object-fit:cover;
+  object-position:var(--pos-portrait); }
+.fb__t{
+  flex:0 0 auto; display:flex; flex-direction:column; gap:var(--s-3);
+  padding:var(--s-5);
 }
-.hm-t__by{ padding:0 var(--s-4); font-size:var(--t-label); color:var(--mc-ink-3); }
-.hm-t__by b{ color:var(--mc-ink); font-weight:600; }
-/* the long ones carry themselves: no photograph, bigger type, an opening mark */
-.hm-t--said{ background:var(--mc-band); border-color:transparent; padding-top:var(--s-5); }
-.hm-t--said .hm-t__q{ font-size:var(--t-prose); line-height:1.5; color:var(--mc-ink); }
-.hm-t--said .hm-t__q::before{
-  content:"\201C"; display:block; margin-bottom:calc(var(--s-2) * -1);
-  font-size:2.6em; line-height:.8; color:var(--mc-control);
-}
-@media (max-width:1200px){ .hm-mosaic__in{ columns:3; } }
-@media (max-width:820px){ .hm-mosaic__in{ columns:2; padding-inline:var(--mc-gutter-m); } }
-@media (max-width:520px){ .hm-mosaic__in{ columns:1; } }
+.fb--side .fb__t{ flex:1 1 auto; min-width:0; }
+.fb__q{ margin:0; font-size:var(--t-prose); line-height:1.55; color:var(--mc-ink-2); }
+.fb__by{ margin-top:auto; font-size:var(--t-label); font-weight:600; color:var(--mc-ink); }
 
-/* ---- pinned, on a wide screen ------------------------------------------
-   The mosaic keeps its columns — it is the same object standing still or moving,
-   which is why a new review needs no arithmetic from anyone. The section holds it
-   for one screen and moves it faster than the page. */
-.hm-people.is-pinned .hm-people__pin{
-  position:sticky; top:0; height:100vh; height:100svh;
-  display:flex; flex-direction:column; gap:var(--s-4);
-  padding-block:var(--s-7) var(--s-6);
-  overflow:hidden;
+/* ---- the controls ---- */
+.hm-fb__bar{
+  display:flex; align-items:center; justify-content:center; gap:var(--s-4);
+  margin-top:var(--s-5);
 }
-.hm-people.is-pinned .hm-mosaic{
-  flex:1 1 auto; min-height:0;
-  /* No scrollbar of its own, on any engine: the movement belongs to the page, and
-     a bar inside the section would advertise a second scroll that does not exist. */
-  overflow:hidden; scrollbar-width:none; -ms-overflow-style:none;
+.hm-fb__nav{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:44px; height:44px; padding:0; cursor:pointer;
+  background:var(--mc-surface); border:1px solid var(--mc-rule); color:var(--mc-ink);
+  border-radius:var(--mc-r-card);
+  transition:border-color var(--m-quick) var(--e-out);
 }
-.hm-people.is-pinned .hm-mosaic::-webkit-scrollbar{ display:none; }
-.hm-people.is-pinned .hm-mosaic__in{ will-change:transform; }
+.hm-fb__nav:hover{ border-color:var(--mc-ink); }
+.hm-fb__nav:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:2px; }
+.hm-fb__ticks{ display:flex; align-items:center; gap:var(--s-2); margin:0; padding:0; list-style:none; }
+/* The mark is 24px of rule; the target around it is 44. Drawn at the size of the
+   target they were a row of heavy dashes, and drawn at the size of the mark they
+   were a 24x44 button — under the 24px floor entirely at 390px, where the bar
+   squeezed two of them to 20. */
+.hm-fb__ticks button{
+  display:flex; align-items:center; justify-content:center;
+  width:44px; height:44px; padding:0; border:0; background:none; cursor:pointer;
+}
+.hm-fb__ticks button::before{
+  content:""; display:block; width:24px; height:2px; background:var(--mc-rule);
+  transition:background var(--m-quick) var(--e-out);
+}
+.hm-fb__ticks button[aria-current="true"]::before{ background:var(--mc-ink); height:3px; }
+.hm-fb__count{ display:none; margin:0; font-size:var(--t-label); font-weight:600;
+  color:var(--mc-ink-2); font-variant-numeric:tabular-nums; }
+.hm-fb__ticks button:hover::before{ background:var(--mc-ink-3); }
+.hm-fb__ticks button:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:2px; }
+.hm-fb__play{
+  min-height:44px; padding-inline:var(--s-4); cursor:pointer;
+  background:none; border:1px solid var(--mc-rule); border-radius:var(--mc-r-card);
+  font-size:var(--t-label); font-weight:600; color:var(--mc-ink-2);
+  transition:border-color var(--m-quick) var(--e-out), color var(--m-quick) var(--e-out);
+}
+.hm-fb__play:hover{ border-color:var(--mc-ink); color:var(--mc-ink); }
+.hm-fb__play:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:2px; }
+
+@media (max-width:999px){
+  /* The packing was computed for a 1180px slide. There is no 1180px slide on a
+     phone, so the grouping is dissolved and every review becomes its own snap
+     unit — the rail the catalogue already uses. Left grouped, one slide held two
+     reviews and stood 2,459px tall with its own controls below the fold.
+     display:contents removes the slide's box without removing the slide from
+     the document, and the script switches its units to match. */
+  .hm-fb__stage{ --fb-h:auto; }
+  .hm-fb__rail{ gap:var(--s-4); align-items:flex-start; }
+  .hm-fb__slide{ display:contents; }
+  .fb, .fb--side{
+    flex:0 0 86%; max-width:none; scroll-snap-align:start;
+    flex-direction:column;
+  }
+  .fb__ph, .fb--side .fb__ph{ flex:0 0 auto; aspect-ratio:4 / 3; }
+}
+@media (max-width:680px){
+  /* Nine 44px targets do not fit beside two arrows and a pause button on a
+     phone, and swipe is the control anybody actually uses there. The count says
+     the same thing in the space available. */
+  .hm-fb__ticks{ display:none; }
+  .hm-fb__count{ display:block; }
+}

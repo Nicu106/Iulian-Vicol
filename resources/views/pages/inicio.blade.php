@@ -113,44 +113,89 @@
     </div>
   </section>
 
-  {{-- ============ the people ============
-       A mosaic, because the quotes run 32 to 901 characters and a uniform grid can
-       only hold that by cutting the longest — which is the best one he has. Fixed
-       width, free height, nothing clamped.
+  {{-- ============ what they wrote ============
+       A carousel, running on its own, holding every review in full.
 
-       On a wide screen the section is pinned and the mosaic travels sideways as the
-       page scrolls: 24 reviews at full length are 4.1 screens of ordinary page, and
-       this is one screen that the reader passes through. It is NOT scroll-hijacking
-       — the scroll stays the browser's own, so the wheel, the bar, the keyboard,
-       trackpad momentum and Page Down all behave exactly as they always do. Only the
-       direction the content moves is ours.
+       The measurements that decide the shape: 24 reviews, 6,900 characters,
+       7m25s of reading. 49% of all that text is in 5 of the 24 (494 to 901
+       characters) while 15 are under 250. One slide shape and one interval
+       cannot serve both — the first version's answer was to clamp the long ones
+       behind "Ver más", which shows a truncated review as if it were the review.
 
-       Narrow screens, reduced motion, and no JavaScript all get the plain vertical
-       mosaic: pinning a sideways rail on a phone would fail WCAG's 400% reflow, and
-       the mosaic reads perfectly well standing still. --}}
-  <section class="hm-people" id="reviews" aria-labelledby="h-wall">
-    <div class="hm-people__pin">
-      <div class="cat-wrap hm-people__head">
-        <h2 class="hm-h2" id="h-wall">{{ $wall->count() }} personas se hicieron la foto</h2>
-        <p class="hm-sec__p">Con el coche que se llevaron. Ninguna foto de archivo, ningún texto recortado.</p>
-      </div>
+       So the shape follows the text. Each review is a column as wide as it needs
+       to be, floored so it stays readable and capped at a 64-character measure,
+       and the columns are packed into slides. Inside a column the text takes what
+       it needs and THE PHOTOGRAPH TAKES WHAT IS LEFT: height when the review is
+       short, width when it is long. One idea on two axes, and every one of the
+       24 photographs is used at a size it earns.
 
-      <div class="hm-mosaic" id="mosaic">
-        <div class="hm-mosaic__in" id="mosaic-in">
-          @foreach($wall as $i => $t)
-            <figure class="hm-t hm-t--{{ $t->kind }}">
-              @if($t->kind === 'shot')
-                <div class="hm-t__ph">
-                  <img src="{{ $t->img }}" alt="{{ $t->name }} con su coche"
-                       loading="lazy" decoding="async" width="600" height="750">
+       The interval follows the text too — a slide's dwell is its own character
+       count, 7 to 12 seconds, so a dense slide is not gone before a sparse one
+       has been looked at.
+
+       It stops when you touch it, when you tab into it, when the tab is hidden,
+       when it scrolls out of view, and when you press pause — and it never
+       starts at all under prefers-reduced-motion. Without JavaScript the rail is
+       a plain horizontal scroller with all nine slides in it. --}}
+  <section class="hm-fb" id="reviews" aria-labelledby="h-fb">
+    <div class="cat-wrap hm-fb__head">
+      <h2 class="hm-h2" id="h-fb">{{ $reviewCount }} personas se hicieron la foto</h2>
+      <p class="hm-sec__p">Con el coche que se llevaron. Ninguna foto de archivo,
+        y ningún texto recortado: lo que escribieron está aquí entero.</p>
+    </div>
+
+    <div class="cat-wrap hm-fb__stage">
+      <div class="hm-fb__rail" id="fb-rail" tabindex="0"
+           role="group" aria-roledescription="carrusel" aria-label="Lo que escribieron los clientes">
+        @foreach($slides as $i => $row)
+          <div class="hm-fb__slide" role="group" aria-roledescription="diapositiva"
+               aria-label="{{ $i + 1 }} de {{ count($slides) }}"
+               data-chars="{{ collect($row)->sum('len') }}">
+            @foreach($row as $t)
+              @php
+                $src = fn ($w) => route('img.resize', ['w' => $w]) . '?p=' . urlencode($t->img);
+              @endphp
+              <figure class="fb {{ $t->side ? 'fb--side' : '' }}"
+                      style="--w:{{ $t->w }}px; --cell:{{ $t->cell }}px">
+                <div class="fb__ph">
+                  <img src="{{ $src(600) }}"
+                       srcset="{{ $src(400) }} 400w, {{ $src(600) }} 600w, {{ $src(900) }} 900w"
+                       sizes="(min-width:1000px) 320px, 70vw"
+                       alt="{{ $t->name }}, con su coche" loading="lazy" decoding="async">
                 </div>
-              @endif
-              <blockquote class="hm-t__q">{{ $t->quote }}</blockquote>
-              <figcaption class="hm-t__by"><b>{{ $t->name }}</b>@if($t->place) · {{ $t->place }}@endif</figcaption>
-            </figure>
-          @endforeach
-        </div>
+                <div class="fb__t">
+                  <blockquote class="fb__q">{{ $t->quote }}</blockquote>
+                  <figcaption class="fb__by">{{ $t->name }}</figcaption>
+                </div>
+              </figure>
+            @endforeach
+          </div>
+        @endforeach
       </div>
+
+      <div class="hm-fb__bar">
+        <button class="hm-fb__nav" type="button" data-go="-1" aria-label="Anterior">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+            <path d="M15 4 7 12l8 8" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="square"/></svg>
+        </button>
+
+        <p class="hm-fb__count" id="fb-count" aria-hidden="true"></p>
+
+        <ol class="hm-fb__ticks" id="fb-ticks">
+          @foreach($slides as $i => $row)
+            <li><button type="button" data-to="{{ $i }}"
+                        aria-label="Ir a la diapositiva {{ $i + 1 }}"></button></li>
+          @endforeach
+        </ol>
+
+        <button class="hm-fb__nav" type="button" data-go="1" aria-label="Siguiente">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+            <path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="square"/></svg>
+        </button>
+
+        <button class="hm-fb__play" id="fb-play" type="button" hidden>Pausar</button>
       </div>
     </div>
   </section>
@@ -247,81 +292,124 @@
 
 <script>
 (function () {
-  /* ---- the pinned mosaic -------------------------------------------------
-     The section is made tall; its contents stick to the top for that height; how
-     far the page has moved through it becomes how far the mosaic has moved — and
-     the mosaic moves FASTER than the page, so 24 reviews at full length pass in
-     less scrolling than they would occupy standing still.
+  /* ---- the carousel -----------------------------------------------------
+     A scroll-snap rail, not a transform carousel: swipe, trackpad, keyboard and
+     the scrollbar are the browser's own and cost nothing, and with the script
+     absent the rail is still a horizontal scroller holding every slide. Autoplay
+     is then only a scrollTo on a timer.
 
-     The browser keeps its own scroll throughout: nothing is intercepted, no event
-     is cancelled, no wheel is swallowed. The bar, the keyboard, trackpad momentum
-     and Page Down all behave exactly as they always do — only what the movement
-     is spent on is ours. That is the difference between this and scroll-hijacking:
-     the section can still be reversed, flung past, or landed in from a browser's
-     own restore-scroll, because none of those were ever taken away.
+     The dwell is the slide's own character count — 7s to 12s — because the
+     packing made the slides similar in reading time but not identical, and a
+     fixed interval would hand the densest slide the same seconds as the sparsest.
 
-     The mosaic itself is CSS columns: a new review needs no arithmetic from anyone,
-     it simply joins the flow and the section re-measures its own height on load
-     and on resize.
+     It does not run when: the reader prefers reduced motion (never), the pointer
+     is over it, focus is inside it, the tab is hidden, the section is off screen,
+     or pause has been pressed. That last one is WCAG 2.2.2 — anything that moves
+     by itself for more than five seconds needs a way to stop it — and the button
+     is only shown once we know the script is here to honour it. */
+  var rail = document.getElementById('fb-rail');
+  if (rail) {
+    // On a wide screen a slide is a packed group; below that the grouping is
+    // dissolved in CSS and every review is its own stop. The script asks the
+    // layout which it is rather than deciding for it.
+    var groups = Array.prototype.slice.call(rail.children);
+    var cells  = Array.prototype.slice.call(rail.querySelectorAll('.fb'));
+    var packed = window.matchMedia('(min-width: 1000px)');
+    var slides = packed.matches ? groups : cells;
+    var ticks  = Array.prototype.slice.call(document.querySelectorAll('#fb-ticks button'));
+    var play   = document.getElementById('fb-play');
+    var still  = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var at = 0, timer = null, paused = false, seen = true, over = false;
 
-     Narrow screens, reduced motion, and no JavaScript get the plain mosaic,
-     standing still: pinning on a phone would fail WCAG's 400% reflow, and the
-     mosaic reads perfectly well without moving. */
-  var sec  = document.getElementById('reviews');
-  var pin  = sec && sec.querySelector('.hm-people__pin');
-  var rail = document.getElementById('mosaic-in');
-
-  if (sec && rail && pin) {
-    var tiles = Array.prototype.slice.call(rail.children);
-    var wide  = window.matchMedia('(min-width: 1000px)');
-    var still = window.matchMedia('(prefers-reduced-motion: reduce)');
-    var SPEED = 2.1;              // the mosaic covers this much ground per page-pixel
-    var travel = 0, ticking = false;
-
-    function measure() {
-      if (!wide.matches || still.matches) {
-        sec.style.height = ''; rail.style.transform = '';
-        sec.classList.remove('is-pinned');
-        travel = 0;
-        /* Standing still in one column, 24 reviews are 12.6 screens — measured.
-           So where the section cannot be pinned it opens with six and hands over
-           the rest on request. Without JavaScript none of this runs and all 24 are
-           simply there, which is the honest fallback. */
-        var many = tiles.length > 6 && window.innerWidth < 700;
-        return;
-      }
-      sec.classList.add('is-pinned');
-      sec.style.height = '';
-      rail.style.transform = '';
-      // How much taller the mosaic is than the window it is read through — the
-      // window, not the section: the pin also holds the heading and its padding,
-      // and measuring against the whole thing left the last tile 100px below the
-      // fold at the end of the travel, permanently unread.
-      var view = sec.querySelector('.hm-mosaic');
-      var over = Math.max(0, rail.scrollHeight - view.clientHeight);
-      travel = over;
-      // the page pays for it at SPEED — the whole point of pinning it
-      sec.style.height = (window.innerHeight + over / SPEED) + 'px';
-      draw();
+    function dwell(i) {
+      var n = +(slides[i].getAttribute('data-chars') || 400);
+      return Math.max(7000, Math.min(12000, n * 10.5));
     }
-    function draw() {
-      if (!travel) return;
-      var top = sec.getBoundingClientRect().top;
-      var page = (sec.offsetHeight - window.innerHeight) || 1;
-      var p = Math.min(1, Math.max(0, -top / page));
-      rail.style.transform = 'translate3d(0,' + (-p * travel) + 'px,0)';
+    var count = document.getElementById('fb-count');
+    function mark() {
+      var on = Math.round(at / Math.max(1, slides.length - 1) * (ticks.length - 1));
+      ticks.forEach(function (t, k) {
+        t.setAttribute('aria-current', k === on ? 'true' : 'false');
+      });
+      if (count) { count.textContent = (at + 1) + ' / ' + slides.length; }
+    }
+    function go(i, smooth) {
+      at = (i + slides.length) % slides.length;
+      rail.scrollTo({ left: slides[at].offsetLeft - slides[0].offsetLeft,
+                      behavior: smooth && !still.matches ? 'smooth' : 'auto' });
+      mark();
+    }
+    function stop() { if (timer) { clearTimeout(timer); timer = null; } }
+    function tick() {
+      stop();
+      if (still.matches || paused || over || !seen || document.hidden) { return; }
+      timer = window.setTimeout(function () { go(at + 1, true); tick(); }, dwell(at));
     }
 
-
-    window.addEventListener('scroll', function () {
-      if (ticking) return; ticking = true;
-      requestAnimationFrame(function () { draw(); ticking = false; });
+    // the rail is the source of truth: a swipe moves it, and everything follows
+    var settle = null;
+    rail.addEventListener('scroll', function () {
+      window.clearTimeout(settle);
+      settle = window.setTimeout(function () {
+        var x = rail.scrollLeft + slides[0].offsetLeft, best = 0, d = Infinity;
+        slides.forEach(function (s, k) {
+          var v = Math.abs(s.offsetLeft - x);
+          if (v < d) { d = v; best = k; }
+        });
+        if (best !== at) { at = best; mark(); }
+        tick();
+      }, 120);
     }, { passive: true });
-    window.addEventListener('resize', measure);
-    wide.addEventListener('change', measure);
-    still.addEventListener('change', measure);
-    window.addEventListener('load', measure);   // the photographs decide the height
-    measure();
+
+    document.querySelectorAll('.hm-fb__nav').forEach(function (b) {
+      b.addEventListener('click', function () { go(at + (+b.getAttribute('data-go')), true); tick(); });
+    });
+    ticks.forEach(function (t, k) {
+      t.addEventListener('click', function () {
+        go(Math.round(k / Math.max(1, ticks.length - 1) * (slides.length - 1)), true); tick();
+      });
+    });
+
+    if (play) {
+      play.hidden = false;
+      play.addEventListener('click', function () {
+        paused = !paused;
+        play.textContent = paused ? 'Reanudar' : 'Pausar';
+        play.setAttribute('aria-pressed', paused ? 'true' : 'false');
+        tick();
+      });
+      play.setAttribute('aria-pressed', 'false');
+    }
+
+    var sec = document.getElementById('reviews');
+    ['pointerenter', 'focusin'].forEach(function (e) {
+      sec.addEventListener(e, function () { over = true; stop(); });
+    });
+    ['pointerleave', 'focusout'].forEach(function (e) {
+      sec.addEventListener(e, function () {
+        if (e === 'focusout' && sec.contains(document.activeElement)) { return; }
+        over = false; tick();
+      });
+    });
+    document.addEventListener('visibilitychange', tick);
+    still.addEventListener('change', function () { still.matches ? stop() : tick(); });
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) {
+        seen = es[0].isIntersecting; tick();
+      }, { threshold: 0.25 }).observe(sec);
+    }
+
+    function relayout() {
+      var next = packed.matches ? groups : cells;
+      if (next !== slides) { slides = next; at = Math.min(at, slides.length - 1); }
+      // the ticks count the packed groups; off the packed layout they still mark
+      // progress through the same reviews, so map the stop onto them
+      go(at, false);
+    }
+    packed.addEventListener('change', relayout);
+    window.addEventListener('resize', relayout);
+    mark(); tick();
   }
 
   document.documentElement.className += ' js';
