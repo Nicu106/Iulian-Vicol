@@ -279,7 +279,7 @@
 }
 
 .hm-fb__rail{
-  --fb-h:28rem;
+  --fb-h:32.5rem;
   display:flex; overflow-x:auto; overflow-y:hidden;
   scrollbar-width:none; -ms-overflow-style:none;
   overscroll-behavior-x:contain;
@@ -337,24 +337,47 @@
   border-radius:var(--mc-r-card);
 }
 .fb--side{ flex-direction:row; }
+/* One height for every card, and the controller solves the shapes against this
+   same number. The words scroll past it only if someone writes something no
+   card of any width could hold. */
+.hm-fb__row{ align-items:stretch; }
+.fb{ height:35rem; }
 /* Fixed, not "whatever is left". Letting the photograph absorb the slack gave
    every card a different photo height — 199, 226, 310 side by side — and a row
    of pictures ending at random heights reads as a collage, not as a rail. The
    width solved in the controller guarantees the words fit under exactly this
    much, so the band across the top is now one straight line the whole way. The
    slack goes under the quote instead, where it is just air. */
-.fb__ph{ flex:0 0 12.5rem; overflow:hidden; background:var(--mc-band); }
-.fb--side .fb__ph{ flex:0 0 16.25rem; height:auto; }   /* beside the words: full height, and it keeps the slack */   /* 260px + the 16px it sits away from the words = the 276 the controller reserves */
-/* these are people standing beside cars, so a centred crop takes their heads
-   off in a wide band. The system already has the bias for it. */
-.fb__ph img{ display:block; width:100%; height:100%; object-fit:cover;
-  object-position:var(--pos-portrait); }
+/* The box carries the picture's OWN aspect ratio, so there is nothing to crop
+   and nothing to letterbox. Landscape sits above the words and takes the card's
+   width; portrait stands beside them and takes the card's height. The picture's
+   own orientation decides, so anything uploaded later arranges itself. */
+.fb__ph{ flex:0 0 auto; width:100%; aspect-ratio:var(--ratio, 4/3);
+  overflow:hidden; background:var(--mc-band); }
+.fb--side .fb__ph{ flex:0 0 var(--pw); width:var(--pw); height:100%; aspect-ratio:auto; }   /* 260px + the 16px it sits away from the words = the 276 the controller reserves */
+/* CONTAIN, NOT COVER. This is the whole answer to heads coming off. `cover`
+   fills the box by throwing away whatever does not fit, and no object-position
+   can be right for a photograph nobody has seen yet: measured on the real
+   files, the old band showed 49% of a 3:4 photo's height and the old column
+   beside the text showed 78% of its width. `contain` cannot cut anything. And
+   because the box is already the picture's own shape, for a normal photograph
+   there is nothing to letterbox either — the two agree exactly. Something
+   extreme gets a mat of --mc-band around it, and still loses nothing. */
+.fb__ph img{ display:block; width:100%; height:100%; object-fit:contain; }
 .fb__t{
-  flex:0 0 auto; display:flex; flex-direction:column; gap:var(--s-3);
+  flex:1 1 auto; width:var(--w); display:flex; flex-direction:column; gap:var(--s-3);
   padding:var(--s-5);
+  /* The safety net, and only that. The shape is solved so the words fit, and
+     for anything anyone is likely to write they do. But "any text of any size"
+     has no upper bound, and a card does — so past the point where no width and
+     no type size can hold it, the words scroll rather than being cut off. */
+  overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin;
 }
-.fb--side .fb__t{ flex:1 1 auto; min-width:0; }
-.fb__q{ margin:0; font-size:var(--t-prose); line-height:1.55; color:var(--mc-ink-2); }
+.fb--side .fb__t{ flex:0 0 var(--w); min-width:0; }
+/* --scale is 1 for every review anyone has written so far; it steps down only
+   when a card cannot otherwise hold the words. */
+.fb__q{ margin:0; font-size:calc(var(--t-prose) * var(--scale, 1)); line-height:1.55;
+  color:var(--mc-ink-2); }
 .fb__by{ margin-top:auto; font-size:var(--t-label); font-weight:600; color:var(--mc-ink); }
 
 @media (max-width:999px){
@@ -373,9 +396,11 @@
      stood 1,070px high with 600px of nothing under it. */
   .hm-fb__row{ gap:var(--s-4); padding-inline:var(--mc-gutter-m) 0; align-items:flex-start; }
   .fb, .fb--side{ flex:0 0 86vw; max-width:22rem; height:var(--fb-h); flex-direction:column; }
-  /* Here it does absorb the slack, because a phone shows one card at a time and
-     there is no neighbour to be ragged against. */
-  .fb__ph, .fb--side .fb__ph{ flex:1 1 auto; min-height:4.5rem; aspect-ratio:auto; }
+  /* One card at a time here, so the photograph simply takes the room the words
+     leave — and being contained, it shrinks inside that room rather than being
+     cut by it. A long review therefore gets a small whole picture, not a sliver
+     of a big one. */
+  .fb__ph, .fb--side .fb__ph{ flex:1 1 auto; min-height:6rem; aspect-ratio:auto; }
   /* Past a length there is no arrangement on a 390px screen that holds both
      the words and a photograph worth looking at. So it stops being a band
      across the top — which at 90px was a sliver of somebody's head — and

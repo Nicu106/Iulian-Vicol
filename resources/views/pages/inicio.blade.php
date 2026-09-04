@@ -152,7 +152,7 @@
           @foreach($reviews as $t)
             @php $src = fn ($w) => route('img.resize', ['w' => $w]) . '?p=' . urlencode($t->img); @endphp
             <figure class="fb {{ $t->side ? 'fb--side' : '' }} {{ $t->xl ? 'fb--xl' : '' }}"
-                    style="--w:{{ $t->w }}px; --cell:{{ $t->cell }}px">
+                    style="--w:{{ $t->w }}px; --cell:{{ $t->cell }}px; --pw:{{ $t->pw }}px; --ratio:{{ $t->ratio }}">
               <div class="fb__ph">
                 <img src="{{ $src(600) }}"
                      srcset="{{ $src(400) }} 400w, {{ $src(600) }} 600w, {{ $src(900) }} 900w"

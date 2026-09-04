@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Testimonial;
+use Illuminate\Support\Facades\Cache;
 use App\Models\Vehicle;
 use Illuminate\View\View;
 
@@ -18,15 +19,28 @@ class HomePageController extends Controller
     /* The card's own dimensions, and what has to fit inside them. Kept here
      * because the CSS lays out the same numbers, and measured against the
      * rendered page rather than guessed. */
-    private const FB_CARD   = 448;    // the height every card gets
+    /* The card height is not a number somebody picked — it is derived from the
+     * longest review there is, clamped so one enormous one cannot make the whole
+     * row a wall. Anything that still will not fit is set a step smaller rather
+     * than truncated, so any text of any length has somewhere to go. */
+    /* Both measured off the rendered page, not estimated: the quote sets at 18px
+     * with a 27.9px line, and across the 23 multi-line reviews one character
+     * takes between 8.91 and 11.48px. The worst case is the one to plan with —
+     * budget for the median and the wide ones overflow, which is exactly what
+     * two of them were doing. */
+    private const FB_LINE   = 28;     // one line of the quote
+    private const FB_CHAR   = 11.5;   // one character of it, at its widest
+    private const FB_CARD   = 560;    // the height of every card, and the CSS agrees
     private const FB_CHROME = 88;     // its padding, plus the byline under the quote
-    private const FB_PHOTO  = 200;    // the least a photograph can be and still be one
-    private const FB_ASIDE  = 276;    // its width when it stands beside the text instead
-    private const FB_LINE   = 26;     // one line of the quote
-    private const FB_CHAR   = 10.5;   // one character of it
-    private const FB_INSET  = 50;     // the padding and borders the text sits inside
+    private const FB_INSET  = 50;     // the padding and borders the words sit inside
     private const FB_W_MIN  = 240;
-    private const FB_W_MAX  = 560;
+    private const FB_W_HARD = 900;    // and the one we will accept rather than not fit
+    /* The widest a card may be and still put the photograph on top. Beyond this
+     * the band would be wider than 1.54:1, and a 3:4 phone photograph of people
+     * standing next to a car does not survive a crop much flatter than that —
+     * measured on all 24: at 2.35:1 several were decapitated. This is a ratio
+     * ceiling expressed as a width, and it holds for any review anyone adds
+     * later, of any length, without anybody looking at the photograph. */
 
     private const MARQUES = [
         ['key' => 'volkswagen', 'name' => 'Volkswagen',    'match' => ['volkswagen', 'vw']],
@@ -38,6 +52,73 @@ class HomePageController extends Controller
 
     /** Months the "al mes" figure is spread over. No interest — the widget says so. */
     public const MONTHS = 48;
+
+    /**
+     * The shape of one card.
+     *
+     * Only two things are decided here, and both are coarse on purpose:
+     * WHERE the photograph goes, from the picture's own orientation, and HOW
+     * WIDE the words are, from how many there are. Everything that depends on
+     * font metrics — how tall a card ends up, where the lines break — is left to
+     * the browser, which knows. Solving that here meant estimating characters
+     * per pixel, and every correction to the estimate just moved the overflow
+     * somewhere else: measured at 8.91 to 11.48px per character across 23
+     * reviews, there is no single number that is right.
+     *
+     * NOTHING IS EVER CROPPED. The photograph's box carries the picture's own
+     * aspect-ratio, so there is nothing to cut and nothing to letterbox, and
+     * `contain` catches anything the ratio cannot express.
+     *
+     * The text block is sized to stay roughly as wide as it is tall, whatever
+     * the length — so five words get a narrow column and nine hundred get a
+     * broad one, and neither is a sliver or a wall.
+     */
+    public static function shapeFor(int $len, float $ratio): array
+    {
+        $ratio = max(0.2, min(4.0, $ratio));
+
+        $side = $ratio < 1.0;
+
+        // The card's height is fixed, so the photograph's width follows from the
+        // picture's own shape and the words' width follows from how many there
+        // are. Nothing is circular and nothing is cropped.
+        //
+        // It has to be this way round. Letting the card size itself to its
+        // contents put the photograph's width behind an aspect-ratio on a
+        // stretched box, whose height is only known once the card is sized — and
+        // a browser resolving that circle guesses low: measured, a card came out
+        // 370px wide holding a 423px photograph and clipped its own text to a
+        // sliver.
+        $lines = max(1, (int) floor((self::FB_CARD - self::FB_CHROME
+                 - ($side ? 0 : (int) round(self::FB_CARD * 0.62))) / self::FB_LINE));
+        $w  = (int) ceil($len * self::FB_CHAR / $lines) + self::FB_INSET;
+        $w  = max(self::FB_W_MIN, min(self::FB_W_HARD, $w));
+        $pw = (int) round(($side ? self::FB_CARD : $w) * $ratio);
+
+        return [
+            'side'  => $side,
+            'w'     => $w,
+            'pw'    => $side ? $pw : $w,
+            'ph'    => $side ? self::FB_CARD : (int) round($w / $ratio),
+            'cell'  => $side ? $pw + 16 + $w : $w,
+            'ratio' => round($ratio, 4),
+        ];
+    }
+
+    /** A photograph's aspect ratio, read once per file and remembered. Falls back
+     *  to 3:4 — what a phone shoots — if the file is missing or unreadable, so a
+     *  broken path costs a shape, not a fatal. */
+    private function ratioOf(?string $path): float
+    {
+        $file = public_path(ltrim((string) $path, '/'));
+        $key  = 'fb-ratio:' . md5($file) . ':' . (@filemtime($file) ?: 0);
+        $r = Cache::remember($key, now()->addDays(30), function () use ($file) {
+            $s = @getimagesize($file);
+            return ($s && $s[1] > 0) ? $s[0] / $s[1] : 0.75;
+        });
+        // keep it inside what a card can hold; contain does the rest
+        return max(0.45, min(2.2, (float) $r));
+    }
 
     public function index(): View
     {
@@ -96,45 +177,16 @@ class HomePageController extends Controller
             ->whereNotNull('image_path')->get()
             ->filter(fn ($t) => mb_strlen(trim((string) $t->quote)) > 20)   // one review is a comma
             ->values()
-            ->map(function ($t) {
-                $len = mb_strlen(trim($t->quote));
-
-                // How many lines of quote fit ABOVE a photograph that is still
-                // worth calling one, and how many fit BESIDE it.
-                $linesTop  = (int) floor((self::FB_CARD - self::FB_CHROME - self::FB_PHOTO) / self::FB_LINE);
-                $linesSide = (int) floor((self::FB_CARD - self::FB_CHROME) / self::FB_LINE);
-                $widthFor  = fn ($lines) => (int) ceil($len * self::FB_CHAR / $lines) + self::FB_INSET;
-
-                // The column is as wide as the text needs to fit in those lines.
-                // The first version had this backwards — it sized the column so
-                // the text filled the whole card, and then gave the photograph
-                // whatever was left, which for a 241-character review was THREE
-                // PIXELS. 14 of the 24 came out under 176px. The photograph's
-                // minimum is reserved first now, and the width is solved for it.
-                $need = $widthFor($linesTop);
-                $side = $need > self::FB_W_MAX;
-                $w    = max(self::FB_W_MIN, min(self::FB_W_MAX,
-                            $side ? $widthFor($linesSide) : $need));
-
-                return (object) [
+            ->map(fn ($t) => (object) array_merge(
+                    self::shapeFor(mb_strlen(trim($t->quote)), $this->ratioOf($t->image_path)),
+                [
                     'name'  => $t->author_name,
                     'quote' => trim($t->quote),
-                    'len'   => $len,
-                    'w'     => $w,
-                    // Past the widest column a review may be, the photograph
-                    // stops sharing the height and takes the width instead: a
-                    // full-height column of its own beside the words.
-                    'side'  => $side,
-                    'cell'  => $w + ($side ? self::FB_ASIDE : 0),
-                    // On a phone there is one column and no width to trade at
-                    // all, so past this length the photograph changes role there
-                    // rather than shrinking: it becomes a portrait beside the
-                    // name, and the quote is set a step smaller. Measured: these
-                    // five, and only these five, were squeezing it under 160px.
-                    'xl'    => $len > 480,
+                    'len'   => mb_strlen(trim($t->quote)),
+                    'xl'    => mb_strlen(trim($t->quote)) > 480,
                     'img'   => $t->image_path,
-                ];
-            });
+                ]
+            ));
 
         return view('pages.inicio', [
             'available' => $available,
