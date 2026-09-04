@@ -20,19 +20,31 @@
 
 <main class="ct">
 
-  {{-- ---- the hero ---------------------------------------------------------
-       The words sit where the photograph can carry them. Found by sliding a
-       text-sized block across the whole frame and scoring each position by its
-       LIGHTEST pixel — that is what decides legibility, not the average. For this
-       picture the answer is lower-right, 13.62:1, against 1.43:1 lower-left where
-       they were. No text-shadow: a line that needs one is in the wrong place. --}}
-  <section class="ct-hero">
-    <img class="ct-hero__img" src="{{ $hero }}" width="2400" height="3200"
-         alt="Un Porsche Cayman con matrícula alemana" fetchpriority="high" decoding="async">
-    <div class="ct-hero__in cat-wrap">
-      <p class="ct-hero__kicker">Málaga · {{ $sold }} coches entregados</p>
-      <h1 class="ct-h1">Escríbeme.<br>Contesto yo.</h1>
-      <p class="ct-lead">No hay centralita ni formulario esperando a que alguien lo mire.</p>
+  {{-- ==================================================================
+       The opening: the picture becomes the page
+
+       One car filling the screen. As you scroll it slices into columns, the
+       columns turn WHITE, and they descend — and what they descend into is the
+       page itself, which is white. The photograph does not fade out; it is
+       converted into the surface everything below is printed on.
+
+       The words sit lower-right, where a sliding-block scan of this photograph
+       put the best position for white type: 13.62:1 at its lightest pixel,
+       against 1.43:1 lower-left. No text-shadow — a line that needs one is in
+       the wrong place.
+       ================================================================== --}}
+  <section class="ct-open" id="open">
+    <div class="ct-open__pin">
+      <div class="ct-open__cols" id="cols" style="--hero:url('{{ $hero }}')"></div>
+
+      <img class="ct-open__plain" src="{{ $hero }}" width="2400" height="3200"
+           alt="Un Porsche Cayman con matrícula alemana" fetchpriority="high" decoding="async">
+
+      <div class="ct-open__words" id="open-words">
+        <p class="ct-hero__kicker">Málaga · {{ $sold }} coches entregados</p>
+        <h1 class="ct-h1">Escríbeme.<br>Contesto yo.</h1>
+        <p class="ct-lead">No hay centralita ni formulario esperando a que alguien lo mire.</p>
+      </div>
     </div>
   </section>
 
@@ -212,6 +224,118 @@
 <script>
 (function () {
   document.documentElement.className += ' js';
+
+  /* ---- the picture becomes the page ------------------------------------
+     Twelve columns carry one photograph between them — size and position are
+     computed from the picture's own proportions, because a percentage pair on
+     background-size forces both axes and would stretch it.
+
+     frame by frame
+       0.00        the car, whole, with the words on it
+       0.00-0.16   the columns part; the words go
+       0.14-0.42   each column turns white, left to right — the picture is being
+                   converted, not hidden
+       0.30-1.00   they descend, staggered, accelerating on t², and the white they
+                   leave behind IS the page: the section under this one is white,
+                   so the last frame of the animation and the first frame of the
+                   content are the same surface
+
+     Transform and opacity only, so it stays on the compositor, and the scroll is
+     never intercepted: the section is tall, its contents stick, page distance
+     becomes animation distance.
+
+     Below 900px, with reduced motion, or without JavaScript no columns are built
+     at all — the photograph is simply there, at its own size, and the page carries
+     on. The picture is content; the conversion is decoration. ================ */
+  var open = document.getElementById('open');
+  var host = document.getElementById('cols');
+  var words = document.getElementById('open-words');
+  if (open && host) {
+    var N = 12;
+    var wide = window.matchMedia('(min-width: 900px)');
+    var still = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var kids = [], ticking = false, IMG = { w: 0, h: 0 };
+
+    var probe = new Image();
+    probe.onload = function () { IMG.w = probe.naturalWidth; IMG.h = probe.naturalHeight; measure(); };
+    probe.src = @json($hero);
+
+    function build() {
+      host.innerHTML = ''; kids = [];
+      for (var i = 0; i < N; i++) {
+        var col = document.createElement('span');
+        col.className = 'ct-col';
+        var pic = document.createElement('span');
+        pic.className = 'ct-col__pic';
+        col.appendChild(pic);
+        host.appendChild(col);
+        kids.push({ col: col, pic: pic });
+      }
+    }
+
+    function frame() {
+      if (!IMG.w || !kids.length) return;
+      var vw = window.innerWidth, vh = host.clientHeight || window.innerHeight;
+      var scale = Math.max(vw / IMG.w, vh / IMG.h);       // cover, computed
+      var dw = IMG.w * scale, dh = IMG.h * scale;
+      var ox = (vw - dw) / 2, oy = (vh - dh) * 0.52;
+      var colw = vw / N;
+      for (var i = 0; i < N; i++) {
+        kids[i].pic.style.backgroundSize = dw + 'px ' + dh + 'px';
+        kids[i].pic.style.backgroundPosition = (ox - i * colw) + 'px ' + oy + 'px';
+      }
+    }
+
+    function measure() {
+      if (!wide.matches || still.matches || !IMG.w) {
+        open.classList.remove('is-live'); open.style.height = ''; return;
+      }
+      if (!kids.length) build();
+      open.classList.add('is-live');
+      // 1.9 screens: one to look at the car, 0.9 to convert it. At 2.4 the columns
+      // had all landed by 0.78 and the last fifth of the section was a blank white
+      // screen — the transition finished and then waited.
+      open.style.height = (window.innerHeight * 1.9) + 'px';
+      frame(); draw();
+    }
+
+    var clamp = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
+    var span = function (p, a, b) { return clamp((p - a) / (b - a)); };
+
+    function draw() {
+      if (!open.classList.contains('is-live')) return;
+      var top = open.getBoundingClientRect().top;
+      var run = open.offsetHeight - window.innerHeight || 1;
+      var p = clamp(-top / run);
+      var vh = window.innerHeight;
+
+      if (words) words.style.opacity = String(1 - span(p, 0.03, 0.15));
+
+      for (var i = 0; i < N; i++) {
+        var lag = (i / N) * 0.26;
+        // The picture drains out of this column — one column at a time, left to
+        // right. With a small stagger every column bleached at once and the frame
+        // just looked washed out; the conversion has to be legible as an order.
+        var white = clamp((span(p, 0.14, 0.46) - (i / N) * 0.55) / (1 - 0.55));
+        kids[i].pic.style.opacity = String(1 - white);
+        // then the white column goes down
+        var t = clamp((span(p, 0.30, 0.96) - lag) / (1 - 0.26));
+        var gap = span(p, 0, 0.16) * 8;
+        var x = (i - (N - 1) / 2) * gap;
+        kids[i].col.style.transform =
+          'translate3d(' + x + 'px,' + (t * t * vh * 1.25) + 'px,0)';
+      }
+    }
+
+    window.addEventListener('scroll', function () {
+      if (ticking) return; ticking = true;
+      requestAnimationFrame(function () { draw(); ticking = false; });
+    }, { passive: true });
+    window.addEventListener('resize', measure);
+    wide.addEventListener('change', measure);
+    still.addEventListener('change', measure);
+    measure();
+  }
 
   /* ---- the roads draw themselves --------------------------------------
      Triggered by arrival, not tied to scroll position. Tying it to scroll meant
