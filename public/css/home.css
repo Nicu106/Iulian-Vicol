@@ -285,11 +285,36 @@
   overscroll-behavior-x:contain;
   /* Not a container with the cards clipped at its edge — a window they pass
      through. This is the detail that decides whether a moving row reads as an
-     object or as a filmstrip that got cut off. */
-  -webkit-mask-image:linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
-          mask-image:linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
+     object or as a filmstrip that got cut off.
+
+     Three stops, not two, and the middle one is at 20% alpha rather than 50%.
+     A plain transparent→opaque gradient is linear in alpha, and perceived
+     opacity is not: it reads as a grey haze laid over the edge. Held near
+     transparent for the first half of the band and then ramped, the cards
+     appear to emerge instead. Linear ships exactly this curve at 64px; the
+     band is wider here because this row is full-bleed and its cards are tall.
+     In px, not %, so it does not change size with the viewport. */
+  --fade:5.5rem;
+  -webkit-mask-image:linear-gradient(to right,
+    transparent 0,
+    rgba(0,0,0,.2) calc(var(--fade) / 2),
+    #000 var(--fade),
+    #000 calc(100% - var(--fade)),
+    rgba(0,0,0,.2) calc(100% - var(--fade) / 2),
+    transparent 100%);
+          mask-image:linear-gradient(to right,
+    transparent 0,
+    rgba(0,0,0,.2) calc(var(--fade) / 2),
+    #000 var(--fade),
+    #000 calc(100% - var(--fade)),
+    rgba(0,0,0,.2) calc(100% - var(--fade) / 2),
+    transparent 100%);
 }
 .hm-fb__rail::-webkit-scrollbar{ display:none; }
+/* A plain mouse has no way into a horizontal row — the wheel belongs to the page
+   and there are no buttons. So it can be taken hold of and thrown. */
+.hm-fb__rail{ cursor:grab; }
+.hm-fb__rail.is-held{ cursor:grabbing; user-select:none; }
 .hm-fb__rail:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:-3px; }
 .hm-fb__row{ display:flex; gap:var(--s-5); padding-inline:var(--s-5) 0; }
 .hm-fb__row + .hm-fb__row{ padding-inline:var(--s-5) 0; }
@@ -328,9 +353,8 @@
      as a broken grid, and sized to the tallest they left 600px of nothing under
      a 32-character review. The floor keeps a band of the picture even on the
      901-character one, which is the only review with no room for it. */
-  .hm-fb__rail{ --fb-h:46rem;
-    -webkit-mask-image:linear-gradient(to right, #000 88%, transparent);
-            mask-image:linear-gradient(to right, #000 88%, transparent); }
+  .hm-fb__rail{ --fb-h:46rem; --fade:1.5rem;
+  }
   /* align-items on the rail governs the two rows, not the cells inside them:
      left there, every cell stretched to the tallest and a 32-character review
      stood 1,070px high with 600px of nothing under it. */

@@ -266,39 +266,47 @@
   /* ---- the drift --------------------------------------------------------
      The row moves by itself, for ever, and there is nothing to press. It is the
      browser's own scroller underneath, so a trackpad, a swipe, shift+wheel and
-     the arrow keys all work on it for free, and a flick keeps the platform's own
-     momentum rather than an imitation of it. All this adds is a constant
-     velocity on top and a wrap at the seam.
+     the arrow keys all work on it for free, and a swipe keeps the platform's own
+     momentum rather than an imitation of it. This adds a constant velocity on
+     top, a wrap at the seam, and — because a plain mouse has no way into a
+     horizontal row — grab and throw.
 
-     Velocity is never set, only aimed at: `v` chases `want` with a time
-     constant, so hovering does not stop the row dead — it takes it down to a
-     stop over about a quarter of a second, and lets it back up the same way.
-     A hard stop is the single thing that makes one of these feel like a widget.
+     The numbers are not invented. Every marquee library that states its speed in
+     px/sec picks 50; Linear's and Vercel's shipped logo walls work out at 20-24.
+     Neither is right here, because those are logos and these are sentences: at
+     238 words per minute a 40-word review needs about ten seconds, and a card
+     stays fully legible for roughly 700px of travel. 34px/s gives it twenty.
 
-     dt-normalised, so a 120Hz screen does not run it at twice the speed.
+     Hover does not stop the row dead — that is the single clearest tell of a
+     cheap one. It takes it down to a quarter speed, which is slow enough to read
+     and still visibly alive. Keyboard focus and the stop button do stop it, on
+     purpose: someone reading with a keyboard is not hovering anything.
 
-     It yields to the reader completely: any wheel, drag, touch or key inside the
-     rail suspends the drift, and it only creeps back once they have been still
-     for a moment. And it never starts at all under prefers-reduced-motion. */
+     Velocity is damped, never assigned: v moves toward its target by
+     1 - e^(-dt/tau), the frame-rate-independent form, so 60Hz and 120Hz settle
+     over the same 150ms rather than the same number of frames.
+
+     It never starts at all under prefers-reduced-motion, and the row stays a
+     scrollable row in that case rather than becoming a dead block. */
   var rail = document.getElementById('fb-rail');
   if (rail) {
-    var SPEED = 34;        // px per second
-    var TAU   = 260;       // ms for the velocity to close most of a change
-    var YIELD = 1400;      // ms of stillness before the drift comes back
+    var SPEED = 34;        // px/s
+    var HOVER = 0.25;      // what hovering takes it down to, not zero
+    var TAU   = 150;       // ms; the damping time constant
+    var THROW = 325;       // ms; the decay of a flick, the iOS-derived constant
+    var YIELD = 1200;      // ms of stillness before the drift comes back
     var still = window.matchMedia('(prefers-reduced-motion: reduce)');
     var halt  = document.getElementById('fb-halt');
-
+    var sec   = document.getElementById('reviews');
     var row   = rail.firstElementChild;
-    var rowW  = 0, v = 0, over = false, stopped = false, busy = 0, last = 0, raf = 0;
-    // The drift's own position, in floating point. scrollLeft rounds, so adding
-    // 0.57px to it every frame did not move it 0.57px — it rounded up to a whole
-    // one, and the row ran at exactly one pixel per frame whatever SPEED said.
-    // Measured before the fix: 181 frames, 181px, 60.3px/s against a constant of
-    // 34. We keep the position and hand the scroller a number; when the reader
-    // takes over, we take theirs back.
-    var pos = 0, mine = 0;
+
+    var rowW = 0, v = 0, pos = 0, mine = 0, last = 0, raf = 0;
+    var over = false, keyed = false, stopped = false, busy = 0;
+    var held = false, moved = false, px = 0, ppos = 0, pt = 0, fling = 0;
 
     function measure() { rowW = row.scrollWidth; }
+    function wrap(x) { return x >= rowW ? x - rowW : x < 0 ? x + rowW : x; }
+    function put(x) { pos = wrap(x); rail.scrollLeft = pos; mine = performance.now(); }
 
     function frame(now) {
       raf = requestAnimationFrame(frame);
@@ -306,50 +314,88 @@
       last = now;
       if (!rowW) { measure(); return; }
 
-      var want = (still.matches || stopped || over || now < busy) ? 0 : SPEED;
+      if (held) { return; }                      // the hand has it
+
+      if (Math.abs(fling) > 12) {                // ...and has just let go
+        put(pos + fling * dt / 1000);
+        fling *= Math.exp(-dt / THROW);
+        v = fling > 0 ? Math.min(fling, SPEED) : 0;   // hand the drift back a moving row
+        return;
+      }
+      fling = 0;
+
+      var want = (still.matches || stopped || keyed || now < busy) ? 0
+               : over ? SPEED * HOVER : SPEED;
       v += (want - v) * (1 - Math.exp(-dt / TAU));
 
       if (v <= 0.02) { pos = rail.scrollLeft; return; }   // theirs, not ours
       if (Math.abs(pos - rail.scrollLeft) > 2) { pos = rail.scrollLeft; }
-
-      pos += v * dt / 1000;
-      // the seam: one row on, one row back, and the picture does not change
-      if (pos >= rowW) { pos -= rowW; }
-      else if (pos < 0) { pos += rowW; }
-
-      rail.scrollLeft = pos;
-      mine = now;
+      put(pos + v * dt / 1000);
     }
 
+    /* ---- taking hold of it ---- */
+    rail.addEventListener('pointerdown', function (e) {
+      if (e.pointerType !== 'mouse' || e.button !== 0) { return; }   // touch has its own
+      held = true; moved = false; fling = 0;
+      px = e.clientX; pos = rail.scrollLeft; ppos = pos; pt = performance.now();
+    });
+    rail.addEventListener('pointermove', function (e) {
+      if (!held) { return; }
+      var d = px - e.clientX;
+      // A press is not a drag until it travels: below this a click still clicks
+      // and a selection still selects.
+      if (!moved && Math.abs(d) < 4) { return; }
+      if (!moved) { moved = true; rail.classList.add('is-held'); rail.setPointerCapture(e.pointerId); }
+      var now = performance.now(), dt = now - pt;
+      put(pos + d);
+      px = e.clientX;
+      if (dt > 0) {
+        // sampled the way kinetic scrolling has been done since iOS: a running
+        // average, so one jittery frame does not decide the throw
+        fling = 0.8 * ((pos - ppos) / dt * 1000) + 0.2 * fling;
+        ppos = pos; pt = now;
+      }
+    });
+    ['pointerup', 'pointercancel'].forEach(function (n) {
+      rail.addEventListener(n, function () {
+        if (!held) { return; }
+        held = false;
+        rail.classList.remove('is-held');
+        if (!moved) { fling = 0; return; }
+        fling = Math.max(-2600, Math.min(2600, fling * 0.8));   // amplitude = 0.8 x velocity
+        busy = performance.now() + YIELD;
+      });
+    });
+
+    /* ---- and everything else that is theirs ---- */
     function yieldNow() { busy = performance.now() + YIELD; }
-    ['wheel', 'pointerdown', 'touchstart', 'keydown'].forEach(function (e) {
+    ['wheel', 'touchstart', 'keydown'].forEach(function (e) {
       rail.addEventListener(e, yieldNow, { passive: true });
     });
     rail.addEventListener('scroll', function () {
-      // A scroll we did not cause is the reader's, and the drift steps aside for
-      // it. Ours fire this too, so the test is when, not whether.
-      if (performance.now() - mine > 120) { yieldNow(); }
+      // Ours fire this too, so the test is when, not whether.
+      if (!held && performance.now() - mine > 120) { yieldNow(); }
     }, { passive: true });
 
-    var sec = document.getElementById('reviews');
     sec.addEventListener('pointerenter', function () { over = true; });
     sec.addEventListener('pointerleave', function () { over = false; });
-    sec.addEventListener('focusin',  function () { over = true; });
+    sec.addEventListener('focusin',  function () { keyed = true; });
     sec.addEventListener('focusout', function () {
-      if (!sec.contains(document.activeElement)) { over = false; }
+      if (!sec.contains(document.activeElement)) { keyed = false; }
     });
 
     if (halt) {
       halt.hidden = false;
+      halt.setAttribute('aria-pressed', 'false');
       halt.addEventListener('click', function () {
         stopped = !stopped;
         halt.textContent = stopped ? 'Reanudar el movimiento' : 'Detener el movimiento';
         halt.setAttribute('aria-pressed', stopped ? 'true' : 'false');
       });
-      halt.setAttribute('aria-pressed', 'false');
     }
 
     window.addEventListener('resize', measure);
+    window.addEventListener('load', measure);
     document.addEventListener('visibilitychange', function () {
       if (document.hidden) { cancelAnimationFrame(raf); raf = 0; last = 0; }
       else if (!raf) { raf = requestAnimationFrame(frame); }
@@ -362,7 +408,6 @@
     } else {
       raf = requestAnimationFrame(frame);
     }
-    window.addEventListener('load', measure);
     measure();
   }
 
