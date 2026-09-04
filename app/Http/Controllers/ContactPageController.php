@@ -37,8 +37,19 @@ class ContactPageController extends Controller
             'available' => Vehicle::where('status', 'available')->count(),
             'sold'      => Vehicle::where('status', 'sold')->count(),
             'people'    => Testimonial::where('is_active', true)->whereNotNull('image_path')->count(),
-            // His own photograph, not stock: the E350d cabrio with Málaga behind it.
-            'hero'      => '/storage/vehicles/mercedes-benz-e350d-bluetec-9g-2016-pg9d3/LbLEXNfUs2rDWJBJ3NDryD1d7xub6RzMBPx3Hsmx.jpg',
+            // Chosen from four, and not on the numbers — all four measured well and
+            // all four spread their subject across every one of the 24 columns the
+            // slices cut, so all four survive being sliced. What decided it:
+            //   c1  Panamera in snow, plate reads Ontario. The place contradicts Málaga.
+            //   c2  A tail-light detail. Beautiful, but sliced it never reads as a car,
+            //       and it repeats the 911 already on /inicio.
+            //   c4  911 in profile — the cleanest of the four, and from the same
+            //       photographer's set as the /inicio hero (ids ...646 and ...711).
+            //       It would make two pages look like one.
+            //   c3  A Cayman on a GERMAN plate — the blue EU strip and a Berlin B.
+            //       The page says five German marques; this photograph says it too.
+            //       Its brake light also rhymes with the Porsche red in the palette.
+            'hero'      => '/img/banner/contacto.jpg',
             // Four faces for the strip under the map — the people he actually sold to.
             'faces'     => Testimonial::where('is_active', true)->whereNotNull('image_path')
                               ->orderBy('order_index')->take(4)->get(),

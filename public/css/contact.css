@@ -90,11 +90,18 @@
      before it had begun to open. */
   flex:1 1 0; height:100%; margin-inline:-0.5px;
   background-image:var(--hero); background-repeat:no-repeat;
+  background-position-y:52%;
   will-change:transform; backface-visibility:hidden;
+  /* The garage's strip lighting is warm — measured at R−B +4 against this site's
+     −4 — so it is cooled and steadied to sit in the same air as the navy. The
+     brake light survives it, which is the point: it is the one warm thing left,
+     and it rhymes with the Porsche red in the palette. */
+  filter:saturate(.88) contrast(1.06) brightness(.94) hue-rotate(-6deg);
 }
 /* the same photograph, whole, for everyone who never sees the slices */
 .ct-open__plain{
-  display:block; width:100%; aspect-ratio:16 / 9; object-fit:cover; object-position:50% 50%;
+  display:block; width:100%; aspect-ratio:16 / 9; object-fit:cover; object-position:50% 52%;
+  filter:saturate(.88) contrast(1.06) brightness(.94) hue-rotate(-6deg);
 }
 .ct-open.is-live .ct-open__plain{ display:none; }
 @media (min-width:900px){ .ct-open__plain{ grid-column:1 / -1; } }
