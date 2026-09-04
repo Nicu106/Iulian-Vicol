@@ -309,9 +309,10 @@
      prefers-reduced-motion it never moves and every card shows its words. */
   var rail = document.getElementById('fb-rail');
   if (rail) {
-    var SPEED  = 74;     // px/s between cards
-    var BOOST  = 3.2;    // ...and how much faster it arrives
-    var CRAWL  = 0.10;   // what it slows to with a card in the middle
+    var SPEED  = 110;    // px/s between cards
+    var BOOST  = 2.2;    // ...and how much faster it arrives
+    var CRAWL  = 0.22;   // what it slows to with a card in the middle — still visibly moving,
+                         //   because at a tenth it read as stopped and the row looked dead
     var DETENT = 120;    // how near the middle a card has to be for that
     var FLIP   = 70;     // half the distance a card turns over in
     var LEAD   = 130;    // ...starting this far PAST the middle, once the slow zone is behind it
@@ -370,7 +371,11 @@
         var t = clamp01((now - glide.t0) / GLIDE);
         var e = 1 - Math.pow(1 - t, 3);
         pos = glide.from + (glide.to - glide.from) * e;
-        if (t >= 1) { glide = null; busy = now + 700; }
+        // land at rest. Left alone, the velocity from before the press kept
+        // integrating for a few frames after the glide finished — the residual
+        // of 60px/s over a 150ms time constant — and the photograph came to rest
+        // 14-16px off the middle it had just been carried to.
+        if (t >= 1) { glide = null; v = 0; busy = now + 700; }
       } else {
         var near = paint();
         // fast on arrival, a crawl with a card in the middle, and hovering or
@@ -378,7 +383,7 @@
         var boost = warm ? 1 + (BOOST - 1) * clamp01((warm - now) / 1500) : 1;
         var want  = (still.matches || stopped || keyed || now < busy) ? 0
                   : SPEED * boost * (CRAWL + (1 - CRAWL) * smooth(near / DETENT))
-                          * (over ? 0.45 : 1);
+                          * (over ? 0.35 : 1);
         v += (want - v) * (1 - Math.exp(-dt / TAU));
         if (v <= 0.02) { pos = rail.scrollLeft; paint(); return; }
         if (Math.abs(pos - rail.scrollLeft) > 2) { pos = rail.scrollLeft; }
@@ -401,6 +406,7 @@
       if (d >  rowW / 2) { d -= rowW; }
       if (d < -rowW / 2) { d += rowW; }
       glide = { from: pos, to: pos + d, t0: performance.now() };
+      v = 0;
     }
     function step(dir) {
       if (!kids.length) { return; }
