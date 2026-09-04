@@ -259,38 +259,11 @@
   padding-block:var(--s-7) var(--s-6);
   overflow:hidden;
 }
-.hm-people.is-pinned .hm-mosaic{ flex:1 1 auto; min-height:0; }
+.hm-people.is-pinned .hm-mosaic{
+  flex:1 1 auto; min-height:0;
+  /* No scrollbar of its own, on any engine: the movement belongs to the page, and
+     a bar inside the section would advertise a second scroll that does not exist. */
+  overflow:hidden; scrollbar-width:none; -ms-overflow-style:none;
+}
+.hm-people.is-pinned .hm-mosaic::-webkit-scrollbar{ display:none; }
 .hm-people.is-pinned .hm-mosaic__in{ will-change:transform; }
-
-/* how far through the reviews you are — vertical, beside them, because that is
-   the direction the reading is going */
-.hm-people__bar{ display:none; }
-.hm-people.is-pinned .hm-people__bar{
-  display:block; position:absolute; right:calc(var(--mc-gutter-d) / 2); top:18vh; bottom:12vh;
-  width:2px; background:var(--mc-hairline);
-}
-.hm-people.is-pinned .hm-people__bar span{
-  display:block; height:100%; background:var(--mc-ink);
-  transform:scaleY(0); transform-origin:top; will-change:transform;
-}
-
-.hm-t.is-extra{ display:none; }
-.hm-people__foot{ display:flex; justify-content:center; padding-top:var(--s-5); }
-.hm-people.is-pinned .hm-people__foot{ display:contents; }
-.hm-t.is-extra{ display:none; }
-/* standing still, the button is part of the page, centred under the mosaic */
-.hm-people:not(.is-pinned) .hm-people__all{ display:block; margin:var(--s-6) auto 0; }
-.hm-people__all{
-  min-height:44px; padding:0 var(--s-4);
-  border:1px solid var(--mc-rule); border-radius:var(--mc-r);
-  background:var(--mc-surface); color:var(--mc-ink);
-  font:600 var(--t-small)/1 var(--f-ui); cursor:pointer;
-}
-.hm-people__all:hover{ border-color:var(--mc-control); }
-.hm-people__all:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:2px; }
-.hm-people.is-here .hm-people__all{
-  position:fixed; right:var(--mc-gutter-d); bottom:var(--s-6); z-index:30;
-  background:var(--mc-ink); color:#FFFFFF; border-color:var(--mc-ink);
-  box-shadow:0 6px 24px rgba(4,7,14,.28);
-}
-.hm-people.is-here .hm-people__all:hover{ background:var(--mc-ink-2); border-color:var(--mc-ink-2); }

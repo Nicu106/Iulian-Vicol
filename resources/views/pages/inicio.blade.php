@@ -161,13 +161,6 @@
           @endforeach
         </div>
       </div>
-
-      <div class="hm-people__foot cat-wrap">
-        <div class="hm-people__bar" aria-hidden="true"><span id="mosaic-bar"></span></div>
-        {{-- Research is unanimous that a pinned section must be escapable. It sits
-             in the bottom-right corner, where the hand already is, and only while
-             the section is the thing on screen. --}}
-        <button class="hm-people__all" type="button" id="wall-all" hidden>Saltar reseñas ↓</button>
       </div>
     </div>
   </section>
@@ -224,9 +217,9 @@
      The browser keeps its own scroll throughout: nothing is intercepted, no event
      is cancelled, no wheel is swallowed. The bar, the keyboard, trackpad momentum
      and Page Down all behave exactly as they always do — only what the movement
-     is spent on is ours. That is the difference between this and scroll-hijacking,
-     and it is the reason the section can also be skipped, reversed, or landed in
-     from a browser's own restore-scroll.
+     is spent on is ours. That is the difference between this and scroll-hijacking:
+     the section can still be reversed, flung past, or landed in from a browser's
+     own restore-scroll, because none of those were ever taken away.
 
      The mosaic itself is CSS columns: a new review needs no arithmetic from anyone,
      it simply joins the flow and the section re-measures its own height on load
@@ -238,8 +231,7 @@
   var sec  = document.getElementById('reviews');
   var pin  = sec && sec.querySelector('.hm-people__pin');
   var rail = document.getElementById('mosaic-in');
-  var bar  = document.getElementById('mosaic-bar');
-  var skip = document.getElementById('wall-all');
+
   if (sec && rail && pin) {
     var tiles = Array.prototype.slice.call(rail.children);
     var wide  = window.matchMedia('(min-width: 1000px)');
@@ -250,27 +242,18 @@
     function measure() {
       if (!wide.matches || still.matches) {
         sec.style.height = ''; rail.style.transform = '';
-        sec.classList.remove('is-pinned', 'is-here');
+        sec.classList.remove('is-pinned');
         travel = 0;
         /* Standing still in one column, 24 reviews are 12.6 screens — measured.
            So where the section cannot be pinned it opens with six and hands over
            the rest on request. Without JavaScript none of this runs and all 24 are
            simply there, which is the honest fallback. */
         var many = tiles.length > 6 && window.innerWidth < 700;
-        tiles.forEach(function (t, i) { t.classList.toggle('is-extra', many && !sec.classList.contains('is-all') && i >= 6); });
-        if (skip) {
-          var held = many && !sec.classList.contains('is-all');
-          skip.hidden = !held;
-          skip.textContent = 'Ver las ' + tiles.length + ' reseñas';
-          skip.dataset.mode = 'more';
-        }
         return;
       }
       sec.classList.add('is-pinned');
       sec.style.height = '';
       rail.style.transform = '';
-      tiles.forEach(function (t) { t.classList.remove('is-extra'); });
-      if (skip) { skip.textContent = 'Saltar reseñas ↓'; skip.dataset.mode = 'skip'; }
       // How much taller the mosaic is than the window it is read through — the
       // window, not the section: the pin also holds the heading and its padding,
       // and measuring against the whole thing left the last tile 100px below the
@@ -280,7 +263,6 @@
       travel = over;
       // the page pays for it at SPEED — the whole point of pinning it
       sec.style.height = (window.innerHeight + over / SPEED) + 'px';
-      if (skip) skip.hidden = over === 0;
       draw();
     }
     function draw() {
@@ -289,28 +271,8 @@
       var page = (sec.offsetHeight - window.innerHeight) || 1;
       var p = Math.min(1, Math.max(0, -top / page));
       rail.style.transform = 'translate3d(0,' + (-p * travel) + 'px,0)';
-      if (bar) bar.style.transform = 'scaleY(' + p + ')';
     }
 
-    if (skip) {
-      skip.addEventListener('click', function () {
-        if (skip.dataset.mode === 'more') {          // narrow: hand over the rest
-          sec.classList.add('is-all');
-          measure();
-          return;
-        }
-        // pinned: past the section, at its own pace — the reader asked to leave, not to jump
-        var y = sec.getBoundingClientRect().top + window.pageYOffset + sec.offsetHeight - window.innerHeight + 2;
-        window.scrollTo({ top: y, behavior: still.matches ? 'auto' : 'smooth' });
-      });
-    }
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(function (es) {
-        es.forEach(function (e) {
-          sec.classList.toggle('is-here', e.isIntersecting && sec.classList.contains('is-pinned'));
-        });
-      }, { threshold: 0.2 }).observe(sec);
-    }
 
     window.addEventListener('scroll', function () {
       if (ticking) return; ticking = true;
