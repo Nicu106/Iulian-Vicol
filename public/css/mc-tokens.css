@@ -133,6 +133,10 @@
      these are L .165 and L .14, so the page ends lower than anything on it. */
   --mc-deep:    #040B1F;
   --mc-deep-2:  #02061A;
+  --mc-scrim:   4, 7, 14;    /* the black used inside gradients over photographs, as
+                                channels so it can carry an alpha. Was written as a
+                                literal rgba(4,7,14,…) in catalog.css and #05070C in
+                                car.css — three names for one idea. */
   --mc-r-card:  0px;     /* the car card and everything inside it: frame, price box,
                             badge. Square, because on a full-bleed marque field a
                             rounded card pulls the eye into itself while a square one

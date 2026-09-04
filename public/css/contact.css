@@ -78,9 +78,12 @@
    three people already answered it in their own words. Real coordinates, real
    road distances, and the lines draw themselves as the section is read.
    ========================================================================= */
-/* Light ground. Measured, this page read 82% dark against 22% for the car page —
-   the darkest thing on the site, and the least like the rest of it. The map is an
-   infographic; infographics are read on paper, not in a cinema. */
+/* Light ground. Two measurements agree this page was the darkest on the site and
+   disagree on by how much, because they count different things: 82% of RENDERED
+   PIXELS were dark (photographs included), while 59% of PAGE HEIGHT sat on a dark
+   ground (the design's own choice). The second is the fairer number for a design
+   decision; both were far outside the system's 22-24% spine. The map is an
+   infographic, and infographics are read on paper, not in a cinema. */
 .ct-far{
   padding-block:var(--s-9);
   background:var(--mc-band);
@@ -106,7 +109,9 @@
 .ct-far__item.is-on{ opacity:1; transform:none; }
 .ct-far__km{
   grid-row:1 / span 2; align-self:start;
-  font-size:clamp(2.25rem, 1.6rem + 2.6vw, 3.25rem); font-weight:700; line-height:.92;
+  /* on the ladder: --t-h1 is the 34→52 step and this is that step, not a sixth one
+     invented here with a floor 2px above it */
+  font-size:var(--t-h1); font-weight:700; line-height:.92;
   letter-spacing:-.03em; color:var(--mc-ink); font-variant-numeric:tabular-nums;
 }
 .ct-far__km i{ font-style:normal; font-size:.36em; font-weight:600; letter-spacing:.04em;
@@ -189,8 +194,6 @@
 .ct-sec__p{ margin:0 0 var(--s-5); max-width:54ch; font-size:var(--t-small);
   line-height:1.55; color:var(--mc-ink-2); }
 
-/* the reasons, on the page's own band */
-.ct-band{ margin-top:var(--s-9); padding-block:var(--s-8); background:var(--mc-band); }
 .ct-reasons{ display:flex; flex-wrap:wrap; gap:var(--s-3); margin:0; padding:0; list-style:none; }
 .ct-reason{
   display:inline-flex; align-items:center; min-height:48px; padding:0 var(--s-5);

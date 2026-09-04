@@ -267,9 +267,9 @@
   border:1px solid rgba(255,255,255,.45); border-radius:var(--mc-r);
   background:transparent; color:#FFFFFF;
   font:600 var(--t-small)/1 var(--f-ui); letter-spacing:.01em; cursor:pointer;
-  transition:background var(--m-in) var(--e-out), border-color var(--m-in) var(--e-out);
+  transition:background var(--m-quick) var(--e-out), border-color var(--m-quick) var(--e-out);
 }
-.cat-row__all::after{ content:"→"; font-weight:400; transition:translate var(--m-in) var(--e-out); }
+.cat-row__all::after{ content:"→"; font-weight:400; transition:translate var(--m-quick) var(--e-out); }
 .cat-row__all:hover{ background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.75); }
 .cat-row__all:hover::after{ translate:3px 0; }
 .cat-row__all[aria-expanded="true"]::after{ content:"×"; }
@@ -570,8 +570,8 @@
 .cat-hero::after{
   content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
   background:
-    linear-gradient(180deg, rgba(4,7,14,0) 26%, rgba(4,7,14,.44) 58%, rgba(4,7,14,.90) 100%),
-    linear-gradient(100deg, rgba(4,7,14,.72) 0%, rgba(4,7,14,.34) 42%, rgba(4,7,14,0) 68%);
+    linear-gradient(180deg, rgba(var(--mc-scrim),0) 26%, rgba(var(--mc-scrim),.44) 58%, rgba(var(--mc-scrim),.90) 100%),
+    linear-gradient(100deg, rgba(var(--mc-scrim),.72) 0%, rgba(var(--mc-scrim),.34) 42%, rgba(var(--mc-scrim),0) 68%);
 }
 .cat-hero__in{
   position:relative; z-index:2; width:100%;
@@ -611,7 +611,7 @@
   /* a narrow frame puts the words over the car itself, so the floor comes up */
   .cat-hero::after{
     background:
-      linear-gradient(180deg, rgba(4,7,14,.10) 0%, rgba(4,7,14,.30) 26%, rgba(4,7,14,.62) 52%, rgba(4,7,14,.94) 100%),
-      linear-gradient(100deg, rgba(4,7,14,.46) 0%, rgba(4,7,14,.20) 52%, rgba(4,7,14,0) 80%);
+      linear-gradient(180deg, rgba(var(--mc-scrim),.10) 0%, rgba(var(--mc-scrim),.30) 26%, rgba(var(--mc-scrim),.62) 52%, rgba(var(--mc-scrim),.94) 100%),
+      linear-gradient(100deg, rgba(var(--mc-scrim),.46) 0%, rgba(var(--mc-scrim),.20) 52%, rgba(var(--mc-scrim),0) 80%);
   }
 }

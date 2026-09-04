@@ -144,7 +144,7 @@
   position:fixed; inset:0; z-index:80;
   display:grid; grid-template-columns:auto 1fr auto; align-items:center;
   gap:var(--s-3); padding:var(--s-4);
-  background:#05070C;
+  background:rgb(var(--mc-scrim));
 }
 .car-view[hidden]{ display:none; }
 .car-view__img{
