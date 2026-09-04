@@ -33,6 +33,7 @@ class HomePageController extends Controller
     private const FB_CARD   = 560;    // the height of every card, and the CSS agrees
     private const FB_CHROME = 88;     // its padding, plus the byline under the quote
     private const FB_INSET  = 50;     // the padding and borders the words sit inside
+    private const FB_SCALES = [1.0, 0.9, 0.8, 0.7];
     private const FB_W_MIN  = 240;
     private const FB_W_HARD = 900;    // and the one we will accept rather than not fit
     /* The widest a card may be and still put the photograph on top. Beyond this
@@ -77,30 +78,41 @@ class HomePageController extends Controller
     {
         $ratio = max(0.2, min(4.0, $ratio));
 
-        $side = $ratio < 1.0;
-
-        // The card's height is fixed, so the photograph's width follows from the
-        // picture's own shape and the words' width follows from how many there
-        // are. Nothing is circular and nothing is cropped.
+        // The card is one rectangle with a photograph on the front and the words
+        // on the back, so it has to hold both. Its height is fixed, which makes
+        // the photograph's width follow from the picture's own shape — and the
+        // card is that width whenever the words can be made to fit it.
         //
-        // It has to be this way round. Letting the card size itself to its
-        // contents put the photograph's width behind an aspect-ratio on a
-        // stretched box, whose height is only known once the card is sized — and
-        // a browser resolving that circle guesses low: measured, a card came out
-        // 370px wide holding a 423px photograph and clipped its own text to a
-        // sliver.
-        $lines = max(1, (int) floor((self::FB_CARD - self::FB_CHROME
-                 - ($side ? 0 : (int) round(self::FB_CARD * 0.62))) / self::FB_LINE));
-        $w  = (int) ceil($len * self::FB_CHAR / $lines) + self::FB_INSET;
-        $w  = max(self::FB_W_MIN, min(self::FB_W_HARD, $w));
-        $pw = (int) round(($side ? self::FB_CARD : $w) * $ratio);
+        // NOTHING IS CROPPED. Measured on the real files, a fixed band showed 49%
+        // of a 3:4 photo's height and a fixed column beside the text showed 78%
+        // of its width; no object-position is right for a photograph nobody has
+        // seen yet, and these arrive constantly. So the box is the picture's own
+        // shape and the image is `contain`: there is nothing to cut.
+        $pw = (int) round(self::FB_CARD * $ratio);
+
+        // Try each type size and take the first whose words fit the photograph's
+        // width. Stepping the type down a notch is a far smaller price than
+        // matting the picture into a wider card, and smaller still than cropping.
+        foreach (self::FB_SCALES as $k) {
+            $line  = self::FB_LINE * $k;
+            $char  = self::FB_CHAR * $k;
+            $lines = max(1, (int) floor((self::FB_CARD - self::FB_CHROME) / $line));
+            $tw    = (int) ceil($len * $char / $lines) + self::FB_INSET;
+            if ($tw <= $pw) {
+                return ['w' => max(self::FB_W_MIN, $pw), 'scale' => $k, 'ratio' => round($ratio, 4)];
+            }
+        }
+
+        // Only something extreme gets here: the card widens and the photograph
+        // sits matted inside it, whole.
+        $k     = self::FB_SCALES[count(self::FB_SCALES) - 1];
+        $line  = self::FB_LINE * $k;
+        $lines = max(1, (int) floor((self::FB_CARD - self::FB_CHROME) / $line));
+        $tw    = (int) ceil($len * self::FB_CHAR * $k / $lines) + self::FB_INSET;
 
         return [
-            'side'  => $side,
-            'w'     => $w,
-            'pw'    => $side ? $pw : $w,
-            'ph'    => $side ? self::FB_CARD : (int) round($w / $ratio),
-            'cell'  => $side ? $pw + 16 + $w : $w,
+            'w'     => max(self::FB_W_MIN, min(self::FB_W_HARD, max($pw, $tw))),
+            'scale' => $k,
             'ratio' => round($ratio, 4),
         ];
     }

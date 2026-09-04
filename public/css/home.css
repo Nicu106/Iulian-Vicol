@@ -247,15 +247,16 @@
 }
 
 /* ---- what they wrote ----------------------------------------------------
-   One row, drifting. Its shape is decided by the reviews: the column width is
-   set per review in the controller and arrives as --cell, and inside the column
-   the text takes what it needs while the photograph takes what is left — the
-   height, when the review is short and the picture sits above it; the width,
-   when the review is long and the picture stands beside it.
+   One row, travelling left to right on its own, for ever. Each card is a
+   photograph until it nears the middle of the row, where it turns over and
+   becomes what that person wrote.
 
-   --fb-h is the height every cell gets, sized for the tallest review's text plus
-   its padding and byline. Anything less and the longest review would need a
-   scrollbar inside a moving row. */
+   The card is the photograph's own shape — height x the picture's aspect
+   ratio, read from the file — so NOTHING IS CROPPED: measured on the real
+   files, the old band showed 49% of a 3:4 photo's height and the old column
+   beside the text 78% of its width, and no object-position is right for a
+   photograph nobody has seen yet. The words on the back are set a notch smaller
+   when they would not otherwise fit that width. */
 .hm-fb{ padding-block:var(--s-9); background:var(--mc-band); }
 /* The measure belongs to the paragraph, not to the wrap: cat-wrap carries
    margin-inline:auto, so a max-width on that same element centred the whole
@@ -263,9 +264,9 @@
 .hm-fb__head{ margin-bottom:var(--s-7); }
 .hm-fb__head .hm-sec__p{ max-width:56ch; }
 
-/* The only control, and it is not there until a keyboard finds it. Moving
-   content has to be stoppable; a button parked under the row for ever is the
-   widget chrome this section exists to avoid. Same trick as a skip link. */
+/* The only control that stops it, and it is not there until a keyboard finds
+   it. Moving content has to be stoppable; a button parked under the row for
+   ever is the widget chrome this section exists to avoid. */
 .hm-fb__halt{
   position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden;
 }
@@ -279,135 +280,124 @@
 }
 
 .hm-fb__rail{
-  --fb-h:32.5rem;
+  --fb-h:35rem;
   display:flex; overflow-x:auto; overflow-y:hidden;
   scrollbar-width:none; -ms-overflow-style:none;
   overscroll-behavior-x:contain;
+  cursor:grab;
   /* Not a container with the cards clipped at its edge — a window they pass
-     through. This is the detail that decides whether a moving row reads as an
-     object or as a filmstrip that got cut off.
-
-     Three stops, not two, and the middle one is at 20% alpha rather than 50%.
-     A plain transparent→opaque gradient is linear in alpha, and perceived
-     opacity is not: it reads as a grey haze laid over the edge. Held near
-     transparent for the first half of the band and then ramped, the cards
-     appear to emerge instead. Linear ships exactly this curve at 64px; the
-     band is wider here because this row is full-bleed and its cards are tall.
-     In px, not %, so it does not change size with the viewport. */
+     through. Three stops with the middle one at 20% alpha: a plain two-stop
+     gradient is linear in alpha and reads as a grey haze; held near
+     transparent for half the band and then ramped, cards appear to emerge.
+     Linear ships exactly this curve at 64px. In px, so it does not resize. */
   --fade:5.5rem;
   -webkit-mask-image:linear-gradient(to right,
-    transparent 0,
-    rgba(0,0,0,.2) calc(var(--fade) / 2),
-    #000 var(--fade),
-    #000 calc(100% - var(--fade)),
-    rgba(0,0,0,.2) calc(100% - var(--fade) / 2),
-    transparent 100%);
+    transparent 0, rgba(0,0,0,.2) calc(var(--fade) / 2), #000 var(--fade),
+    #000 calc(100% - var(--fade)), rgba(0,0,0,.2) calc(100% - var(--fade) / 2), transparent 100%);
           mask-image:linear-gradient(to right,
-    transparent 0,
-    rgba(0,0,0,.2) calc(var(--fade) / 2),
-    #000 var(--fade),
-    #000 calc(100% - var(--fade)),
-    rgba(0,0,0,.2) calc(100% - var(--fade) / 2),
-    transparent 100%);
+    transparent 0, rgba(0,0,0,.2) calc(var(--fade) / 2), #000 var(--fade),
+    #000 calc(100% - var(--fade)), rgba(0,0,0,.2) calc(100% - var(--fade) / 2), transparent 100%);
 }
 .hm-fb__rail::-webkit-scrollbar{ display:none; }
-/* A plain mouse has no way into a horizontal row — the wheel belongs to the page
-   and there are no buttons. So it can be taken hold of and thrown. */
-.hm-fb__rail{ cursor:grab; }
-.hm-fb__rail.is-held{ cursor:grabbing; user-select:none; }
 .hm-fb__rail:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:-3px; }
-/* flex-shrink:0 on both, and it is not belt-and-braces. These sit in a flex
-   container that scrolls, and a flex line is laid out against the box you can
-   SEE — 1440px — not against the 11,803px it scrolls. Left shrinkable, the
-   browser is entitled to squeeze all 24 cards into that 1440, and Safari does:
-   cards collapsed to 22-35px slivers with their neighbours painted over them.
-   Chrome happened not to, which is why a Chrome-only check called it clean. */
-.hm-fb__row{ display:flex; flex:0 0 auto; gap:var(--s-5); padding-inline:var(--s-5) 0; }
+/* flex-shrink:0, and it is not belt-and-braces: a flex line is laid out against
+   the box you can SEE, and left shrinkable Safari squeezed all 24 cards into
+   1440px — 22-35px slivers with neighbours painted over them. */
+.hm-fb__row{ display:flex; flex:0 0 auto; gap:var(--s-5); padding-inline:var(--s-5) 0; align-items:stretch; }
 
+/* ---- the card: two faces ---- */
 .fb{
-  /* figure carries the UA's `margin: 1em 40px`, which took 80px out of every
-     cell and 320px off a four-cell group, so the 240px floor rendered at 186px
-     and six reviews overflowed their box. */
   margin:0;
-  flex:0 0 var(--cell); min-width:0; height:var(--fb-h);
-  display:flex; flex-direction:column; overflow:hidden;
-  /* --mc-hairline on the band is 1.03:1 — no edge at all, so a card stopped
-     reading as one object and the row looked like loose fragments. */
-  background:var(--mc-surface); border:1px solid var(--mc-rule);
-  border-radius:var(--mc-r-card);
+  /* Longhands, not the shorthand: WebKit mishandles a custom property in the
+     flex basis slot, and a card whose basis silently fails has no width. */
+  flex-grow:0; flex-shrink:0; flex-basis:var(--w);
+  width:var(--w); height:var(--fb-h);
+  perspective:1600px;
 }
-.fb--side{ flex-direction:row; }
-/* One height for every card, and the controller solves the shapes against this
-   same number. The words scroll past it only if someone writes something no
-   card of any width could hold. */
-.hm-fb__row{ align-items:stretch; }
-.fb{ height:35rem; }
-/* Fixed, not "whatever is left". Letting the photograph absorb the slack gave
-   every card a different photo height — 199, 226, 310 side by side — and a row
-   of pictures ending at random heights reads as a collage, not as a rail. The
-   width solved in the controller guarantees the words fit under exactly this
-   much, so the band across the top is now one straight line the whole way. The
-   slack goes under the quote instead, where it is just air. */
-/* The box carries the picture's OWN aspect ratio, so there is nothing to crop
-   and nothing to letterbox. Landscape sits above the words and takes the card's
-   width; portrait stands beside them and takes the card's height. The picture's
-   own orientation decides, so anything uploaded later arranges itself. */
-.fb__ph{ flex:0 0 auto; width:100%; aspect-ratio:var(--ratio, 4/3);
-  overflow:hidden; background:var(--mc-band); }
-.fb--side .fb__ph{ flex:0 0 var(--pw); width:var(--pw); height:100%; aspect-ratio:auto; }   /* 260px + the 16px it sits away from the words = the 276 the controller reserves */
-/* CONTAIN, NOT COVER. This is the whole answer to heads coming off. `cover`
-   fills the box by throwing away whatever does not fit, and no object-position
-   can be right for a photograph nobody has seen yet: measured on the real
-   files, the old band showed 49% of a 3:4 photo's height and the old column
-   beside the text showed 78% of its width. `contain` cannot cut anything. And
-   because the box is already the picture's own shape, for a normal photograph
-   there is nothing to letterbox either — the two agree exactly. Something
-   extreme gets a mat of --mc-band around it, and still loses nothing. */
-.fb__ph img{ display:block; width:100%; height:100%; object-fit:contain; }
-.fb__t{
-  flex:1 1 auto; width:var(--w); display:flex; flex-direction:column; gap:var(--s-3);
-  padding:var(--s-5);
-  /* The safety net, and only that. The shape is solved so the words fit, and
-     for anything anyone is likely to write they do. But "any text of any size"
-     has no upper bound, and a card does — so past the point where no width and
-     no type size can hold it, the words scroll rather than being cut off. */
-  overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin;
+.fb__flip{
+  position:relative; width:100%; height:100%;
+  transform-style:preserve-3d;
+  transform:rotateY(var(--flip, 0deg));
+  will-change:transform;
 }
-.fb--side .fb__t{ flex:0 0 var(--w); min-width:0; }
-/* --scale is 1 for every review anyone has written so far; it steps down only
-   when a card cannot otherwise hold the words. */
+/* No border and no mat. A rule around a photograph reads as a frame, and a
+   framed photograph reads as a widget's slot rather than as somebody's picture.
+   Under the image there is only the section's own colour, so on the rare image
+   whose shape the card cannot express there is nothing to see rather than a
+   visible surround. A soft shadow instead: it sits them on the page as objects
+   without drawing a line around them. */
+.fb__face{
+  position:absolute; inset:0; overflow:hidden;
+  backface-visibility:hidden; -webkit-backface-visibility:hidden;
+  border:0; border-radius:var(--mc-r-card);
+  /* two layers: a tight one that seats it, a wide soft one that lifts it */
+  box-shadow:0 1px 2px rgba(var(--mc-scrim), .10), 0 14px 40px -12px rgba(var(--mc-scrim), .22);
+}
+.fb__face--front{ background:var(--mc-band); }
+/* contain, never cover: the box is already the picture's shape, so there is
+   nothing to letterbox — and a picture the shape cannot express is matted whole
+   rather than trimmed. */
+.fb__face--front img{ display:block; width:100%; height:100%; object-fit:contain; }
+.fb__face--back{
+  transform:rotateY(180deg); background:var(--mc-surface);
+  display:flex; flex-direction:column; gap:var(--s-4); padding:var(--s-7) var(--s-6) var(--s-6);
+}
+/* the mark that opens a quotation, set large and light — the one flourish */
+.fb__face--back::before{
+  content:"\201C"; display:block; height:.5em; margin-top:-.1em;
+  font-size:calc(var(--t-h1) * 1.15); line-height:1; font-weight:700;
+  color:var(--mc-rule);
+}
+/* --scale is 1 for 20 of the 24; it steps down only when a card cannot
+   otherwise hold the words at the photograph's width. The scroll is a safety
+   net for text no card of any width could hold, and never otherwise shows. */
 .fb__q{ margin:0; font-size:calc(var(--t-prose) * var(--scale, 1)); line-height:1.55;
-  color:var(--mc-ink-2); }
-.fb__by{ margin-top:auto; font-size:var(--t-label); font-weight:600; color:var(--mc-ink); }
+  color:var(--mc-ink-2); overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; }
+/* the byline sits on its own short rule, the same device the contact page uses */
+.fb__by{ margin-top:auto; padding-top:var(--s-4); font-size:var(--t-label); font-weight:600;
+  letter-spacing:.02em; color:var(--mc-ink); position:relative; }
+.fb__by::before{ content:""; position:absolute; top:0; left:0; width:2.5rem; height:1px; background:var(--mc-rule); }
+
+/* ---- the two buttons, and nothing else ---- */
+.hm-fb__step{
+  display:flex; align-items:center; justify-content:center; gap:var(--s-3);
+  margin-top:var(--s-6);
+}
+.hm-fb__nav{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:48px; height:48px; padding:0; cursor:pointer;
+  background:var(--mc-surface); border:1px solid var(--mc-rule); color:var(--mc-ink);
+  border-radius:var(--mc-r-card);
+  transition:background var(--m-quick) var(--e-out), border-color var(--m-quick) var(--e-out),
+             color var(--m-quick) var(--e-out), transform var(--m-instant) var(--e-out);
+}
+.hm-fb__nav:hover{ background:var(--mc-ink); border-color:var(--mc-ink); color:var(--mc-surface); }
+.hm-fb__nav:active{ transform:scale(.96); }
+.hm-fb__nav:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:2px; }
+
+/* ---- static: reduced motion, or no script ----
+   Nothing moves and nothing turns over, so the back of a card would never be
+   seen. The two faces stack instead — photograph, then words — and the row is
+   an ordinary scroller holding every review whole. */
+html:not(.js) .fb, .hm-fb.is-static .fb{ height:auto; perspective:none; }
+html:not(.js) .fb__flip, .hm-fb.is-static .fb__flip{ transform:none; transform-style:flat; height:auto; }
+html:not(.js) .fb__face, .hm-fb.is-static .fb__face{
+  position:static; transform:none; box-shadow:none;
+  backface-visibility:visible; -webkit-backface-visibility:visible;
+}
+html:not(.js) .fb__face--front img, .hm-fb.is-static .fb__face--front img{ height:auto; aspect-ratio:var(--ratio); }
+html:not(.js) .hm-fb__step{ display:none; }
 
 @media (max-width:999px){
-  /* The widths were computed for a desktop row. On a phone a review is as wide
-     as the screen allows and the picture goes back on top of it, because a
-     260px picture beside 100px of text is not a layout. */
-  /* Uniform height here too, and the photograph absorbs the difference exactly
-     as it does on the wide layout — ragged cards drifting past each other read
-     as a broken grid, and sized to the tallest they left 600px of nothing under
-     a 32-character review. The floor keeps a band of the picture even on the
-     901-character one, which is the only review with no room for it. */
-  .hm-fb__rail{ --fb-h:46rem; --fade:1.5rem;
+  /* One card at a time. The same rule — the card is the picture's own shape —
+     with the height fixed so cards do not stand ragged, and the width capped so
+     a landscape picture is never wider than the screen. */
+  .hm-fb__rail{ --fade:1.5rem; --fb-h:min(64vh, 30rem); }
+  .hm-fb__row{ gap:var(--s-4); padding-inline:var(--mc-gutter-m) 0; }
+  .fb{
+    flex-basis:min(88vw, calc(var(--fb-h) * var(--ratio)));
+    width:min(88vw, calc(var(--fb-h) * var(--ratio)));
   }
-  /* align-items on the rail governs the two rows, not the cells inside them:
-     left there, every cell stretched to the tallest and a 32-character review
-     stood 1,070px high with 600px of nothing under it. */
-  .hm-fb__row{ gap:var(--s-4); padding-inline:var(--mc-gutter-m) 0; align-items:flex-start; }
-  .fb, .fb--side{ flex:0 0 86vw; max-width:22rem; height:var(--fb-h); flex-direction:column; }
-  /* One card at a time here, so the photograph simply takes the room the words
-     leave — and being contained, it shrinks inside that room rather than being
-     cut by it. A long review therefore gets a small whole picture, not a sliver
-     of a big one. */
-  .fb__ph, .fb--side .fb__ph{ flex:1 1 auto; min-height:6rem; aspect-ratio:auto; }
-  /* Past a length there is no arrangement on a 390px screen that holds both
-     the words and a photograph worth looking at. So it stops being a band
-     across the top — which at 90px was a sliver of somebody's head — and
-     becomes a portrait, which is a thing a card is allowed to have. */
-  .fb--xl .fb__q{ font-size:var(--t-small); line-height:1.5; }
-  .fb--xl .fb__ph{
-    flex:0 0 auto; width:4.5rem; height:4.5rem;
-    margin:var(--s-5) var(--s-5) 0;
-  }
+  .fb__face--back{ padding:var(--s-5); }
+  html:not(.js) .fb, .hm-fb.is-static .fb{ height:auto; }
 }

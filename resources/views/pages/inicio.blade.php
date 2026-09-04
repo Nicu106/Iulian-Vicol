@@ -132,6 +132,7 @@
        a shift-wheel all work on it without a line of code, and why a flick has
        the platform's own momentum instead of an imitation of it.
        ================================================================== --}}
+  @if($reviewCount > 0)
   <section class="hm-fb" id="reviews" aria-labelledby="h-fb">
     <div class="cat-wrap hm-fb__head">
       <h2 class="hm-h2" id="h-fb">{{ $reviewCount }} personas se hicieron la foto</h2>
@@ -147,29 +148,51 @@
     <div class="hm-fb__rail" id="fb-rail" tabindex="0"
          role="group" aria-roledescription="carrusel"
          aria-label="Lo que escribieron los clientes">
-      @foreach([0, 1] as $pass)
+      @php
+        // The loop needs each printed copy to be wider than any screen, or the
+        // seam shows as a gap. Two copies cover it from about 8 reviews up;
+        // fewer than that are printed more times. The copies after the first
+        // are hidden from assistive tech so nothing is read twice.
+        $copies = max(2, (int) ceil(3600 / max(1, $reviews->sum('w'))) + 1);
+      @endphp
+      @foreach(range(0, $copies - 1) as $pass)
         <div class="hm-fb__row" @if($pass) aria-hidden="true" @endif>
           @foreach($reviews as $t)
             @php $src = fn ($w) => route('img.resize', ['w' => $w]) . '?p=' . urlencode($t->img); @endphp
-            <figure class="fb {{ $t->side ? 'fb--side' : '' }} {{ $t->xl ? 'fb--xl' : '' }}"
-                    style="--w:{{ $t->w }}px; --cell:{{ $t->cell }}px; --pw:{{ $t->pw }}px; --ratio:{{ $t->ratio }}">
-              <div class="fb__ph">
-                <img src="{{ $src(600) }}"
-                     srcset="{{ $src(400) }} 400w, {{ $src(600) }} 600w, {{ $src(900) }} 900w"
-                     sizes="(min-width:1000px) 320px, 70vw"
-                     alt="{{ $pass ? '' : $t->name . ', con su coche' }}"
-                     loading="lazy" decoding="async">
-              </div>
-              <div class="fb__t">
-                <blockquote class="fb__q">{{ $t->quote }}</blockquote>
-                <figcaption class="fb__by">{{ $t->name }}</figcaption>
+            <figure class="fb" style="--w:{{ $t->w }}px; --ratio:{{ $t->ratio }}; --scale:{{ $t->scale }}">
+              <div class="fb__flip">
+                <div class="fb__face fb__face--front">
+                  <img src="{{ $src(600) }}"
+                       srcset="{{ $src(400) }} 400w, {{ $src(600) }} 600w, {{ $src(900) }} 900w"
+                       sizes="(min-width:1000px) 420px, 80vw"
+                       alt="{{ $pass ? '' : $t->name . ', con su coche' }}"
+                       loading="{{ !$pass && $loop->index < 8 ? 'eager' : 'lazy' }}" decoding="async">
+                </div>
+                <div class="fb__face fb__face--back">
+                  <blockquote class="fb__q">{{ $t->quote }}</blockquote>
+                  <figcaption class="fb__by">{{ $t->name }}</figcaption>
+                </div>
               </div>
             </figure>
           @endforeach
         </div>
       @endforeach
     </div>
+
+    {{-- Two, and nothing else. Each carries the next card across the middle,
+         which is where a card turns over. --}}
+    <div class="hm-fb__step">
+      <button class="hm-fb__nav" type="button" data-go="-1" aria-label="Anterior">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+          <path d="M15 4 7 12l8 8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+      </button>
+      <button class="hm-fb__nav" type="button" data-go="1" aria-label="Siguiente">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+          <path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+      </button>
+    </div>
   </section>
+  @endif
 
   {{-- ============ how it actually goes ============
        This was "Proceso simple en 4 pasos": Elige, Verifica, Prueba, Finaliza —
@@ -263,50 +286,79 @@
 
 <script>
 (function () {
-  /* ---- the drift --------------------------------------------------------
-     The row moves by itself, for ever, and there is nothing to press. It is the
-     browser's own scroller underneath, so a trackpad, a swipe, shift+wheel and
-     the arrow keys all work on it for free, and a swipe keeps the platform's own
-     momentum rather than an imitation of it. This adds a constant velocity on
-     top, a wrap at the seam, and — because a plain mouse has no way into a
-     horizontal row — grab and throw.
+  /* ---- the row -----------------------------------------------------------
+     It travels left to right on its own, for ever. Each card is a photograph
+     through the middle of the row — that is what slows down there and what
+     draws the eye — and turns over as it leaves, becoming what that person
+     wrote. A press on a button carries the centred picture across, turns it,
+     and brings the next one in.
 
-     The numbers are not invented. Every marquee library that states its speed in
-     px/sec picks 50; Linear's and Vercel's shipped logo walls work out at 20-24.
-     Neither is right here, because those are logos and these are sentences: at
-     238 words per minute a 40-word review needs about ten seconds, and a card
-     stays fully legible for roughly 700px of travel. 34px/s gives it twenty.
+     The speed is not constant, and that is the point. The row arrives fast, so
+     that anyone scrolling past sees it moving; then it drops to a crawl
+     whenever a card is sitting in the middle, so there is time to read the one
+     that has just turned over. A detent, not a stop: a hard stop is the tell of
+     a widget, and every ticker that publishes its numbers eases a multiplier
+     instead.
 
-     Hover does not stop the row dead — that is the single clearest tell of a
-     cheap one. It takes it down to a quarter speed, which is slow enough to read
-     and still visibly alive. Keyboard focus and the stop button do stop it, on
-     purpose: someone reading with a keyboard is not hovering anything.
+     Two buttons carry the next card across the middle. Nothing else.
 
-     Velocity is damped, never assigned: v moves toward its target by
-     1 - e^(-dt/tau), the frame-rate-independent form, so 60Hz and 120Hz settle
-     over the same 150ms rather than the same number of frames.
-
-     It never starts at all under prefers-reduced-motion, and the row stays a
-     scrollable row in that case rather than becoming a dead block. */
+     It is the browser's own scroller underneath, so a trackpad, a swipe and the
+     arrow keys all work for free. Positions are cached, so a frame reads no
+     layout: 48 cards, and the only per-frame work is arithmetic and a custom
+     property. dt-normalised, so 120Hz does not run it at double speed. Under
+     prefers-reduced-motion it never moves and every card shows its words. */
   var rail = document.getElementById('fb-rail');
   if (rail) {
-    var SPEED = 34;        // px/s
-    var HOVER = 0.25;      // what hovering takes it down to, not zero
-    var TAU   = 150;       // ms; the damping time constant
-    var THROW = 325;       // ms; the decay of a flick, the iOS-derived constant
-    var YIELD = 1200;      // ms of stillness before the drift comes back
+    var SPEED  = 74;     // px/s between cards
+    var BOOST  = 3.2;    // ...and how much faster it arrives
+    var CRAWL  = 0.10;   // what it slows to with a card in the middle
+    var DETENT = 120;    // how near the middle a card has to be for that
+    var FLIP   = 70;     // half the distance a card turns over in
+    var LEAD   = 130;    // ...starting this far PAST the middle, once the slow zone is behind it
+    var TAU    = 150;    // ms, the damping time constant
+    var GLIDE  = 780;    // ms for a button press to land the next card
+
     var still = window.matchMedia('(prefers-reduced-motion: reduce)');
     var halt  = document.getElementById('fb-halt');
     var sec   = document.getElementById('reviews');
     var row   = rail.firstElementChild;
 
-    var rowW = 0, v = 0, pos = 0, mine = 0, last = 0, raf = 0;
-    var over = false, keyed = false, stopped = false, busy = 0;
-    var held = false, moved = false, px = 0, ppos = 0, pt = 0, fling = 0;
+    var kids = [], rowW = 0, mid = 0;
+    var pos = 0, v = 0, last = 0, raf = 0, mine = 0, warm = 0;
+    var over = false, keyed = false, stopped = false, busy = 0, glide = null;
 
-    function measure() { rowW = row.scrollWidth; }
-    function wrap(x) { return x >= rowW ? x - rowW : x < 0 ? x + rowW : x; }
-    function put(x) { pos = wrap(x); rail.scrollLeft = pos; mine = performance.now(); }
+    function measure() {
+      rowW = row.scrollWidth;
+      mid  = rail.clientWidth / 2;
+      kids = Array.prototype.map.call(rail.querySelectorAll('.fb'), function (el) {
+        return { el: el, c: el.offsetLeft + el.offsetWidth / 2, flip: -1 };
+      });
+      pos = rail.scrollLeft;
+    }
+
+    var clamp01 = function (x) { return x < 0 ? 0 : x > 1 ? 1 : x; };
+    var smooth  = function (x) { x = clamp01(x); return x * x * (3 - 2 * x); };
+
+    function paint() {
+      var near = Infinity;
+      for (var i = 0; i < kids.length; i++) {
+        var d = kids[i].c - pos - mid;
+        if (d > -rowW / 2 - 1200 && d < rowW / 2 + 1200) {
+          var a = d < 0 ? -d : d;
+          if (a < near) { near = a; }
+        }
+        // The middle is for the PHOTOGRAPH: that is what slows down there and
+        // what draws the eye. The card turns over as it LEAVES — once it is past
+        // the slow zone and picking up speed — and travels on as the words. So a
+        // press on the button carries the centred picture to the right, turns it
+        // into its review, and brings the next picture into the middle. Turning
+        // it exactly at the middle put the 90-degree moment, a card of zero
+        // width, at the slowest point of the row: a hole where a review should be.
+        var f = Math.round(smooth((d - LEAD) / (2 * FLIP)) * 180);
+        if (f !== kids[i].flip) { kids[i].flip = f; kids[i].el.style.setProperty('--flip', f + 'deg'); }
+      }
+      return near;
+    }
 
     function frame(now) {
       raf = requestAnimationFrame(frame);
@@ -314,72 +366,90 @@
       last = now;
       if (!rowW) { measure(); return; }
 
-      if (held) { return; }                      // the hand has it
-
-      if (Math.abs(fling) > 12) {                // ...and has just let go
-        put(pos + fling * dt / 1000);
-        fling *= Math.exp(-dt / THROW);
-        v = fling > 0 ? Math.min(fling, SPEED) : 0;   // hand the drift back a moving row
-        return;
+      if (glide) {
+        var t = clamp01((now - glide.t0) / GLIDE);
+        var e = 1 - Math.pow(1 - t, 3);
+        pos = glide.from + (glide.to - glide.from) * e;
+        if (t >= 1) { glide = null; busy = now + 700; }
+      } else {
+        var near = paint();
+        // fast on arrival, a crawl with a card in the middle, and hovering or
+        // reading with a keyboard slows it further still
+        var boost = warm ? 1 + (BOOST - 1) * clamp01((warm - now) / 1500) : 1;
+        var want  = (still.matches || stopped || keyed || now < busy) ? 0
+                  : SPEED * boost * (CRAWL + (1 - CRAWL) * smooth(near / DETENT))
+                          * (over ? 0.45 : 1);
+        v += (want - v) * (1 - Math.exp(-dt / TAU));
+        if (v <= 0.02) { pos = rail.scrollLeft; paint(); return; }
+        if (Math.abs(pos - rail.scrollLeft) > 2) { pos = rail.scrollLeft; }
+        pos -= v * dt / 1000;                     // left to right
       }
-      fling = 0;
 
-      var want = (still.matches || stopped || keyed || now < busy) ? 0
-               : over ? SPEED * HOVER : SPEED;
-      v += (want - v) * (1 - Math.exp(-dt / TAU));
-
-      if (v <= 0.02) { pos = rail.scrollLeft; return; }   // theirs, not ours
-      if (Math.abs(pos - rail.scrollLeft) > 2) { pos = rail.scrollLeft; }
-      put(pos + v * dt / 1000);
+      if (pos < 0) { pos += rowW; } else if (pos >= rowW) { pos -= rowW; }
+      rail.scrollLeft = pos;
+      mine = now;
+      paint();
     }
 
-    /* ---- taking hold of it ---- */
-    rail.addEventListener('pointerdown', function (e) {
-      if (e.pointerType !== 'mouse' || e.button !== 0) { return; }   // touch has its own
-      held = true; moved = false; fling = 0;
-      px = e.clientX; pos = rail.scrollLeft; ppos = pos; pt = performance.now();
+    /* ---- the two buttons ---- */
+    function glideTo(kid) {
+      // The card may be in the other printed copy, so normalise into one row's
+      // worth and take the shorter way round — without this a step to the next
+      // card once travelled 10,546px the wrong way.
+      var to = (((kid.c - mid) % rowW) + rowW) % rowW;
+      var d  = to - pos;
+      if (d >  rowW / 2) { d -= rowW; }
+      if (d < -rowW / 2) { d += rowW; }
+      glide = { from: pos, to: pos + d, t0: performance.now() };
+    }
+    function step(dir) {
+      if (!kids.length) { return; }
+      // measured from where a glide is GOING, so a second press during the first
+      // steps two cards rather than re-targeting the one already on its way
+      var at = glide ? glide.to : pos, best = 0, bd = Infinity;
+      for (var i = 0; i < kids.length; i++) {
+        var a = Math.abs(kids[i].c - at - mid);
+        if (a < bd) { bd = a; best = i; }
+      }
+      glideTo(kids[(best + dir + kids.length) % kids.length]);
+    }
+    document.querySelectorAll('.hm-fb__step .hm-fb__nav').forEach(function (b) {
+      b.addEventListener('click', function () { step(+b.getAttribute('data-go')); });
     });
-    rail.addEventListener('pointermove', function (e) {
-      if (!held) { return; }
-      var d = px - e.clientX;
-      // A press is not a drag until it travels: below this a click still clicks
-      // and a selection still selects.
-      if (!moved && Math.abs(d) < 4) { return; }
-      if (!moved) { moved = true; rail.classList.add('is-held'); rail.setPointerCapture(e.pointerId); }
-      var now = performance.now(), dt = now - pt;
-      put(pos + d);
-      px = e.clientX;
-      if (dt > 0) {
-        // sampled the way kinetic scrolling has been done since iOS: a running
-        // average, so one jittery frame does not decide the throw
-        fling = 0.8 * ((pos - ppos) / dt * 1000) + 0.2 * fling;
-        ppos = pos; pt = now;
+    // A photograph you can see is a review you might want: click it and it
+    // comes to the middle and turns over. The press itself has to travel less
+    // than 6px, so a drag is still a drag.
+    var pressX = 0;
+    rail.addEventListener('pointerdown', function (e) { pressX = e.clientX; });
+    rail.addEventListener('click', function (e) {
+      if (Math.abs(e.clientX - pressX) > 6) { return; }
+      var card = e.target.closest ? e.target.closest('.fb') : null;
+      if (!card || !kids.length) { return; }
+      for (var i = 0; i < kids.length; i++) {
+        if (kids[i].el === card) { glideTo(kids[i]); break; }
       }
     });
-    ['pointerup', 'pointercancel'].forEach(function (n) {
-      rail.addEventListener(n, function () {
-        if (!held) { return; }
-        held = false;
-        rail.classList.remove('is-held');
-        if (!moved) { fling = 0; return; }
-        fling = Math.max(-2600, Math.min(2600, fling * 0.8));   // amplitude = 0.8 x velocity
-        busy = performance.now() + YIELD;
-      });
-    });
 
-    /* ---- and everything else that is theirs ---- */
-    function yieldNow() { busy = performance.now() + YIELD; }
-    ['wheel', 'touchstart', 'keydown'].forEach(function (e) {
+    /* ---- and everything that is theirs ---- */
+    function yieldNow() { busy = performance.now() + 1200; }
+    ['wheel', 'touchstart', 'pointerdown', 'keydown'].forEach(function (e) {
       rail.addEventListener(e, yieldNow, { passive: true });
     });
     rail.addEventListener('scroll', function () {
-      // Ours fire this too, so the test is when, not whether.
-      if (!held && performance.now() - mine > 120) { yieldNow(); }
+      if (!glide && performance.now() - mine > 120) { yieldNow(); pos = rail.scrollLeft; }
     }, { passive: true });
 
     sec.addEventListener('pointerenter', function () { over = true; });
     sec.addEventListener('pointerleave', function () { over = false; });
-    sec.addEventListener('focusin',  function () { keyed = true; });
+    // Focus stops the row only when it is a KEYBOARD's focus. A mouse click on
+    // one of the two buttons also focuses it, and that used to park the row
+    // for good — one press and it never moved again until something else was
+    // clicked.
+    sec.addEventListener('focusin',  function (e) {
+      // the two buttons never count: pressing one is asking for motion
+      if (e.target && e.target.closest && e.target.closest('.hm-fb__step')) { keyed = false; return; }
+      keyed = !!(e.target && e.target.matches && e.target.matches(':focus-visible'));
+    });
     sec.addEventListener('focusout', function () {
       if (!sec.contains(document.activeElement)) { keyed = false; }
     });
@@ -394,6 +464,12 @@
       });
     }
 
+    // Under prefers-reduced-motion nothing moves and nothing turns over — so
+    // the words would be stuck on the back of every card. The section goes
+    // static instead: photograph above, words below, all of it simply there.
+    function calm() { sec.classList.toggle('is-static', still.matches); }
+    still.addEventListener('change', calm); calm();
+
     window.addEventListener('resize', measure);
     window.addEventListener('load', measure);
     document.addEventListener('visibilitychange', function () {
@@ -402,8 +478,9 @@
     });
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(function (es) {
-        if (es[0].isIntersecting) { if (!raf) { last = 0; raf = requestAnimationFrame(frame); } }
-        else { cancelAnimationFrame(raf); raf = 0; }
+        if (es[0].isIntersecting) {
+          if (!raf) { last = 0; warm = performance.now() + 1500; raf = requestAnimationFrame(frame); }
+        } else { cancelAnimationFrame(raf); raf = 0; }
       }, { threshold: 0 }).observe(sec);
     } else {
       raf = requestAnimationFrame(frame);
