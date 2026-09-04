@@ -316,8 +316,13 @@
 .hm-fb__rail{ cursor:grab; }
 .hm-fb__rail.is-held{ cursor:grabbing; user-select:none; }
 .hm-fb__rail:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:-3px; }
-.hm-fb__row{ display:flex; gap:var(--s-5); padding-inline:var(--s-5) 0; }
-.hm-fb__row + .hm-fb__row{ padding-inline:var(--s-5) 0; }
+/* flex-shrink:0 on both, and it is not belt-and-braces. These sit in a flex
+   container that scrolls, and a flex line is laid out against the box you can
+   SEE — 1440px — not against the 11,803px it scrolls. Left shrinkable, the
+   browser is entitled to squeeze all 24 cards into that 1440, and Safari does:
+   cards collapsed to 22-35px slivers with their neighbours painted over them.
+   Chrome happened not to, which is why a Chrome-only check called it clean. */
+.hm-fb__row{ display:flex; flex:0 0 auto; gap:var(--s-5); padding-inline:var(--s-5) 0; }
 
 .fb{
   /* figure carries the UA's `margin: 1em 40px`, which took 80px out of every
