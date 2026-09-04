@@ -169,15 +169,56 @@
 .hm-tile .tt-photo img{ width:100%; height:100%; object-fit:cover; object-position:var(--pos-portrait); display:block; }
 
 /* steps */
-.hm-steps__list{ margin:0; padding:0; list-style:none; counter-reset:step;
-  display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:var(--s-5); }
-@media (max-width:760px){ .hm-steps__list{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
-.hm-steps__list li{ counter-increment:step; display:flex; flex-direction:column; gap:var(--s-2);
-  padding-top:var(--s-4); border-top:2px solid var(--mc-ink); }
-.hm-steps__list li::before{ content:counter(step, decimal-leading-zero);
-  font-size:var(--t-label); font-weight:600; letter-spacing:.06em; color:var(--mc-ink-3); }
-.hm-steps__list b{ font-size:var(--t-h3); color:var(--mc-ink); }
-.hm-steps__list span{ font-size:var(--t-small); line-height:1.5; color:var(--mc-ink-2); }
+/* ---- how it actually goes ----------------------------------------------
+   A route down the page, not a row across it. The number is the loud element —
+   the same device the contact page uses for a distance — and the copy beside it
+   has room to be a sentence. Four equal columns are what turned these into
+   one-word slogans, three of which were not true.
+
+   The rule and its square markers are one object: the rule is on the list, the
+   squares are on the steps, and both are pinned to the same 4.5px centre line so
+   a step added tomorrow lands on it without a number being touched. */
+.hm-how__head{ max-width:54ch; margin-bottom:var(--s-7); }
+.hm-how__list{ position:relative; margin:0; padding:0; list-style:none; }
+/* The spine sits on the column boundary, so it is the same line the numbers end
+   at and the words begin at — one edge doing both jobs instead of a marker rail
+   floating 45px to the left of everything it marks. */
+.hm-how__list::before{
+  content:""; position:absolute; left:5.5rem; top:0; bottom:0;
+  width:1px; background:var(--mc-rule);
+}
+.hm-how__step{
+  position:relative;
+  display:grid; grid-template-columns:5.5rem minmax(0,1fr); column-gap:var(--s-6);
+  align-items:start; padding-block:var(--s-5);
+}
+.hm-how__step + .hm-how__step{ border-top:1px solid var(--mc-hairline); }
+/* the stop, square, because nothing on this site has a radius */
+.hm-how__step::before{
+  content:""; position:absolute; left:calc(5.5rem - 4px); top:calc(var(--s-5) + .48em);
+  width:9px; height:9px; background:var(--mc-ink);
+}
+/* The column is a fixed width and the words start at its edge, so 01 and 04 line
+   up whatever the figures measure — DM Sans has no tabular set, and asking for
+   one left the four headings on four different left margins. */
+.hm-how__n{
+  font-size:var(--t-h1); font-weight:700; line-height:.86; letter-spacing:-.03em;
+  color:var(--mc-ink);
+}
+.hm-how__t h3{ margin:0 0 var(--s-2); font-size:var(--t-h3); color:var(--mc-ink); }
+.hm-how__t p{ margin:0; max-width:56ch; font-size:var(--t-prose);
+  line-height:1.55; color:var(--mc-ink-2); }
+/* 44px of target without 44px of gap: the box is padded, the space is taken back */
+.hm-how__t .mc-link{
+  display:inline-flex; align-items:center; min-height:44px; margin-top:calc(-1 * var(--s-3));
+}
+@media (max-width:640px){
+  /* the number goes above the words: at 390px a 34px figure and a 32px gutter
+     left fourteen characters to the line, which is not a sentence any more */
+  .hm-how__list::before, .hm-how__step::before{ display:none; }
+  .hm-how__step{ grid-template-columns:minmax(0,1fr); row-gap:var(--s-2); }
+  .hm-how__n{ font-size:var(--t-h3); color:var(--mc-ink-3); }
+}
 
 /* questions — left, like everything else; the measure is on the rows, not the wrap,
    or the whole block centres itself inside the container */

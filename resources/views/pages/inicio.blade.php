@@ -155,14 +155,63 @@
     </div>
   </section>
 
-  {{-- ============ how it goes ============ --}}
-  <section class="hm-sec hm-steps cat-wrap" aria-labelledby="h-steps">
-    <h2 class="hm-h2" id="h-steps">Proceso simple en 4 pasos</h2>
-    <ol class="hm-steps__list">
-      <li><b>Elige</b><span>Busca en el catálogo el modelo adecuado.</span></li>
-      <li><b>Verifica</b><span>Historial claro e informe técnico detallado.</span></li>
-      <li><b>Prueba</b><span>Programa una prueba de manejo sin compromisos.</span></li>
-      <li><b>Finaliza</b><span>Financiación y entrega rápida.</span></li>
+  {{-- ============ how it actually goes ============
+       This was "Proceso simple en 4 pasos": Elige, Verifica, Prueba, Finaliza —
+       the stock four-step funnel, in four equal one-line columns. Three of the
+       four were not true here. There is no technical report anywhere on this
+       site; what he sends is video, with the parts that are not perfect in it.
+       There is no showroom to book a test drive at — the contact page says so in
+       his own words. And several buyers never came at all: one drove 720 km, one
+       had the car delivered to his door.
+
+       So it does not claim a process any more. Each step is a thing the visitor
+       can go and check somewhere else on this site, which is why every one of
+       them ends in a link. The route runs down the page rather than across it
+       because the copy is now sentences, and four narrow columns would clamp
+       them back into slogans — which is how it got here. --}}
+  <section class="hm-sec hm-how cat-wrap" aria-labelledby="h-steps">
+    <div class="hm-how__head">
+      <h2 class="hm-h2" id="h-steps">Cómo va, de verdad</h2>
+      <p class="hm-sec__p">No hay concesionario, ni centralita, ni un formulario esperando
+        a que alguien lo mire mañana. Hay un teléfono, un coche y yo.</p>
+    </div>
+
+    <ol class="hm-how__list">
+      <li class="hm-how__step">
+        <span class="hm-how__n" aria-hidden="true">01</span>
+        <div class="hm-how__t">
+          <h3>Escribes</h3>
+          <p>Al WhatsApp que hay en toda la web. Contesto yo, y normalmente en minutos.
+            No hay nadie más al otro lado.</p>
+          <a class="mc-link" href="/contacto">Ver cómo contactar</a>
+        </div>
+      </li>
+      <li class="hm-how__step">
+        <span class="hm-how__n" aria-hidden="true">02</span>
+        <div class="hm-how__t">
+          <h3>Te mando vídeo</h3>
+          <p>Del coche entero, y de lo que no está perfecto también. Prefiero que lo
+            veas en el móvil antes de coger el coche para venir.</p>
+          <a class="mc-link" href="/catalogo">Ver los coches</a>
+        </div>
+      </li>
+      <li class="hm-how__step">
+        <span class="hm-how__n" aria-hidden="true">03</span>
+        <div class="hm-how__t">
+          <h3>Lo ves. O no lo ves</h3>
+          <p>Quedamos en Málaga, en el punto exacto donde esté el coche. O no vienes:
+            hay quien ha conducido 720 km para verlo y quien no se movió de casa.</p>
+          <a class="mc-link" href="/contacto#far">Lo que hicieron ellos</a>
+        </div>
+      </li>
+      <li class="hm-how__step">
+        <span class="hm-how__n" aria-hidden="true">04</span>
+        <div class="hm-how__t">
+          <h3>Te lo llevas</h3>
+          <p>Papeles, transferencia y entrega. Si no puedes venir a por él, te lo llevo.</p>
+          <a class="mc-link" href="https://wa.me/34614753187">Preguntar por uno</a>
+        </div>
+      </li>
     </ol>
   </section>
 
