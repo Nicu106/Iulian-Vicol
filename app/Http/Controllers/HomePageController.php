@@ -55,8 +55,30 @@ class HomePageController extends Controller
             ];
         }
 
+        // The reviews, arranged for the mosaic. Two facts decide the shape: the
+        // quotes run 1 to 901 characters, and 22 of the 24 photographs are portrait.
+        // So there are two kinds of tile — a photograph with a short quote under it,
+        // and a long quote set as type with no photograph — and the long ones become
+        // the mosaic's own rhythm instead of being clamped away.
         $wall = Testimonial::where('is_active', true)->orderBy('order_index')
-            ->whereNotNull('image_path')->get();
+            ->whereNotNull('image_path')->get()
+            ->filter(fn ($t) => mb_strlen(trim((string) $t->quote)) > 20)   // one review is a comma
+            ->values()
+            ->map(function ($t) {
+                $len = mb_strlen(trim($t->quote));
+                return (object) [
+                    'name'  => $t->author_name,
+                    'place' => $t->author_location,
+                    'quote' => trim($t->quote),
+                    'img'   => $t->image_path,
+                    // A starting guess only. The page measures every tile once it
+                    // is laid out and promotes any whose words do not fit into a
+                    // 'said' tile — so a review added tomorrow, of any length,
+                    // lands in the right shape without anyone touching a number.
+                    'kind'  => $len > 160 ? 'said' : 'shot',
+                    'len'   => $len,
+                ];
+            });
 
         return view('pages.inicio', [
             'available' => $available,

@@ -123,22 +123,53 @@
     </div>
   </section>
 
-  {{-- ============ the people ============ --}}
-  <section class="hm-sec hm-wall cat-wrap" aria-labelledby="h-wall">
-    <div class="hm-sec__head">
-      <h2 class="hm-h2" id="h-wall">{{ $wall->count() }} personas se hicieron la foto</h2>
-      <p class="hm-sec__p">Con el coche que se llevaron. Ninguna foto de archivo.</p>
+  {{-- ============ the people ============
+       A mosaic, because the quotes run 32 to 901 characters and a uniform grid can
+       only hold that by cutting the longest — which is the best one he has. Fixed
+       width, free height, nothing clamped.
+
+       On a wide screen the section is pinned and the mosaic travels sideways as the
+       page scrolls: 24 reviews at full length are 4.1 screens of ordinary page, and
+       this is one screen that the reader passes through. It is NOT scroll-hijacking
+       — the scroll stays the browser's own, so the wheel, the bar, the keyboard,
+       trackpad momentum and Page Down all behave exactly as they always do. Only the
+       direction the content moves is ours.
+
+       Narrow screens, reduced motion, and no JavaScript all get the plain vertical
+       mosaic: pinning a sideways rail on a phone would fail WCAG's 400% reflow, and
+       the mosaic reads perfectly well standing still. --}}
+  <section class="hm-people" id="reviews" aria-labelledby="h-wall">
+    <div class="hm-people__pin">
+      <div class="cat-wrap hm-people__head">
+        <h2 class="hm-h2" id="h-wall">{{ $wall->count() }} personas se hicieron la foto</h2>
+        <p class="hm-sec__p">Con el coche que se llevaron. Ninguna foto de archivo, ningún texto recortado.</p>
+      </div>
+
+      <div class="hm-mosaic" id="mosaic">
+        <div class="hm-mosaic__in" id="mosaic-in">
+          @foreach($wall as $i => $t)
+            <figure class="hm-t hm-t--{{ $t->kind }}">
+              @if($t->kind === 'shot')
+                <div class="hm-t__ph">
+                  <img src="{{ $t->img }}" alt="{{ $t->name }} con su coche"
+                       loading="lazy" decoding="async" width="600" height="750">
+                </div>
+              @endif
+              <blockquote class="hm-t__q">{{ $t->quote }}</blockquote>
+              <figcaption class="hm-t__by"><b>{{ $t->name }}</b>@if($t->place) · {{ $t->place }}@endif</figcaption>
+            </figure>
+          @endforeach
+        </div>
+      </div>
+
+      <div class="hm-people__foot cat-wrap">
+        <div class="hm-people__bar" aria-hidden="true"><span id="mosaic-bar"></span></div>
+        {{-- Research is unanimous that a pinned section must be escapable. It sits
+             in the bottom-right corner, where the hand already is, and only while
+             the section is the thing on screen. --}}
+        <button class="hm-people__all" type="button" id="wall-all" hidden>Saltar reseñas ↓</button>
+      </div>
     </div>
-    <ul class="hm-wall__grid">
-      @foreach($wall->take(8) as $t)
-        <li class="hm-tile">
-          <div class="tt-photo"><img src="{{ $t->image_path }}" alt="{{ $t->author_name }}" loading="lazy" decoding="async" width="600" height="800"></div>
-          @if(mb_strlen(trim($t->quote)) > 2)<p class="tt-quote is-clamped">{{ $t->quote }}</p>@endif
-          <p class="tt-attr"><b>{{ $t->author_name }}</b>@if($t->author_location) · {{ $t->author_location }}@endif</p>
-        </li>
-      @endforeach
-    </ul>
-    @if($wall->count() > 8)<p class="hm-sec__more">y {{ $wall->count() - 8 }} más.</p>@endif
   </section>
 
   {{-- ============ how it goes ============ --}}
@@ -184,6 +215,114 @@
 
 <script>
 (function () {
+  /* ---- the pinned mosaic -------------------------------------------------
+     The section is made tall; its contents stick to the top for that height; how
+     far the page has moved through it becomes how far the mosaic has moved — and
+     the mosaic moves FASTER than the page, so 24 reviews at full length pass in
+     less scrolling than they would occupy standing still.
+
+     The browser keeps its own scroll throughout: nothing is intercepted, no event
+     is cancelled, no wheel is swallowed. The bar, the keyboard, trackpad momentum
+     and Page Down all behave exactly as they always do — only what the movement
+     is spent on is ours. That is the difference between this and scroll-hijacking,
+     and it is the reason the section can also be skipped, reversed, or landed in
+     from a browser's own restore-scroll.
+
+     The mosaic itself is CSS columns: a new review needs no arithmetic from anyone,
+     it simply joins the flow and the section re-measures its own height on load
+     and on resize.
+
+     Narrow screens, reduced motion, and no JavaScript get the plain mosaic,
+     standing still: pinning on a phone would fail WCAG's 400% reflow, and the
+     mosaic reads perfectly well without moving. */
+  var sec  = document.getElementById('reviews');
+  var pin  = sec && sec.querySelector('.hm-people__pin');
+  var rail = document.getElementById('mosaic-in');
+  var bar  = document.getElementById('mosaic-bar');
+  var skip = document.getElementById('wall-all');
+  if (sec && rail && pin) {
+    var tiles = Array.prototype.slice.call(rail.children);
+    var wide  = window.matchMedia('(min-width: 1000px)');
+    var still = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var SPEED = 2.1;              // the mosaic covers this much ground per page-pixel
+    var travel = 0, ticking = false;
+
+    function measure() {
+      if (!wide.matches || still.matches) {
+        sec.style.height = ''; rail.style.transform = '';
+        sec.classList.remove('is-pinned', 'is-here');
+        travel = 0;
+        /* Standing still in one column, 24 reviews are 12.6 screens — measured.
+           So where the section cannot be pinned it opens with six and hands over
+           the rest on request. Without JavaScript none of this runs and all 24 are
+           simply there, which is the honest fallback. */
+        var many = tiles.length > 6 && window.innerWidth < 700;
+        tiles.forEach(function (t, i) { t.classList.toggle('is-extra', many && !sec.classList.contains('is-all') && i >= 6); });
+        if (skip) {
+          var held = many && !sec.classList.contains('is-all');
+          skip.hidden = !held;
+          skip.textContent = 'Ver las ' + tiles.length + ' reseñas';
+          skip.dataset.mode = 'more';
+        }
+        return;
+      }
+      sec.classList.add('is-pinned');
+      sec.style.height = '';
+      rail.style.transform = '';
+      tiles.forEach(function (t) { t.classList.remove('is-extra'); });
+      if (skip) { skip.textContent = 'Saltar reseñas ↓'; skip.dataset.mode = 'skip'; }
+      // How much taller the mosaic is than the window it is read through — the
+      // window, not the section: the pin also holds the heading and its padding,
+      // and measuring against the whole thing left the last tile 100px below the
+      // fold at the end of the travel, permanently unread.
+      var view = sec.querySelector('.hm-mosaic');
+      var over = Math.max(0, rail.scrollHeight - view.clientHeight);
+      travel = over;
+      // the page pays for it at SPEED — the whole point of pinning it
+      sec.style.height = (window.innerHeight + over / SPEED) + 'px';
+      if (skip) skip.hidden = over === 0;
+      draw();
+    }
+    function draw() {
+      if (!travel) return;
+      var top = sec.getBoundingClientRect().top;
+      var page = (sec.offsetHeight - window.innerHeight) || 1;
+      var p = Math.min(1, Math.max(0, -top / page));
+      rail.style.transform = 'translate3d(0,' + (-p * travel) + 'px,0)';
+      if (bar) bar.style.transform = 'scaleY(' + p + ')';
+    }
+
+    if (skip) {
+      skip.addEventListener('click', function () {
+        if (skip.dataset.mode === 'more') {          // narrow: hand over the rest
+          sec.classList.add('is-all');
+          measure();
+          return;
+        }
+        // pinned: past the section, at its own pace — the reader asked to leave, not to jump
+        var y = sec.getBoundingClientRect().top + window.pageYOffset + sec.offsetHeight - window.innerHeight + 2;
+        window.scrollTo({ top: y, behavior: still.matches ? 'auto' : 'smooth' });
+      });
+    }
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          sec.classList.toggle('is-here', e.isIntersecting && sec.classList.contains('is-pinned'));
+        });
+      }, { threshold: 0.2 }).observe(sec);
+    }
+
+    window.addEventListener('scroll', function () {
+      if (ticking) return; ticking = true;
+      requestAnimationFrame(function () { draw(); ticking = false; });
+    }, { passive: true });
+    window.addEventListener('resize', measure);
+    wide.addEventListener('change', measure);
+    still.addEventListener('change', measure);
+    window.addEventListener('load', measure);   // the photographs decide the height
+    measure();
+  }
+
   document.documentElement.className += ' js';
   var STOCK  = @json($stock);
   var MONTHS = {{ $months }};

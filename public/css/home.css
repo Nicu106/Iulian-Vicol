@@ -204,3 +204,93 @@
 @media (max-width:768px), (max-height:520px) and (orientation:landscape){
   body:has(.cat-dock) main{ padding-bottom:0; }
 }
+
+/* ============================================================================
+   The people — a mosaic
+   The quotes run 32 to 901 characters and 22 of 24 photographs are portrait.
+   A uniform grid can only hold that by cutting the longest quote, which is the
+   best one he has. So: fixed width, free height, nothing clamped, and two kinds
+   of tile — a photograph with its short quote, and a long quote set as type.
+   ========================================================================= */
+.hm-people{ position:relative; margin-top:var(--s-9); }
+.hm-people__head{ padding-bottom:var(--s-6); }
+.hm-people__head .hm-h2{ margin-bottom:var(--s-2); }
+
+.hm-mosaic{ overflow:hidden; }
+.hm-mosaic__in{
+  /* standing still: an ordinary mosaic in columns */
+  columns:4; column-gap:var(--s-4);
+  padding-inline:var(--mc-gutter-d);
+  max-width:var(--mc-container); margin-inline:auto;
+}
+.hm-t{
+  break-inside:avoid; margin:0 0 var(--s-4);
+  background:var(--mc-surface); border:1px solid var(--mc-hairline);
+  border-radius:var(--mc-r-card);
+  display:flex; flex-direction:column; gap:var(--s-3); padding-bottom:var(--s-4);
+}
+.hm-t__ph{ aspect-ratio:4 / 5; overflow:hidden; background:var(--mc-band); }
+.hm-t__ph img{ width:100%; height:100%; object-fit:cover; object-position:var(--pos-portrait); display:block; }
+.hm-t__q{
+  margin:0; padding:0 var(--s-4);
+  font-family:var(--f-voice); font-style:italic;
+  font-size:var(--t-small); line-height:1.55; color:var(--mc-ink-2);
+}
+.hm-t__by{ padding:0 var(--s-4); font-size:var(--t-label); color:var(--mc-ink-3); }
+.hm-t__by b{ color:var(--mc-ink); font-weight:600; }
+/* the long ones carry themselves: no photograph, bigger type, an opening mark */
+.hm-t--said{ background:var(--mc-band); border-color:transparent; padding-top:var(--s-5); }
+.hm-t--said .hm-t__q{ font-size:var(--t-prose); line-height:1.5; color:var(--mc-ink); }
+.hm-t--said .hm-t__q::before{
+  content:"\201C"; display:block; margin-bottom:calc(var(--s-2) * -1);
+  font-size:2.6em; line-height:.8; color:var(--mc-control);
+}
+@media (max-width:1200px){ .hm-mosaic__in{ columns:3; } }
+@media (max-width:820px){ .hm-mosaic__in{ columns:2; padding-inline:var(--mc-gutter-m); } }
+@media (max-width:520px){ .hm-mosaic__in{ columns:1; } }
+
+/* ---- pinned, on a wide screen ------------------------------------------
+   The mosaic keeps its columns — it is the same object standing still or moving,
+   which is why a new review needs no arithmetic from anyone. The section holds it
+   for one screen and moves it faster than the page. */
+.hm-people.is-pinned .hm-people__pin{
+  position:sticky; top:0; height:100vh; height:100svh;
+  display:flex; flex-direction:column; gap:var(--s-4);
+  padding-block:var(--s-7) var(--s-6);
+  overflow:hidden;
+}
+.hm-people.is-pinned .hm-mosaic{ flex:1 1 auto; min-height:0; }
+.hm-people.is-pinned .hm-mosaic__in{ will-change:transform; }
+
+/* how far through the reviews you are — vertical, beside them, because that is
+   the direction the reading is going */
+.hm-people__bar{ display:none; }
+.hm-people.is-pinned .hm-people__bar{
+  display:block; position:absolute; right:calc(var(--mc-gutter-d) / 2); top:18vh; bottom:12vh;
+  width:2px; background:var(--mc-hairline);
+}
+.hm-people.is-pinned .hm-people__bar span{
+  display:block; height:100%; background:var(--mc-ink);
+  transform:scaleY(0); transform-origin:top; will-change:transform;
+}
+
+.hm-t.is-extra{ display:none; }
+.hm-people__foot{ display:flex; justify-content:center; padding-top:var(--s-5); }
+.hm-people.is-pinned .hm-people__foot{ display:contents; }
+.hm-t.is-extra{ display:none; }
+/* standing still, the button is part of the page, centred under the mosaic */
+.hm-people:not(.is-pinned) .hm-people__all{ display:block; margin:var(--s-6) auto 0; }
+.hm-people__all{
+  min-height:44px; padding:0 var(--s-4);
+  border:1px solid var(--mc-rule); border-radius:var(--mc-r);
+  background:var(--mc-surface); color:var(--mc-ink);
+  font:600 var(--t-small)/1 var(--f-ui); cursor:pointer;
+}
+.hm-people__all:hover{ border-color:var(--mc-control); }
+.hm-people__all:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:2px; }
+.hm-people.is-here .hm-people__all{
+  position:fixed; right:var(--mc-gutter-d); bottom:var(--s-6); z-index:30;
+  background:var(--mc-ink); color:#FFFFFF; border-color:var(--mc-ink);
+  box-shadow:0 6px 24px rgba(4,7,14,.28);
+}
+.hm-people.is-here .hm-people__all:hover{ background:var(--mc-ink-2); border-color:var(--mc-ink-2); }
