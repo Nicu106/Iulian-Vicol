@@ -52,7 +52,7 @@
 .ct-open__cols{ display:none; }
 .ct-assemble.is-live .ct-open__cols{ display:block; position:absolute; inset:0; z-index:1; }
 .ct-col{
-  position:absolute; top:0; height:100%;
+  position:absolute; top:0; height:100%; overflow:hidden;
   transform-origin:0 0;
   background:var(--mc-bg);
   will-change:transform; backface-visibility:hidden;
@@ -73,11 +73,13 @@
   position:absolute; inset:0; opacity:0; will-change:opacity;
   box-shadow:0 3px 22px rgba(var(--mc-scrim), .16), 0 1px 3px rgba(var(--mc-scrim), .10);
 }
+/* Not a slice of the picture — the whole picture, at the size and place it would
+   have as the page's background. The strip around it is the window. */
 .ct-col__pic{
-  position:absolute; inset:0;
+  position:absolute; left:0; top:0; transform-origin:0 0;
   background-image:var(--hero); background-repeat:no-repeat;
   filter:saturate(.88) contrast(1.06) brightness(.94) hue-rotate(-6deg);
-  will-change:opacity;
+  will-change:transform, opacity;
 }
 
 .ct-open__words{
@@ -132,6 +134,14 @@
   display:flex; flex-direction:column; justify-content:center;
 }
 @media (max-width:899px){ .ct-panel{ padding:var(--s-6); } }
+
+/* what arrives, once the strips are home. Transform and opacity only: these sit
+   inside the two boxes the strips are aiming at, and nothing here may move a box. */
+.ct-reach .ct-reveal{
+  transition:opacity var(--m-reveal) var(--e-out), transform var(--m-reveal) var(--e-out);
+}
+.ct-reach.is-armed .ct-reveal{ opacity:0; transform:translateY(16px); }
+.ct-reach.is-armed .ct-reveal.is-on{ opacity:1; transform:none; }
 
 .ct-reach .ct-h2{ color:var(--mc-ink); margin-bottom:var(--s-3); }
 .ct-reach__lead{ margin:0 0 var(--s-6); max-width:44ch; font-size:var(--t-prose);
@@ -258,17 +268,6 @@
 }
 .ct-reason:hover{ border-color:var(--mc-ink); background:var(--mc-ink); color:#FFFFFF; }
 .ct-reason:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:2px; }
-
-/* ---- the faces ---------------------------------------------------------- */
-.ct-faces{ padding-block:var(--s-8); background:var(--mc-surface); }
-.ct-faces__lead{ margin:0 0 var(--s-5); font-size:var(--t-prose); color:var(--mc-ink-2); }
-.ct-faces__lead b{ color:var(--mc-ink); font-weight:600; }
-.ct-faces__row{ margin:0; padding:0; list-style:none; display:grid; gap:var(--s-4);
-  grid-template-columns:repeat(4,minmax(0,1fr)); }
-@media (max-width:640px){ .ct-faces__row{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
-.ct-faces__row img{ width:100%; aspect-ratio:4 / 5; object-fit:cover;
-  object-position:var(--pos-portrait); display:block; border-radius:var(--mc-r-card);
-  background:var(--mc-band); }
 
 /* ---- the form, on the deep ground --------------------------------------- */
 .ct-formband{

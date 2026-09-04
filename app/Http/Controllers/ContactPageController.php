@@ -50,9 +50,6 @@ class ContactPageController extends Controller
             //       The page says five German marques; this photograph says it too.
             //       Its brake light also rhymes with the Porsche red in the palette.
             'hero'      => '/img/banner/contacto.jpg',
-            // Four faces for the strip under the map — the people he actually sold to.
-            'faces'     => Testimonial::where('is_active', true)->whereNotNull('image_path')
-                              ->orderBy('order_index')->take(4)->get(),
             // Where his customers came from — and this is the page's whole argument.
             // The reviews say it themselves: "viaje desde Valladolid", "viaje desde
             // Valencia", "me lo entregaron a la puerta de mi casa". A man with no

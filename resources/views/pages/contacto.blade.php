@@ -73,44 +73,44 @@
       <div class="cat-wrap ct-reach__in">
 
         <div class="ct-panel ct-reach__card" id="panel-a">
-          <h2 class="ct-h2" id="reach-h">Escríbeme</h2>
-          <p class="ct-reach__lead">Contesto yo. No hay centralita, ni un formulario
+          <h2 class="ct-h2 ct-reveal" id="reach-h">Escríbeme</h2>
+          <p class="ct-reach__lead ct-reveal">Contesto yo. No hay centralita, ni un formulario
             esperando a que alguien lo mire mañana.</p>
 
           <dl class="ct-reach__list">
-            <div class="ct-reach__row">
+            <div class="ct-reach__row ct-reveal">
               <dt>WhatsApp</dt>
               <dd><a href="https://wa.me/{{ $phoneRaw }}">{{ $phone }}</a>
                   <span>Lo leo en minutos. Te mando vídeo del coche, incluido lo que no está perfecto.</span></dd>
             </div>
-            <div class="ct-reach__row">
+            <div class="ct-reach__row ct-reveal">
               <dt>Teléfono</dt>
               <dd><a href="tel:+{{ $phoneRaw }}">{{ $phone }}</a>
                   <span>Si estoy con un cliente, insiste o escríbeme.</span></dd>
             </div>
-            <div class="ct-reach__row">
+            <div class="ct-reach__row ct-reveal">
               <dt>Email</dt>
               <dd><a href="mailto:{{ $email }}">{{ $email }}</a>
                   <span>Para documentación y facturas.</span></dd>
             </div>
-            <div class="ct-reach__row">
+            <div class="ct-reach__row ct-reveal">
               <dt>Dónde</dt>
               <dd><b>Málaga, España</b>
                   <span>Trabajo con cita: te digo el punto exacto cuando quedemos.</span></dd>
             </div>
-            <div class="ct-reach__row">
+            <div class="ct-reach__row ct-reveal">
               <dt>Horario</dt>
               <dd><b>Abierto cada día</b>
                   <span>Consultar disponibilidad. <a class="mc-link" href="#ct-hours-h">Ver el detalle</a></span></dd>
             </div>
           </dl>
 
-          <a class="mc-btn mc-btn--cta ct-reach__cta"
+          <a class="mc-btn mc-btn--cta ct-reach__cta ct-reveal"
              href="https://wa.me/{{ $phoneRaw }}?text={{ urlencode('Hola, te escribo desde la web.') }}">Abrir WhatsApp</a>
         </div>
 
         <figure class="ct-panel ct-gmap" id="panel-b">
-          <div class="ct-gmap__frame">
+          <div class="ct-gmap__frame ct-reveal">
             <iframe class="ct-gmap__f" title="Mapa de Málaga, España"
                     src="https://maps.google.com/maps?q={{ urlencode('Málaga, España') }}&z=11&hl=es&output=embed"
                     loading="lazy" referrerpolicy="no-referrer-when-downgrade"
@@ -119,7 +119,7 @@
               <span>Activar el mapa</span>
             </button>
           </div>
-          <figcaption class="ct-gmap__bar">
+          <figcaption class="ct-gmap__bar ct-reveal">
             <span class="ct-gmap__where">Málaga, España</span>
             <a class="mc-link" href="https://www.google.com/maps/search/?api=1&amp;query={{ urlencode('Málaga, España') }}"
                target="_blank" rel="noopener">Abrir en Google Maps</a>
@@ -179,20 +179,6 @@
       <p class="ct-hours__note">No tengo horario de oficina ni una tienda a la que
         presentarse: trabajo con cita, y te digo el punto exacto de Málaga cuando
         quedemos — depende de dónde tenga el coche que quieres ver.</p>
-    </div>
-  </section>
-
-  {{-- ---- the faces, so the map is not the only picture ------------------- --}}
-  <section class="ct-faces" aria-label="Clientes">
-    <div class="cat-wrap">
-      <p class="ct-faces__lead"><b>{{ $people }} personas</b> se hicieron la foto con el coche
-        que se llevaron. <a class="mc-link" href="/inicio#reviews">Verlas todas →</a></p>
-      <ul class="ct-faces__row">
-        @foreach($faces as $f)
-          <li><img src="{{ $f->image_path }}" alt="{{ $f->author_name }} con su coche"
-                   loading="lazy" decoding="async" width="400" height="500"></li>
-        @endforeach
-      </ul>
     </div>
   </section>
 
@@ -269,17 +255,21 @@
        0.00        the car, whole, with the words on it
        0.02-0.09   the cuts are drawn — before this the picture is untouched
        0.05-0.26   the strips part; the deep shows through the cuts; the words go
-       0.10-0.40   the photograph drains out of them left to right — the picture
-                   is being milled, not hidden
-       0.40-0.88   each strip walks to its place in one of the two panels. Six
-                   left, six right. It is not walking towards a guess: the two
-                   panels are measured every frame and the strips aim at where
-                   they actually are, so the target moves with the page and they
-                   meet it exactly.
-       0.72-0.88   the five seams inside each group fade; the two outer hairlines
+       0.40-0.84   each strip walks to its place in one of the two panels, six
+                   left and six right, AND IT TAKES ITS SLICE OF THE CAR WITH IT.
+                   The first version drained the photograph at 0.40 and then flew
+                   twelve empty rectangles for the rest: measured, 56% of the
+                   scroll had no image on screen at all, two near-whites 1.08:1
+                   apart, and that is the whole reason it read cheap. The
+                   material is conserved now — you watch the car become the
+                   panels rather than watching it be deleted and something else
+                   arrive.
+       0.86-0.98   only now does the picture drain, and the content comes up
+                   through it at the same time
+       0.72-0.84   the five seams inside each group fade; the two outer hairlines
                    stay and become the panel's own edges
-       0.90-1.00   the stage is dismissed. The strips and the panels are the same
-                   two rectangles by then, so what is revealed is what was there.
+       0.88-1.00   the stage is dismissed; the panels' own contents arrive in
+                   order, 60ms apart, which is where the time is spent
 
      The walk is LINEAR in scroll. That is not laziness: easing a scrubbed
      transform is the one thing that makes scroll position and visual position
@@ -306,6 +296,30 @@
   var panelA   = document.getElementById('panel-a');
   var panelB   = document.getElementById('panel-b');
   var live     = false;
+
+  /* ---- the arrival ------------------------------------------------------
+     The panels' contents come up in order once the strips are home. Their boxes
+     never move — only what is inside them — because the strips are aiming at
+     those boxes and a target that shifts on arrival is a target that is missed.
+     Armed by script, so without it everything is simply there. */
+  var reach = document.getElementById('reach'), revealed = false;
+  function reveal() {
+    if (revealed || !reach) return;
+    revealed = true;
+    reach.querySelectorAll('.ct-reveal').forEach(function (el, i) {
+      window.setTimeout(function () { el.classList.add('is-on'); }, i * 60);
+    });
+  }
+  if (reach && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    reach.classList.add('is-armed');
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (e, obs) {
+        if (!e[0].isIntersecting) return;
+        obs.disconnect();
+        if (!live) reveal();          // the strips own the cue while they run
+      }, { threshold: 0.3 }).observe(reach);
+    } else { reveal(); }
+  }
 
   var clamp = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
   var span  = function (p, a, b) { return clamp((p - a) / (b - a)); };
@@ -345,8 +359,15 @@
       for (var i = 0; i < N; i++) {
         kids[i].col.style.left  = (i * colw) + 'px';
         kids[i].col.style.width = (colw + 0.6) + 'px';    // 0.6px of overlap, so six
-        kids[i].pic.style.backgroundSize = dw + 'px ' + dh + 'px';   // strips close into one
-        kids[i].pic.style.backgroundPosition = (ox - i * colw) + 'px ' + oy + 'px';
+        // Every strip holds the WHOLE picture, at the size and place it would
+        // have as the page's background, and the strip is a window onto it. The
+        // slicing is done by the clip. A window can then be moved, narrowed and
+        // shortened without the photograph inside it ever being stretched —
+        // which is the whole trick, and why this is not twelve backgrounds.
+        kids[i].pic.style.width  = vw + 'px';
+        kids[i].pic.style.height = vh + 'px';
+        kids[i].pic.style.backgroundSize = dw + 'px ' + dh + 'px';
+        kids[i].pic.style.backgroundPosition = ox + 'px ' + oy + 'px';
       }
     }
 
@@ -369,7 +390,7 @@
       // which the strips must be home. Everything else is a fraction of it, so
       // the timing survives any content height, any viewport, any font.
       var top = panelA.getBoundingClientRect().top - assemble.getBoundingClientRect().top;
-      RUN = Math.max(1, (top - vh * 0.24) / 0.88);
+      RUN = Math.max(1, (top - vh * 0.24) / 0.84);
       draw();
     }
 
@@ -413,15 +434,10 @@
         var g = i < M ? 0 : 1, j = i % M, P = T[g];
         var Li = i * colw;
 
-        // the picture drains, one strip at a time, left to right. With a small
-        // stagger every strip bleached at once and the frame just looked washed
-        // out; the milling has to be legible as an order.
-        var white = clamp((span(p, 0.10, 0.40) - (i / N) * 0.55) / (1 - 0.55));
-        kids[i].pic.style.opacity = String(1 - white);
 
         // the two ends of each group set off first, so the block closes inwards
         var lag = (i < M ? (M - 1 - j) : j) * STEP;
-        var f   = clamp((span(p, 0.40, 0.88) - lag) / (1 - (M - 1) * STEP));
+        var f   = clamp((span(p, 0.40, 0.84) - lag) / (1 - (M - 1) * STEP));
 
         // Horizontal is linear, because horizontal is the axis the hand is not
         // moving and any curve on it would visibly disagree with the scroll.
@@ -446,6 +462,29 @@
 
         kids[i].col.style.transform =
           'translate3d(' + x + 'px,' + y + 'px,0) scale(' + kx + ',' + ky + ')';
+
+        // The strip's frame is scaled by (kx, ky) and those are not equal, so
+        // anything inside it is stretched. The picture undoes exactly that, onto
+        // one uniform scale s, and s COVERS: it is the larger of the two, because
+        // the panels are proportionally taller than the strips are narrow
+        // (0.88 of the viewport's height against 0.83 of a column's width). Scaled
+        // to fit instead, the photograph came up short and every strip carried a
+        // white band at each end — measured at 76px by the time they landed.
+        //   screen = strip_origin + s·(picture_pixel + t)
+        // and t centres the slice the strip was cut from, in both axes, so what
+        // gets lost to the crop is lost evenly. Cropping a photograph is normal;
+        // squashing one, or framing it in white gaps, is not.
+        var sc = kx > ky ? kx : ky;
+        kids[i].pic.style.transform =
+          'scale(' + (sc / kx) + ',' + (sc / ky) + ') translate(' +
+          (colw * kx / (2 * sc) - colw / 2 - Li) + 'px,' +
+          (vh * ky / (2 * sc) - vh / 2) + 'px)';
+
+        // and only at the end does it drain, so that what finally stands in the
+        // panels' place is white — the strips the brief asked for, arriving as a
+        // conclusion instead of as the whole middle of the film
+        var white = clamp((span(p, 0.86, 0.98) - (i / N) * 0.22) / (1 - 0.22));
+        kids[i].pic.style.opacity = String(1 - white);
         // Off the page while it travels, flat on the page when it arrives. Two
         // near-whites 1.08:1 apart cannot show a strip moving; a shadow can, and
         // it is gone by the time the strip is a panel, which has none.
@@ -459,11 +498,14 @@
         kids[i].l.style.transform = kids[i].r.style.transform = 'scaleX(' + (1 / kx) + ')';
       }
 
-      // The strips are home at 0.88 and the stage goes over the next tenth, not
-      // in a frame. Every studio that publishes its numbers spends the time on
-      // the arrival rather than on the debris: the destination reveal is the
-      // slowest thing in the sequence, and here it is the only thing left.
-      var out = span(p, 0.90, 1);
+      // The strips are home at 0.84, and from there the picture and the stage
+      // fade over each other: the photograph drains while the content comes up
+      // through it, so the white panel exists as a moment inside the cross-fade
+      // instead of as an empty beat everybody has to sit through. Every studio
+      // that publishes its numbers spends the time on the arrival rather than on
+      // the debris.
+      var out = span(p, 0.88, 1);
+      if (p >= 0.86) reveal();
       open.style.opacity    = String(1 - out);
       open.style.visibility = out >= 1 ? 'hidden' : 'visible';
     }
