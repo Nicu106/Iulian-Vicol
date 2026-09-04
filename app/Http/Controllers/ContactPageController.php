@@ -53,10 +53,29 @@ class ContactPageController extends Controller
             // Four faces for the strip under the map — the people he actually sold to.
             'faces'     => Testimonial::where('is_active', true)->whereNotNull('image_path')
                               ->orderBy('order_index')->take(4)->get(),
-            // Where the map points. A dealer who works by appointment has no shopfront,
-            // so the map is the city, not a pin on a door that is not there.
-            'place'     => 'Málaga, España',
-            'mapQuery'  => 'M%C3%A1laga, Espa%C3%B1a',
+            // Where his customers came from — and this is the page's whole argument.
+            // The reviews say it themselves: "viaje desde Valladolid", "viaje desde
+            // Valencia", "me lo entregaron a la puerta de mi casa". A man with no
+            // showroom does not need a pin on a map; he needs to show that people
+            // have already driven 700km on his word, and that others never had to.
+            //
+            // Only cities the review TEXTS name are used. The author_location column
+            // says Santander for 19 of 25 and contradicts its own quotes — Domingo's
+            // text says Valencia while his column says Santander — so the column is
+            // not trusted here. Coordinates are real; x/y are a linear lon/lat
+            // projection into a 0-100 box, which is honest over one country.
+            'from'      => [
+                ['city' => 'Valladolid', 'who' => 'Pablo',          'km' => 720, 'x' => 36.31, 'y' => 27.53,
+                 'said' => 'Soy ingeniero mecánico, viaje desde Valladolid, probé el coche y no decepcionó.'],
+                ['city' => 'Valencia',   'who' => 'Domingo',        'km' => 630, 'x' => 70.82, 'y' => 55.51,
+                 'said' => 'Me enamoré del coche y viajé desde Valencia. Julián me dio confianza desde el primer minuto.'],
+                ['city' => 'Granada',    'who' => 'Juanma y Antonio','km' => 130, 'x' => 45.25, 'y' => 84.91,
+                 'said' => 'Este fin de semana adquirido un Mercedes C220. La verdad que una compra genial.'],
+            ],
+            'home'      => ['city' => 'Málaga', 'x' => 38.72, 'y' => 90.75],
+            // and the ones who never travelled at all
+            'delivered' => ['who' => 'Ismael',
+                 'said' => 'Venta online, conversación directa con vídeos muy claros mostrando el coche. Me lo entregaron a la puerta de mi casa.'],
         ]);
     }
 }

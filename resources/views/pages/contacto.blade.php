@@ -20,69 +20,100 @@
 
 <main class="ct">
 
+  {{-- ---- the hero ---------------------------------------------------------
+       The words sit where the photograph can carry them. Found by sliding a
+       text-sized block across the whole frame and scoring each position by its
+       LIGHTEST pixel — that is what decides legibility, not the average. For this
+       picture the answer is lower-right, 13.62:1, against 1.43:1 lower-left where
+       they were. No text-shadow: a line that needs one is in the wrong place. --}}
+  <section class="ct-hero">
+    <img class="ct-hero__img" src="{{ $hero }}" width="2400" height="3200"
+         alt="Un Porsche Cayman con matrícula alemana" fetchpriority="high" decoding="async">
+    <div class="ct-hero__in cat-wrap">
+      <p class="ct-hero__kicker">Málaga · {{ $sold }} coches entregados</p>
+      <h1 class="ct-h1">Escríbeme.<br>Contesto yo.</h1>
+      <p class="ct-lead">No hay centralita ni formulario esperando a que alguien lo mire.</p>
+    </div>
+  </section>
+
   {{-- ==================================================================
-       The opening: one car, then the picture parts and what was behind it
-       is where you reach him.
+       A 720 km de aquí — the one bold thing on this page
 
-       Twelve vertical slices carry one photograph between them. As the page
-       scrolls they collapse outwards from the centre — the left six toward the
-       left edge, where the map is, the right six toward the right, where the
-       card is — each one a little later than the one before it, so the picture
-       opens rather than blinking off.
+       It exists only because this dealer's data allows it. He has no showroom;
+       the page says so. A pin on a map answers a question nobody asked. What
+       somebody looking at a car six hundred kilometres away actually wants to
+       know is whether they can trust it unseen — and three people already did,
+       in their own words.
 
-       Nothing is intercepted: the section is tall, its contents stick, and how
-       far the page has moved is how far the slices have gone. Without
-       JavaScript, on a narrow screen, or with reduced motion, the slices are
-       never built and the map and the card are simply there.
+       The map is information, not decoration: real coordinates, projected
+       linearly over one country, and real road distances. Only cities the review
+       TEXTS name are used. The author_location column says Santander for 19 of
+       25 and contradicts its own quotes, so it is not trusted here.
        ================================================================== --}}
-  <section class="ct-open" id="open">
-    <div class="ct-open__pin">
+  <section class="ct-far" id="far" aria-labelledby="far-h">
+    <div class="cat-wrap ct-far__in">
+      <div class="ct-far__copy">
+        <h2 class="ct-h2" id="far-h">A {{ number_format(max(array_column($from,'km')),0,',','.') }} km de aquí</h2>
+        <p class="ct-far__lead">Nadie compra un coche a setecientos kilómetros por una web.
+          Lo compran porque antes hablaron con alguien. Estos condujeron hasta Málaga:</p>
 
-      <div class="ct-open__under">
-        <div class="ct-open__map">
-          <iframe class="ct-map__it" title="Málaga en el mapa" loading="lazy"
-                  referrerpolicy="no-referrer-when-downgrade" tabindex="-1" aria-hidden="true"
-                  src="https://maps.google.com/maps?q={{ $mapQuery }}&z=11&output=embed"></iframe>
-          <span class="ct-open__pinlabel">{{ $place }}</span>
-        </div>
+        <ol class="ct-far__list">
+          @foreach($from as $i => $f)
+            <li class="ct-far__item" data-i="{{ $i }}">
+              <span class="ct-far__km">{{ number_format($f['km'],0,',','.') }}<i>km</i></span>
+              <span class="ct-far__who"><b>{{ $f['who'] }}</b>, desde {{ $f['city'] }}</span>
+              <span class="ct-far__said">{{ $f['said'] }}</span>
+            </li>
+          @endforeach
+        </ol>
 
-        <div class="ct-open__card">
-          <span class="ct-hero__eyebrow">Málaga · {{ $sold }} coches entregados</span>
-          <h1 class="ct-h1">Escríbeme.<br>Contesto yo.</h1>
-          <p class="ct-lead">No hay centralita. El teléfono es el mío y WhatsApp lo leo en minutos.</p>
+        <p class="ct-far__note">Y {{ $delivered['who'] }} no se movió de casa:
+          «{{ $delivered['said'] }}»</p>
 
-          <div class="ct-ways">
-            <a class="ct-way ct-way--wa" href="https://wa.me/{{ $phoneRaw }}">
-              <span class="ct-way__k">WhatsApp</span>
-              <span class="ct-way__v">{{ $phone }}</span>
-            </a>
-            <a class="ct-way" href="tel:+{{ $phoneRaw }}">
-              <span class="ct-way__k">Llamar</span>
-              <span class="ct-way__v">{{ $phone }}</span>
-            </a>
-            <a class="ct-way" href="mailto:{{ $email }}">
-              <span class="ct-way__k">Email</span>
-              <span class="ct-way__v">{{ $email }}</span>
-            </a>
-          </div>
-        </div>
+        <a class="mc-btn mc-btn--cta ct-far__cta"
+           href="https://wa.me/{{ $phoneRaw }}?text={{ urlencode('Hola, estoy lejos de Málaga. ¿Cómo lo hacemos?') }}">Estoy lejos — escríbeme</a>
       </div>
 
-      {{-- the picture, on top, built by the script --}}
-      <div class="ct-open__over" id="slices" aria-hidden="true"
-           style="--hero:url('{{ $hero }}')"></div>
+      <figure class="ct-map" aria-hidden="true">
+        <svg class="ct-map__svg" viewBox="26 21 58 76" preserveAspectRatio="xMidYMid meet">
+          @foreach($from as $i => $f)
+            <line class="ct-map__road" data-i="{{ $i }}"
+                  x1="{{ $home['x'] }}" y1="{{ $home['y'] }}" x2="{{ $f['x'] }}" y2="{{ $f['y'] }}"></line>
+          @endforeach
+          @foreach($from as $i => $f)
+            <circle class="ct-map__city" data-i="{{ $i }}" cx="{{ $f['x'] }}" cy="{{ $f['y'] }}" r="1.1"></circle>
+            <text class="ct-map__label" data-i="{{ $i }}"
+                  x="{{ $f['x'] + ($f['x'] > 50 ? -3.2 : 3.2) }}" y="{{ $f['y'] - 2.4 }}"
+                  text-anchor="{{ $f['x'] > 50 ? 'end' : 'start' }}">{{ $f['city'] }}</text>
+          @endforeach
+          <circle class="ct-map__home" cx="{{ $home['x'] }}" cy="{{ $home['y'] }}" r="1.9"></circle>
+          <text class="ct-map__label ct-map__label--home"
+                x="{{ $home['x'] + 3.6 }}" y="{{ $home['y'] + 1.2 }}">Málaga</text>
+        </svg>
+        <figcaption class="ct-map__cap">Distancias por carretera. Las ciudades las nombran
+          ellos, en sus propias reseñas.</figcaption>
+      </figure>
+    </div>
+  </section>
 
-      {{-- The first words, on the car, before anything moves. aria-hidden: the
-           same sentence is the card's heading underneath. --}}
-      <div class="ct-open__title" id="open-title" aria-hidden="true">
-        <span class="ct-open__kicker">Málaga · {{ $sold }} coches entregados</span>
-        <p class="ct-open__big">Escríbeme.<br>Contesto yo.</p>
-        <span class="ct-open__scroll">Baja para verlo ↓</span>
-      </div>
-
-      {{-- and the picture as one image, for everyone who never sees the slices --}}
-      <img class="ct-open__plain" src="{{ $hero }}" width="1600" height="822"
-           alt="Un Mercedes E350d que vendí, en Málaga" fetchpriority="high" decoding="async">
+  {{-- ---- how you reach him ------------------------------------------------ --}}
+  <section class="ct-ways-sec cat-wrap" aria-label="Cómo contactar">
+    <div class="ct-ways">
+      <a class="ct-way ct-way--wa" href="https://wa.me/{{ $phoneRaw }}">
+        <span class="ct-way__k">WhatsApp</span>
+        <span class="ct-way__v">{{ $phone }}</span>
+        <span class="ct-way__note">Lo leo en minutos. Te mando vídeo del coche, incluido lo que no está perfecto.</span>
+      </a>
+      <a class="ct-way" href="tel:+{{ $phoneRaw }}">
+        <span class="ct-way__k">Llamar</span>
+        <span class="ct-way__v">{{ $phone }}</span>
+        <span class="ct-way__note">Si estoy con un cliente, insiste o escríbeme.</span>
+      </a>
+      <a class="ct-way" href="mailto:{{ $email }}">
+        <span class="ct-way__k">Email</span>
+        <span class="ct-way__v">{{ $email }}</span>
+        <span class="ct-way__note">Para documentación y facturas.</span>
+      </a>
     </div>
   </section>
 
@@ -182,135 +213,48 @@
 (function () {
   document.documentElement.className += ' js';
 
-  /* ================================================================
-     The opening, frame by frame
+  /* ---- the roads draw themselves --------------------------------------
+     Triggered by arrival, not tied to scroll position. Tying it to scroll meant
+     the whole thing had played out before the section was properly on screen —
+     measured: every road was already complete while the section's top was still
+     100px below the fold. An observer fires once, when a third of the section is
+     in view, and the roads then draw in their own time, furthest first, because
+     that is the one that makes the point.
 
-     0.00  One car, whole, filling the screen, with the page's first words on
-           it. Nothing has moved.
-     0.00-0.18  The picture separates into twelve columns: gaps open between
-           them and the words fade, so what you are looking at stops being a
-           photograph and becomes twelve pieces of one.
-     0.18-0.30  Every other column loses its picture — it goes to the page's own
-           navy — so the frame is columns WITH the car and columns without.
-     0.24-0.62  The empty ones fall. They accelerate (t squared, the way a thing
-           falls) and they leave in order, left to right, so it reads as a
-           collapse rather than a switch.
-     0.55-1.00  The six that kept the picture divide: three gather left, three
-           gather right, each compressing toward its own edge — and behind them,
-           where they were, is the map on the left and everything you need to
-           reach him on the right.
+     The drawing is stroke-dashoffset and opacity, both paint-only. Nothing is
+     pinned and no scroll is intercepted.
 
-     Two things the research settles. Movement is transform and opacity only, so
-     it stays on the compositor. And the easing is LINEAR: a scroll-driven
-     animation is already eased by the hand doing the scrolling, and a curve on
-     top of that double-eases it — the previous version smoothstepped here, and
-     that is gone.
+     Without JavaScript, with reduced motion, or if the observer never fires, the
+     `is-armed` class is never added and every road, dot and name is simply there.
+     The map is information; it must not depend on the effect. */
+  var far = document.getElementById('far');
+  if (far && 'IntersectionObserver' in window &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var roads = far.querySelectorAll('.ct-map__road');
+    Array.prototype.forEach.call(roads, function (r, i) {
+      var len = r.getTotalLength ? r.getTotalLength() : 100;
+      r.style.strokeDasharray = len;
+      r.style.strokeDashoffset = len;
+      r.style.transition = 'stroke-dashoffset 1100ms cubic-bezier(.22,.61,.36,1) ' + (i * 260) + 'ms';
+    });
+    far.classList.add('is-armed');
 
-     The scroll itself is never touched: the section is tall, its contents stick,
-     and page distance becomes animation distance. ==================== */
-  var open = document.getElementById('open');
-  var host = document.getElementById('slices');
-  var title = document.getElementById('open-title');
-  if (open && host) {
-    var N = 12;
-    var wide = window.matchMedia('(min-width: 900px)');
-    var still = window.matchMedia('(prefers-reduced-motion: reduce)');
-    var kids = [], ticking = false, IMG = { w: 0, h: 0 };
-
-    // The picture's own proportions, so the twelve pieces are a photograph and
-    // not a stretched one. A percentage pair on background-size forces BOTH axes:
-    // the previous version painted a 0.75 portrait into a 1.57 box.
-    var probe = new Image();
-    probe.onload = function () { IMG.w = probe.naturalWidth; IMG.h = probe.naturalHeight; measure(); };
-    probe.src = @json($hero);
-
-    function build() {
-      host.innerHTML = ''; kids = [];
-      for (var i = 0; i < N; i++) {
-        var s = document.createElement('span');
-        s.className = 'ct-slice' + (i % 2 ? ' is-empty' : ' is-photo');
-        host.appendChild(s); kids.push(s);
-      }
-    }
-
-    function frame() {
-      // cover, computed rather than declared: the picture is scaled to fill the
-      // screen at its own aspect, then each column shows its own strip of it
-      if (!IMG.w || !kids.length) return;
-      var vw = window.innerWidth, vh = host.clientHeight || window.innerHeight;
-      var scale = Math.max(vw / IMG.w, vh / IMG.h);
-      var dw = IMG.w * scale, dh = IMG.h * scale;
-      var ox = (vw - dw) / 2, oy = (vh - dh) * 0.52;   // 52% down, where the car sits
-      var col = vw / N;
-      for (var i = 0; i < N; i++) {
-        kids[i].style.backgroundSize = dw + 'px ' + dh + 'px';
-        kids[i].style.backgroundPosition = (ox - i * col) + 'px ' + oy + 'px';
-      }
-    }
-
-    function measure() {
-      if (!wide.matches || still.matches || !IMG.w) {
-        open.classList.remove('is-live'); open.style.height = ''; return;
-      }
-      if (!kids.length) build();
-      open.classList.add('is-live');
-      open.style.height = (window.innerHeight * 2.6) + 'px';
-      frame(); draw();
-    }
-
-    var clamp = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
-    var span  = function (p, a, b) { return clamp((p - a) / (b - a)); };
-
-    function draw() {
-      if (!open.classList.contains('is-live')) return;
-      var top = open.getBoundingClientRect().top;
-      var run = open.offsetHeight - window.innerHeight || 1;
-      var p = clamp(-top / run);
-      var vw = window.innerWidth, vh = window.innerHeight;
-
-      if (title) title.style.opacity = String(1 - span(p, 0.04, 0.16));
-
-      // What is behind stays hidden until the columns are actually leaving. Without
-      // this the map and the card showed through the falling gaps and the middle of
-      // the sequence was a jumble of tarmac, road names and half a phone number.
-      var under = open.querySelector('.ct-open__under');
-      if (under) under.style.opacity = String(span(p, 0.58, 0.86));
-
-      var part  = span(p, 0.00, 0.18);
-      var drop  = span(p, 0.24, 0.62);
-      var split = span(p, 0.55, 1.00);
-
-      for (var i = 0; i < N; i++) {
-        var k = kids[i], x = (i - (N - 1) / 2) * (part * 10), y = 0, sx = 1, op = 1;
-
-        if (k.classList.contains('is-empty')) {
-          k.style.setProperty('--photo', String(1 - span(p, 0.18, 0.30)));
-          var lag = (i / N) * 0.30;
-          var t = clamp((drop - lag) / (1 - 0.30));
-          y = t * t * (vh * 1.35);
-          op = 1 - span(t, 0.75, 1);
-        } else {
-          var left = i < N / 2;
-          var order = left ? (N / 2 - 1 - i) : (i - N / 2);
-          var t2 = clamp((split - order * 0.10) / (1 - 0.25));
-          var edge = left ? -(i + 1) * (vw / N) : (N - i) * (vw / N);
-          x += t2 * edge;
-          sx = 1 - t2 * 0.92;
-          op = 1 - span(t2, 0.82, 1);
-        }
-        k.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0) scaleX(' + sx + ')';
-        k.style.opacity = String(op);
-      }
-    }
-
-    window.addEventListener('scroll', function () {
-      if (ticking) return; ticking = true;
-      requestAnimationFrame(function () { draw(); ticking = false; });
-    }, { passive: true });
-    window.addEventListener('resize', measure);
-    wide.addEventListener('change', measure);
-    still.addEventListener('change', measure);
-    measure();
+    new IntersectionObserver(function (entries, obs) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        obs.disconnect();
+        far.classList.add('is-drawn');
+        Array.prototype.forEach.call(roads, function (r) { r.style.strokeDashoffset = '0'; });
+        // each name and each row arrives as its own road lands
+        far.querySelectorAll('.ct-far__item').forEach(function (el, i) {
+          window.setTimeout(function () { el.classList.add('is-on'); }, 120 + i * 260);
+        });
+        far.querySelectorAll('.ct-map__city, .ct-map__label[data-i]').forEach(function (el) {
+          var i = +el.getAttribute('data-i');
+          window.setTimeout(function () { el.classList.add('is-on'); }, 900 + i * 260);
+        });
+      });
+    }, { threshold: 0.34 }).observe(far);
   }
 
   var form = document.getElementById('ct-form');
