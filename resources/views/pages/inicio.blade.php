@@ -182,12 +182,9 @@
     {{-- Two, and nothing else. Each carries the next card across the middle,
          which is where a card turns over. --}}
     <div class="hm-fb__step">
-      <button class="hm-fb__nav hm-fb__nav--first" type="button" data-go="-1" aria-label="Anterior">
-        <svg class="hm-fb__glyph-prev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+      <button class="hm-fb__nav" type="button" data-go="-1" aria-label="Anterior">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
           <path d="M15 4 7 12l8 8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
-        <svg class="hm-fb__glyph-flip" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
-          <path d="M20 12a8 8 0 1 1-2.4-5.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-          <path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
       </button>
       <button class="hm-fb__nav" type="button" data-go="1" aria-label="Siguiente">
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
@@ -323,14 +320,21 @@
     var GLIDE  = 780;    // ms for a button press to land the next card
 
     var still  = window.matchMedia('(prefers-reduced-motion: reduce)');
-    // On a phone one card fits, so a card that turns over as it LEAVES the
-    // middle turns over off screen and its words are never seen. There, nothing
-    // turns by position: the first button turns the centred card in place, the
-    // second brings the next picture. The row holds still while a card is
-    // showing its words, because a review that drifts away while you read it
-    // is worse than no review.
-    var narrow = window.matchMedia('(max-width: 999px)');
-    var reading = null;      // the card turned by hand, on a phone
+    // On a phone one card fits, so a row that drifts and turns cards as they
+    // LEAVE the middle turns them off screen. There the section runs a stepped
+    // sequence instead: the photograph sits in the middle, turns over into its
+    // words, holds long enough to read them, and the next photograph comes in.
+    // "Next" advances that same sequence one step — turn, then advance, then
+    // turn — and a swipe only chooses where the sequence carries on from.
+    var narrow  = window.matchMedia('(max-width: 999px)');
+    var reading = null;      // the card currently showing its words, on a phone
+    var phase   = 'photo', since = 0, swipedAt = 0, held = false;
+    var HOLD_PHOTO = 2200;   // ms to look at the picture
+    var holdText = function (k) {           // ms to read: by length, within reason
+      var n = k.el.querySelector('.fb__q').textContent.length;
+      return Math.max(4000, Math.min(14000, n * 55));
+    };
+
     var halt  = document.getElementById('fb-halt');
     var sec   = document.getElementById('reviews');
     var row   = rail.firstElementChild;
@@ -359,13 +363,13 @@
           var a = d < 0 ? -d : d;
           if (a < near) { near = a; }
         }
-        // The middle is for the PHOTOGRAPH: that is what slows down there and
-        // what draws the eye. The card turns over as it LEAVES — once it is past
-        // the slow zone and picking up speed — and travels on as the words. So a
-        // press on the button carries the centred picture to the right, turns it
-        // into its review, and brings the next picture into the middle. Turning
-        // it exactly at the middle put the 90-degree moment, a card of zero
-        // width, at the slowest point of the row: a hole where a review should be.
+        // Wide: the middle is for the PHOTOGRAPH — that is what slows down there
+        // and what draws the eye — and the card turns over as it LEAVES, once
+        // it is past the slow zone and picking up speed. Turning it exactly at
+        // the middle put the 90-degree moment, a card of zero width, at the
+        // slowest point of the row: a hole where a review should be.
+        // Phone: nothing turns by position; only the card the sequence has
+        // turned.
         var f = narrow.matches ? 0 : Math.round(smooth((d - LEAD) / (2 * FLIP)) * 180);
         if (kids[i] === reading) { f = 180; }
         if (f !== kids[i].flip) { kids[i].flip = f; kids[i].el.style.setProperty('--flip', f + 'deg'); }
@@ -373,27 +377,80 @@
       return near;
     }
 
+    function centredKid() {
+      var best = null, bd = Infinity;
+      for (var i = 0; i < kids.length; i++) {
+        var a = Math.abs(kids[i].c - pos - mid);
+        if (a < bd) { bd = a; best = kids[i]; }
+      }
+      return best;
+    }
+    function glideTo(kid) {
+      // The card may be in the other printed copy, so normalise into one row's
+      // worth and take the shorter way round — without this a step to the next
+      // card once travelled 10,546px the wrong way.
+      var to = (((kid.c - mid) % rowW) + rowW) % rowW;
+      var d  = to - pos;
+      if (d >  rowW / 2) { d -= rowW; }
+      if (d < -rowW / 2) { d += rowW; }
+      glide = { from: pos, to: pos + d, t0: performance.now() };
+      v = 0;
+    }
+    function neighbour(kid, dir) {
+      var i = kids.indexOf(kid);
+      return kids[(i + dir + kids.length) % kids.length];
+    }
+
+    /* ---- the phone's sequence: photograph, turn, hold, next ---- */
+    function turn(k)   { reading = k; phase = 'text';  since = performance.now(); paint(); }
+    function unturn()  { reading = null; phase = 'photo'; since = performance.now(); paint(); }
+    function advance(dir) { reading = null; phase = 'photo'; glideTo(neighbour(centredKid(), dir)); }
+    function phoneFrame(now) {
+      if (glide) {
+        var t = clamp01((now - glide.t0) / GLIDE);
+        var e = 1 - Math.pow(1 - t, 3);
+        pos = glide.from + (glide.to - glide.from) * e;
+        if (t >= 1) { glide = null; phase = 'photo'; since = now; }
+        if (pos < 0) { pos += rowW; } else if (pos >= rowW) { pos -= rowW; }
+        rail.scrollLeft = pos; mine = now; paint();
+        return;
+      }
+      // a swipe settles: seat the nearest card and carry on from it
+      if (swipedAt && !held && now - swipedAt > 160) {
+        swipedAt = 0; pos = rail.scrollLeft; reading = null; phase = 'photo';
+        glideTo(centredKid());
+        return;
+      }
+      // the sequence holds while a finger is down, while it is being read
+      // with a keyboard, when stopped, and never runs under reduced motion
+      if (still.matches || stopped || keyed || held || swipedAt) { since = now; return; }
+      var k = centredKid();
+      if (!k) { return; }
+      if (phase === 'photo' && now - since > HOLD_PHOTO) { turn(k); return; }
+      if (phase === 'text'  && now - since > holdText(k)) { advance(1); }
+    }
+
     function frame(now) {
       raf = requestAnimationFrame(frame);
       var dt = last ? Math.min(64, now - last) : 16;
       last = now;
       if (!rowW) { measure(); return; }
+      if (narrow.matches) { phoneFrame(now); return; }
 
       if (glide) {
         var t = clamp01((now - glide.t0) / GLIDE);
         var e = 1 - Math.pow(1 - t, 3);
         pos = glide.from + (glide.to - glide.from) * e;
         // land at rest. Left alone, the velocity from before the press kept
-        // integrating for a few frames after the glide finished — the residual
-        // of 60px/s over a 150ms time constant — and the photograph came to rest
-        // 14-16px off the middle it had just been carried to.
+        // integrating for a few frames after the glide finished and the card
+        // came to rest 14-16px off the middle it had just been carried to.
         if (t >= 1) { glide = null; v = 0; busy = now + 700; }
       } else {
         var near = paint();
         // fast on arrival, a crawl with a card in the middle, and hovering or
         // reading with a keyboard slows it further still
         var boost = warm ? 1 + (BOOST - 1) * clamp01((warm - now) / 1500) : 1;
-        var want  = (still.matches || stopped || keyed || reading || now < busy) ? 0
+        var want  = (still.matches || stopped || keyed || now < busy) ? 0
                   : SPEED * boost * (CRAWL + (1 - CRAWL) * smooth(near / DETENT))
                           * (over ? 0.35 : 1);
         v += (want - v) * (1 - Math.exp(-dt / TAU));
@@ -409,41 +466,14 @@
     }
 
     /* ---- the two buttons ---- */
-    function glideTo(kid) {
-      // The card may be in the other printed copy, so normalise into one row's
-      // worth and take the shorter way round — without this a step to the next
-      // card once travelled 10,546px the wrong way.
-      var to = (((kid.c - mid) % rowW) + rowW) % rowW;
-      var d  = to - pos;
-      if (d >  rowW / 2) { d -= rowW; }
-      if (d < -rowW / 2) { d += rowW; }
-      glide = { from: pos, to: pos + d, t0: performance.now() };
-      v = 0;
-    }
-    function centredKid() {
-      var best = null, bd = Infinity;
-      for (var i = 0; i < kids.length; i++) {
-        var a = Math.abs(kids[i].c - pos - mid);
-        if (a < bd) { bd = a; best = kids[i]; }
-      }
-      return best;
-    }
-    var first = document.querySelector('.hm-fb__nav--first');
-    function labelFirst() {
-      if (!first) { return; }
-      first.setAttribute('aria-label', !narrow.matches ? 'Anterior' : reading ? 'Ver la foto' : 'Leer la reseña');
-      first.setAttribute('aria-pressed', narrow.matches ? (reading ? 'true' : 'false') : 'false');
-    }
-    function turnCentred() {
-      var k = centredKid();
-      if (!k) { return; }
-      reading = (reading === k) ? null : k;
-      if (reading) { glideTo(k); }          // seat it exactly before it turns
-      labelFirst(); paint();
-    }
     function step(dir) {
       if (!kids.length) { return; }
-      reading = null; labelFirst();
+      if (narrow.matches) {
+        // next: turn, then advance, then turn. previous: the same, backwards.
+        if (dir > 0) { phase === 'photo' ? turn(centredKid()) : advance(1); }
+        else         { phase === 'text'  ? unturn()           : advance(-1); }
+        return;
+      }
       // measured from where a glide is GOING, so a second press during the first
       // steps two cards rather than re-targeting the one already on its way
       var at = glide ? glide.to : pos, best = 0, bd = Infinity;
@@ -454,16 +484,11 @@
       glideTo(kids[(best + dir + kids.length) % kids.length]);
     }
     document.querySelectorAll('.hm-fb__step .hm-fb__nav').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var go = +b.getAttribute('data-go');
-        if (narrow.matches && go < 0) { turnCentred(); } else { step(go); }
-      });
+      b.addEventListener('click', function () { step(+b.getAttribute('data-go')); });
     });
-    narrow.addEventListener('change', function () { reading = null; labelFirst(); paint(); });
-    labelFirst();
     // A photograph you can see is a review you might want: click it and it
-    // comes to the middle and turns over. The press itself has to travel less
-    // than 6px, so a drag is still a drag.
+    // comes to the middle. On a phone the centred one turns instead. The press
+    // has to travel less than 6px, so a drag is still a drag.
     var pressX = 0;
     rail.addEventListener('pointerdown', function (e) { pressX = e.clientX; });
     rail.addEventListener('click', function (e) {
@@ -472,29 +497,35 @@
       if (!card || !kids.length) { return; }
       for (var i = 0; i < kids.length; i++) {
         if (kids[i].el !== card) { continue; }
-        if (narrow.matches && kids[i] === centredKid()) { turnCentred(); }
-        else { reading = null; labelFirst(); glideTo(kids[i]); }
+        if (narrow.matches) { kids[i] === centredKid() ? step(1) : (reading = null, phase = 'photo', glideTo(kids[i])); }
+        else { glideTo(kids[i]); }
         break;
       }
     });
 
     /* ---- and everything that is theirs ---- */
     function yieldNow() { busy = performance.now() + 1200; }
-    ['wheel', 'touchstart', 'pointerdown', 'keydown'].forEach(function (e) {
-      rail.addEventListener(e, yieldNow, { passive: true });
+    ['wheel', 'keydown'].forEach(function (e) { rail.addEventListener(e, yieldNow, { passive: true }); });
+    rail.addEventListener('touchstart', function () { held = true; yieldNow(); }, { passive: true });
+    ['touchend', 'touchcancel'].forEach(function (e) {
+      rail.addEventListener(e, function () { held = false; if (!swipedAt) { swipedAt = performance.now(); } }, { passive: true });
     });
     rail.addEventListener('scroll', function () {
-      if (!glide && performance.now() - mine > 120) { yieldNow(); pos = rail.scrollLeft; }
+      // A scroll we did not cause is the reader's. Wide, the drift steps aside
+      // for it; on a phone it is a swipe, and the sequence resumes from wherever
+      // it settles.
+      if (!glide && performance.now() - mine > 120) {
+        yieldNow(); pos = rail.scrollLeft;
+        if (narrow.matches) { swipedAt = performance.now(); reading = null; paint(); }
+      }
     }, { passive: true });
 
     sec.addEventListener('pointerenter', function () { over = true; });
     sec.addEventListener('pointerleave', function () { over = false; });
     // Focus stops the row only when it is a KEYBOARD's focus. A mouse click on
-    // one of the two buttons also focuses it, and that used to park the row
-    // for good — one press and it never moved again until something else was
-    // clicked.
+    // one of the two buttons also focuses it, and that used to park the row for
+    // good. The two buttons never count: pressing one is asking for motion.
     sec.addEventListener('focusin',  function (e) {
-      // the two buttons never count: pressing one is asking for motion
       if (e.target && e.target.closest && e.target.closest('.hm-fb__step')) { keyed = false; return; }
       keyed = !!(e.target && e.target.matches && e.target.matches(':focus-visible'));
     });
@@ -517,9 +548,15 @@
     // static instead: photograph above, words below, all of it simply there.
     function calm() { sec.classList.toggle('is-static', still.matches); }
     still.addEventListener('change', calm); calm();
+    // crossing the breakpoint: forget any turned card and, on a phone, seat one
+    narrow.addEventListener('change', function () {
+      reading = null; phase = 'photo'; measure();
+      if (narrow.matches && kids.length) { glideTo(centredKid()); }
+      paint();
+    });
 
     window.addEventListener('resize', measure);
-    window.addEventListener('load', measure);
+    window.addEventListener('load', function () { measure(); if (narrow.matches && kids.length && !glide) { glideTo(centredKid()); } });
     document.addEventListener('visibilitychange', function () {
       if (document.hidden) { cancelAnimationFrame(raf); raf = 0; last = 0; }
       else if (!raf) { raf = requestAnimationFrame(frame); }
@@ -527,13 +564,15 @@
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(function (es) {
         if (es[0].isIntersecting) {
-          if (!raf) { last = 0; warm = performance.now() + 1500; raf = requestAnimationFrame(frame); }
+          if (!raf) { last = 0; warm = performance.now() + 1500; since = performance.now(); raf = requestAnimationFrame(frame); }
         } else { cancelAnimationFrame(raf); raf = 0; }
       }, { threshold: 0 }).observe(sec);
     } else {
       raf = requestAnimationFrame(frame);
     }
     measure();
+    // a phone starts with the first photograph seated in the middle
+    if (narrow.matches && kids.length) { glideTo(kids[0]); }
   }
 
   document.documentElement.className += ' js';
