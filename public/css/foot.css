@@ -87,17 +87,16 @@
   line-height:.78;
   font-weight:700; letter-spacing:-.045em;
 
-  /* Cut into the wall, not drawn on it. An outline reads as line-work — letters
-     made of wire; this is the opposite move: the type is *darker* than the navy
-     it sits in, as though the surface had been carved away, with a single hair of
-     light caught on the lower edge where a real cut would catch it.
-     The whole thing then fades downward through a mask, so the name sinks into the
-     foot of the page instead of stopping at a border. */
-  color:color-mix(in oklab, var(--mc-deep-2) 46%, #000);
-  text-shadow:
-    0 1px 0 rgba(255,255,255,.11),           /* the lit edge — the one line that says "cut" */
-    0 2px 0 rgba(255,255,255,.035),          /* its fall-off */
-    0 -1px 0 rgba(0,0,0,.55);                /* the shadow the upper edge throws */
+  /* Tone on tone, lighter, lit from above. The carved version — letters darker than
+     the ground — was black type on navy once the ground went this deep: seen at 2x,
+     a black sticker. There is no "darker" left below a ground at L .14. So the name
+     is a whisper LIGHTER than the ground, 12% white at the top of the letters falling
+     to 4% at the foot, and the whole slice still fades downward through the mask.
+     No stroke, no shadow: the light does the work, the way it does on an embossed
+     name in a dark wall. */
+  color:transparent;
+  background:linear-gradient(180deg, rgba(255,255,255,.12) 0%, rgba(255,255,255,.04) 100%);
+  -webkit-background-clip:text; background-clip:text;
   -webkit-mask-image:linear-gradient(180deg, #000 0%, rgba(0,0,0,.78) 60%, rgba(0,0,0,.30) 100%);
           mask-image:linear-gradient(180deg, #000 0%, rgba(0,0,0,.78) 60%, rgba(0,0,0,.30) 100%);
 }

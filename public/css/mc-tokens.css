@@ -131,8 +131,8 @@
      the top joins the last marque field, the bottom is where the name is cut.
      Measured against the fields above it — Mercedes, the darkest, is L .20;
      these are L .165 and L .14, so the page ends lower than anything on it. */
-  --mc-deep:    #000C2C;
-  --mc-deep-2:  #000723;
+  --mc-deep:    #040B1F;
+  --mc-deep-2:  #02061A;
   --mc-r-card:  0px;     /* the car card and everything inside it: frame, price box,
                             badge. Square, because on a full-bleed marque field a
                             rounded card pulls the eye into itself while a square one
