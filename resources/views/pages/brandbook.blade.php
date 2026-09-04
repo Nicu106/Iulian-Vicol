@@ -42,6 +42,12 @@
   <div class="bb-wrap">
     <span class="bb-num bb-label">IV MOTORCLASS · Málaga · design system, draft {{ $draft }}</span>
     <h1 class="bb-display">Your website, before it is built</h1>
+    {{-- The pages themselves, built in this language. The book describes; these show. --}}
+    <nav class="bb-pages" aria-label="Páginas en diseño">
+      <a class="mc-btn mc-btn--primary" href="/inicio">Inicio →</a>
+      <a class="mc-btn mc-btn--primary" href="/catalogo">Catálogo →</a>
+      <a class="mc-btn mc-btn--ghost bb-pages__ghost" href="/coche/mercedes-benz-e350d-bluetec-9g-2016-pg9d3">Ficha de un coche →</a>
+    </nav>
     <p class="bb-prose" style="margin-top:var(--s-6)">
       This is not an essay about design. It is a picture of every part of your site, at
       real size, in the real code — so you can look at each one and say yes, or say what

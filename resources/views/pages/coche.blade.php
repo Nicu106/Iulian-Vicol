@@ -18,9 +18,10 @@
 
 <header class="mc-head">
   <div class="mc-head__in cat-wrap" style="padding-block:0">
-    <a class="mc-logo" href="/brandbook">IV&nbsp;MOTORCLASS</a>
+    <a class="mc-logo" href="/inicio">IV&nbsp;MOTORCLASS</a>
     <nav class="mc-nav" style="margin-right:var(--s-4)">
-      <a class="mc-nav__i" href="/catalogo">Coches</a>
+      <a class="mc-nav__i " href="/inicio">Inicio</a>
+      <a class="mc-nav__i " href="/catalogo">Coches</a>
       <a class="mc-nav__i" href="/brandbook">Quién soy</a>
     </nav>
     <a class="mc-btn mc-btn--cta" href="https://wa.me/34614753187">WhatsApp</a>

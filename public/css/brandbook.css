@@ -691,3 +691,9 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
 .bb-atom__n{ font-size:var(--t-small); font-weight:500; color:var(--mc-ink); }
 .bb-atom__n small{ display:block; font-weight:500; letter-spacing:.010em; color:var(--mc-ink-3); font-size:var(--t-label); }
 .bb-atom__s{ display:flex; flex-wrap:wrap; gap:var(--s-3); align-items:center; min-width:0; }
+
+/* the built pages, reachable from the book's first screen */
+.bb-pages{ display:flex; flex-wrap:wrap; gap:var(--s-3); margin:var(--s-5) 0 var(--s-2); }
+.bb-pages .mc-btn{ min-height:48px; }
+.bb-pages__ghost{ --btn-fg:#FFFFFF; --btn-bd:rgba(255,255,255,.55); }
+.bb-pages__ghost:hover{ --btn-bd:#FFFFFF; }
