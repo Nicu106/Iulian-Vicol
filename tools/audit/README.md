@@ -11,6 +11,7 @@ node tools/audit/audit.mjs targets  /catalogo
 node tools/audit/audit.mjs nojs     /catalogo
 node tools/audit/audit.mjs measure  /brandbook
 node tools/audit/audit.mjs shot     /catalogo --w 390,1400
+node tools/audit/colour-scan.mjs   /contacto        # colour per 100px band
 ```
 
 `AUDIT_HOST` overrides the host (default `v2design.ivmotorclass.com`, resolved to

@@ -137,6 +137,45 @@ type is in the wrong place. Read the frame first; place the type in the calm; an
 if there is no calm region large enough, the honest answer is that the type does not
 belong on the picture.
 
+## 3c. When the client says something is missing and cannot name it
+
+*"parca pagina asta are prea putina culoare si parca are nevoie de un pic mai mult
+dar tot nu inteleg ce"* — the most useful kind of feedback, and the hardest to act
+on by looking, because the fault is usually not in any one element.
+
+**Scan the page in bands.** `node tools/audit/colour-scan.mjs /contacto` renders the
+full page, cuts it into 100px bands and reports, for each: mean saturation, the
+share of pixels over 15% saturation, and the share over 35%. A feeling becomes a
+shape.
+
+For /contacto it read:
+
+| region | coloured pixels |
+|---|---|
+| y 0–1,100, the opening | 30–40% |
+| y 1,100–3,600 | 0–7%, with **twelve consecutive bands at exactly 0** |
+| y 3,600–4,195, the footer | 75–100% |
+
+So the page was colour, then 2,500px — 60% of its height — of nothing, then colour.
+Not a missing element: a missing *stretch*. Quiet only reads as quiet when something
+loud sits on either side of it, and there was 2,500px of quiet with nothing to be
+quiet against.
+
+The fix was one band, not decoration spread thin: the distances section — the only
+place on the page where other people speak — became a full-bleed navy field.
+Whole-page coloured pixels went 24.3% → 40.5%, dead bands 12 → 9.
+`--mc-blue-tint` was considered and rejected by the same measurement: at under 5%
+saturation it would not have registered at all.
+
+**And it caught a rule that had never done anything.** The map carried
+`filter: grayscale(1)` with a paragraph justifying it. Rendered with `grayscale(1)`,
+with `saturate(.9)` and with `none`, the pixels inside that frame are identical —
+10.6% mean saturation, 25% over 0.10, in all three: a CSS filter on the parent does
+not reach a cross-origin frame's own compositing. The rule had been written, read
+back from `getComputedStyle`, believed and documented for weeks. Only sampling the
+painted pixels showed it was inert. **Reading back the property you just set proves
+you set it, not that it did anything.**
+
 ## 4. Research findings with sources (motion, images, carousels)
 
 **Speed / drift.** Libraries stating px/s pick 50 (Motion+ Ticker, react-fast-marquee);

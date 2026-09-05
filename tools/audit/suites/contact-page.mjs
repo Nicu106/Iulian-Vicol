@@ -50,14 +50,18 @@ const b = await p.launch({
   // A 32px error here shipped once: the grid's main track was the full container
   // while every .cat-wrap section under it started a gutter further in. A 16px
   // error shipped too: the grid's gutter plus a padding-inline of its own.
+  // The heading's own left edge, not the section's. A section can be full-bleed
+  // with its content in a wrapper — .ct-far became a navy band and started
+  // reporting 0 while the words inside it had not moved a pixel. What "one spine"
+  // means is that the text lines up, so measure the text.
   const spine = await pg.evaluate(() => {
     const edge = (sel) => {
       const e = document.querySelector(sel);
-      if (!e) return null;
-      return Math.round(e.getBoundingClientRect().left + parseFloat(getComputedStyle(e).paddingLeft));
+      return e ? Math.round(e.getBoundingClientRect().left) : null;
     };
-    return { open: edge('.ct-open__say'), ways: edge('.ct-open__ways-wrap'),
-             where: edge('.ct-where__say'), far: edge('.ct-far'), write: edge('.ct-write') };
+    return { open: edge('.ct-open__h'), ways: edge('.ct-ways .ct-way__k'),
+             where: edge('.ct-where__say .ct-h2'), far: edge('.ct-far .ct-h2'),
+             write: edge('.ct-write .ct-h2') };
   });
   const xs = Object.values(spine).filter(v => v !== null);
   is(new Set(xs).size === 1, 'every section starts on the same vertical spine',

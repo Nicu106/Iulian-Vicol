@@ -93,7 +93,11 @@
   </section>
 
   {{-- ---- why anyone trusts a man with no showroom ------------------- --}}
-  <section class="ct-far ct-sec cat-wrap" aria-labelledby="far-h">
+  {{-- Full bleed: the band is the point, so the colour has to reach both edges.
+       The wrap moves inside, which keeps this section on the same spine as every
+       other one. --}}
+  <section class="ct-far" aria-labelledby="far-h">
+    <div class="cat-wrap">
     <h2 class="ct-h2 ct-rise" id="far-h">A {{ number_format(max(array_column($from,'km')),0,',','.') }} km de aquí</h2>
     <p class="ct-lede ct-rise">Nadie compra un coche a setecientos kilómetros por una web.
       Lo compran porque antes hablaron con alguien. Estos condujeron hasta Málaga:</p>
@@ -110,6 +114,7 @@
 
     <p class="ct-note ct-rise">Y {{ $delivered['who'] }} no se movió de casa:
       «{{ $delivered['said'] }}»</p>
+    </div>
   </section>
 
   {{-- ---- the slowest way, last ------------------------------------- --}}

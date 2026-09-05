@@ -243,13 +243,18 @@
      attribution stays visible, as the terms require. */
   position:absolute; left:0; right:0; top:-84px; height:calc(100% + 84px);
   width:100%; border:0;
-  /* Google's map is red pins on beige roads and it fights every colour the page
-     owns. Desaturated it is geography. The colour returns the moment someone
-     engages with it, which is the moment they need it. */
-  filter:grayscale(1) contrast(1.04);
-  transition:filter var(--m-move) var(--e-out);
+  /* No filter. There was a grayscale(1) here with a paragraph explaining that
+     Google's colours fight the page, and it never did anything: rendered with
+     grayscale(1), with saturate(.9) and with none, the pixels inside this frame
+     are byte-for-byte the same — 10.6% mean saturation, 25% of pixels over 0.10,
+     in all three. A CSS filter on the parent does not reach this cross-origin
+     frame's own compositing. The rule was written, read back from the computed
+     style, believed, and documented; only sampling the painted pixels showed it
+     had no effect. The map has always been in colour, and Google's palette is
+     simply pale.
+     Left off rather than left in: a rule that cannot be shown to do anything is
+     a comment pretending to be code. */
 }
-.ct-where__canvas.is-on .ct-where__f{ filter:none; }
 /* An embed is live from the frame it loads: a scroll that starts over the map
    is eaten by the map. The shield hands it over on purpose. */
 .ct-where__shield{
@@ -291,7 +296,34 @@
 }
 
 /* ==========================================================================
-   THE DISTANCES — three equal columns, the page's only grid of thirds
+   THE DISTANCES — a full-bleed dark band, and the page's only grid of thirds
+
+   A band, not another quiet section, because of the same scan: after the
+   photograph the page ran for 2,500px without a single surface carrying weight,
+   and a page that opens strongly and then goes flat for 60% of its height is
+   exactly the "parca ii lipseste ceva" the client could not name. Quiet only
+   reads as quiet when something loud sits on either side of it.
+
+   This section earns the weight: it is the only place on the page where other
+   people speak, and it is the argument for buying a car from a man with no
+   showroom. Navy rather than a tint — --mc-blue-tint measures under 5%
+   saturation and would not have registered at all.
+   ========================================================================= */
+.ct-far{
+  background:var(--mc-navy); color:var(--mc-on-navy);
+  padding-block:var(--s-10);
+}
+@media (max-width:759.98px){ .ct-far{ padding-block:var(--s-8); } }
+.ct-far .ct-h2{ color:var(--mc-on-navy); }
+.ct-far .ct-lede{ color:var(--mc-on-navy-2); }      /* 6.56:1 on navy */
+.ct-far .ct-trip__km{ color:var(--mc-on-navy); }
+.ct-far .ct-trip__km i{ color:var(--mc-on-navy-2); }
+.ct-far .ct-trip__who{ color:var(--mc-on-navy-2); }
+.ct-far .ct-trip__said{ color:var(--mc-on-navy); }
+.ct-far .ct-note{ color:var(--mc-on-navy-2); }
+
+/* ==========================================================================
+   the thirds themselves
    Only cities the review TEXTS name. The author_location column says
    Santander for 19 of 25 rows and contradicts its own quotes.
    ======================================================================== */
