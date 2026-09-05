@@ -159,7 +159,7 @@
         <div class="hm-fb__row" @if($pass) aria-hidden="true" @endif>
           @foreach($reviews as $t)
             @php $src = fn ($w) => route('img.resize', ['w' => $w]) . '?p=' . urlencode($t->img); @endphp
-            <figure class="fb" style="--w:{{ $t->w }}px; --ratio:{{ $t->ratio }}; --scale:{{ $t->scale }}">
+            <figure class="fb" style="--w:{{ $t->w }}px; --ratio:{{ $t->ratio }}; --scale:{{ $t->scale }}; --scale-m:{{ $t->scaleM }}">
               <div class="fb__flip">
                 <div class="fb__face fb__face--front">
                   <img src="{{ $src(600) }}"

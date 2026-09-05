@@ -164,9 +164,6 @@
 .hm-wall__grid{ margin:0; padding:0; list-style:none; display:grid; gap:var(--s-5);
   grid-template-columns:repeat(4,minmax(0,1fr)); }
 @media (max-width:900px){ .hm-wall__grid{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s-4); } }
-.hm-tile{ display:flex; flex-direction:column; gap:var(--s-2); min-width:0; }
-.hm-tile .tt-photo{ border-radius:var(--mc-r-card); }
-.hm-tile .tt-photo img{ width:100%; height:100%; object-fit:cover; object-position:var(--pos-portrait); display:block; }
 
 /* steps */
 /* ---- how it actually goes ----------------------------------------------
@@ -400,7 +397,12 @@ html:not(.js) .hm-fb__step{ display:none; }
     flex-basis:min(88vw, calc(var(--fb-h) * var(--ratio)));
     width:min(88vw, calc(var(--fb-h) * var(--ratio)));
   }
-  .fb__face--back{ padding:var(--s-5); }
+  /* 16px on top, not 24: the 901-character review was 3px short at the smallest type
+     step, and buying it with 16px more card height cost five photographs a 3% deeper mat. */
+  .fb__face--back{ padding:var(--s-4) var(--s-5) var(--s-5); }
+  /* the words' own type step for THIS box — solved in the controller against
+     the phone's 496x343, not carried over from a desktop card up to 30% wider */
+  .fb__q{ font-size:calc(var(--t-prose) * var(--scale-m, var(--scale, 1))); }
   html:not(.js) .fb, .hm-fb.is-static .fb{ height:auto; }
   /* Wide, --flip changes every frame with the card's position, so a transition
      would only lag it. On a phone the sequence sets it in one go, and the turn

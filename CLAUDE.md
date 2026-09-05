@@ -14,7 +14,8 @@ never generic, never "cheap". The standard already reached is high. Match it.
 Separate PHP-FPM pool, separate SQLite DB, separate git. Production has had zero
 commits from this engagement and it must stay that way. If you find yourself
 editing under /var/www/motorclass, stop. Verify at the end of every session:
-`git log --oneline -1` must still be `643a3b9`.
+`git -C /var/www/motorclass log --oneline -1` must still be `643a3b9` (this repo's HEAD is
+something else — the path matters).
 
 Reach the dev site from this box with
 `curl --insecure --resolve v2design.ivmotorclass.com:443:127.0.0.1 https://v2design.ivmotorclass.com/...`
@@ -52,26 +53,39 @@ a new session starts:
    white-on-white strips at 1.08:1; a 3-pixel photograph; heads cut off; a 90° card as a
    hole in the row. Screenshots caught every one. Take them (`tools/audit/audit.mjs shot`,
    or a puppeteer `elementHandle.screenshot()`), and open them with the Read tool.
-3. **Test in more than Chrome's head.** Safari collapsed every card to a 22–35px sliver
-   because `flex-shrink:1` in an `overflow-x:auto` flex container lays out against the
-   VISIBLE box. Chrome happened not to. Assert the invariant ("each card is exactly its
-   computed width"), not the accident ("no overlap in Chrome").
-4. **Stress the system, not the sample.** The 24 current reviews are not the input; "any
-   image, any text, any length" is. `shapeFor()` was run over 132 ratio×length
+3. **Test in more than Chrome's head — but know there is no Safari on this box.** The
+   client tests Safari and phones and sends screenshots; ask for them. Safari collapsed
+   every card to a 22–35px sliver because `flex-shrink:1` in an `overflow-x:auto` flex
+   container lays out against the VISIBLE box; Chrome happened not to. So encode Safari
+   lessons as invariants a Chrome run can assert ("each card is exactly its computed
+   width" — `tools/audit/suites/reviews-widths.mjs`), not as the accident ("no overlap").
+4. **Stress the system, not the sample.** The current reviews (25 active in the DB, all
+   with photographs; 24 render because one quote is a single character and
+   `HomePageController` keeps only quotes over 20 chars) are not the input; "any image,
+   any text, any length" is. `shapeFor()` was run over 132 ratio×length
    combinations before it was trusted; that found a fatal (`end()` on a class constant).
-5. **The audit floor** — run before every commit that touches a page:
+5. **The audit floor** — run before every commit that touches a page, from the repo root:
 
-       node tools/audit/audit.mjs contrast /inicio     # 0 failing (occluded ≠ failing)
-       node tools/audit/audit.mjs overflow /inicio     # 0 at 390 / 768 / 1400
-       node tools/audit/audit.mjs targets  /inicio     # only the keyboard-only halt (16x6) may show
+       cd /var/www/motorclass-v2
+       node tools/audit/audit.mjs contrast /inicio     # failing: 0   (occluded: 48 = the review back faces; fine)
+       node tools/audit/audit.mjs contrast /contacto   # failing: 2   — exactly p.ct-hero__kicker and p.ct-lead (see below)
+       node tools/audit/audit.mjs overflow /inicio     # overflow: 0 at 390/768/1400; escaping: ["button.hm-fb__halt"] is expected
+       node tools/audit/audit.mjs targets  /inicio     # small: only "Detener el movimiento" 16x6 (keyboard-only control)
        node tools/audit/audit.mjs ladder   /inicio     # {} {} {} {}
        node tools/audit/audit.mjs nojs     /inicio     # hiddenOnlyWithoutJs: ["button.hm-fb__halt"] only
 
-   Known, deliberate "failures" (do not fix them): the contact hero words read as
-   white-on-band because the tool cannot see the photograph under them (they are 13.6:1
-   on it); `button.hm-fb__halt` is a keyboard-only stop control, 16x6 at rest by design.
-6. **Regression suites** live in `tools/audit/suites/` (see its README). Run the relevant
-   one after any change to that component. They fail without the fix they encode.
+   **Reading the output.** `failing` is the verdict; `occluded` is text covered by something
+   (not a failure); `escaping` lists elements outside the viewport (the halt button is
+   off-screen by design); `hiddenInBothStates` is informational (a CSS decision, 3 on
+   /inicio, 2 on /contacto); `worst` names the offenders. There are seven checks —
+   `contrast overflow targets ladder nojs measure shot` — and a bare `audit.mjs` silently
+   runs `contrast /`, so always pass both arguments.
+   Known, deliberate "failures" (do not fix them): the two contact hero lines read as
+   white-on-band because the tool cannot see the photograph under them (they measure
+   13.6:1 on it); `button.hm-fb__halt` is a keyboard-only stop control, 16x6 at rest.
+6. **Regression suites** live in `tools/audit/suites/` (see its README; run them from that
+   directory). Each prints ✓/✗ lines and exits 1 on any ✗ — a non-zero exit IS a
+   regression. Run the relevant one after any change to that component.
 
 ## 3. The system: `public/css/mc-tokens.css` is canonical
 
@@ -82,17 +96,20 @@ one, add the token WITH a comment saying why (see `--mc-scrim`). Current ladders
     colour   --mc-bg #F4F6FA · --mc-surface #FFF · --mc-band #E8EDF5 · --mc-deep #040B1F
              --mc-ink #111C2E · --mc-ink-2 #475467 · --mc-ink-3 #5D6B80 (lightest text allowed)
              --mc-hairline #E3E8F0 (decorative) · --mc-rule #C9D2DF (structural edges)
-             --mc-blue #1558D6 (primary) · --mc-price #C6352A (price ONLY) · --mc-wa #017B37
+             --mc-blue #1558D6 (primary) · --mc-price #C6352A (the price) · --mc-wa #017B37
+             --mc-accent #A8330F (darker red: 13–16px text, error borders) · --mc-accent-dark hover
+             --mc-accent-tint price-chip ground · --mc-navy #0E2E57 (footer, fixed bars; 13.57:1 white)
              --mc-scrim 4,7,14 (channels; the black inside gradients over photographs)
     type     --t-h1 34→52 (also --t-display) · --t-h2 28→40 · --t-h3/--t-sub 18 · --t-prose 17→18
              --t-ui 16 · --t-small 14 · --t-label 13 (the floor). Family: DM Sans everywhere.
     space    --s-1 .25rem … --s-5 1.5rem --s-6 2rem --s-7 3rem --s-8 4rem --s-9 6rem --s-10 8rem
     radius   --mc-r-card 0px — the car card and everything inside it is SQUARE (client decision).
-             --mc-r-s 4px chips · --mc-r-l 22px legacy/brandbook · --mc-r-pill icon discs only
+             --mc-r-s 4px chips · --mc-r-l 22px BRANDBOOK SPECIMENS ONLY · --mc-r-pill icon discs only
     motion   --m-instant 80 · --m-quick 160 · --m-state 220 · --m-move 280 · --m-reveal 420 (ms)
              --e-out .22,.61,.36,1 · --e-inout .4,0,.2,1 · --e-in · --e-line
              Derive, don't invent: a 630ms flip is `calc(var(--m-reveal) * 1.5)`.
-    image    --pos-portrait 50% 40%  (only meaningful when something IS cropped; see §5)
+    image    --ar-* and --pos-portrait are LEGACY (brandbook specimens only). Product
+             testimonial photographs are never cropped — see §5. --ar-card 4/3 IS live: the car card.
 
 `docs/DESIGN-REVIEWER.md` is a strict critic prompt for reviewing a section; its ladder
 table predates the square-card decision — the token file wins where they disagree.
@@ -117,9 +134,12 @@ table predates the square-card decision — the token file wins where they disag
 - **`prefers-reduced-motion`**: nothing moves, and every piece of content must still be
   reachable (the reviews go static: photo above, words below). Same for no-JS.
 
-## 5. Photographs: NEVER CROP. Ever.
+## 5. Customer photographs: NEVER CROP. Ever.
 
-The admin uploads phone photos constantly; nobody will set focal points. Measured: a
+Scope: this rule is for CUSTOMER/TESTIMONIAL photographs — unknown ratio, uploaded by the
+admin, people in them. Vehicle photographs are different: the car card is deliberately a
+fixed 4/3 `object-fit: cover` (`--ar-card`), as is the detail page's lead photo. Do not
+"fix" those. The admin uploads customer photos constantly; nobody will set focal points. Measured: a
 2.35:1 band showed 49% of a 3:4 photo's height (heads off); a 260px column beside text
 showed 78% of its width (people cut at the edge). Twitter abandoned saliency cropping
 of people after publishing its bias numbers; no CDN publishes accuracy figures.
@@ -128,8 +148,14 @@ The rule: **the box takes the image's own aspect ratio** (`HomePageController::r
 cached per path+mtime) and the image is `object-fit: contain`. Then there is nothing to
 cut and nothing to letterbox; a truly odd image is matted whole on `--mc-band`, never
 trimmed. Text that must share the box steps its type down (`--scale`) before the box
-widens. Serve through `route('img.resize', ['w'=>…])` with a 400/600/900 srcset — the
-originals average 702KB.
+widens. Numbers: `ratioOf()` clamps the file's ratio to 0.45–2.2 and `shapeFor()` to
+0.2–4.0; type steps are 1/.9/.8/.7 (`--scale`, solved for the 560px desktop card) and a
+SECOND scale `--scale-m` solved for the phone box (496 tall, ≤343 wide) — a 0.88-ratio
+photo kept scale 1 on a card that had shrunk 30% and overran 126px until it existed;
+only past the smallest step does the card widen, to `FB_W_HARD` 900, and the photo sits
+matted whole. On phones a ≤5% mat is accepted where the 88vw width cap binds (uniform
+height + ratio-exact width + screen width cannot all hold). Serve through
+`route('img.resize', ['w'=>…])` with a 400/600/900 srcset — the originals average 702KB.
 
 ## 6. Responsive & browser lessons (each cost real time)
 
@@ -163,6 +189,14 @@ originals average 702KB.
     pages/brandbook.blade.php+ public/css/brandbook.css BrandbookController    /brandbook
     public/css/mc-tokens.css   THE tokens        docs/vault/   structured project knowledge
     tools/audit/               measurement floor + regression suites (README there)
+
+    Page JavaScript is INLINE in each page blade — the reviews engine is the <script> in
+    inicio.blade.php from ~line 287. public/js/* is legacy from the old site; ignore it.
+    Reviews come in through the admin: model app/Models/Testimonial.php, table
+    testimonials(author_name, author_location, image_path, quote, is_active, order_index),
+    UI at /admin/testimonials, files under public/storage/testimonials/.
+    docs/vault/70-Audit/ catalogues 46 defects (incl. security) — read it before any
+    backend work; the eight production defects in DESIGN-GUIDE §6 are there.
 
 Each component's design intent and the reasons behind it are in `docs/DESIGN-GUIDE.md §5`,
 and in the commit messages — read `git log` for the file you are about to touch; the

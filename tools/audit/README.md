@@ -61,13 +61,18 @@ one for the component you touched; quote its output in the commit message.
 cd tools/audit/suites
 node reviews-desktop.mjs   # 12 behaviours: direction, photo at centre, buttons, click-to-centre, geometry, reduced-motion, no-JS, phone sizing
 node reviews-phone.mjs     # 13 steps at 390px: auto turn/advance, next/prev alternation, swipes as steps
-node reviews-photos.mjs    # 0 photographs cut, 0 matted, 0 text overflowing at 1440/768/390
+node reviews-photos.mjs    # asserts: 0 cut and 0 quotes needing the scroll fallback at every width; 0 mat ≥1000px, ≤5% mat below
 node reviews-widths.mjs    # every card renders at exactly its computed width (the Safari flex-shrink guard)
 node reviews-seam.mjs      # the loop seam is exactly one row: 0px error, every pair one stride apart
-node reviews-speed.mjs     # px/s delivered vs the constant (scrollLeft rounds — this caught 1px/frame)
+node reviews-speed.mjs     # one sample of the speed profile, 24–110 px/s (scrollLeft rounds — this once caught 1px/frame)
 node contact-landing.mjs   # the strips land on both contact panels at 0px on all four edges
 node contact-frames.mjs    # share of the contact scroll with no photograph on screen (was 56%, must be ~0)
 ```
+
+Every suite prints ✓/✗ lines and exits 1 on any ✗. The suites map the host themselves
+and do not honour `AUDIT_HOST`. All seven `audit.mjs` checks: `contrast overflow targets
+ladder nojs measure shot` (`measure` dumps computed styles for a selector; `shot` takes
+screenshots). Run `audit.mjs` with both arguments — bare, it runs `contrast /`.
 
 Screenshots go to `tools/audit/out/` (or the dir you pass as the first argument).
 Puppeteer resolves from this repo's `node_modules`; Chrome from `~/.cache/puppeteer/chrome`.

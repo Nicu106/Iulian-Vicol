@@ -6,7 +6,7 @@ const OUT = process.argv[2] || new URL('../out', import.meta.url).pathname; mkdi
 const dir=`${process.env.HOME}/.cache/puppeteer/chrome`;
 const ex=`${dir}/${readdirSync(dir).filter(d=>d.startsWith('linux-')).sort().pop()}/chrome-linux64/chrome`;
 const b=await p.launch({executablePath:ex,args:['--no-sandbox','--ignore-certificate-errors','--host-resolver-rules=MAP v2design.ivmotorclass.com 127.0.0.1']});
-const URL='https://v2design.ivmotorclass.com/inicio';
+const PAGE='https://v2design.ivmotorclass.com/inicio';
 const out=[];
 const ok=(name,cond,detail='')=>out.push(`${cond?'✓':'✗'} ${name}${detail?'  — '+detail:''}`);
 
@@ -14,7 +14,7 @@ const ok=(name,cond,detail='')=>out.push(`${cond?'✓':'✗'} ${name}${detail?' 
 {
   const pg=await b.newPage(); await pg.setViewport({width:1440,height:900});
   const errs=[]; pg.on('pageerror',e=>errs.push(String(e)));
-  await pg.goto(URL,{waitUntil:'networkidle2'});
+  await pg.goto(PAGE,{waitUntil:'networkidle2'});
   await pg.evaluate(()=>{const s=document.getElementById('reviews'); scrollTo(0,s.getBoundingClientRect().top+scrollY-60);});
   await pg.mouse.move(20,20); await new Promise(r=>setTimeout(r,2500));
   const L=()=>pg.evaluate(()=>document.getElementById('fb-rail').scrollLeft);
@@ -62,7 +62,7 @@ const ok=(name,cond,detail='')=>out.push(`${cond?'✓':'✗'} ${name}${detail?' 
 {
   const pg=await b.newPage(); await pg.setViewport({width:1440,height:900});
   await pg.emulateMediaFeatures([{name:'prefers-reduced-motion',value:'reduce'}]);
-  await pg.goto(URL,{waitUntil:'networkidle2'});
+  await pg.goto(PAGE,{waitUntil:'networkidle2'});
   await pg.evaluate(()=>{const s=document.getElementById('reviews'); scrollTo(0,s.getBoundingClientRect().top+scrollY-60);});
   await new Promise(r=>setTimeout(r,1500));
   const a=await pg.evaluate(()=>document.getElementById('fb-rail').scrollLeft); await new Promise(r=>setTimeout(r,2500));
@@ -76,7 +76,7 @@ const ok=(name,cond,detail='')=>out.push(`${cond?'✓':'✗'} ${name}${detail?' 
 // ---- no javascript ----
 {
   const pg=await b.newPage(); await pg.setViewport({width:1440,height:900}); await pg.setJavaScriptEnabled(false);
-  await pg.goto(URL,{waitUntil:'networkidle2'});
+  await pg.goto(PAGE,{waitUntil:'networkidle2'});
   const st=await pg.evaluate(()=>{const f=document.querySelector('.fb'); const fr=f.querySelector('.fb__face--front').getBoundingClientRect(), bk=f.querySelector('.fb__face--back').getBoundingClientRect();
     const step=document.querySelector('.hm-fb__step'); return {stacked:bk.top>=fr.bottom-1, bothVisible:fr.height>50&&bk.height>50, buttonsHidden:!step||getComputedStyle(step).display==='none',
       overflow:document.documentElement.scrollWidth-innerWidth};});
@@ -86,7 +86,7 @@ const ok=(name,cond,detail='')=>out.push(`${cond?'✓':'✗'} ${name}${detail?' 
 // ---- phone ----
 {
   const pg=await b.newPage(); await pg.setViewport({width:390,height:844,isMobile:true,hasTouch:true});
-  await pg.goto(URL,{waitUntil:'networkidle2'}); await new Promise(r=>setTimeout(r,1500));
+  await pg.goto(PAGE,{waitUntil:'networkidle2'}); await new Promise(r=>setTimeout(r,1500));
   const m=await pg.evaluate(()=>{const cells=[...document.querySelectorAll('.fb')].slice(0,24); const R=cells.map(f=>f.getBoundingClientRect());
     return {h:[...new Set(R.map(r=>Math.round(r.height)))], maxW:Math.max(...R.map(r=>Math.round(r.width))), vw:innerWidth, overflow:document.documentElement.scrollWidth-innerWidth};});
   ok('phone: uniform height, no card wider than the screen, no page overflow', m.h.length===1&&m.maxW<=m.vw*0.88+1&&m.overflow===0, JSON.stringify(m));

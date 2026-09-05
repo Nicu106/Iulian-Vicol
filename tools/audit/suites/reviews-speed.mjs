@@ -10,7 +10,7 @@ const pg=await b.newPage(); await pg.setViewport({width:1440,height:900});
 await pg.goto('https://v2design.ivmotorclass.com/inicio',{waitUntil:'networkidle2'});
 await pg.evaluate(()=>{const s=document.getElementById('reviews'); scrollTo(0,s.getBoundingClientRect().top+scrollY-80);});
 await new Promise(r=>setTimeout(r,2500));   // let v settle at target
-console.log(await pg.evaluate(()=>new Promise(res=>{
+const r = await pg.evaluate(()=>new Promise(res=>{
   const r=document.getElementById('fb-rail');
   let n=0; const t0=performance.now(), x0=r.scrollLeft;
   function f(){ n++; if (performance.now()-t0 < 3000) requestAnimationFrame(f);
@@ -18,5 +18,8 @@ console.log(await pg.evaluate(()=>new Promise(res=>{
               px:+(r.scrollLeft-x0).toFixed(1),
               pxPerSec:+((r.scrollLeft-x0)/((performance.now()-t0)/1000)).toFixed(1)}); }
   requestAnimationFrame(f);
-})));
+}));
+console.log({frames:r.frames, fps:r.fps, pxPerSec:Math.abs(r.pxPerSec),
+  direction:r.pxPerSec<0?'left → right (content moves right) ✓':'right → left ✗',
+  expected:'one 3s sample of the profile — between 24 (a card in the middle) and 110 (between cards) px/s'});
 await b.close();

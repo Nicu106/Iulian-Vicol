@@ -125,7 +125,7 @@
      photographs and bare text links, and it read as old-school. */
   --mc-r-s:    4px;      /* chips, badges, small tabs, spec rows */
   --mc-r:     10px;      /* buttons, inputs */
-  --mc-r-l:   22px;      /* cards, panels — car-planet's exact card radius (26/26) */
+  --mc-r-l:   22px;      /* BRANDBOOK SPECIMENS ONLY. Product cards are --mc-r-card 0px (square). Was car-planet's card radius */
   --mc-r-pill: 999px;    /* icon discs only */
   /* The foot of the page. Two stops of one descent, on the navy hue (256°):
      the top joins the last marque field, the bottom is where the name is cut.
@@ -159,7 +159,7 @@
   --ar-card:      4 / 3;    /* vehicle card, gallery thumb */
   --ar-hero-m:    4 / 3;    /* detail lead photo, mobile */
   --ar-hero-d:    3 / 2;    /* detail lead photo, desktop */
-  --ar-portrait:  4 / 5;    /* testimonial, default */
+  --ar-portrait:  4 / 5;    /* LEGACY — brandbook specimen only. Product testimonial photos are never cropped (CLAUDE.md §5) */
   --ar-tall:      5 / 7;    /* tall-tail testimonial (ratio < 0.62). 3/4 was measured
                                against the real library and FAILS the 25% rule
                                on 1 file (27.6%); 5/7 gives 23.9% worst case. */
@@ -171,7 +171,7 @@
      all 25 files puts the face band at 20-50% depth, peaking at 30-40%. Only
      8.8% of skin pixels are in the top fifth, which is sky and warehouse
      ceiling. Biasing upward preserves empty headroom and eats the car. */
-  --pos-portrait: 50% 40%;
+  --pos-portrait: 50% 40%;  /* LEGACY — only meaningful where something is cropped; product testimonial photos are not */
   --pos-vehicle:  50% 42%;   /* protects the roofline */
 
   /* ---- MOTION -------------------------------------------- */

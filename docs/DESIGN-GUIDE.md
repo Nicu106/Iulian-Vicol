@@ -172,8 +172,10 @@ that evidences it; a spine with square stops; numbers as the loud element.
 
 **Inicio — the reviews row** — the most-iterated component. Final state:
 - One rectangle per review, TWO FACES: photograph front, words back. Card = photo's own
-  ratio (`shapeFor()`); `contain`; type steps down (`--scale` 1/.9/.8/.7) before the card
-  widens; none of the 24 matted, 20 at full type. No border, two-layer shadow; large
+  ratio (`shapeFor()`); `contain`; type steps down (`--scale` 1/.9/.8/.7, and a phone
+  scale `--scale-m` solved for the 496×343 phone box) before the card widens. On the
+  desktop none of the 24 is matted and 20 keep full type; on phones a ≤5% mat is the
+  accepted residual where the 88vw cap binds. No border, two-layer shadow; large
   opening quote mark in `--mc-rule`; byline on a 2.5rem rule.
 - Desktop: travels left→right for ever (owned float `pos`, wrap at row width, seam 0px);
   the PHOTOGRAPH sits in the middle and is the slowest thing on the page (detent: 24 px/s
@@ -195,7 +197,6 @@ that evidences it; a spine with square stops; numbers as the loud element.
 
 ## 6. Things the client has deferred / must decide (do not resolve unilaterally)
 
-Catalogue banner stock photo; the "Soporte 24/7" claim (dropped); three `[CONFIRM]` legal
-strings; WhatsApp green choice; filters at ~25 cars; star ratings; eight production
+Catalogue banner stock photo; the "Soporte 24/7" claim (dropped); WhatsApp green choice; filters at ~25 cars; star ratings; eight production
 defects catalogued but not applied; the `/inicio` people section and the contact page both
 used a held-viewport gesture (the reviews row no longer does).

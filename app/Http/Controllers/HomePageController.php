@@ -34,6 +34,15 @@ class HomePageController extends Controller
     private const FB_CHROME = 88;     // its padding, plus the byline under the quote
     private const FB_INSET  = 50;     // the padding and borders the words sit inside
     private const FB_SCALES = [1.0, 0.9, 0.8, 0.7];
+    /* The phone's box is not the desktop's: 480 tall, and never wider than 343
+     * (88vw on a 390 screen), whatever the picture's ratio says. So the words get
+     * their own type size there, solved the same way against that box. Solved
+     * only for the desktop, a 0.88-ratio photograph kept scale 1 on a card that
+     * had shrunk 30% — measured 126px of quote past a 348px box at 390. */
+    private const FB_CARD_M   = 480;
+    private const FB_PHONE_W  = 343;
+    private const FB_CHROME_M = 124;   // measured: a 480 card left 348px for the quote at 24px top padding; 16px buys 8 more
+    private const FB_INSET_M  = 48;    // the back face's 24px padding, both sides
     private const FB_W_MIN  = 240;
     private const FB_W_HARD = 900;    // and the one we will accept rather than not fit
     /* The widest a card may be and still put the photograph on top. Beyond this
@@ -99,7 +108,7 @@ class HomePageController extends Controller
             $lines = max(1, (int) floor((self::FB_CARD - self::FB_CHROME) / $line));
             $tw    = (int) ceil($len * $char / $lines) + self::FB_INSET;
             if ($tw <= $pw) {
-                return ['w' => max(self::FB_W_MIN, $pw), 'scale' => $k, 'ratio' => round($ratio, 4)];
+                return ['w' => max(self::FB_W_MIN, $pw), 'scale' => $k, 'scaleM' => self::scaleForPhone($len, $ratio), 'ratio' => round($ratio, 4)];
             }
         }
 
@@ -111,10 +120,23 @@ class HomePageController extends Controller
         $tw    = (int) ceil($len * self::FB_CHAR * $k / $lines) + self::FB_INSET;
 
         return [
-            'w'     => max(self::FB_W_MIN, min(self::FB_W_HARD, max($pw, $tw))),
-            'scale' => $k,
-            'ratio' => round($ratio, 4),
+            'w'      => max(self::FB_W_MIN, min(self::FB_W_HARD, max($pw, $tw))),
+            'scale'  => $k,
+            'scaleM' => self::scaleForPhone($len, $ratio),
+            'ratio'  => round($ratio, 4),
         ];
+    }
+
+    /** The type step at which this review's words fit the PHONE box. */
+    public static function scaleForPhone(int $len, float $ratio): float
+    {
+        $pw = min(self::FB_PHONE_W, (int) round(self::FB_CARD_M * $ratio));
+        foreach (self::FB_SCALES as $k) {
+            $lines = max(1, (int) floor((self::FB_CARD_M - self::FB_CHROME_M) / (self::FB_LINE * $k)));
+            $tw    = (int) ceil($len * self::FB_CHAR * $k / $lines) + self::FB_INSET_M;
+            if ($tw <= $pw) { return $k; }
+        }
+        return self::FB_SCALES[count(self::FB_SCALES) - 1];
     }
 
     /** A photograph's aspect ratio, read once per file and remembered. Falls back
