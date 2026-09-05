@@ -91,6 +91,52 @@ now encoded in `tools/audit/audit.mjs` or in a suite:
 - Puppeteer's `page.tap(selector)` failed to find a node `document.querySelector` found;
   drive buttons with in-page `.click()` in tests.
 
+## 3b. Reading a photograph before you write on it
+
+The client threw away two versions of /contacto. The second one was a full-bleed
+photograph with a big white headline over a dark gradient, and his words were:
+*"arata dea dreputl oribiil si iesftin ... nu este specific apple de loc sau google
+sau custom design deloc"*, and then, when pressed on why: **"cand alegi sa pui text
+pe o imagine trebuie sa o faci strategic, nu doar sa-l pui — trebuie sa analizezi
+continutul imaginii, ce se afla in ea, si dupa asta sa incepi a edita ... ce ai
+facut acum impresiona lumea acum 10 ani."**
+
+He is right on both counts, and the second one is measurable.
+
+**The method.** Draw the file into a canvas and reduce it to three grids (12 x 16
+works for a portrait file). Mean luminance says where it is light or dark. Mean
+absolute gradient says where it is calm or busy. Mean saturation says where the
+colour lives. It takes one `pg.evaluate` and it settles arguments that otherwise
+get settled by taste. Do this BEFORE deciding where type goes.
+
+**What it said about `public/img/banner/contacto.jpg` (2400x3200):**
+
+| region | reading |
+|---|---|
+| right half, below row 7 | luminance 13-29, gradient 0-7 — the calmest, darkest field in the frame |
+| cols 1-3, rows 8-13 | gradient 24-37 — the busiest region: the wheel and its reflections |
+| col 0, rows 9-15 | luminance 166-202 — a hard bright strip, the lit floor |
+| rows 7-13, cols 5-11 | saturation 60-75% — the red tail light |
+| rows 0-3 | luminance to 167 — garage ceiling and strip lights |
+
+The headline had been set bottom-left: the wheel and the lit floor. The heavy
+gradient it needed to stay legible was treating a wound that had been chosen. The
+calm field was the opposite corner.
+
+**What actually followed from the numbers** was not "move the type to the right".
+It was that the file is 3:4 and was being forced into a 16:10 band, throwing away
+53% of it, and that a portrait file wants a portrait-shaped hole. So the type came
+off the photograph entirely — ink on the page ground, full contrast, no scrim — and
+the photograph took a tall column beside it. Then the same maps chose the crop:
+`object-position: 68% 46%` spends the 33% that `cover` discards on the bright noisy
+left edge and on a near-black sliver of the car's right side (luminance 13-16), and
+keeps the roofline, the glass and the tail light.
+
+**The general rule.** A gradient scrim under a headline is usually a sign that the
+type is in the wrong place. Read the frame first; place the type in the calm; and
+if there is no calm region large enough, the honest answer is that the type does not
+belong on the picture.
+
 ## 4. Research findings with sources (motion, images, carousels)
 
 **Speed / drift.** Libraries stating px/s pick 50 (Motion+ Ticker, react-fast-marquee);
@@ -142,6 +188,33 @@ parity gaps (8/4/7/2%); no CDN (Cloudinary, imgix, Thumbor) publishes accuracy f
 WordPress core, Drupal, Craft and Sanity all ship MANUAL focal points emitted as
 `object-position` — ruled out here because the admin will not set them. Hence: no crop;
 box = image ratio; `contain`.
+
+## 4b. Layout traps that each cost a rebuild
+
+- **A full-bleed grid built from `100vw` is wrong by half a scrollbar.**
+  `calc((100vw - 1200px)/2)` is the usual way to write one; `100vw` counts the
+  scrollbar and an element's width does not, so every section built that way sits
+  a few pixels off every `.cat-wrap` above it. Build the tracks from the container
+  token instead — `minmax(gutter,1fr) [main-start] repeat(12, minmax(0, calc((container - 2*gutter)/12))) [main-end] minmax(gutter,1fr)` —
+  and the main track resolves from the element's own width, which is what
+  `.cat-wrap` resolves from. Assert it: three sections, one x.
+- **And the main track is the container MINUS its gutters.** The first version put
+  `main-start` at 120px while every `.cat-wrap` section under it started at 152.
+- **Then do not add the gutter twice.** A `padding-inline` on an element already
+  sitting in the main track put one caption 16px right of everything else.
+- **`overflow: hidden` on an ancestor silently creates a scroll container and kills
+  `position: sticky`.** Use `overflow: clip`. It is a very common line in a layout
+  wrapper and it fails without any error.
+- **`--mc-head-h` lies on a phone.** It says 56px; at 390 the header renders 100
+  because the nav wraps to a second line. Anything that subtracts the header must
+  measure it, not read the token — or, better, be built so it does not need to.
+- **A sticky panel shorter than its column opens a seam.** A one-screen photograph
+  in a 1,049px column held for ~180px and then let a 43px band of page ground open
+  between its bottom edge and the top of the next section. Invisible in a
+  screenshot of the landing. Check geometry at four scroll positions, not one.
+- **Two 128px paddings meeting make a 256px hole, not air.** 96 a side reads as
+  deliberate; 128 a side reads as a bug. Air is only air if something is on both
+  sides of it.
 
 ## 5. The built components, and why they are the way they are
 

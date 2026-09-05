@@ -65,8 +65,13 @@ node reviews-photos.mjs    # asserts: 0 cut and 0 quotes needing the scroll fall
 node reviews-widths.mjs    # every card renders at exactly its computed width (the Safari flex-shrink guard)
 node reviews-seam.mjs      # the loop seam is exactly one row: 0px error, every pair one stride apart
 node reviews-speed.mjs     # one sample of the speed profile, 24–110 px/s (scrollLeft rounds — this once caught 1px/frame)
-node contact-landing.mjs   # the strips land on both contact panels at 0px on all four edges
-node contact-frames.mjs    # share of the contact scroll with no photograph on screen (was 56%, must be ~0)
+node contact-page.mjs       # the contact page: the photograph is never upscaled, every
+                           # section starts on the same spine, the opening line fits its
+                           # column, no band of ground opens under the photograph at any
+                           # scroll, nothing is left invisible, and the phone reads
+                           # statement -> photograph -> ways with the statement clear of
+                           # the dock. Replaced contact-landing.mjs and contact-frames.mjs,
+                           # which measured a page that was thrown away.
 ```
 
 Every suite prints ✓/✗ lines and exits 1 on any ✗. The suites map the host themselves

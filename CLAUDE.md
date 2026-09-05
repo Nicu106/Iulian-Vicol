@@ -134,6 +134,26 @@ table predates the square-card decision — the token file wins where they disag
 - **`prefers-reduced-motion`**: nothing moves, and every piece of content must still be
   reachable (the reviews go static: photo above, words below). Same for no-JS.
 
+## 4b. Before you put type on a photograph, read the photograph
+
+Draw the file into a canvas and reduce it to three grids — mean luminance, mean
+gradient, mean saturation, 12 x 16 for a portrait file. That is one `pg.evaluate`
+and it tells you where the frame is calm, where it is busy and where the colour is.
+Do it BEFORE choosing where the words go, not after they look wrong.
+
+A gradient scrim under a headline is usually a sign the type is in the wrong place.
+On /contacto the headline sat over the wheel and the lit floor — the busiest and
+brightest regions in the file — and the scrim was treating a self-inflicted wound.
+The client's own words: *"cand alegi sa pui text pe o imagine trebuie sa o faci
+strategic, nu doar sa-l pui ... ce ai facut acum impresiona lumea acum 10 ani."*
+
+Also read the file's SHAPE. /contacto's photograph is 3:4 and was being forced into
+a 16:10 band, losing 53% of itself. A portrait file wants a portrait-shaped field.
+Full method, numbers and the crop that came out of them: docs/DESIGN-GUIDE.md §3b.
+Layout traps that cost a rebuild each (full-bleed grids and `100vw`, `overflow:
+hidden` killing sticky, `--mc-head-h` lying at 390px, sticky panels opening seams):
+§4b.
+
 ## 5. Customer photographs: NEVER CROP. Ever.
 
 Scope: this rule is for CUSTOMER/TESTIMONIAL photographs — unknown ratio, uploaded by the

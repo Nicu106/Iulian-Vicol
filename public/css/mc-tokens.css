@@ -105,6 +105,17 @@
   /* ---- TYPE SCALE — fluid 390px → 1200px, base 16px ------- */
   /* slopes solved for exactly 390px → 1200px, so a 390px phone renders the floor */
   --t-display: var(--t-h1);   /* one 34 → 52 step; two names would be two ladders */
+  /* One step above the ladder, for a page that opens with a statement rather
+     than a heading. Added because the ladder stops at 52px and 52px is a
+     caption, not the first thing anyone is meant to see. Used on the contact
+     page's opening line and nowhere else; if a second page needs it, it is a
+     ladder step, not a one-off.
+     The ceiling is 100, not 112: the line sits in a 7-of-12 column beside a
+     photograph, not across the full page. Measured, not guessed — the longest
+     line renders 461px at 88px in a 663px column, and the size that keeps a
+     comfortable margin at every width down to the 900px split breakpoint (431
+     of 488 there) is 100. The size is set by the measure it has to fit. */
+  --t-mega:    clamp(3.25rem,1.8056rem + 5.9259vw,6.25rem);    /* 52 → 100 */
   --t-h1:      clamp(2.125rem,1.5833rem + 2.2222vw,3.25rem);   /* 34 → 52 */
   --t-h2:      clamp(1.75rem,1.3889rem + 1.4815vw,2.5rem);     /* 28 → 40. car-planet's h2 is 40 */
   --t-sub:     1.125rem;                                    /* 18. the grey line under an h2 */
