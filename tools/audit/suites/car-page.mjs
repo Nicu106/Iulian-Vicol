@@ -31,40 +31,26 @@ await pg.goto(B + href, { waitUntil: 'networkidle0' });
 await new Promise(r => setTimeout(r, 700));
 
 /* --- what goes with the car --------------------------------------------- */
-const where = await pg.evaluate(() => {
-  const sec = document.querySelector('.car-with');
-  if (!sec) return { there: false };
-  const prev = sec.previousElementSibling, next = sec.nextElementSibling;
+const col = await pg.evaluate(() => {
+  const side = document.querySelector('.car-side');
+  const wit = document.querySelector('.car-with');
+  if (!side || !wit) return { there: false };
   return { there: true,
-           after: prev?.querySelector('h2')?.textContent.trim() || null,
-           before: next?.querySelector('h2')?.textContent.trim() || null,
+           inColumn: side.contains(wit),
+           order: [...side.children].map(c => c.className.split(' ')[0]),
+           specsCopies: document.querySelectorAll('.car-specs').length,
            panels: document.querySelectorAll('.car-off').length,
            steps: [...document.querySelectorAll('.car-off')].map(o => o.querySelectorAll('.car-off__step').length),
            included: document.querySelectorAll('.car-off__step--inc').length };
 });
-is(where.there, 'the offers section is on the page');
-is(where.after === 'Especificaciones técnicas', 'and it sits under the specifications', `after "${where.after}"`);
-is(where.panels === 2 && where.steps.join(',') === '3,2',
-   'two panels: three warranty steps and two maintenance steps', JSON.stringify(where.steps));
-is(where.included === 1, 'exactly one step is marked as included');
-
-// The six facts are one partial rendered in two slots. Exactly one may be
-// displayed at any width — two would put the same values in the accessibility
-// tree twice — and the switch is at 1000px, where .car-grid grows its sidebar.
-for (const [w, expect] of [[1440, 'with'], [1000, 'with'], [999, 'side'], [768, 'side'], [390, 'side']]) {
-  await pg.setViewport({ width: w, height: 1000 });
-  await new Promise(r => setTimeout(r, 300));
-  const sl = await pg.evaluate(() => {
-    const vis = s => { const e = document.querySelector(s); return e && getComputedStyle(e).display !== 'none'; };
-    const side = vis('.car-specs-slot--side'), wi = vis('.car-specs-slot--with');
-    return { side, wi, n: [side, wi].filter(Boolean).length,
-             rows: document.querySelectorAll('.car-specs-slot:not([style*="none"]) .mc-specs__row').length };
-  });
-  is(sl.n === 1, `exactly one copy of the facts is shown at ${w}px`, `side:${sl.side} with:${sl.wi}`);
-  is((expect === 'with') === sl.wi, `and it is the ${expect} one at ${w}px`);
-}
-await pg.setViewport({ width: 1440, height: 1000 });
-await new Promise(r => setTimeout(r, 300));
+is(col.there && col.inColumn,
+   'everything that comes with the car sits in the right-hand column');
+is(col.order.join(' ') === 'car-price mc-specs car-act car-with',
+   'under the price, the facts and the buttons, in that order', col.order.join(' → '));
+is(col.specsCopies === 1, 'the six facts are rendered exactly once', `${col.specsCopies} copies`);
+is(col.panels === 2 && col.steps.join(',') === '3,2',
+   'two panels: three warranty steps and two maintenance steps', JSON.stringify(col.steps));
+is(col.included === 1, 'exactly one step is marked as included');
 
 // The calculator and the "request a viewing / an offer" block were deleted.
 const gone = await pg.evaluate(() => ({
@@ -74,27 +60,26 @@ const gone = await pg.evaluate(() => ({
 is(!gone.calc && !gone.form, 'the calculator and the request form are gone',
    `calc:${gone.calc} form:${gone.form}`);
 
-// A ladder that wraps into 2 + 1 reads as a mistake. Below 560 it becomes a
-// column on purpose; above it, the three steps share one row.
-for (const w of [1440, 1200, 1000, 768, 560]) {
-  await pg.setViewport({ width: w, height: 1000 });
+// The panel is 336px in the sidebar and never wider than 410 anywhere, so the
+// ladder is lines, not cells. What must never happen is a half-broken grid — two
+// on one row and one orphaned under them.
+for (const w of [1800, 1440, 1100, 1000, 900, 768, 600, 390, 320]) {
+  await pg.setViewport({ width: w, height: 1100 });
   await new Promise(r => setTimeout(r, 300));
-  const rows = await pg.evaluate(() => {
+  const l = await pg.evaluate(() => {
     const cells = document.querySelector('.car-off').querySelectorAll('.car-off__step');
-    return new Set([...cells].map(c => Math.round(c.getBoundingClientRect().top))).size;
+    const rows = new Set([...cells].map(c => Math.round(c.getBoundingClientRect().top))).size;
+    return { rows, n: cells.length,
+             panel: Math.round(document.querySelector('.car-off').getBoundingClientRect().width),
+             overflow: Math.max(0, document.documentElement.scrollWidth - window.innerWidth) };
   });
-  is(rows === 1, `the warranty ladder is one row at ${w}px`, `${rows} row(s)`);
+  is(l.rows === 1 || l.rows === l.n,
+     `the ladder is whole at ${w}px — all across or one per line, never 2 + 1`,
+     `${l.rows} rows of ${l.n}, panel ${l.panel}px`);
+  is(l.overflow === 0, `and nothing overflows at ${w}px`, `${l.overflow}px`);
 }
-for (const w of [480, 390, 320]) {
-  await pg.setViewport({ width: w, height: 1000 });
-  await new Promise(r => setTimeout(r, 300));
-  const r = await pg.evaluate(() => {
-    const cells = document.querySelector('.car-off').querySelectorAll('.car-off__step');
-    return { rows: new Set([...cells].map(c => Math.round(c.getBoundingClientRect().top))).size,
-             n: cells.length };
-  });
-  is(r.rows === r.n, `and one step per line at ${w}px, not a broken grid`, `${r.rows} of ${r.n}`);
-}
+await pg.setViewport({ width: 1440, height: 900 });
+await new Promise(r => setTimeout(r, 300));
 
 /* --- the full-screen viewer's arrows ------------------------------------
    They are absolutely positioned children of a grid container. With a definite

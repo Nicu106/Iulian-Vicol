@@ -95,7 +95,7 @@
         @endif
       </div>
 
-      <div class="car-specs-slot car-specs-slot--side">@include('partials.car-specs')</div>
+      @include('partials.car-specs')
 
       <div class="car-act">
         {{-- "Me interesa" on a car that is already gone is the page telling a
@@ -106,6 +106,60 @@
             : 'Hola, me interesa el '.$car->brand.' '.$car->model.' '.$car->year) }}">{{ $gone ? '¿Tienes algo parecido?' : 'WhatsApp' }}</a>
         <a class="mc-btn mc-btn--ghost" href="tel:+34614753187">Llamar</a>
       </div>
+
+      {{-- Everything that comes with the car sits in this column, under the price
+           and the buttons — the client: "trebuiau toate sa fie sub pret pe
+           varianta pe pc, adica in partea dreapta sa fie toate". One place in the
+           markup, not two: below 1000px .car-grid is a single column, so this
+           simply falls under the buttons on a phone, which is where it reads
+           anyway. --}}
+      <section class="car-with" aria-labelledby="with-h">
+        <h2 class="car-with__h" id="with-h">Lo que va con el coche</h2>
+
+      <div class="car-with__grid">
+
+        <article class="car-off">
+          <h3 class="car-off__h">Garantía</h3>
+          <p class="car-off__say">Un año va incluido con cada coche que vendo.
+            Si quieres más tiempo, se amplía.</p>
+          <ul class="car-off__steps">
+            <li class="car-off__step car-off__step--inc">
+              <span class="car-off__t">1 año</span>
+              <span class="car-off__p">Incluido</span>
+            </li>
+            <li class="car-off__step">
+              <span class="car-off__t">2 años</span>
+              <span class="car-off__p">600 €</span>
+            </li>
+            <li class="car-off__step">
+              <span class="car-off__t">3 años</span>
+              <span class="car-off__p">900 €</span>
+            </li>
+          </ul>
+          <p class="car-off__note">Es una garantía nacional: vale en toda España, no
+            sólo en Málaga. Si el coche te falla lejos de aquí, te lo atienden allí.</p>
+        </article>
+
+        <article class="car-off">
+          <h3 class="car-off__h">Mantenimiento</h3>
+          <p class="car-off__say">Aceite, filtros y lo que toque, a precio cerrado.
+            Este es opcional.</p>
+          <ul class="car-off__steps">
+            <li class="car-off__step">
+              <span class="car-off__t">1 año</span>
+              <span class="car-off__p">200 €</span>
+            </li>
+            <li class="car-off__step">
+              <span class="car-off__t">2 años</span>
+              <span class="car-off__p">400 €</span>
+            </li>
+          </ul>
+          <p class="car-off__note">Sale más a cuenta que ir suelto al taller cada vez,
+            y no tienes que acordarte de nada: te aviso yo cuando toca.</p>
+        </article>
+
+      </div>
+      </section>
     </aside>
   </div>
 
@@ -138,66 +192,6 @@
       </dl>
     </section>
   @endif
-
-  {{-- ---- what goes with the car, whichever car it is ------------------
-       Not a per-car field: this is what he offers on everything he sells, so it
-       is written here rather than typed into 32 records that would drift apart.
-       Unconditional, and phrased about what he does rather than about this
-       particular car, so it is still true on the page of one already gone.
-       ------------------------------------------------------------------- --}}
-  <section class="car-sec car-with" aria-labelledby="with-h">
-    <h2 class="car-h2" id="with-h">Lo que va con el coche</h2>
-    <p class="car-with__lead">Lo mismo en todos: uno va incluido, el resto lo eliges tú.</p>
-
-    <div class="car-with__grid">
-
-      <article class="car-off">
-        <h3 class="car-off__h">Garantía</h3>
-        <p class="car-off__say">Un año va incluido con cada coche que vendo.
-          Si quieres más tiempo, se amplía.</p>
-        <ul class="car-off__steps">
-          <li class="car-off__step car-off__step--inc">
-            <span class="car-off__t">1 año</span>
-            <span class="car-off__p">Incluido</span>
-          </li>
-          <li class="car-off__step">
-            <span class="car-off__t">2 años</span>
-            <span class="car-off__p">600 €</span>
-          </li>
-          <li class="car-off__step">
-            <span class="car-off__t">3 años</span>
-            <span class="car-off__p">900 €</span>
-          </li>
-        </ul>
-        <p class="car-off__note">Es una garantía nacional: vale en toda España, no
-          sólo en Málaga. Si el coche te falla lejos de aquí, te lo atienden allí.</p>
-      </article>
-
-      <article class="car-off">
-        <h3 class="car-off__h">Mantenimiento</h3>
-        <p class="car-off__say">Aceite, filtros y lo que toque, a precio cerrado.
-          Este es opcional.</p>
-        <ul class="car-off__steps">
-          <li class="car-off__step">
-            <span class="car-off__t">1 año</span>
-            <span class="car-off__p">200 €</span>
-          </li>
-          <li class="car-off__step">
-            <span class="car-off__t">2 años</span>
-            <span class="car-off__p">400 €</span>
-          </li>
-        </ul>
-        <p class="car-off__note">Sale más a cuenta que ir suelto al taller cada vez,
-          y no tienes que acordarte de nada: te aviso yo cuando toca.</p>
-      </article>
-
-    </div>
-
-    {{-- On a wide screen the six facts move down here, out of the sidebar: the
-         client asked for the page to be more compact and this is where the room
-         is. Below 1000px the copy beside the price is the one that shows. --}}
-    <div class="car-specs-slot car-specs-slot--with">@include('partials.car-specs')</div>
-  </section>
 
   @if(count($tags))
     <section class="car-sec">

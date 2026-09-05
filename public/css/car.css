@@ -89,53 +89,6 @@
 .car-specs{ margin:0; display:grid; grid-template-columns:minmax(0,1fr); gap:var(--s-2); }
 .car-specs .mc-specs__row{ grid-template-columns:minmax(9ch,11ch) minmax(0,1fr); }
 
-/* ---- where the six facts live ------------------------------------------
-   One partial, rendered in two slots, displayed in exactly one of them at any
-   width — so only one is ever in the accessibility tree, and there is no second
-   copy of the values to drift.
-   1000px is not a new number: it is where .car-grid grows its sidebar. Below it
-   there is no sidebar to be uncompact, and the facts stay where they belong on a
-   phone, directly under the price. */
-.car-specs-slot--with{ display:none; }
-@media (min-width:1000px){
-  .car-specs-slot--side{ display:none; }
-  .car-specs-slot--with{ display:block; margin-top:var(--s-6); }
-  /* Full width under the panels, so it reads as a summary line rather than as a
-     third panel. auto-fit on the same 7.5rem floor the offer steps use, so the
-     row count follows the number of facts a car actually has — they range from
-     three to six across the inventory — instead of being fixed at six and
-     leaving holes. */
-  .car-specs-slot--with .car-specs{
-    grid-template-columns:repeat(auto-fit, minmax(12rem, 1fr));
-    gap:var(--s-3);
-  }
-  .car-specs-slot--with .mc-specs__row{
-    grid-template-columns:minmax(0,auto) minmax(0,1fr);
-    padding:var(--s-3) var(--s-4);
-    background:var(--mc-band); border-radius:var(--mc-r-card);
-  }
-}
-.car-act{ display:flex; gap:var(--s-3); }
-.car-act .mc-btn{ flex:1 1 auto; min-height:48px; }
-
-.car-text{ margin-top:var(--s-8); max-width:60ch; }
-.car-h2{ margin:0 0 var(--s-3); font-size:var(--t-h2); letter-spacing:-.016em; color:var(--mc-ink); }
-.car-text p{ margin:0; font-size:var(--t-prose); line-height:1.55; color:var(--mc-ink-2); }
-.car-feats{ margin:0; padding:0; list-style:none; columns:2; column-gap:var(--s-6);
-  font-size:var(--t-small); line-height:1.7; color:var(--mc-ink-2); }
-.car-feats li{ break-inside:avoid; padding-left:var(--s-4); position:relative; }
-.car-feats li::before{ content:"·"; position:absolute; left:var(--s-2); color:var(--mc-control); }
-@media (max-width:560px){ .car-feats{ columns:1; } }
-.car-more{ margin:var(--s-3) 0 0; font-size:var(--t-small); color:var(--mc-ink-3); }
-
-/* the dock is a phone thing here too */
-@media (min-width:769px){ .cat-dock{ display:none; } }
-@media (max-width:768px), (max-height:520px) and (orientation:landscape){
-  body:has(.cat-dock) main{
-    padding-bottom:calc(var(--mc-bar-h) + 1px + var(--s-5) + env(safe-area-inset-bottom, 0px));
-  }
-}
-
 /* ---- arrows on the stage -------------------------------------------------
    Only drawn once the script is running, because without it they would do
    nothing. Ink on white rather than white on the photograph: a car photographed
@@ -271,94 +224,75 @@
   border-radius:var(--mc-r-card); font-size:var(--t-small); color:var(--mc-ink-2);
 }
 
-/* ---- what goes with the car ---------------------------------------------
+/* ---- what goes with the car --------------------------------------------
    Two panels: the warranty, which is included and can be extended, and the
-   maintenance plan, which is not included at all. They are the same shape on
-   purpose — same panel, same ladder, same note — because the thing that differs
-   between them is the only thing worth reading: one starts at "Incluido" and the
-   other starts at a price.
+   maintenance plan, which is not included at all. Same shape on purpose — same
+   panel, same ladder, same note — because the thing that differs between them is
+   the only thing worth reading: one starts at "Incluido", the other at a price.
 
-   A price table is the fastest way to make a page look like a template, so the
-   figures are not put in a table. Each option is a cell on the band, the term
-   small above and the amount large below, and the row of cells reads as a scale
-   rather than as a list of products. The included step is the only one that
-   inverts to navy: it is the one you already have, and the eye should land on it
-   first and then walk right.
+   They live in the right-hand column under the price, which is where the client
+   asked for them. That changes the layout problem: the panel's width is now set
+   by a 21rem column, not by the viewport, so the viewport-width rules this block
+   used to carry were answering the wrong question. Below 1000px .car-grid is a
+   single column and the panel is as wide as the page; at 1440 it is 336px — the
+   same panel, with four times the width between the two cases.
+
+   So the ladder is lines, always: term left, amount right. A container query was
+   written to turn it back into a row of cells above 27.5rem of panel, and then
+   measured across nine viewports from 320 to 1800 — the panel is 336px in the
+   sidebar and never exceeds 410px anywhere, because two side by side is the
+   widest it ever gets. The query could not fire, so it is not here. A rule that
+   cannot be shown to do anything is a comment pretending to be code.
    ========================================================================= */
-.car-with__lead{
-  margin:0 0 var(--s-6); max-width:52ch;
-  font-size:var(--t-prose); line-height:1.55; color:var(--mc-ink-2);
+.car-with{ margin-top:var(--s-7); }
+.car-with__h{
+  margin:0 0 var(--s-4); font-size:var(--t-h3); font-weight:700;
+  letter-spacing:-.010em; color:var(--mc-ink);
 }
-.car-with__grid{ display:grid; gap:var(--s-5); grid-template-columns:minmax(0,1fr); }
-/* 1000, not 820. The warranty panel needs three cells at the 7.5rem floor plus
-   two gaps — 384px of content, 448px of panel — and at 820 it got 418 and
-   auto-fit broke the three steps into 2 + 1 while the other panel dropped to a
-   single column. A ladder that wraps is not a ladder. Measured: three across
-   from 1000px up, one column below. */
-@media (min-width:1000px){
-  /* Not 1fr 1fr. The warranty carries three steps and the maintenance plan two,
-     so equal columns would leave the second panel's cells half as wide again as
-     the first's, for no reason anyone could name. 3:2 brings them within a few
-     pixels of each other — 191 against 182 at 1440 — which is close enough that
-     the row reads as one scale rather than two. */
-  .car-with__grid{ grid-template-columns:3fr 2fr; gap:var(--s-6); }
+.car-with__grid{
+  display:grid; gap:var(--s-4);
+  /* 17rem: two panels side by side from about 568px of column, one below that.
+     In the 21rem sidebar this always resolves to one. */
+  grid-template-columns:repeat(auto-fit, minmax(17rem, 1fr));
 }
 
 .car-off{
-  min-width:0; padding:var(--s-6);
+  min-width:0; padding:var(--s-5);
   background:var(--mc-surface); border:1px solid var(--mc-hairline);
   border-radius:var(--mc-r-card); box-shadow:var(--mc-shadow-1);
 }
 .car-off__h{
-  margin:0 0 var(--s-3); font-size:var(--t-h3); font-weight:700;
+  margin:0 0 var(--s-2); font-size:var(--t-value); font-weight:700;
   letter-spacing:-.010em; color:var(--mc-ink);
 }
 .car-off__say{
-  margin:0 0 var(--s-5); max-width:34ch;
-  font-size:var(--t-value); line-height:1.5; color:var(--mc-ink);
+  margin:0 0 var(--s-4); max-width:40ch;
+  font-size:var(--t-small); line-height:1.55; color:var(--mc-ink);
 }
+/* A price table is the fastest way to make a page look like a template, so the
+   figures are not put in a table. In a narrow panel each option is a line — term
+   left, amount right; wide enough, the same lines become a row of cells and read
+   as a scale. The included step is the only one that inverts to navy: it is the
+   one you already have, and the eye should land on it first. */
 .car-off__steps{
-  margin:0 0 var(--s-5); padding:0; list-style:none;
-  display:grid; gap:var(--s-3);
-  /* auto-fit, so a panel with two steps and a panel with three need no separate
-     rule, and a fourth step later needs none either. The floor is the measure of
-     "Incluido" — the longest string that has to hold one line at --t-km — plus
-     its padding: below it the word wraps and the cell stops being one thing. */
-  grid-template-columns:repeat(auto-fit, minmax(7.5rem, 1fr));
+  margin:0 0 var(--s-4); padding:0; list-style:none;
+  display:grid; gap:var(--s-2); grid-template-columns:minmax(0,1fr);
 }
 .car-off__step{
-  padding:var(--s-4);
+  padding:var(--s-3) var(--s-4);
   background:var(--mc-band); border-radius:var(--mc-r-card);
-  display:flex; flex-direction:column; gap:var(--s-1);
+  display:flex; align-items:baseline; justify-content:space-between; gap:var(--s-4);
 }
-.car-off__step--inc{ background:var(--mc-navy); }
 .car-off__t{ font-size:var(--t-small); color:var(--mc-ink-2); }
+.car-off__step--inc{ background:var(--mc-navy); }
 .car-off__step--inc .car-off__t{ color:var(--mc-on-navy-2); }
 .car-off__p{
   font-size:var(--t-km); font-weight:700; letter-spacing:-.020em;
   line-height:1.1; color:var(--mc-ink); font-variant-numeric:tabular-nums;
 }
 .car-off__step--inc .car-off__p{ color:var(--mc-on-navy); }
-/* Below 560 the ladder stops fitting across, and rather than let auto-fit break
-   three steps into 2 + 1 — which reads as a mistake, not as a layout — the row
-   becomes a column and each step becomes a line: term left, amount right. A
-   ladder read downward is still a ladder.
-   560 and not 480: at 480 the panel leaves exactly 384px of content and three
-   cells at the 7.5rem floor plus two 12px gaps want exactly 384, so auto-fit
-   dropped to two columns on a tie. Measured, not reasoned — the arithmetic said
-   it fit and the browser disagreed. At 560 the cells land at 146px, which is
-   margin rather than a coin toss. */
-@media (max-width:559.98px){
-  .car-off__steps{ grid-template-columns:minmax(0,1fr); gap:var(--s-2); }
-  .car-off__step{
-    flex-direction:row; align-items:baseline; justify-content:space-between;
-    gap:var(--s-4); padding:var(--s-3) var(--s-4);
-  }
-}
-
 .car-off__note{
-  margin:0; max-width:46ch;
-  font-size:var(--t-small); line-height:1.55; color:var(--mc-ink-2);
+  margin:0; font-size:var(--t-label); line-height:1.55; color:var(--mc-ink-2);
 }
 
 /* ============================================================================
