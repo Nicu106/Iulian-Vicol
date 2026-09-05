@@ -195,20 +195,46 @@ const checks = {
     const out = [];
     for (const w of WIDTHS) {
       const pg = await open(w);
-      out.push({ width: w, small: await pg.evaluate(() =>
-        [...document.querySelectorAll('a,button,input,select,[role=button]')].map(e => {
+      const res = await pg.evaluate(() => {
+        const small = [], presented = [];
+        for (const e of document.querySelectorAll('a,button,input,select,[role=button]')) {
           const s = getComputedStyle(e);
           // the real target is the label that wraps a control, not the control's own box
           const lab = e.closest('label');
-          const r = (lab && lab.contains(e) ? lab : e).getBoundingClientRect();
+          const box = () => (lab && lab.contains(e) ? lab : e).getBoundingClientRect();
+          let r = box(), onFocus = false;
+          // A control parked off-screen until the keyboard finds it is not a pointer
+          // target while it is parked, and its parked box is meaningless: the reviews
+          // row's Pause control measures 16x6 clipped and 44px tall the moment it is
+          // shown. 2.5.8 asks about the box it presents when it is presented.
+          // Clipped to a pixel, or pushed far off-canvas — the two shapes the
+          // visually-hidden pattern actually takes.
+          // Not "below the fold": a card further down the page is not parked, and
+          // testing r.top > innerHeight dragged every off-screen link through a
+          // focus() that scrolled the page. Not "outside the viewport
+          // horizontally" either: that is every card sitting off-screen in a
+          // horizontal rail, which is a scroller, not a parked control.
+          if (r.width <= 1 || r.height <= 1 || r.right <= -999) {
+            try {
+              e.focus();
+              const f = box();
+              if (f.width && f.height && f.right > 0 && f.left < innerWidth) { r = f; onFocus = true; }
+              e.blur();
+            } catch (_) { /* not focusable; keep the parked box */ }
+          }
           // 2.5.8 exempts a target sitting in a sentence: inline, with other text beside it
           const holder = e.parentElement;
           const sentence = s.display.startsWith('inline') && holder &&
             holder.textContent.trim().length > e.textContent.trim().length + 8;
-          return r.height && !sentence && (r.height < 44 || r.width < 44)
-            ? { t: (e.textContent.trim() || e.type || e.tagName.toLowerCase()).slice(0, 28),
-                w: Math.round(r.width), h: Math.round(r.height) } : null;
-        }).filter(Boolean)) });
+          if (!r.height || sentence) continue;
+          const row = { t: (e.textContent.trim() || e.type || e.tagName.toLowerCase()).slice(0, 28),
+                        w: Math.round(r.width), h: Math.round(r.height) };
+          if (r.height < 44 || r.width < 44) { if (onFocus) row.onFocus = true; small.push(row); }
+          else if (onFocus) presented.push(row);
+        }
+        return { small, presented };
+      });
+      out.push({ width: w, small: res.small, shownOnFocus: res.presented });
       await pg.close();
     }
     return out;

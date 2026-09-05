@@ -28,6 +28,12 @@ each of which reported a defect that was not there until the check was corrected
   the spec rows behind it is the demonstration. Reported separately, never as a failure.
 - **The target is the label, not the control.** A 24px checkbox inside a 356x57 label
   is a 356x57 target.
+- **A control parked off-screen until the keyboard finds it has no target yet.** The
+  reviews row's Pause control (SC 2.2.2) is clipped to 16x6 at `left:-9999px` and
+  becomes a 44px button on `:focus`. Measured where it is parked it failed 2.5.8 on
+  every run of `/inicio`, which is how a check teaches people to ignore it. The check
+  now focuses such an element and measures the box it actually presents, and lists it
+  under `shownOnFocus` so the run shows the judgement was made rather than skipped.
 - **2.5.8 exempts a link in a sentence**, judged by whether the holder carries text
   beside the link, not by the tag it happens to sit in.
 - **Decorative text is out of 1.4.3's scope** when it is `aria-hidden` and its words
