@@ -128,6 +128,65 @@
   body:has(.cat-dock) .mc-foot{
     padding-bottom:calc(var(--mc-bar-h) + env(safe-area-inset-bottom, 0px));
   }
+  /* These stay here, not in the portrait block below, because this query also
+     catches a phone held sideways — 844x390, where the width is a desktop's and
+     the height is not. Moved out, a landscape phone got the desktop's 96px of
+     top padding on a 390px-tall screen. The portrait block overrides them. */
   .mc-foot__in{ padding-block:var(--s-8) var(--s-6); gap:var(--s-6); }
   .mc-foot__sign{ height:clamp(3.4rem, 15vw, 6rem); }
+}
+
+/* ---- the phone -----------------------------------------------------------
+   The four-column footer above reads well on a desktop. Stacked on a phone it
+   was that same footer with the columns underneath each other — 1,099px, one
+   and a third screens, none of it decided for this screen. Everything here is
+   phone-only; nothing above is touched.
+
+   It has to sit AFTER the base rules, not beside the other phone block near the
+   top of the file: put there, `.mc-foot__legal{display:grid}` lost to the
+   `display:flex` further down and only the properties the base rule did not
+   set survived. Source order is the whole of the specificity story here.
+
+   The name looks like a size problem and is not. Measured at this face and
+   tracking, "IV MOTORCLASS" needs 7.0128px of width per 1px of size — the CSS
+   above says 7.0126 — so the 358px between the gutters puts it at 51px and
+   there is nowhere else for it to go. Breaking it over two lines buys 51 -> 59,
+   16%, and costs a line with "IV" alone on it. What fails at 51px is contrast:
+   12% white on this navy carries at the desktop's 166px and disappears at a
+   third of it. So the tone comes up and the mask lets go later — the same
+   whisper, at a size where it can still be heard. It is aria-hidden ornament,
+   and its words are in the logo above, so 1.4.3 does not reach it. */
+@media (max-width:759.98px){
+  /* read at arm's length, not across a desk */
+  .mc-foot__in{ padding-block:var(--s-7) var(--s-5); gap:var(--s-5); }
+  .mc-foot__h{ margin-bottom:var(--s-2); }
+  .mc-foot__say{ margin-bottom:var(--s-4); max-width:34ch; }
+
+  /* Four short labels do not need four rows, and neither do a phone number and
+     a WhatsApp link. Two columns; the mail address and the town span both,
+     because "jvmotorclass@gmail.com" is 150 of the 171px a column has. */
+  .mc-foot__col ul{ display:grid; grid-template-columns:1fr 1fr; gap:0 var(--s-4); }
+  .mc-foot__col li:has(a[href^="mailto"]),
+  .mc-foot__col li:has(> span){ grid-column:1 / -1; }
+
+  .mc-foot__sign{ height:clamp(3.4rem, 15vw, 6rem); }
+  .mc-foot__mark{
+    /* background-image, NOT the `background` shorthand: the shorthand resets
+       background-clip to border-box, and the base rule's `background-clip: text`
+       is what makes these letters letters. Overridden with the shorthand, the
+       name rendered as a solid grey slab. */
+    background-image:linear-gradient(180deg, rgba(255,255,255,.22) 0%, rgba(255,255,255,.09) 100%);
+    -webkit-mask-image:linear-gradient(180deg, #000 0%, rgba(0,0,0,.86) 60%, rgba(0,0,0,.55) 100%);
+            mask-image:linear-gradient(180deg, #000 0%, rgba(0,0,0,.86) 60%, rgba(0,0,0,.55) 100%);
+  }
+
+  /* The legal line wrapped mid-list and left a separator hanging at the right
+     edge with nothing after it. The copyright takes its own row and the two
+     links sit side by side, so there is nothing left to separate. */
+  .mc-foot__legal{
+    display:grid; grid-template-columns:1fr 1fr; align-items:center;
+    gap:0 var(--s-4); padding-block:var(--s-2) var(--s-3);
+  }
+  .mc-foot__legal > span:first-child{ grid-column:1 / -1; }
+  .mc-foot__legal-sep{ display:none; }
 }
