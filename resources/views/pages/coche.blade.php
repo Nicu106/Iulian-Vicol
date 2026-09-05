@@ -95,11 +95,7 @@
         @endif
       </div>
 
-      <dl class="mc-specs car-specs">
-        @foreach($specs as $k => $v)
-          <div class="mc-specs__row"><dt>{{ $k }}</dt><dd>{{ $v }}</dd></div>
-        @endforeach
-      </dl>
+      <div class="car-specs-slot car-specs-slot--side">@include('partials.car-specs')</div>
 
       <div class="car-act">
         {{-- "Me interesa" on a car that is already gone is the page telling a
@@ -196,6 +192,11 @@
       </article>
 
     </div>
+
+    {{-- On a wide screen the six facts move down here, out of the sidebar: the
+         client asked for the page to be more compact and this is where the room
+         is. Below 1000px the copy beside the price is the one that shows. --}}
+    <div class="car-specs-slot car-specs-slot--with">@include('partials.car-specs')</div>
   </section>
 
   @if(count($tags))

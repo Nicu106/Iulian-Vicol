@@ -88,6 +88,33 @@
    how "Diesel" ended up set one letter per line. */
 .car-specs{ margin:0; display:grid; grid-template-columns:minmax(0,1fr); gap:var(--s-2); }
 .car-specs .mc-specs__row{ grid-template-columns:minmax(9ch,11ch) minmax(0,1fr); }
+
+/* ---- where the six facts live ------------------------------------------
+   One partial, rendered in two slots, displayed in exactly one of them at any
+   width — so only one is ever in the accessibility tree, and there is no second
+   copy of the values to drift.
+   1000px is not a new number: it is where .car-grid grows its sidebar. Below it
+   there is no sidebar to be uncompact, and the facts stay where they belong on a
+   phone, directly under the price. */
+.car-specs-slot--with{ display:none; }
+@media (min-width:1000px){
+  .car-specs-slot--side{ display:none; }
+  .car-specs-slot--with{ display:block; margin-top:var(--s-6); }
+  /* Full width under the panels, so it reads as a summary line rather than as a
+     third panel. auto-fit on the same 7.5rem floor the offer steps use, so the
+     row count follows the number of facts a car actually has — they range from
+     three to six across the inventory — instead of being fixed at six and
+     leaving holes. */
+  .car-specs-slot--with .car-specs{
+    grid-template-columns:repeat(auto-fit, minmax(12rem, 1fr));
+    gap:var(--s-3);
+  }
+  .car-specs-slot--with .mc-specs__row{
+    grid-template-columns:minmax(0,auto) minmax(0,1fr);
+    padding:var(--s-3) var(--s-4);
+    background:var(--mc-band); border-radius:var(--mc-r-card);
+  }
+}
 .car-act{ display:flex; gap:var(--s-3); }
 .car-act .mc-btn{ flex:1 1 auto; min-height:48px; }
 

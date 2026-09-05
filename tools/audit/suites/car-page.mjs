@@ -48,6 +48,24 @@ is(where.panels === 2 && where.steps.join(',') === '3,2',
    'two panels: three warranty steps and two maintenance steps', JSON.stringify(where.steps));
 is(where.included === 1, 'exactly one step is marked as included');
 
+// The six facts are one partial rendered in two slots. Exactly one may be
+// displayed at any width — two would put the same values in the accessibility
+// tree twice — and the switch is at 1000px, where .car-grid grows its sidebar.
+for (const [w, expect] of [[1440, 'with'], [1000, 'with'], [999, 'side'], [768, 'side'], [390, 'side']]) {
+  await pg.setViewport({ width: w, height: 1000 });
+  await new Promise(r => setTimeout(r, 300));
+  const sl = await pg.evaluate(() => {
+    const vis = s => { const e = document.querySelector(s); return e && getComputedStyle(e).display !== 'none'; };
+    const side = vis('.car-specs-slot--side'), wi = vis('.car-specs-slot--with');
+    return { side, wi, n: [side, wi].filter(Boolean).length,
+             rows: document.querySelectorAll('.car-specs-slot:not([style*="none"]) .mc-specs__row').length };
+  });
+  is(sl.n === 1, `exactly one copy of the facts is shown at ${w}px`, `side:${sl.side} with:${sl.wi}`);
+  is((expect === 'with') === sl.wi, `and it is the ${expect} one at ${w}px`);
+}
+await pg.setViewport({ width: 1440, height: 1000 });
+await new Promise(r => setTimeout(r, 300));
+
 // The calculator and the "request a viewing / an offer" block were deleted.
 const gone = await pg.evaluate(() => ({
   calc: !!document.querySelector('.car-calc, .car-ask, #calc-sum'),
