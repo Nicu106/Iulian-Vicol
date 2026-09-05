@@ -201,7 +201,10 @@
 <div class="car-view" id="view" hidden role="dialog" aria-modal="true" aria-label="Fotografía a pantalla completa">
   <button class="car-view__x" type="button" id="view-x" aria-label="Cerrar">&times;</button>
   <button class="car-view__nav car-view__nav--prev" type="button" id="view-prev" aria-label="Anterior"></button>
-  <img class="car-view__img" id="view-img" src="" alt="">
+  <figure class="car-view__fig">
+    <img class="car-view__img" id="view-img" src="" alt="">
+    @if($gone)<span class="car-view__sold" aria-hidden="true">Vendido</span>@endif
+  </figure>
   <button class="car-view__nav car-view__nav--next" type="button" id="view-next" aria-label="Siguiente"></button>
   <span class="car-view__count" id="view-count"></span>
 </div>

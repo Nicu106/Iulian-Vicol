@@ -74,10 +74,13 @@ node reviews-speed.mjs     # one sample of the speed profile, 24–110 px/s (scr
 node sold-state.mjs         # a car that is gone: every sold card in the catalogue
                            # opens its page, that page loads, the theme is on <body>
                            # so header and footer go grey too, the photographs keep a
-                           # trace of colour rather than going flat, no brand hue
-                           # (green, red, blue, warn) is painted anywhere, the fixed
-                           # "Vendido" label appears only where it clears the text,
-                           # and a car still for sale is untouched.
+                           # trace of colour rather than going flat — stage, thumbs
+                           # AND the enlarged view — no brand hue (green, red, blue,
+                           # warn) is painted anywhere, the square "Vendido" stamp is
+                           # present at seven widths from 320 to 1600 and always clear
+                           # of the phone dock, the enlarged photograph carries its own
+                           # mark in ITS corner rather than the overlay's, and a car
+                           # still for sale is untouched.
 node contact-page.mjs       # the contact page: the photograph is never upscaled, every
                            # section starts on the same spine, the opening line fits its
                            # column, no band of ground opens under the photograph at any

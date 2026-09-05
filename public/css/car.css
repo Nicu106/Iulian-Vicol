@@ -148,7 +148,6 @@
 }
 .car-view[hidden]{ display:none; }
 .car-view__img{
-  grid-column:2; justify-self:center;
   max-width:100%; max-height:calc(100vh - var(--s-8));
   max-height:calc(100svh - var(--s-8));
   object-fit:contain; display:block;
@@ -288,8 +287,13 @@
 
 /* Only the images. The token is shared with the catalogue card so that clicking
    a grey card into a differently-grey page is impossible; see mc-tokens.css. */
+/* The viewer's photograph is in this list too. It was not at first, and clicking
+   a grey thumbnail then opened a full-colour photograph — the same picture in two
+   states one tap apart. There is nothing to inspect the true colour of on a car
+   that is already gone. */
 .car--sold .car-stage__img,
-.car--sold .car-thumb img{ filter:var(--mc-sold-img); }
+.car--sold .car-thumb img,
+.car--sold .car-view__img{ filter:var(--mc-sold-img); }
 
 .car-gone{
   margin:calc(-1 * var(--s-4)) 0 var(--s-6); max-width:52ch;
@@ -298,32 +302,60 @@
 }
 
 /* ---- the fixed label ----------------------------------------------------
-   Down the right edge, vertical, so it costs no horizontal room in the reading
-   column. writing-mode rather than a rotate: the box is then really tall and
-   narrow, so it takes part in layout honestly instead of overlapping whatever
-   its unrotated footprint happened to cover.
+   A square stamp, bottom left, fixed, and there at every width — the client:
+   "o eticheta patrata in partea stanga care sa apara chiar daca scrolezi ...
+   ea tot timpul trebuie sa fie prezenta".
 
-   It appears from 1360px up, and that number is measured rather than chosen.
-   The container is 1200 and the tab is 38px, so the tab only clears the text
-   when (viewport - 1200) / 2 >= 38 — that is 1276px, plus a little air. Below
-   that it would sit on the words, and a label that covers the page to announce
-   the page is a worse answer than no label. The sentence under the title says
-   the same thing at every width and is the one a screen reader gets, which is
-   why this is aria-hidden. */
-.car-tab-sold{ display:none; }
-@media (min-width:1360px){
-  .car-tab-sold{
-    display:block; position:fixed; z-index:3;
-    right:0; top:50%; transform:translateY(-50%);
-    margin:0; padding:var(--s-5) var(--s-2);
-    writing-mode:vertical-rl;
-    background:var(--mc-navy); color:var(--mc-on-navy);
-    font-size:var(--t-label); font-weight:600; letter-spacing:.18em;
-    text-transform:uppercase;
-    border-radius:var(--mc-r) 0 0 var(--mc-r);
-    box-shadow:var(--mc-shadow-2);
+   The first version was a vertical tab down the RIGHT edge that only appeared
+   above 1360px, because that is where it stopped sitting on the words. "Tot
+   timpul prezenta" rules that out, so the position moved to the one place that
+   is free at every width: the bottom left corner, which is where floating page
+   chrome already lives on this site — the dock is fixed to the bottom edge and
+   nobody reads a corner as part of the text.
+
+   Square corners, via the card token, because a stamp with rounded corners is a
+   button and this is not pressable. z-index sits under the full-screen viewer
+   (80): inside it the photograph carries its own mark, and two of them on one
+   screen would be one too many.
+
+   aria-hidden: the sentence under the title already says this in the reading
+   order, and the mark in the viewer is aria-hidden for the same reason. */
+.car-tab-sold{
+  position:fixed; z-index:70;
+  left:var(--s-4); bottom:var(--s-4);
+  margin:0; width:72px; height:72px;
+  display:grid; place-items:center;
+  background:var(--mc-navy); color:var(--mc-on-navy);
+  border-radius:var(--mc-r-card);
+  font-size:var(--t-label); font-weight:700; letter-spacing:.02em;
+  /* A navy square on the navy footer would vanish as you reach the end of the
+     page, and the page ALWAYS ends on the footer. The hairline is what keeps it
+     a separate object down there. */
+  box-shadow:0 0 0 1px rgba(255,255,255,.16), var(--mc-shadow-2);
+}
+/* The dock owns the bottom 64px of a phone, plus whatever the notch takes. */
+@media (max-width:768px), (max-height:520px) and (orientation:landscape){
+  body:has(.cat-dock) .car-tab-sold{
+    width:60px; height:60px; font-size:var(--t-small);
+    bottom:calc(var(--mc-bar-h) + env(safe-area-inset-bottom, 0px) + var(--s-3));
   }
 }
-@media (prefers-reduced-motion:no-preference){
-  .car-tab-sold{ transition:none; }   /* it never moves; stated so nobody adds it */
+
+/* ---- and on the photograph itself --------------------------------------
+   "cand deschidem imaginea mai mare in coltul imaginii trebuie sa fie scris
+   Vendido". In the corner of the IMAGE, not of the screen: the viewer centres
+   the photograph and letterboxes around it, so a mark pinned to the overlay
+   would float in the black beside a portrait shot. The figure wraps the img and
+   shrink-wraps to it, so this corner is always the photograph's corner.
+   Top left: the close button is top right and the counter is bottom centre. */
+.car-view__fig{
+  grid-column:2; justify-self:center; position:relative;
+  margin:0; display:block; max-width:100%; line-height:0;
+}
+.car-view__sold{
+  position:absolute; left:0; top:0; z-index:1;
+  padding:var(--s-2) var(--s-4);
+  background:var(--mc-navy); color:var(--mc-on-navy);
+  font-size:var(--t-label); font-weight:700; letter-spacing:.02em; line-height:1.4;
+  box-shadow:0 0 0 1px rgba(255,255,255,.16);
 }

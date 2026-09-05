@@ -72,13 +72,17 @@ else {
       stage: getComputedStyle(i).filter,
       thumb: (() => { const t = document.querySelector('.car-thumb img');
                       return t ? getComputedStyle(t).filter : '(none)'; })(),
+      viewer: getComputedStyle(document.getElementById('view-img')).filter,
       stageLoaded: i.complete && i.naturalWidth > 0,
     };
   });
   is(page.onBody, 'the sold theme is on <body>, so the header and footer go grey too');
   is(page.gone, 'and the state is in the reading order for everyone, not only in the label');
-  is(page.stage === page.thumb && page.stage.startsWith('grayscale('),
-     'the photographs carry the filter, stage and thumbnails alike', `${page.stage} / ${page.thumb}`);
+  // The viewer was missing from this list at first: a grey thumbnail opened a
+  // full-colour photograph, the same picture in two states one tap apart.
+  is(page.stage === page.thumb && page.thumb === page.viewer && page.stage.startsWith('grayscale('),
+     'every photograph carries the filter — stage, thumbnails and the enlarged view',
+     `${page.stage} / ${page.thumb} / ${page.viewer}`);
   is(page.stageLoaded, 'and the main photograph actually decodes');
 
   // The green "-500 €" survived the first pass because --mc-ok and --mc-warn are
@@ -97,25 +101,52 @@ else {
   is(leaks.length === 0, 'no brand hue is painted anywhere on the page',
      leaks.length ? leaks.slice(0, 4).join(' | ') : 'checked green, red, blue and warn');
 
-  // The tab is fixed to the viewport edge, so the only thing that can go wrong
-  // is it sitting on the words.
-  for (const [w, shown] of [[1440, true], [1600, true], [1280, false], [390, false]]) {
-    await pg.setViewport({ width: w, height: 900 });
-    await new Promise(r => setTimeout(r, 250));
+  // "Ea tot timpul trebuie sa fie prezenta" — so there is no width at which it is
+  // allowed to be absent. The earlier version was a vertical tab down the right
+  // edge that vanished below 1360px, which is the requirement this replaces.
+  for (const w of [1600, 1440, 1280, 1024, 768, 390, 320]) {
+    await pg.setViewport({ width: w, height: 844 });
+    await new Promise(r => setTimeout(r, 300));
     const t = await pg.evaluate(() => {
       const tab = document.querySelector('.car-tab-sold');
-      const cs = getComputedStyle(tab);
-      if (cs.display === 'none') return { shown: false };
-      const r = tab.getBoundingClientRect();
-      const main = document.querySelector('main.car');
-      const m = main.getBoundingClientRect(), ms = getComputedStyle(main);
-      const contentRight = m.right - parseFloat(ms.paddingRight);
-      return { shown: true, gap: Math.round(r.left - contentRight), text: tab.textContent.trim() };
+      const cs = getComputedStyle(tab), r = tab.getBoundingClientRect();
+      const dock = document.querySelector('.cat-dock');
+      const dockTop = (dock && getComputedStyle(dock).display !== 'none')
+        ? dock.getBoundingClientRect().top : Infinity;
+      return { shown: cs.display !== 'none', w: Math.round(r.width), h: Math.round(r.height),
+               radius: cs.borderRadius, left: Math.round(r.left),
+               clearsDock: dockTop === Infinity ? true : r.bottom <= dockTop,
+               text: tab.textContent.trim() };
     });
-    is(t.shown === shown, `the label ${shown ? 'is shown' : 'is withheld'} at ${w}px`,
-       t.shown ? `"${t.text}", ${t.gap}px clear of the text` : 'display:none');
-    if (t.shown) is(t.gap > 0, `and at ${w}px it does not sit on the words`, `${t.gap}px`);
+    is(t.shown && t.text === 'Vendido', `the label is present at ${w}px`, `"${t.text}"`);
+    is(t.w === t.h, `and square at ${w}px`, `${t.w}x${t.h}`);
+    is(parseFloat(t.radius) === 0, `with square corners at ${w}px — a stamp, not a button`, t.radius);
+    is(t.left >= 0 && t.left < 40, `on the left at ${w}px`, `left:${t.left}`);
+    is(t.clearsDock, `and clear of the phone dock at ${w}px`);
   }
+  await pg.setViewport({ width: 1440, height: 900 });
+
+  // "In coltul imaginii" — of the image, not of the overlay. The viewer centres
+  // the photograph, so a mark pinned to the overlay would float in the black
+  // beside a portrait shot.
+  const mark = await pg.evaluate(async () => {
+    document.getElementById('stage').click();
+    await new Promise(r => setTimeout(r, 900));
+    const img = document.getElementById('view-img');
+    const m = document.querySelector('.car-view__sold');
+    if (!m) return { there: false };
+    const i = img.getBoundingClientRect(), r = m.getBoundingClientRect();
+    return { there: true, open: !document.getElementById('view').hidden,
+             dx: Math.round(r.left - i.left), dy: Math.round(r.top - i.top),
+             inside: r.right <= i.right + 1 && r.bottom <= i.bottom + 1,
+             text: m.textContent.trim(),
+             imgBox: Math.round(i.width) + 'x' + Math.round(i.height) };
+  });
+  is(mark.there && mark.open, 'the enlarged view opens and carries its own mark');
+  is(mark.dx === 0 && mark.dy === 0 && mark.inside,
+     'and the mark sits in the corner of the photograph, not of the screen',
+     `offset ${mark.dx},${mark.dy} inside ${mark.imgBox}`);
+  is(mark.text === 'Vendido', 'and it says so', `"${mark.text}"`);
   is(errs.length === 0, 'no script errors', errs.slice(0, 2).join(' | '));
   await pg.close();
 }
