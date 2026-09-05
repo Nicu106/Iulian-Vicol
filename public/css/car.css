@@ -242,3 +242,88 @@
 .car-calc__out span{ font-size:var(--t-small); color:var(--mc-ink-2); }
 .car-form .mc-btn{ align-self:flex-start; min-height:48px; }
 @media (min-width:820px){ .car-calc__f{ max-width:22rem; } }
+
+/* ============================================================================
+   SOLD — the page for a car that is gone
+   The client: "cele vandute ... nu se deschid ca anunt, dar vreau sa le putem
+   deschide ... si trebuie pentru pagina masinii sa abordezi o tema gri total
+   si doar imaginile sa aibe toate un filtru care sa aiba si culoare dar sa bata
+   si ele in gri si sa fie o eticheta fixa in pagina din partea stanga sau
+   dreapta in care sa scrie Vendido."
+   ========================================================================= */
+
+/* One override block, not thirty rules. Every accent in the system is pointed
+   at a step of the ink ladder, so the page loses its blue, its red and its
+   green without a single component knowing it happened — and without any of
+   them being reimplemented here, which is how the two would drift apart.
+   The ink ladder is this system's grey: blue-cast, never pure black, and every
+   step already proven against all four grounds, so nothing here can quietly
+   fail contrast. */
+/* On <body>, not on <main>. Scoped to the content the header's WhatsApp button
+   and the footer's "Reservar cita" stayed brand-green on an otherwise fully grey
+   page — one green rectangle in the top right of an archive, which is exactly
+   the kind of leftover the client notices. "Tema gri total" means the page, and
+   the header and footer are part of the page. Only the accents neutralise; the
+   navigation behaves identically. */
+.car--sold{
+  --mc-blue:        var(--mc-ink-2);
+  --mc-blue-dark:   var(--mc-ink);
+  --mc-blue-tint:   var(--mc-band);
+  --mc-price:       var(--mc-ink);
+  --mc-accent:      var(--mc-ink);
+  --mc-accent-dark: var(--mc-ink);
+  --mc-accent-tint: var(--mc-band);
+  --mc-wa:          var(--mc-ink-2);
+  --mc-wa-dark:     var(--mc-ink);
+  --mc-wa-tint:     var(--mc-band);
+  /* --mc-ok and --mc-warn are their own literals in mc-tokens.css, not aliases
+     of --mc-wa, so remapping the green above left the price page's "-500 €"
+     rendering green on a grey page. Anything that can carry a hue is listed
+     here; that is the whole point of doing it with tokens. */
+  --mc-ok:          var(--mc-ink-2);
+  --mc-ok-tint:     var(--mc-band);
+  --mc-warn:        var(--mc-ink-2);
+  --mc-warn-tint:   var(--mc-band);
+}
+
+/* Only the images. The token is shared with the catalogue card so that clicking
+   a grey card into a differently-grey page is impossible; see mc-tokens.css. */
+.car--sold .car-stage__img,
+.car--sold .car-thumb img{ filter:var(--mc-sold-img); }
+
+.car-gone{
+  margin:calc(-1 * var(--s-4)) 0 var(--s-6); max-width:52ch;
+  font-size:var(--t-prose); line-height:1.6; color:var(--mc-ink-2);
+  border-left:3px solid var(--mc-ink-3); padding-left:var(--s-4);
+}
+
+/* ---- the fixed label ----------------------------------------------------
+   Down the right edge, vertical, so it costs no horizontal room in the reading
+   column. writing-mode rather than a rotate: the box is then really tall and
+   narrow, so it takes part in layout honestly instead of overlapping whatever
+   its unrotated footprint happened to cover.
+
+   It appears from 1360px up, and that number is measured rather than chosen.
+   The container is 1200 and the tab is 38px, so the tab only clears the text
+   when (viewport - 1200) / 2 >= 38 — that is 1276px, plus a little air. Below
+   that it would sit on the words, and a label that covers the page to announce
+   the page is a worse answer than no label. The sentence under the title says
+   the same thing at every width and is the one a screen reader gets, which is
+   why this is aria-hidden. */
+.car-tab-sold{ display:none; }
+@media (min-width:1360px){
+  .car-tab-sold{
+    display:block; position:fixed; z-index:3;
+    right:0; top:50%; transform:translateY(-50%);
+    margin:0; padding:var(--s-5) var(--s-2);
+    writing-mode:vertical-rl;
+    background:var(--mc-navy); color:var(--mc-on-navy);
+    font-size:var(--t-label); font-weight:600; letter-spacing:.18em;
+    text-transform:uppercase;
+    border-radius:var(--mc-r) 0 0 var(--mc-r);
+    box-shadow:var(--mc-shadow-2);
+  }
+}
+@media (prefers-reduced-motion:no-preference){
+  .car-tab-sold{ transition:none; }   /* it never moves; stated so nobody adds it */
+}

@@ -14,7 +14,8 @@
 <link rel="stylesheet" href="{{ asset('css/foot.css') }}">
 <link rel="stylesheet" href="{{ asset('css/car.css') }}">
 </head>
-<body class="bb cat">
+@php $gone = ($car->status ?? '') === 'sold'; @endphp
+<body class="bb cat {{ $gone ? 'car--sold' : '' }}">
 
 @include('partials.head', ['current' => ''])
 
@@ -25,6 +26,13 @@
   <h1 class="car-h">
     {{ $car->brand }} {{ $car->model }} <span>{{ $car->year }}</span>
   </h1>
+
+  @if($gone)
+    {{-- The state, in the reading order, for everyone. The fixed tab below is
+         aria-hidden precisely so this is not announced twice. --}}
+    <p class="car-gone">Vendido. Esta ficha se queda como registro: las fotos son
+      las que se hicieron entonces, sin retocar.</p>
+  @endif
 
   <div class="car-grid">
 
@@ -94,7 +102,12 @@
       </dl>
 
       <div class="car-act">
-        <a class="mc-btn mc-btn--cta" href="https://wa.me/34614753187?text={{ urlencode('Hola, me interesa el '.$car->brand.' '.$car->model.' '.$car->year) }}">WhatsApp</a>
+        {{-- "Me interesa" on a car that is already gone is the page telling a
+             lie about itself. What is actually useful is the question the
+             visitor really has. --}}
+        <a class="mc-btn mc-btn--cta" href="https://wa.me/34614753187?text={{ urlencode($gone
+            ? 'Hola, he visto el '.$car->brand.' '.$car->model.' '.$car->year.' que ya vendiste. ¿Tienes algo parecido?'
+            : 'Hola, me interesa el '.$car->brand.' '.$car->model.' '.$car->year) }}">{{ $gone ? '¿Tienes algo parecido?' : 'WhatsApp' }}</a>
         <a class="mc-btn mc-btn--ghost" href="tel:+34614753187">Llamar</a>
       </div>
     </aside>
@@ -193,6 +206,8 @@
   <span class="car-view__count" id="view-count"></span>
 </div>
 
+@if($gone)<p class="car-tab-sold" aria-hidden="true">Vendido</p>@endif
+
 @include('partials.foot')
 
 <div class="cat-dock" role="complementary" aria-label="Contacto">
@@ -202,7 +217,11 @@
       @if($car->mileage)<span class="mc-bar__km">{{ number_format($car->mileage, 0, ',', '.') }} km</span>@endif
     </span>
     <span class="mc-bar__act">
-      <a class="mc-btn mc-btn--cta" href="https://wa.me/34614753187">WhatsApp</a>
+      {{-- The same question the side CTA asks, so the two do not disagree about
+           what this page is for. --}}
+      <a class="mc-btn mc-btn--cta" href="https://wa.me/34614753187{{ $gone
+         ? '?text='.urlencode('Hola, he visto el '.$car->brand.' '.$car->model.' '.$car->year.' que ya vendiste. ¿Tienes algo parecido?')
+         : '' }}">WhatsApp</a>
       <a class="mc-btn mc-btn--ghost" href="tel:+34614753187" aria-label="Llamar">Tel</a>
     </span>
   </div>

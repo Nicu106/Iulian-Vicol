@@ -378,7 +378,7 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
 .mc-card:hover .mc-card__arrow,.mc-card.is-hover .mc-card__arrow{ transform:translateX(4px); }
 
 .mc-card.is-focus{ outline:3px solid var(--mc-focus); outline-offset:var(--s-1); }
-.mc-card--sold .mc-frame img{ filter:grayscale(100%); opacity:.85; }
+.mc-card--sold .mc-frame img{ filter:var(--mc-sold-img); opacity:.9; }
 .mc-card--sold .mc-card__title,.mc-card--sold .mc-km{ color:var(--mc-ink-2); }
 .mc-card--sold .mc-price{ color:var(--mc-ink-2); }
 .mc-card--sold .mc-chip{ background:var(--mc-band); color:var(--mc-ink-3); }

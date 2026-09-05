@@ -71,6 +71,13 @@ node reviews-photos.mjs    # asserts: 0 cut and 0 quotes needing the scroll fall
 node reviews-widths.mjs    # every card renders at exactly its computed width (the Safari flex-shrink guard)
 node reviews-seam.mjs      # the loop seam is exactly one row: 0px error, every pair one stride apart
 node reviews-speed.mjs     # one sample of the speed profile, 24–110 px/s (scrollLeft rounds — this once caught 1px/frame)
+node sold-state.mjs         # a car that is gone: every sold card in the catalogue
+                           # opens its page, that page loads, the theme is on <body>
+                           # so header and footer go grey too, the photographs keep a
+                           # trace of colour rather than going flat, no brand hue
+                           # (green, red, blue, warn) is painted anywhere, the fixed
+                           # "Vendido" label appears only where it clears the text,
+                           # and a car still for sale is untouched.
 node contact-page.mjs       # the contact page: the photograph is never upscaled, every
                            # section starts on the same spine, the opening line fits its
                            # column, no band of ground opens under the photograph at any

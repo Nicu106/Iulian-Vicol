@@ -185,6 +185,23 @@
   --pos-portrait: 50% 40%;  /* LEGACY — only meaningful where something is cropped; product testimonial photos are not */
   --pos-vehicle:  50% 42%;   /* protects the roofline */
 
+  /* ---- SOLD --------------------------------------------------
+     A car that is gone is still worth showing: 31 of the 32 sold cars carry
+     five or more of the dealer's own photographs, and they are the evidence
+     that he sells what he says he sells. The state has to read at a glance
+     without destroying them.
+     grayscale(100%) is what the catalogue card used, and it turns a car into an
+     archive scan — no red is red, no marque colour survives.
+     Chosen by rendering .60 / .72 / .82 / .90 on the same photograph of a red
+     Clio and looking. At .60 and .72 it is still a red car, which is not what
+     was asked for; at .90 the colour is gone. At .82 it reads as grey with a
+     red cast — "sa aiba si culoare dar sa bata si ele in gri" — and the
+     contrast nudge puts back what desaturation flattens.
+     One token, because the card and the car page must agree: clicking a grey
+     card into a differently-grey page is exactly the kind of seam that reads
+     as unfinished. */
+  --mc-sold-img: grayscale(.82) contrast(1.05);
+
   /* ---- MOTION -------------------------------------------- */
   --m-instant:  80ms;   /* press down */
   --m-quick:   160ms;   /* colour, border, opacity */

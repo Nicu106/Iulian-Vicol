@@ -3,7 +3,9 @@
 @php
   $g = fn($k) => is_array($car) ? ($car[$k] ?? null) : ($car->$k ?? null);
   $img = $kind === 'demo' ? asset('storage/'.$g('img')) : $car->thumbUrl(800);
-  $href = $kind === 'available' ? '/coche/'.$g('slug') : null;
+  // 'demo' is an invented example and has no page. Everything real does, sold
+  // included: the photographs are the record of what he has actually delivered.
+  $href = in_array($kind, ['available', 'sold'], true) ? '/coche/'.$g('slug') : null;
   $alt = $kind === 'demo' ? 'Ejemplo de ficha — Porsche '.$g('model') : trim($g('brand').' '.$g('model').' '.$g('year'));
 @endphp
 <article class="mc-card {{ $kind === 'sold' ? 'mc-card--sold' : '' }} {{ $kind === 'demo' ? 'mc-card--demo' : '' }}">
