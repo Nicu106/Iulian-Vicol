@@ -232,6 +232,11 @@
            replaces the square stamp entirely — see car.css — so it is the only
            place the word appears down here, and it is not aria-hidden. --}}
       <span class="cat-dock__sold">Vendido</span>
+      {{-- .mc-btn--cta IS the WhatsApp button: it carries the mark in a ::before as
+           well as the green. A link to the catalogue wearing it says "this opens
+           WhatsApp", which it does not. The base .mc-btn is the same solid button
+           without the mark. --}}
+      <a class="mc-btn cat-dock__back" href="/catalogo">Catálogo</a>
     @else
     <span class="mc-bar__pair">
       <span class="mc-bar__price">{{ $euros($car->price) }}</span>

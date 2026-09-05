@@ -124,18 +124,37 @@ else {
       const tab = document.querySelector('.car-tab-sold');
       const dock = document.querySelector('.cat-dock');
       const sold = document.querySelector('.cat-dock__sold');
+      const back = document.querySelector('.cat-dock__back');
+      const sc = sold ? getComputedStyle(sold) : null;
+      // the word was set in white on a bar that paints --mc-surface white: the
+      // colour was put on .cat-dock and .mc-bar paints over it
+      const groundOf = el => { for (let n = el; n; n = n.parentElement) {
+        const c = getComputedStyle(n).backgroundColor;
+        if (c && c !== 'rgba(0, 0, 0, 0)') return c; } return null; };
       return { stamp: getComputedStyle(tab).display,
                dock: dock ? getComputedStyle(dock).display : '(absent)',
                says: sold ? sold.textContent.trim() : null,
+               fg: sc ? sc.color : null, bg: sold ? groundOf(sold) : null,
+               size: sc ? parseFloat(sc.fontSize) : 0,
                price: !!document.querySelector('.cat-dock .mc-bar__price'),
-               buttons: document.querySelectorAll('.cat-dock .mc-btn').length };
+               wa: document.querySelectorAll('.cat-dock a[href*="wa.me"], .cat-dock a[href^="tel"]').length,
+               back: back ? { text: back.textContent.trim(), href: back.getAttribute('href'),
+                              cta: back.classList.contains('mc-btn--cta') } : null };
     });
     is(d.stamp === 'none', `the stamp gives way to the dock at ${w}px`, d.stamp);
     is(d.dock === 'block' && d.says === 'Vendido',
        `and the dock says it instead at ${w}px`, `"${d.says}"`);
-    is(!d.price && d.buttons === 0,
-       `with no price and no buttons — nothing here is for sale at ${w}px`,
-       `price:${d.price} buttons:${d.buttons}`);
+    is(d.fg !== d.bg, `and the word is not the colour of the bar it sits on at ${w}px`,
+       `${d.fg} on ${d.bg}`);
+    is(d.size >= 20, `and it is set larger than a label at ${w}px`, `${d.size}px`);
+    is(!d.price && d.wa === 0,
+       `with no price and no contact buttons — nothing here is for sale at ${w}px`,
+       `price:${d.price} contact:${d.wa}`);
+    // .mc-btn--cta paints the WhatsApp mark in a ::before. A link to the catalogue
+    // wearing it says "this opens WhatsApp", which it does not.
+    is(d.back && d.back.href === '/catalogo' && !d.back.cta,
+       `and a way back to the catalogue, without the WhatsApp mark, at ${w}px`,
+       d.back ? `"${d.back.text}" → ${d.back.href}, --cta:${d.back.cta}` : '(missing)');
   }
   await pg.setViewport({ width: 1440, height: 900 });
 

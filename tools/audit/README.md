@@ -28,6 +28,21 @@ each of which reported a defect that was not there until the check was corrected
   the spec rows behind it is the demonstration. Reported separately, never as a failure.
 - **The target is the label, not the control.** A 24px checkbox inside a 356x57 label
   is a 356x57 target.
+- **The contrast check ran at one width.** It opened `WIDTHS.at(-1)` and nothing
+  else, so everything that only exists on a phone — the contact dock, the phone-only
+  footer grid, the phone reviews sequence — had never been contrast-checked at all.
+  It reported a car page 0/78 clean while its fixed bottom bar rendered white text on
+  white, because at 1400 that bar is `display: none`. Now every width, merged.
+- **Sample the centre of what is ON SCREEN and UNCLIPPED, not the clamped centre of
+  the box.** Clamping to `innerHeight - 1` moves the probe off the element whenever
+  its middle sits below the fold, and it then reads whatever is painted there: 87
+  /catalogo card titles were reported at 1.06 against a marque colour field they
+  never touch. Intersect the rect with the viewport AND with every clipping ancestor.
+- **A hairline at the fold is not a reading.** The scroll loop keys rows by sampled
+  background, so a wrong sample taken while an element was 1px tall at the viewport
+  edge survives next to the correct one taken a step later, and is counted. Skip
+  anything with under 4px of visible width or height; it will be sampled properly at
+  another scroll position.
 - **An absolutely positioned grid child with a definite `grid-column` is laid out
   against its GRID AREA, not the container's padding box.** The full-screen viewer's
   arrows carry `grid-column: 1` and `3` from the desktop rule; on the phone's

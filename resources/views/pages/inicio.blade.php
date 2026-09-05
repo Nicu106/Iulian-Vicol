@@ -267,7 +267,9 @@
     <div class="cat-wrap hm-cta__in">
       <h2 class="hm-cta__h">Encuentra tu coche perfecto hoy</h2>
       <p class="hm-cta__p">Stock actualizado, verificaciones completas y ofertas flexibles de financiación.</p>
-      <a class="mc-btn mc-btn--cta" href="/catalogo">Entrar al catálogo</a>
+      {{-- base .mc-btn, not --cta: that modifier paints the WhatsApp mark, and this
+           goes to the catalogue. --}}
+      <a class="mc-btn" href="/catalogo">Entrar al catálogo</a>
     </div>
   </section>
 </main>

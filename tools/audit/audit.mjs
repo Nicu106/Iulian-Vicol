@@ -69,8 +69,33 @@ const PAINTED = `(el => {
   const own = getComputedStyle(el).backgroundColor;
   if (own && !/rgba\\(0, 0, 0, 0\\)|transparent/.test(own)) return own;   // it paints its own
   const r = el.getBoundingClientRect();
-  const x = Math.min(innerWidth - 1, Math.max(0, r.left + r.width / 2));
-  const y = Math.min(innerHeight - 1, Math.max(0, r.top + r.height / 2));
+  // Sample the centre of the part that is ON SCREEN, not the clamped centre of the
+  // whole box. Clamping to innerHeight - 1 moves the probe OFF the element whenever
+  // its middle sits below the fold, and then it reads whatever is painted there: on
+  // /catalogo at 768 that was the marque's colour field behind the cards, and 87 card
+  // titles were reported at 1.06 against a navy they never touch. If there is no
+  // intersection at all there is nothing to sample — the scroll loop will reach this
+  // element at a position where there is.
+  let x0 = Math.max(0, r.left),  x1 = Math.min(innerWidth,  r.right);
+  let y0 = Math.max(0, r.top),   y1 = Math.min(innerHeight, r.bottom);
+  // ...and with every ancestor that clips. A card inside a rail with
+  // overflow:hidden can have a rect that intersects the viewport while the part
+  // the probe would hit is scrolled out of its own container — and then the probe
+  // reads the marque's colour field behind the rail instead of the card's white.
+  for (let n = el.parentElement; n; n = n.parentElement) {
+    const cs = getComputedStyle(n);
+    if (cs.overflow === 'visible' && cs.overflowX === 'visible' && cs.overflowY === 'visible') continue;
+    const b = n.getBoundingClientRect();
+    x0 = Math.max(x0, b.left);  x1 = Math.min(x1, b.right);
+    y0 = Math.max(y0, b.top);   y1 = Math.min(y1, b.bottom);
+  }
+  // A 1px sliver at the fold is not a reading. The scroll loop stores one row per
+  // element PER SAMPLED BACKGROUND, so a bad sample taken while the element was a
+  // hairline at the viewport edge survives next to the good one taken a step later
+  // and is counted as a failure. Two /catalogo rows were reported white-on-white
+  // this way; sampled properly they sit on the marque's navy fill.
+  if (x1 - x0 < 4 || y1 - y0 < 4) return 'OFFSCREEN';
+  const x = (x0 + x1) / 2, y = (y0 + y1) / 2;
   const stack = document.elementsFromPoint(x, y);
   // If something else is painted on top at the text's own centre, the text is occluded,
   // not low-contrast. A phone specimen's sticky bar covering the spec rows behind it is
@@ -121,8 +146,20 @@ const PAINTED = `(el => {
 })`;
 
 const checks = {
+  // Every width, not just the widest. It ran at WIDTHS.at(-1) alone, so anything
+  // that only exists on a phone — the contact dock, the phone-only footer grid,
+  // the phone reviews sequence — was never contrast-checked at all. It reported
+  // 0/78 clean on a car page whose fixed bottom bar was rendering white text on
+  // white, because at 1400 that bar is display:none.
   async contrast() {
-    const pg = await open(WIDTHS.at(-1));
+    const all = [];
+    for (const width of WIDTHS) all.push({ width, ...(await this._contrastAt(width)) });
+    const failing = all.reduce((n, r) => n + r.failing, 0);
+    return { failing, checked: all.reduce((n, r) => n + r.checked, 0), byWidth: all };
+  },
+
+  async _contrastAt(w) {
+    const pg = await open(w);
     // elementsFromPoint only reads what is on screen, so walk the page a screen at a
     // time and merge. Without this the check silently covers the first viewport only.
     const height = await pg.evaluate(() => innerHeight);
@@ -154,6 +191,7 @@ const checks = {
     const bad = [], occluded = [];
     for (const r of seen.values()) {
       if (r.bg === 'OCCLUDED') { occluded.push({ sel: r.sel, text: r.text }); continue; }
+      if (r.bg === 'OFFSCREEN') continue;   // not sampleable here; seen at another scroll step
       const f = parse(r.fg), b = parse(r.bg);
       const mix = f.rgb.map((v, i) => Math.round(f.a * v + (1 - f.a) * b.rgb[i]));
       const ratio = cr(mix, b.rgb);
