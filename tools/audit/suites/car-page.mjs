@@ -60,6 +60,37 @@ const gone = await pg.evaluate(() => ({
 is(!gone.calc && !gone.form, 'the calculator and the request form are gone',
    `calc:${gone.calc} form:${gone.form}`);
 
+// The sidebar spans every row of the left column instead of sitting in row 1. A
+// grid item sizes its row, so with it in row 1 the gallery's row was as tall as
+// the panels beside it and the description began below all of that — ~790px of
+// empty page under the thumbnails. The invariant is that nothing in the left
+// column is separated from the block above it by more than the grid's own gap.
+for (const w of [1440, 1200, 1000]) {
+  await pg.setViewport({ width: w, height: 1000 });
+  await new Promise(r => setTimeout(r, 350));
+  const g = await pg.evaluate(() => {
+    const grid = document.querySelector('.car-grid');
+    const gap = parseFloat(getComputedStyle(grid).rowGap) || 0;
+    const left = [...grid.children].filter(c => !c.classList.contains('car-side'))
+      .map(c => c.getBoundingClientRect());
+    let worst = 0, at = '';
+    for (let i = 1; i < left.length; i++) {
+      const d = Math.round(left[i].top - left[i - 1].bottom);
+      if (d > worst) { worst = d; at = i; }
+    }
+    const side = document.querySelector('.car-side').getBoundingClientRect();
+    const leftH = left.length ? Math.round(left[left.length - 1].bottom - left[0].top) : 0;
+    return { blocks: left.length, gap: Math.round(gap), worst, at,
+             leftH, rightH: Math.round(side.height) };
+  });
+  is(g.worst <= g.gap + 2,
+     `no hole opens in the left column at ${w}px`,
+     `worst gap ${g.worst}px against a ${g.gap}px row gap, ${g.blocks} blocks`);
+  is(Math.abs(g.leftH - g.rightH) < Math.max(g.leftH, g.rightH),
+     `and the two columns are the same order of length at ${w}px`,
+     `left ${g.leftH}, right ${g.rightH}`);
+}
+
 // The panel is 336px in the sidebar and never wider than 410 anywhere, so the
 // ladder is lines, not cells. What must never happen is a half-broken grid — two
 // on one row and one orphaned under them.

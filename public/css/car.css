@@ -13,6 +13,27 @@
 .car-grid{ display:grid; gap:var(--s-7); grid-template-columns:minmax(0,1fr); }
 @media (min-width:1000px){
   .car-grid{ grid-template-columns:minmax(0,1fr) 21rem; align-items:start; }
+  /* The long-form sections live inside the grid and drop into column 1 under the
+     gallery, so the left side has something to run beside the offer panels. With
+     them below the grid the left column ended at the thumbnails and the right
+     carried on for another ~950px of empty page.
+     .car-side stays in row 1 of column 2 and is not stretched, so if the left
+     side ends up the taller of the two the space falls under the panels, where a
+     sidebar ending is what anyone expects. */
+  .car-grid > :not(.car-side){ grid-column:1; }
+  /* Spanning every row of the left column, not sitting in row 1.
+     A grid item sizes its row, so with the sidebar in row 1 the gallery's row was
+     1,278px tall to fit the panels beside it, and the description started below
+     all of that: ~790px of empty page under the thumbnails, which is the hole the
+     client photographed. Spanning means its height is only distributed across
+     rows that are already taller, so it stops forcing anything.
+     The count comes from the template, because it varies: some cars have no
+     description, some have no equipment list. --main-rows is 1, 2 or 3. */
+  .car-side{ grid-column:2; grid-row:1 / span var(--main-rows, 1); align-self:start; }
+  /* The grid's own row gap separates them now; the section margin would add a
+     second, larger gap on top of it. */
+  .car-grid{ row-gap:var(--s-8); }
+  .car-grid > .car-sec{ margin-top:0; }
 }
 
 /* ---- the stage ----------------------------------------------------------

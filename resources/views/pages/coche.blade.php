@@ -34,7 +34,15 @@
       las que se hicieron entonces, sin retocar.</p>
   @endif
 
-  <div class="car-grid">
+  @php
+    // How many blocks end up in the left column. The sidebar spans exactly that
+    // many rows, so it stops dictating the height of row 1 — which is what left a
+    // ~790px hole under the thumbnails while the panels ran on beside it.
+    $mainRows = 1
+      + ($car->description ? 1 : 0)
+      + ((is_array($car->features) && count($car->features)) ? 1 : 0);
+  @endphp
+  <div class="car-grid" style="--main-rows:{{ $mainRows }}">
 
     {{-- ---------------- the photographs ---------------- --}}
     <section class="car-gallery" aria-label="Fotografías">
@@ -161,26 +169,35 @@
       </div>
       </section>
     </aside>
-  </div>
 
+    {{-- Inside the grid, and after the column in the DOM. On a phone the grid is
+         one track, so the order read is gallery → price → facts → buttons → what
+         comes with it → this, which is the order that matters there. On a desktop
+         the rule in car.css puts everything that is not .car-side into column 1,
+         so these fall UNDER the gallery and fill the left side against the panels.
+         Before this they sat below the grid, and the left column ended at the
+         thumbnails while the right ran on for another 950px — the hole the client
+         photographed. --}}
   @if($car->description)
-    <section class="car-sec car-text">
-      <h2 class="car-h2">Lo que hay que saber</h2>
-      <p>{{ \Illuminate\Support\Str::of($car->description)->stripTags()->limit(700) }}</p>
-    </section>
-  @endif
+      <section class="car-sec car-text">
+        <h2 class="car-h2">Lo que hay que saber</h2>
+        <p>{{ \Illuminate\Support\Str::of($car->description)->stripTags()->limit(700) }}</p>
+      </section>
+    @endif
 
-  @if(is_array($car->features) && count($car->features))
-    <section class="car-sec">
-      <h2 class="car-h2">Equipamiento</h2>
-      <ul class="car-feats">
-        @foreach(array_slice($car->features, 0, 24) as $f)<li>{{ $f }}</li>@endforeach
-      </ul>
-      @if(count($car->features) > 24)
-        <p class="car-more">y {{ count($car->features) - 24 }} más — pregúntame por cualquiera.</p>
-      @endif
-    </section>
-  @endif
+    @if(is_array($car->features) && count($car->features))
+      <section class="car-sec">
+        <h2 class="car-h2">Equipamiento</h2>
+        <ul class="car-feats">
+          @foreach(array_slice($car->features, 0, 24) as $f)<li>{{ $f }}</li>@endforeach
+        </ul>
+        @if(count($car->features) > 24)
+          <p class="car-more">y {{ count($car->features) - 24 }} más — pregúntame por cualquiera.</p>
+        @endif
+      </section>
+    @endif
+
+  </div>
 
   @if(count($tech))
     <section class="car-sec">
