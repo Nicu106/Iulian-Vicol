@@ -51,3 +51,24 @@ Things learned the hard way, all encoded above:
   so an inline link in a paragraph is not a defect.
 - Anything gated on the viewport needs the page scrolled before it is measured, or you
   measure the un-started state and call it a bug.
+
+## Regression suites — `tools/audit/suites/`
+
+Each suite was written while fixing a real defect and fails without that fix. Run the
+one for the component you touched; quote its output in the commit message.
+
+```bash
+cd tools/audit/suites
+node reviews-desktop.mjs   # 12 behaviours: direction, photo at centre, buttons, click-to-centre, geometry, reduced-motion, no-JS, phone sizing
+node reviews-phone.mjs     # 13 steps at 390px: auto turn/advance, next/prev alternation, swipes as steps
+node reviews-photos.mjs    # 0 photographs cut, 0 matted, 0 text overflowing at 1440/768/390
+node reviews-widths.mjs    # every card renders at exactly its computed width (the Safari flex-shrink guard)
+node reviews-seam.mjs      # the loop seam is exactly one row: 0px error, every pair one stride apart
+node reviews-speed.mjs     # px/s delivered vs the constant (scrollLeft rounds — this caught 1px/frame)
+node contact-landing.mjs   # the strips land on both contact panels at 0px on all four edges
+node contact-frames.mjs    # share of the contact scroll with no photograph on screen (was 56%, must be ~0)
+```
+
+Screenshots go to `tools/audit/out/` (or the dir you pass as the first argument).
+Puppeteer resolves from this repo's `node_modules`; Chrome from `~/.cache/puppeteer/chrome`.
+The host is mapped to 127.0.0.1 inside each script — never point one at production.
