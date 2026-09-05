@@ -28,6 +28,14 @@ each of which reported a defect that was not there until the check was corrected
   the spec rows behind it is the demonstration. Reported separately, never as a failure.
 - **The target is the label, not the control.** A 24px checkbox inside a 356x57 label
   is a 356x57 target.
+- **An absolutely positioned grid child with a definite `grid-column` is laid out
+  against its GRID AREA, not the container's padding box.** The full-screen viewer's
+  arrows carry `grid-column: 1` and `3` from the desktop rule; on the phone's
+  one-column template column 3 is an implicit line, so `right: 22%` resolved against
+  a zero-width strip and the button sat 3px from the screen edge while its partner
+  sat at 95px. The counter beside them was always centred — it is the one absolutely
+  positioned child with no `grid-column` on it, which is what pinned the cause.
+  `grid-column: auto` restores the padding box as the containing block.
 - **A control parked off-screen until the keyboard finds it has no target yet.** The
   reviews row's Pause control (SC 2.2.2) is clipped to 16x6 at `left:-9999px` and
   becomes a 44px button on `:focus`. Measured where it is parked it failed 2.5.8 on
@@ -71,6 +79,12 @@ node reviews-photos.mjs    # asserts: 0 cut and 0 quotes needing the scroll fall
 node reviews-widths.mjs    # every card renders at exactly its computed width (the Safari flex-shrink guard)
 node reviews-seam.mjs      # the loop seam is exactly one row: 0px error, every pair one stride apart
 node reviews-speed.mjs     # one sample of the speed profile, 24–110 px/s (scrollLeft rounds — this once caught 1px/frame)
+node car-page.mjs           # the car page: the two offer panels sit under the
+                           # specifications, three warranty steps and two maintenance
+                           # steps, the ladder is one row from 560px up and one step
+                           # per line below it (never a broken 2 + 1), the calculator
+                           # and the request form are gone, and the full-screen
+                           # viewer's arrows are symmetric at five viewports.
 node sold-state.mjs         # a car that is gone: every sold card in the catalogue
                            # opens its page, that page loads, the theme is on <body>
                            # so header and footer go grey too, the photographs keep a

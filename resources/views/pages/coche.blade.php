@@ -143,6 +143,61 @@
     </section>
   @endif
 
+  {{-- ---- what goes with the car, whichever car it is ------------------
+       Not a per-car field: this is what he offers on everything he sells, so it
+       is written here rather than typed into 32 records that would drift apart.
+       Unconditional, and phrased about what he does rather than about this
+       particular car, so it is still true on the page of one already gone.
+       ------------------------------------------------------------------- --}}
+  <section class="car-sec car-with" aria-labelledby="with-h">
+    <h2 class="car-h2" id="with-h">Lo que va con el coche</h2>
+    <p class="car-with__lead">Lo mismo en todos: uno va incluido, el resto lo eliges tú.</p>
+
+    <div class="car-with__grid">
+
+      <article class="car-off">
+        <h3 class="car-off__h">Garantía</h3>
+        <p class="car-off__say">Un año va incluido con cada coche que vendo.
+          Si quieres más tiempo, se amplía.</p>
+        <ul class="car-off__steps">
+          <li class="car-off__step car-off__step--inc">
+            <span class="car-off__t">1 año</span>
+            <span class="car-off__p">Incluido</span>
+          </li>
+          <li class="car-off__step">
+            <span class="car-off__t">2 años</span>
+            <span class="car-off__p">600 €</span>
+          </li>
+          <li class="car-off__step">
+            <span class="car-off__t">3 años</span>
+            <span class="car-off__p">900 €</span>
+          </li>
+        </ul>
+        <p class="car-off__note">Es una garantía nacional: vale en toda España, no
+          sólo en Málaga. Si el coche te falla lejos de aquí, te lo atienden allí.</p>
+      </article>
+
+      <article class="car-off">
+        <h3 class="car-off__h">Mantenimiento</h3>
+        <p class="car-off__say">Aceite, filtros y lo que toque, a precio cerrado.
+          Este es opcional.</p>
+        <ul class="car-off__steps">
+          <li class="car-off__step">
+            <span class="car-off__t">1 año</span>
+            <span class="car-off__p">200 €</span>
+          </li>
+          <li class="car-off__step">
+            <span class="car-off__t">2 años</span>
+            <span class="car-off__p">400 €</span>
+          </li>
+        </ul>
+        <p class="car-off__note">Sale más a cuenta que ir suelto al taller cada vez,
+          y no tienes que acordarte de nada: te aviso yo cuando toca.</p>
+      </article>
+
+    </div>
+  </section>
+
   @if(count($tags))
     <section class="car-sec">
       <h2 class="car-h2">Etiquetas</h2>
@@ -152,49 +207,6 @@
     </section>
   @endif
 
-  {{-- Two things a buyer does before writing: works out the monthly figure, and asks
-       to see it. Both here, both plain. The live site puts a "market average" beside
-       the price, generated with random_int(1200,1800) — a different number on every
-       load. It is not here, and the real reduction is, because that one is true. --}}
-  <section class="car-sec car-ask">
-    <div class="car-ask__col">
-      <h2 class="car-h2">Calculadora</h2>
-      <p class="car-ask__note">Orientativa. <b>No incluye intereses ni comisiones</b> —
-        el número real depende de la financiera, y te lo digo antes de firmar nada.</p>
-      <div class="car-calc">
-        <label class="car-calc__f">
-          <span>Entrada</span>
-          <input class="mc-input" type="number" id="calc-down" value="5000" min="0"
-                 max="{{ $price['now'] }}" step="500" inputmode="numeric">
-        </label>
-        <label class="car-calc__f">
-          <span>Meses</span>
-          <select class="mc-input" id="calc-months">
-            <option>24</option><option selected>48</option><option>60</option><option>72</option>
-          </select>
-        </label>
-        <p class="car-calc__out">
-          <b id="calc-sum">—</b> <span>al mes, sin intereses</span>
-        </p>
-      </div>
-    </div>
-
-    <div class="car-ask__col">
-      <h2 class="car-h2">¿Lo quieres ver?</h2>
-      <p class="car-ask__note">Escríbeme y quedamos. Contesto yo, no un formulario.</p>
-      <form class="car-form" id="car-form">
-        <label class="car-calc__f">
-          <span>Tu nombre</span>
-          <input class="mc-input" type="text" id="f-name" autocomplete="name" placeholder="Cómo te llamas">
-        </label>
-        <label class="car-calc__f">
-          <span>Cuándo te viene bien</span>
-          <input class="mc-input" type="text" id="f-when" placeholder="Esta semana, fin de semana…">
-        </label>
-        <button class="mc-btn mc-btn--cta" type="submit">Enviar por WhatsApp</button>
-      </form>
-    </div>
-  </section>
 </main>
 
 {{-- Full screen. Built empty; the script fills and opens it. --}}
@@ -215,6 +227,12 @@
 
 <div class="cat-dock" role="complementary" aria-label="Contacto">
   <div class="mc-bar">
+    @if($gone)
+      {{-- Not a price and two buttons: this one is not for sale. On a phone this
+           replaces the square stamp entirely — see car.css — so it is the only
+           place the word appears down here, and it is not aria-hidden. --}}
+      <span class="cat-dock__sold">Vendido</span>
+    @else
     <span class="mc-bar__pair">
       <span class="mc-bar__price">{{ $euros($car->price) }}</span>
       @if($car->mileage)<span class="mc-bar__km">{{ number_format($car->mileage, 0, ',', '.') }} km</span>@endif
@@ -227,6 +245,7 @@
          : '' }}">WhatsApp</a>
       <a class="mc-btn mc-btn--ghost" href="tel:+34614753187" aria-label="Llamar">Tel</a>
     </span>
+    @endif
   </div>
 </div>
 
@@ -338,43 +357,6 @@
     else if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
     else if (e.key === 'ArrowLeft')  { e.preventDefault(); step(-1); }
   });
-
-  /* ---- the calculator ----------------------------------------------------
-     Price minus deposit, divided by months. No interest, and it says so: a
-     figure that pretends to include finance would be wrong the moment a real
-     lender quoted it. */
-  var down = document.getElementById('calc-down');
-  var mons = document.getElementById('calc-months');
-  var sum  = document.getElementById('calc-sum');
-  if (down && mons && sum) {
-    var PRICE = {{ (int) $price['now'] }};
-    var money = function (n) {
-      return new Intl.NumberFormat('es-ES', { maximumFractionDigits: 0 }).format(n) + ' €';
-    };
-    var run = function () {
-      var d = Math.min(Math.max(parseInt(down.value, 10) || 0, 0), PRICE);
-      var m = parseInt(mons.value, 10) || 48;
-      sum.textContent = money(Math.round((PRICE - d) / m));
-    };
-    down.addEventListener('input', run);
-    mons.addEventListener('change', run);
-    run();
-  }
-
-  /* The form composes a WhatsApp message rather than posting to an inbox nobody
-     reads. He answers WhatsApp; that is where the conversation actually happens. */
-  var form = document.getElementById('car-form');
-  if (form) {
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var name = (document.getElementById('f-name').value || '').trim();
-      var when = (document.getElementById('f-when').value || '').trim();
-      var text = 'Hola' + (name ? ', soy ' + name : '') + '. Me interesa el '
-               + @json($car->brand . ' ' . $car->model . ' ' . $car->year)
-               + (when ? '. ¿Podría verlo ' + when + '?' : '. ¿Cuándo puedo verlo?');
-      window.open('https://wa.me/34614753187?text=' + encodeURIComponent(text), '_blank', 'noopener');
-    });
-  }
 
   // a swipe across the full-screen photograph, which is how a phone expects to move
   var x0 = null;

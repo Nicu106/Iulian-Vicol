@@ -186,11 +186,32 @@
   /* the buttons would eat the photograph on a narrow screen, so they go under it
      and the swipe carries the movement */
   .car-view{ grid-template-columns:1fr; padding:var(--s-3); }
-  .car-view__img{ grid-column:1; max-height:calc(100svh - 9rem); }
-  .car-view__nav{ position:absolute; bottom:calc(var(--s-6) + env(safe-area-inset-bottom,0px)); width:52px; height:52px; }
-  .car-view__nav--prev{ left:22%; }
-  .car-view__nav--next{ right:22%; }
+  .car-view__img{ max-height:calc(100svh - 9rem); }
   .car-view__count{ bottom:calc(var(--s-4) + env(safe-area-inset-bottom,0px)); }
+
+  /* grid-column:auto is the fix, and it is the whole bug.
+     An absolutely positioned child of a grid container that HAS a definite grid
+     position is laid out against its grid area, not against the container's
+     padding box. These buttons carry grid-column 1 and 3 from the desktop rule;
+     the phone template has one column, so column 3 is an implicit line and the
+     button's containing block collapsed to a zero-width strip at the right edge.
+     `right:22%` of 0px is 0px — the next button sat 3px from the screen edge
+     while prev sat at 95px, and the pair looked broken.
+     The counter underneath was always centred correctly, and that is the proof:
+     it is the one absolutely positioned child with no grid-column on it.
+
+     Positioned as a PAIR around one point rather than as two independent edges,
+     so they cannot drift apart again; and that point is the middle of the USABLE
+     width, so a notch — which is on the left in landscape — moves both together
+     instead of pushing one of them under it. */
+  .car-view__nav{
+    position:absolute; grid-column:auto;
+    bottom:calc(var(--s-6) + env(safe-area-inset-bottom, 0px));
+    width:52px; height:52px;
+    left:calc(50% + (env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)) / 2);
+  }
+  .car-view__nav--prev{ translate:calc(-100% - var(--s-4)) 0; }
+  .car-view__nav--next{ translate:var(--s-4) 0; }
 }
 
 /* ---- the sections below the fold ---------------------------------------- */
@@ -223,24 +244,95 @@
   border-radius:var(--mc-r-card); font-size:var(--t-small); color:var(--mc-ink-2);
 }
 
-/* ---- calculator and the ask --------------------------------------------- */
-.car-ask{ display:grid; gap:var(--s-7); grid-template-columns:minmax(0,1fr);
-  padding:var(--s-7); background:var(--mc-band); border-radius:var(--mc-r-card); }
-@media (min-width:820px){ .car-ask{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s-8); } }
-.car-ask__col{ min-width:0; }
-.car-ask__note{ margin:0 0 var(--s-5); max-width:46ch;
-  font-size:var(--t-small); line-height:1.5; color:var(--mc-ink-2); }
-.car-ask__note b{ color:var(--mc-ink); font-weight:600; }
-.car-calc, .car-form{ display:flex; flex-direction:column; gap:var(--s-4); }
-.car-calc__f{ display:flex; flex-direction:column; gap:var(--s-2); }
-.car-calc__f > span{ font-size:var(--t-label); font-weight:500; color:var(--mc-ink-2); }
-.car-calc__out{ margin:var(--s-2) 0 0; display:flex; align-items:baseline; gap:var(--s-2);
-  flex-wrap:wrap; }
-.car-calc__out b{ font-size:var(--t-h1); font-weight:700; color:var(--mc-ink);
-  font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
-.car-calc__out span{ font-size:var(--t-small); color:var(--mc-ink-2); }
-.car-form .mc-btn{ align-self:flex-start; min-height:48px; }
-@media (min-width:820px){ .car-calc__f{ max-width:22rem; } }
+/* ---- what goes with the car ---------------------------------------------
+   Two panels: the warranty, which is included and can be extended, and the
+   maintenance plan, which is not included at all. They are the same shape on
+   purpose — same panel, same ladder, same note — because the thing that differs
+   between them is the only thing worth reading: one starts at "Incluido" and the
+   other starts at a price.
+
+   A price table is the fastest way to make a page look like a template, so the
+   figures are not put in a table. Each option is a cell on the band, the term
+   small above and the amount large below, and the row of cells reads as a scale
+   rather than as a list of products. The included step is the only one that
+   inverts to navy: it is the one you already have, and the eye should land on it
+   first and then walk right.
+   ========================================================================= */
+.car-with__lead{
+  margin:0 0 var(--s-6); max-width:52ch;
+  font-size:var(--t-prose); line-height:1.55; color:var(--mc-ink-2);
+}
+.car-with__grid{ display:grid; gap:var(--s-5); grid-template-columns:minmax(0,1fr); }
+/* 1000, not 820. The warranty panel needs three cells at the 7.5rem floor plus
+   two gaps — 384px of content, 448px of panel — and at 820 it got 418 and
+   auto-fit broke the three steps into 2 + 1 while the other panel dropped to a
+   single column. A ladder that wraps is not a ladder. Measured: three across
+   from 1000px up, one column below. */
+@media (min-width:1000px){
+  /* Not 1fr 1fr. The warranty carries three steps and the maintenance plan two,
+     so equal columns would leave the second panel's cells half as wide again as
+     the first's, for no reason anyone could name. 3:2 brings them within a few
+     pixels of each other — 191 against 182 at 1440 — which is close enough that
+     the row reads as one scale rather than two. */
+  .car-with__grid{ grid-template-columns:3fr 2fr; gap:var(--s-6); }
+}
+
+.car-off{
+  min-width:0; padding:var(--s-6);
+  background:var(--mc-surface); border:1px solid var(--mc-hairline);
+  border-radius:var(--mc-r-card); box-shadow:var(--mc-shadow-1);
+}
+.car-off__h{
+  margin:0 0 var(--s-3); font-size:var(--t-h3); font-weight:700;
+  letter-spacing:-.010em; color:var(--mc-ink);
+}
+.car-off__say{
+  margin:0 0 var(--s-5); max-width:34ch;
+  font-size:var(--t-value); line-height:1.5; color:var(--mc-ink);
+}
+.car-off__steps{
+  margin:0 0 var(--s-5); padding:0; list-style:none;
+  display:grid; gap:var(--s-3);
+  /* auto-fit, so a panel with two steps and a panel with three need no separate
+     rule, and a fourth step later needs none either. The floor is the measure of
+     "Incluido" — the longest string that has to hold one line at --t-km — plus
+     its padding: below it the word wraps and the cell stops being one thing. */
+  grid-template-columns:repeat(auto-fit, minmax(7.5rem, 1fr));
+}
+.car-off__step{
+  padding:var(--s-4);
+  background:var(--mc-band); border-radius:var(--mc-r-card);
+  display:flex; flex-direction:column; gap:var(--s-1);
+}
+.car-off__step--inc{ background:var(--mc-navy); }
+.car-off__t{ font-size:var(--t-small); color:var(--mc-ink-2); }
+.car-off__step--inc .car-off__t{ color:var(--mc-on-navy-2); }
+.car-off__p{
+  font-size:var(--t-km); font-weight:700; letter-spacing:-.020em;
+  line-height:1.1; color:var(--mc-ink); font-variant-numeric:tabular-nums;
+}
+.car-off__step--inc .car-off__p{ color:var(--mc-on-navy); }
+/* Below 560 the ladder stops fitting across, and rather than let auto-fit break
+   three steps into 2 + 1 — which reads as a mistake, not as a layout — the row
+   becomes a column and each step becomes a line: term left, amount right. A
+   ladder read downward is still a ladder.
+   560 and not 480: at 480 the panel leaves exactly 384px of content and three
+   cells at the 7.5rem floor plus two 12px gaps want exactly 384, so auto-fit
+   dropped to two columns on a tie. Measured, not reasoned — the arithmetic said
+   it fit and the browser disagreed. At 560 the cells land at 146px, which is
+   margin rather than a coin toss. */
+@media (max-width:559.98px){
+  .car-off__steps{ grid-template-columns:minmax(0,1fr); gap:var(--s-2); }
+  .car-off__step{
+    flex-direction:row; align-items:baseline; justify-content:space-between;
+    gap:var(--s-4); padding:var(--s-3) var(--s-4);
+  }
+}
+
+.car-off__note{
+  margin:0; max-width:46ch;
+  font-size:var(--t-small); line-height:1.55; color:var(--mc-ink-2);
+}
 
 /* ============================================================================
    SOLD — the page for a car that is gone
@@ -333,12 +425,25 @@
      a separate object down there. */
   box-shadow:0 0 0 1px rgba(255,255,255,.16), var(--mc-shadow-2);
 }
-/* The dock owns the bottom 64px of a phone, plus whatever the notch takes. */
+/* On a phone it goes away entirely. The dock already owns the bottom of the
+   screen and, on a sold car, the dock says "Vendido" instead of a price and two
+   buttons — so a square stamp sitting just above it would be the same word twice
+   in 120px of screen. One statement, in the place the eye already goes. */
 @media (max-width:768px), (max-height:520px) and (orientation:landscape){
-  body:has(.cat-dock) .car-tab-sold{
-    width:60px; height:60px; font-size:var(--t-small);
-    bottom:calc(var(--mc-bar-h) + env(safe-area-inset-bottom, 0px) + var(--s-3));
-  }
+  body:has(.cat-dock) .car-tab-sold{ display:none; }
+}
+
+/* ---- the dock, on a car that is gone ------------------------------------
+   A price and a "WhatsApp" button on a car nobody can buy is the same lie the
+   side CTA had. The bar carries the state instead, and it takes the navy the
+   stamp had so the page does not lose that mark, only move it. */
+.car--sold .cat-dock{ background:var(--mc-navy); }
+.cat-dock__sold{
+  flex:1; text-align:center;
+  font-size:var(--t-h3); font-weight:700; letter-spacing:.02em;
+  color:var(--mc-on-navy);
+  display:inline-flex; align-items:center; justify-content:center;
+  min-height:var(--mc-tap);
 }
 
 /* ---- and on the photograph itself --------------------------------------
@@ -352,6 +457,10 @@
   grid-column:2; justify-self:center; position:relative;
   margin:0; display:block; max-width:100%; line-height:0;
 }
+/* After the rule above, not inside the phone block further up the file: placed
+   there it lost to this one on source order and the figure kept opening an
+   implicit second column on a one-column template. */
+@media (max-width:768px){ .car-view__fig{ grid-column:1; } }
 .car-view__sold{
   position:absolute; left:0; top:0; z-index:1;
   padding:var(--s-2) var(--s-4);

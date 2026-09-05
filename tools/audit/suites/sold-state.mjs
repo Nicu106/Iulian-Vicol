@@ -101,28 +101,41 @@ else {
   is(leaks.length === 0, 'no brand hue is painted anywhere on the page',
      leaks.length ? leaks.slice(0, 4).join(' | ') : 'checked green, red, blue and warn');
 
-  // "Ea tot timpul trebuie sa fie prezenta" — so there is no width at which it is
-  // allowed to be absent. The earlier version was a vertical tab down the right
-  // edge that vanished below 1360px, which is the requirement this replaces.
-  for (const w of [1600, 1440, 1280, 1024, 768, 390, 320]) {
+  // The square stamp holds the wide screens. On a phone it gives way to the dock,
+  // which carries the word instead — two of them inside 120px of screen would be
+  // the same statement twice.
+  for (const w of [1600, 1440, 1280, 1024]) {
     await pg.setViewport({ width: w, height: 844 });
     await new Promise(r => setTimeout(r, 300));
     const t = await pg.evaluate(() => {
       const tab = document.querySelector('.car-tab-sold');
       const cs = getComputedStyle(tab), r = tab.getBoundingClientRect();
-      const dock = document.querySelector('.cat-dock');
-      const dockTop = (dock && getComputedStyle(dock).display !== 'none')
-        ? dock.getBoundingClientRect().top : Infinity;
       return { shown: cs.display !== 'none', w: Math.round(r.width), h: Math.round(r.height),
-               radius: cs.borderRadius, left: Math.round(r.left),
-               clearsDock: dockTop === Infinity ? true : r.bottom <= dockTop,
-               text: tab.textContent.trim() };
+               radius: cs.borderRadius, left: Math.round(r.left), text: tab.textContent.trim() };
     });
-    is(t.shown && t.text === 'Vendido', `the label is present at ${w}px`, `"${t.text}"`);
-    is(t.w === t.h, `and square at ${w}px`, `${t.w}x${t.h}`);
-    is(parseFloat(t.radius) === 0, `with square corners at ${w}px — a stamp, not a button`, t.radius);
-    is(t.left >= 0 && t.left < 40, `on the left at ${w}px`, `left:${t.left}`);
-    is(t.clearsDock, `and clear of the phone dock at ${w}px`);
+    is(t.shown && t.text === 'Vendido' && t.w === t.h && parseFloat(t.radius) === 0 && t.left < 40,
+       `the square stamp is present, square and on the left at ${w}px`,
+       `${t.w}x${t.h}, radius ${t.radius}, left ${t.left}`);
+  }
+  for (const w of [768, 390, 320]) {
+    await pg.setViewport({ width: w, height: 844 });
+    await new Promise(r => setTimeout(r, 300));
+    const d = await pg.evaluate(() => {
+      const tab = document.querySelector('.car-tab-sold');
+      const dock = document.querySelector('.cat-dock');
+      const sold = document.querySelector('.cat-dock__sold');
+      return { stamp: getComputedStyle(tab).display,
+               dock: dock ? getComputedStyle(dock).display : '(absent)',
+               says: sold ? sold.textContent.trim() : null,
+               price: !!document.querySelector('.cat-dock .mc-bar__price'),
+               buttons: document.querySelectorAll('.cat-dock .mc-btn').length };
+    });
+    is(d.stamp === 'none', `the stamp gives way to the dock at ${w}px`, d.stamp);
+    is(d.dock === 'block' && d.says === 'Vendido',
+       `and the dock says it instead at ${w}px`, `"${d.says}"`);
+    is(!d.price && d.buttons === 0,
+       `with no price and no buttons — nothing here is for sale at ${w}px`,
+       `price:${d.price} buttons:${d.buttons}`);
   }
   await pg.setViewport({ width: 1440, height: 900 });
 
