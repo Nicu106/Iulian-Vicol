@@ -60,12 +60,36 @@ const b = await p.launch({
       return e ? Math.round(e.getBoundingClientRect().left) : null;
     };
     return { open: edge('.ct-open__h'), ways: edge('.ct-ways .ct-way__k'),
-             where: edge('.ct-where__say .ct-h2'), far: edge('.ct-far .ct-h2'),
-             write: edge('.ct-write .ct-h2') };
+             where: edge('.ct-where__say .ct-h2'), far: edge('.ct-far .ct-h2') };
   });
   const xs = Object.values(spine).filter(v => v !== null);
   is(new Set(xs).size === 1, 'every section starts on the same vertical spine',
      JSON.stringify(spine));
+
+  // The form is not on the spine on purpose: it is the right-hand column of the
+  // row it shares with the caption — 5 | 7, the mirror of the opening's 7 | 5.
+  // As two separate sections each was a left block with its right half empty.
+  // Below 900 they stack, full width. That also encodes a bug that shipped: the
+  // caption was `span 7` at every width, which on a 390px phone is 209px.
+  for (const [w, side] of [[1440, true], [1100, true], [900, true], [899, false], [390, false]]) {
+    await pg.setViewport({ width: w, height: 900 });
+    await new Promise(r => setTimeout(r, 300));
+    const row = await pg.evaluate(() => {
+      const a = document.querySelector('.ct-where__say').getBoundingClientRect();
+      const b = document.querySelector('.ct-write').getBoundingClientRect();
+      const main = document.querySelector('.ct-far .cat-wrap');
+      const mw = main.getBoundingClientRect().width - parseFloat(getComputedStyle(main).paddingLeft) - parseFloat(getComputedStyle(main).paddingRight);
+      return { sideBySide: Math.abs(a.top - b.top) < 2 && b.left >= a.right - 1,
+               sayW: Math.round(a.width), writeW: Math.round(b.width), mainW: Math.round(mw) };
+    });
+    is(row.sideBySide === side,
+       `caption and form are ${side ? 'side by side' : 'stacked'} at ${w}px`,
+       `say ${row.sayW}, form ${row.writeW}`);
+    if (!side) is(row.sayW >= row.mainW - 1,
+       `and the caption takes the whole width at ${w}px`, `${row.sayW} of ${row.mainW}`);
+  }
+  await pg.setViewport({ width: 1440, height: 900 });
+  await new Promise(r => setTimeout(r, 300));
 
   // The opening line is set from the measure it has to fit, not from taste.
   const line = await pg.evaluate(() => {

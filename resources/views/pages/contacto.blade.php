@@ -90,6 +90,39 @@
       <p class="ct-rise"><a class="mc-link" href="https://www.google.com/maps/search/?api=1&amp;query={{ urlencode('Málaga, España') }}"
             target="_blank" rel="noopener">Abrir en Google Maps</a></p>
     </div>
+
+    {{-- The form sits beside the caption, not in a section of its own below the
+         proof band. As two separate sections — "Málaga" and "O déjalo escrito" —
+         each was a left-aligned block with its right half empty; together they are
+         one composition, 5 | 7, the mirror of the opening's 7 | 5. And the page now
+         closes on the proof band, which is its strongest thing. --}}
+    <div class="ct-write" aria-labelledby="write-h">
+      <h2 class="ct-h2 ct-rise" id="write-h">O déjalo escrito</h2>
+      <p class="ct-lede ct-rise">Tres campos. Al enviar eliges si te abro WhatsApp o el
+        correo — en los dos casos el mensaje va redactado y lo lees antes de mandarlo.</p>
+
+      <form class="ct-form ct-rise" id="ct-form">
+        <label class="ct-f">
+          <span>Tu nombre</span>
+          <input class="mc-input" type="text" id="f-name" name="name" autocomplete="name" required>
+        </label>
+        <label class="ct-f">
+          <span>Tu teléfono <em>(opcional)</em></span>
+          <input class="mc-input" type="tel" id="f-tel" name="phone" autocomplete="tel" inputmode="tel">
+        </label>
+        <label class="ct-f ct-f--wide">
+          <span>Qué necesitas</span>
+          <textarea class="mc-input" id="f-msg" name="message" rows="4" required
+                    placeholder="Un coche concreto, una prueba, financiación…"></textarea>
+        </label>
+        <div class="ct-form__go">
+          <button class="mc-btn mc-btn--cta" type="submit" value="wa" name="via">Enviar por WhatsApp</button>
+          <button class="mc-btn mc-btn--ghost" type="submit" value="mail" name="via">Enviar por email</button>
+        </div>
+        <p class="ct-note">No guardo nada en esta web: el mensaje se escribe en tu WhatsApp
+          o en tu correo y lo envías tú.</p>
+      </form>
+    </div>
   </section>
 
   {{-- ---- why anyone trusts a man with no showroom ------------------- --}}
@@ -117,34 +150,6 @@
     </div>
   </section>
 
-  {{-- ---- the slowest way, last ------------------------------------- --}}
-  <section class="ct-write ct-sec cat-wrap" aria-labelledby="write-h">
-    <h2 class="ct-h2 ct-rise" id="write-h">O déjalo escrito</h2>
-    <p class="ct-lede ct-rise">Tres campos. Al enviar eliges si te abro WhatsApp o el
-      correo — en los dos casos el mensaje va redactado y lo lees antes de mandarlo.</p>
-
-    <form class="ct-form ct-rise" id="ct-form">
-      <label class="ct-f">
-        <span>Tu nombre</span>
-        <input class="mc-input" type="text" id="f-name" name="name" autocomplete="name" required>
-      </label>
-      <label class="ct-f">
-        <span>Tu teléfono <em>(opcional)</em></span>
-        <input class="mc-input" type="tel" id="f-tel" name="phone" autocomplete="tel" inputmode="tel">
-      </label>
-      <label class="ct-f ct-f--wide">
-        <span>Qué necesitas</span>
-        <textarea class="mc-input" id="f-msg" name="message" rows="4" required
-                  placeholder="Un coche concreto, una prueba, financiación…"></textarea>
-      </label>
-      <div class="ct-form__go">
-        <button class="mc-btn mc-btn--cta" type="submit" value="wa" name="via">Enviar por WhatsApp</button>
-        <button class="mc-btn mc-btn--ghost" type="submit" value="mail" name="via">Enviar por email</button>
-      </div>
-      <p class="ct-note">No guardo nada en esta web: el mensaje se escribe en tu WhatsApp
-        o en tu correo y lo envías tú.</p>
-    </form>
-  </section>
 
 </main>
 

@@ -272,12 +272,30 @@
   font-size:var(--t-ui); font-weight:600;
 }
 .ct-where__shield:focus-visible{ outline:3px solid var(--mc-focus); outline-offset:-6px; }
-.ct-where__say{ grid-column:main-start / span 7; padding-block:var(--s-8) var(--s-9); }
+/* Under the map, the caption and the form share one row: 5 | 7, the mirror of
+   the opening's 7 | 5, so the page's two split sections answer each other.
+   Below 900 both take the whole main track and stack — the same breakpoint the
+   opening uses to stack its own two columns. This also fixes something that had
+   shipped unnoticed: the caption was `main-start / span 7` at EVERY width, and
+   seven of twelve tracks on a 390px phone is 209px, so "Málaga" sat in a
+   209px column with 165px of nothing to its right. Measured, not seen — short
+   lines wrap plausibly, which is how it survived the phone walk. */
+.ct-where__say{ grid-column:main-start / span 5; padding-block:var(--s-9) var(--s-9); }
+.ct-write{ grid-column:span 7 / main-end; padding-block:var(--s-9) var(--s-9); }
+@media (min-width:900px){
+  /* the two columns need a gutter between them that the grid's tracks do not give */
+  .ct-where__say{ padding-right:var(--s-8); }
+}
+@media (max-width:899.98px){
+  .ct-where__say{ grid-column:main-start / main-end; padding-block:var(--s-8) 0; }
+  .ct-write{ grid-column:main-start / main-end; padding-block:var(--s-8) var(--s-8); }
+}
 @media (max-width:759.98px){
   /* No padding-inline here: the grid's main track already starts at the
      gutter, and adding it again put this caption 16px right of every other
      heading on the page. */
-  .ct-where__say{ padding-block:var(--s-6) var(--s-7); }
+  .ct-where__say{ padding-block:var(--s-7) 0; }
+  .ct-write{ padding-block:var(--s-7) var(--s-7); }
 }
 /* Where and when are one answer, so they are one section. As a section of its
    own, "Cuándo" was four lines with 250px of empty page above and below — and
@@ -348,9 +366,9 @@
 .ct-note{ margin:var(--s-8) 0 0; max-width:52ch; font-size:var(--t-small); line-height:1.6; color:var(--mc-ink-2); }
 
 /* ==========================================================================
-   THE FORM — last, because it is the slowest of the ways
+   THE FORM — beside the caption; the column is its measure
    ======================================================================== */
-.ct-form{ margin-top:var(--s-8); display:grid; gap:var(--s-5); max-width:720px; }
+.ct-form{ margin-top:var(--s-6); display:grid; gap:var(--s-5); }
 @media (min-width:760px){ .ct-form{ grid-template-columns:1fr 1fr; } }
 .ct-f{ display:grid; gap:var(--s-2); }
 .ct-f--wide{ grid-column:1 / -1; }
