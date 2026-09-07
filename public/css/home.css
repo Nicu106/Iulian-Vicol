@@ -410,3 +410,6 @@ html:not(.js) .hm-fb__step{ display:none; }
      swap, not a turn. */
   .fb__flip{ transition:transform calc(var(--m-reveal) * 1.5) var(--e-inout); }
 }
+
+/* two doors at the end of the page: into the stock, or the other way round */
+.hm-cta__go{ margin:0; display:flex; flex-wrap:wrap; justify-content:center; gap:var(--s-3); }

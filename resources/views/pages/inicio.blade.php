@@ -277,7 +277,10 @@
       <p class="hm-cta__p">Stock actualizado, verificaciones completas y ofertas flexibles de financiación.</p>
       {{-- base .mc-btn, not --cta: that modifier paints the WhatsApp mark, and this
            goes to the catalogue. --}}
-      <a class="mc-btn" href="/catalogo">Entrar al catálogo</a>
+      <p class="hm-cta__go">
+        <a class="mc-btn" href="/catalogo">Entrar al catálogo</a>
+        <a class="mc-btn mc-btn--outline" href="/vende">Vende tu coche</a>
+      </p>
     </div>
   </section>
 </main>

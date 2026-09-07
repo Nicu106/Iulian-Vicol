@@ -107,6 +107,10 @@ node reviews-photos.mjs    # asserts: 0 cut and 0 quotes needing the scroll fall
 node reviews-widths.mjs    # every card renders at exactly its computed width (the Safari flex-shrink guard)
 node reviews-seam.mjs      # the loop seam is exactly one row: 0px error, every pair one stride apart
 node reviews-speed.mjs     # one sample of the speed profile, 24–110 px/s (scrollLeft rounds — this once caught 1px/frame)
+node header.mjs             # the shared header: all five links on every page, the
+                           # current one marked, 100px tall from 320 to 768 and 72 from
+                           # 900 — one row of links that scrolls sideways on a phone, the
+                           # last one reachable, no page overflow. It was 148px at 320.
 node sell-car.mjs           # /vende: served past the BrandbookOnly allowlist, /sell-car
                            # 301s to it, five marques + "otra" in the catalogue's exact
                            # colours, six required questions, question | answers at 1440

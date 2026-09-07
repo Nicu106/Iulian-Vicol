@@ -7,6 +7,7 @@
       <a class="mc-nav__i {{ ($current ?? '') === 'catalogo' ? 'is-current' : '' }}" href="/catalogo">Coches</a>
       <a class="mc-nav__i {{ ($current ?? '') === 'brandbook' ? 'is-current' : '' }}" href="/brandbook">Quién soy</a>
       <a class="mc-nav__i {{ ($current ?? '') === 'contacto' ? 'is-current' : '' }}" href="/contacto">Contacto</a>
+      <a class="mc-nav__i {{ ($current ?? '') === 'vender' ? 'is-current' : '' }}" href="/vende">Vende tu coche</a>
     </nav>
     <a class="mc-btn mc-btn--cta" href="https://wa.me/34614753187">WhatsApp</a>
   </div>

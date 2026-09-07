@@ -229,14 +229,28 @@
 .mc-card--demo .mc-frame img{ filter:saturate(.9); }
 
 
-/* ---- the header at the narrowest widths -----------------------------------
-   At 320px the header asks for 357px: logo 127 + nav 126 + WhatsApp 48, plus
-   two 12px gaps and 32px of gutter. The brandbook's own header escapes this by
-   putting navigation behind a burger; this page has two links and no burger, so
-   the navigation takes a second line rather than a fake menu or a hidden link. */
-@media (max-width:560px){
+/* ---- the header below the desk ----------------------------------------------
+   Five links now — Inicio, Coches, Quién soy, Contacto, Vende tu coche — because
+   this design becomes the site and every page has to be one press from the top
+   of any other. The brandbook's own header hides navigation behind a burger; this
+   one does not: below 900px the row of links takes its own line under the logo,
+   and that line SCROLLS sideways rather than wrapping. Wrapping is what made the
+   header 148px tall at 320 with four links; a fifth would have made three rows.
+   Measured after: 100px from 320 to 899, one line from 900 up. */
+@media (max-width:899.98px){
   .mc-head > *{ flex-wrap:wrap; row-gap:var(--s-2); }
-  .mc-head .mc-nav{ order:3; width:100%; margin-right:0 !important; }
+  .mc-head .mc-nav{
+    order:3; width:100%; margin-right:0 !important;
+    flex-wrap:nowrap; overflow-x:auto; overscroll-behavior-x:contain;
+    scrollbar-width:none; -webkit-overflow-scrolling:touch;
+    /* the gutter is inside the scrolling box, so the last link is not cut at the edge */
+    margin-inline:calc(-1 * var(--s-4)); padding-inline:var(--s-4); width:calc(100% + 2 * var(--s-4));
+    /* a last-link fade says "there is more" without a widget */
+    -webkit-mask-image:linear-gradient(90deg, #000 calc(100% - 2rem), transparent);
+            mask-image:linear-gradient(90deg, #000 calc(100% - 2rem), transparent);
+  }
+  .mc-head .mc-nav::-webkit-scrollbar{ display:none; }
+  .mc-head .mc-nav__i{ flex:0 0 auto; white-space:nowrap; }
   .mc-head .mc-logo{ margin-right:auto; }
 }
 
@@ -444,7 +458,11 @@
 .mc-head .mc-nav__i{ min-width:44px; padding-inline:var(--s-2); text-align:center; }
 /* four items and a button: the nav wraps as a unit rather than pushing the
    button off the edge, and its own gap tightens first */
-.mc-head .mc-nav{ display:flex; flex-wrap:wrap; gap:var(--s-1) var(--s-3); margin-right:var(--s-4); }
+/* No flex-wrap here. It was `wrap`, and being 220 lines below the phone rule at
+   the same specificity it won on source order and put the fifth link on a third
+   row — 148px of header at 390. Above 900 the five links measure 486px and fit;
+   below it the phone rule scrolls them. Neither case wants a wrap. */
+.mc-head .mc-nav{ display:flex; gap:var(--s-1) var(--s-3); margin-right:var(--s-4); }
 @media (max-width:900px){ .mc-head .mc-nav{ gap:var(--s-1) var(--s-2); margin-right:var(--s-2); } }
 
 /* ============================================================================
