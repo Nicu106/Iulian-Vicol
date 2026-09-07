@@ -350,6 +350,38 @@ in the `web` group and runs before a route's `throttle`, so a tokenless loop nev
 reaches it — which is the correct and cheaper order. Testing it needs a real
 cookie jar and a scraped token, which is what a bot has: `302 302 302 302 429 429`.
 
+## 3g. The TikTok section — a number that had to be a picture
+
+The client: 600,000 plays on TikTok, strong engagement, and *"nu doar numere ci si
+ceva grafic ceva animatie ... care sa triggeruiasca oamenii sa se duca pe TikTok."*
+
+**Not three equal tiles.** TikTok is the one that works; Instagram and Facebook
+are not at that level. Three logos in a row would state a symmetry that is not
+true and would spend the only number here big enough to make anyone press
+anything. So TikTok takes the section and the other two take a line each.
+
+**Placed below the reviews, deliberately.** The photographs above are 25 people
+who bought. This is the 600,000 who watched. One is proof, the other is reach,
+and reach only means something after proof.
+
+**The animation is the platform's own signature, not an ornament.** The number is
+set at display scale on TikTok's black and carries TikTok's chromatic split —
+cyan `#25F4EE` and red `#FE2C55`, the two halves of their mark — offset and
+resolving into register as it arrives, while the figure counts up. Borrowing the
+visual language of the thing being linked to is what keeps it from being
+decoration. Once, on first sight: a counter that re-runs on every pass is a widget
+and stops meaning anything by the third time.
+
+**What it costs someone who cannot see it:** nothing. The counter is
+`aria-hidden`; the real figure is in the text below it, so a screen reader is read
+a number rather than a slot machine. Under `prefers-reduced-motion` the number is
+simply there, in register.
+
+**Caught by the contrast check, not by the eye:** brandbook.css carries a global
+`b, strong { color: var(--mc-ink) }` which beat the white the link passed down, so
+"Instagram" and "Facebook" rendered at **1.12:1** — ink on near-black. It looked
+merely dim in a screenshot. State the colour on any `<b>` placed on a dark ground.
+
 ## 4. Research findings with sources (motion, images, carousels)
 
 **Speed / drift.** Libraries stating px/s pick 50 (Motion+ Ticker, react-fast-marquee);

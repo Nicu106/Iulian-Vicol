@@ -413,3 +413,129 @@ html:not(.js) .hm-fb__step{ display:none; }
 
 /* two doors at the end of the page: into the stock, or the other way round */
 .hm-cta__go{ margin:0; display:flex; flex-wrap:wrap; justify-content:center; gap:var(--s-3); }
+
+/* ============================================================================
+   WHERE ELSE HE IS
+   ---------------------------------------------------------------------------
+   Below the reviews: the photographs above are 25 people who bought, this is the
+   600,000 who watched. Proof first, reach second.
+
+   Not three equal tiles. TikTok is the one that works, so it takes the section
+   and the other two take a line. Three logos in a row would state a symmetry
+   that is not true, and would spend the only number here big enough to make
+   anyone press anything.
+
+   The number IS the picture. Set on TikTok's own black, carrying TikTok's own
+   chromatic split — cyan #25F4EE and red #FE2C55, the two halves of their mark —
+   offset and resolving into register as it arrives. The device belongs to the
+   platform being linked to, which is what keeps it from being an ornament.
+   ========================================================================= */
+.hm-soc{
+  background:#000000;                 /* TikTok's ground, not --mc-deep: this
+                                         section is quoting them, and the footer
+                                         below is the navy, so the two do not
+                                         merge into one long dark stretch */
+  color:#FFFFFF;
+  padding-block:var(--s-10);
+  overflow:clip;                      /* the ghosts travel; clip, never hidden */
+}
+@media (max-width:759.98px){ .hm-soc{ padding-block:var(--s-8); } }
+
+.hm-soc__in{
+  display:grid; gap:var(--s-7);
+  grid-template-columns:minmax(0,1fr);
+}
+@media (min-width:1000px){
+  /* The sentence across the top, then the number and the ways in on one row.
+     The first attempt put the list in a column of its own spanning both rows and
+     centred: it finished 120px above the number and left the bottom right of the
+     section empty, which on a black band is a hole rather than air. Reading order
+     and visual order stay the same, so there is nothing to explain to a screen
+     reader. */
+  .hm-soc__in{ grid-template-columns:minmax(0,7fr) minmax(0,5fr); column-gap:var(--s-8); align-items:start; }
+  .hm-soc__say{  grid-column:1 / -1; grid-row:1; }
+  .hm-soc__num{  grid-column:1; grid-row:2; }
+  .hm-soc__list{ grid-column:2; grid-row:2; align-self:end; }
+}
+
+.hm-soc__kick{ margin:0 0 var(--s-4); font-size:var(--t-prose); color:rgba(255,255,255,.66); }
+.hm-soc__h{ margin:0; color:#FFFFFF; max-width:20ch; }
+.hm-soc__p{
+  margin:var(--s-5) 0 0; max-width:52ch;
+  font-size:var(--t-prose); line-height:1.6; color:rgba(255,255,255,.72);
+}
+
+/* ---- the number -----------------------------------------------------------
+   Three copies stacked: cyan behind, red behind, white on top. At rest they are
+   in register and the split is a hairline — the same way TikTok's own mark sits.
+   ========================================================================= */
+.hm-soc__big{
+  position:relative; margin:0; line-height:.9;
+  font-size:var(--t-mega); font-weight:700; letter-spacing:-.045em;
+  font-variant-numeric:tabular-nums;   /* the count must not jitter its own width */
+}
+.hm-soc__ghost,
+.hm-soc__real{ display:block; }
+.hm-soc__ghost{ position:absolute; inset:0; z-index:0; }
+.hm-soc__ghost--c{ color:#25F4EE; translate:-3px 2px; }
+.hm-soc__ghost--r{ color:#FE2C55; translate:3px -2px; }
+.hm-soc__real{ position:relative; z-index:1; color:#FFFFFF; }
+
+/* The arrival: the two halves come in wide and settle into register. 700ms is
+   longer than the system's --m-reveal because this one is the point of the
+   section rather than a section appearing; --e-out is the system's curve. */
+.js .hm-soc.is-armed .hm-soc__ghost{ transition:translate 700ms var(--e-out); }
+.js .hm-soc.is-armed:not(.is-in) .hm-soc__ghost--c{ translate:-28px 16px; }
+.js .hm-soc.is-armed:not(.is-in) .hm-soc__ghost--r{ translate:28px -16px; }
+@media (prefers-reduced-motion:reduce){
+  .js .hm-soc.is-armed .hm-soc__ghost{ transition:none; }
+  .js .hm-soc.is-armed:not(.is-in) .hm-soc__ghost--c{ translate:-3px 2px; }
+  .js .hm-soc.is-armed:not(.is-in) .hm-soc__ghost--r{ translate:3px -2px; }
+}
+
+.hm-soc__unit{
+  margin:var(--s-3) 0 0;
+  font-size:var(--t-km); font-weight:500; letter-spacing:-.01em;
+  color:rgba(255,255,255,.82);
+}
+
+/* ---- the ways in ----------------------------------------------------------
+   Rows, not tiles. The first one is the errand — it says what pressing it does,
+   not the name of an app.
+   ========================================================================= */
+.hm-soc__list{ list-style:none; margin:0; padding:0; display:grid; gap:var(--s-2); }
+.hm-soc__link{
+  display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center;
+  gap:var(--s-4); padding:var(--s-4) var(--s-5); min-height:var(--mc-tap-pref);
+  border-radius:var(--mc-r); text-decoration:none; color:#FFFFFF;
+  background:rgba(255,255,255,.06);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);
+  transition:background var(--m-quick) var(--e-out), box-shadow var(--m-quick) var(--e-out);
+}
+.hm-soc__link:hover{ background:rgba(255,255,255,.12); box-shadow:inset 0 0 0 1px rgba(255,255,255,.28); }
+.hm-soc__link:focus-visible{ outline:3px solid #FFFFFF; outline-offset:3px; }
+.hm-soc__row--lead .hm-soc__link{
+  padding-block:var(--s-5);
+  background:#FFFFFF; color:#000000; box-shadow:none;
+}
+.hm-soc__row--lead .hm-soc__link:hover{ background:#F0F0F0; }
+.hm-soc__t{ display:grid; gap:2px; min-width:0; }
+/* The colour is stated, not inherited. brandbook.css carries a global
+   `b, strong { color: var(--mc-ink) }` which beats the white this link passes
+   down: "Instagram" and "Facebook" were rendering at 1.12:1, ink on near-black.
+   Invisible in a screenshot at a glance, obvious to the contrast check. */
+.hm-soc__t b{ font-size:var(--t-value); font-weight:600; letter-spacing:-.01em; color:#FFFFFF; }
+.hm-soc__row--lead .hm-soc__t b{ color:#000000; }
+.hm-soc__t em{ font-style:normal; font-size:var(--t-small); color:rgba(255,255,255,.60); }
+.hm-soc__row--lead .hm-soc__t em{ color:rgba(0,0,0,.56); }
+
+/* the marks, as masks so they take the row's own colour */
+.hm-soc__ico{ width:24px; height:24px; background:currentColor;
+  -webkit-mask:var(--m) center/contain no-repeat; mask:var(--m) center/contain no-repeat; }
+.hm-soc__ico--tiktok{ --m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5 2.59 2.59 0 0 1 0-5.18c.27 0 .52.04.76.12v-3.2a5.74 5.74 0 0 0-.76-.05A5.72 5.72 0 0 0 4.15 15.3 5.72 5.72 0 0 0 9.86 21a5.72 5.72 0 0 0 5.71-5.71V9.01a7.35 7.35 0 0 0 4.28 1.38V7.3a4.28 4.28 0 0 1-3.25-1.48z'/%3E%3C/svg%3E"); }
+.hm-soc__ico--instagram{ --m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.2c3.2 0 3.6 0 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.25.07 1.65.07 4.85s0 3.6-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.25.06-1.65.07-4.85.07s-3.6 0-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.8 3.8 0 0 1-1.38-.9 3.8 3.8 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.21 15.6 2.2 15.2 2.2 12s0-3.6.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.44 2.21 8.84 2.2 12 2.2zm0 1.98c-3.14 0-3.51.01-4.75.07-1.15.05-1.77.24-2.18.4-.55.22-.94.47-1.35.88-.41.41-.66.8-.88 1.35-.16.41-.35 1.03-.4 2.18-.06 1.24-.07 1.61-.07 4.75s.01 3.51.07 4.75c.05 1.15.24 1.77.4 2.18.22.55.47.94.88 1.35.41.41.8.66 1.35.88.41.16 1.03.35 2.18.4 1.24.06 1.61.07 4.75.07s3.51-.01 4.75-.07c1.15-.05 1.77-.24 2.18-.4.55-.22.94-.47 1.35-.88.41-.41.66-.8.88-1.35.16-.41.35-1.03.4-2.18.06-1.24.07-1.61.07-4.75s-.01-3.51-.07-4.75c-.05-1.15-.24-1.77-.4-2.18a3.6 3.6 0 0 0-.88-1.35 3.6 3.6 0 0 0-1.35-.88c-.41-.16-1.03-.35-2.18-.4-1.24-.06-1.61-.07-4.75-.07zm0 3.37a5.45 5.45 0 1 1 0 10.9 5.45 5.45 0 0 1 0-10.9zm0 8.99a3.54 3.54 0 1 0 0-7.08 3.54 3.54 0 0 0 0 7.08zm6.94-9.21a1.27 1.27 0 1 1-2.55 0 1.27 1.27 0 0 1 2.55 0z'/%3E%3C/svg%3E"); }
+.hm-soc__ico--facebook{ --m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.52 1.5-3.91 3.77-3.91 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.45 2.91h-2.33V22c4.78-.76 8.44-4.92 8.44-9.94z'/%3E%3C/svg%3E"); }
+.hm-soc__go{ width:20px; height:20px; background:currentColor; opacity:.5;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' d='M7 17L17 7M9 7h8v8'/%3E%3C/svg%3E") center/contain no-repeat;
+          mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' d='M7 17L17 7M9 7h8v8'/%3E%3C/svg%3E") center/contain no-repeat; }
+.hm-soc__link:hover .hm-soc__go{ opacity:1; }

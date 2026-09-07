@@ -113,6 +113,13 @@ node sell-car-security.mjs  # attacks /vende: honeypot, a submission under 4 s, 
                            # token (without one every attempt is 419 and the limiter
                            # is never reached), a PHP file renamed .jpg, a .php under
                            # /storage — and that an honest seller still gets through.
+node social.mjs             # the TikTok section: below the reviews, three platforms
+                           # with TikTok leading as the only non-quiet row, every link
+                           # rel=noopener, the real figure in readable text with the
+                           # counter aria-hidden, on black not navy — and the arrival
+                           # sampled while it runs: 0 → counting → 600.000 with the
+                           # chromatic halves settling into register, plus the
+                           # reduced-motion path where it is simply there.
 node layout.mjs             # one document for the site: no page declares its own,
                            # all five extend layouts/site, exactly one header/main/footer
                            # in that order, five nav links, the four shared stylesheets,

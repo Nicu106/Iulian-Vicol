@@ -193,6 +193,75 @@
   </section>
   @endif
 
+  {{-- ============ where else he is ============
+       Below the reviews on purpose: the photographs above are 25 people who
+       bought. This is the 600,000 who watched. One is proof, the other is reach,
+       and reach only means something after proof.
+
+       NOT three equal tiles. TikTok is the one that works, so it takes the
+       section and the other two take a line each. Three logos in a row would be
+       stating a symmetry that is not true and would waste the only number here
+       big enough to make anyone press anything.
+
+       The number is the picture. It is set at display scale on TikTok's own
+       black, and it carries TikTok's own chromatic split — cyan #25F4EE and red
+       #FE2C55, the two halves of their mark — offset and then resolving into
+       register as it arrives. That device belongs to the platform being linked
+       to; it is not an ornament borrowed from somewhere. Everything else here is
+       the site's own furniture.
+       ============================================================== --}}
+  <section class="hm-soc" id="social" aria-labelledby="h-soc">
+    <div class="cat-wrap hm-soc__in">
+
+      <div class="hm-soc__say">
+        <p class="hm-soc__kick">Fuera de esta web</p>
+        <h2 class="hm-h2 hm-soc__h" id="h-soc">Los coches se ven mejor en movimiento.</h2>
+        <p class="hm-soc__p">Subo cada uno en vídeo: por fuera, por dentro, el
+          cuentakilómetros y lo que no está perfecto. Es lo mismo que le mando por
+          WhatsApp a quien pregunta, sólo que antes de que pregunte.</p>
+      </div>
+
+      <div class="hm-soc__num">
+        {{-- aria-hidden on the animated copy; the real figure is in the text
+             below it, so a screen reader is read a number and not a counter. --}}
+        <p class="hm-soc__big" data-to="{{ $social['tiktok']['plays'] }}" aria-hidden="true">
+          <span class="hm-soc__ghost hm-soc__ghost--c">0</span>
+          <span class="hm-soc__ghost hm-soc__ghost--r">0</span>
+          <span class="hm-soc__real" id="soc-n">0</span>
+        </p>
+        <p class="hm-soc__unit">
+          <span class="mc-vh">{{ number_format($social['tiktok']['plays'], 0, ',', '.') }} </span>reproducciones en TikTok
+        </p>
+      </div>
+
+      <ul class="hm-soc__list">
+        <li class="hm-soc__row hm-soc__row--lead">
+          <a class="hm-soc__link" href="{{ $social['tiktok']['url'] }}" target="_blank" rel="noopener">
+            <span class="hm-soc__ico hm-soc__ico--tiktok" aria-hidden="true"></span>
+            <span class="hm-soc__t">
+              <b>Ver los coches en TikTok</b>
+              <em>{{ $social['tiktok']['handle'] }}</em>
+            </span>
+            <span class="hm-soc__go" aria-hidden="true"></span>
+          </a>
+        </li>
+        @foreach(['instagram', 'facebook'] as $k)
+          <li class="hm-soc__row">
+            <a class="hm-soc__link" href="{{ $social[$k]['url'] }}" target="_blank" rel="noopener">
+              <span class="hm-soc__ico hm-soc__ico--{{ $k }}" aria-hidden="true"></span>
+              <span class="hm-soc__t">
+                <b>{{ $social[$k]['name'] }}</b>
+                <em>{{ $social[$k]['handle'] }}</em>
+              </span>
+              <span class="hm-soc__go" aria-hidden="true"></span>
+            </a>
+          </li>
+        @endforeach
+      </ul>
+
+    </div>
+  </section>
+
   {{-- ============ how it actually goes ============
        This was "Proceso simple en 4 pasos": Elige, Verifica, Prueba, Finaliza —
        the stock four-step funnel, in four equal one-line columns. Three of the
@@ -288,6 +357,56 @@
   </div>
 </div>
 @endsection
+
+@push('js')
+<script>
+/* ---- the number arrives once -----------------------------------------------
+   It counts up to 600.000 and the two chromatic halves settle into register at
+   the same time. Once, on first sight, and never again — a figure that re-runs
+   every time it scrolls past is a widget, and it stops meaning anything by the
+   third time.
+
+   The counter is aria-hidden and the real figure is in the text below it, so a
+   screen reader is read a number rather than a slot machine. Under
+   prefers-reduced-motion the number is simply set and the halves do not travel:
+   the CSS holds them in register and this skips straight to the end. */
+(function () {
+  var sec = document.getElementById('social');
+  if (!sec) { return; }
+  var big = sec.querySelector('.hm-soc__big');
+  var out = sec.querySelectorAll('.hm-soc__real, .hm-soc__ghost');
+  var to  = parseInt(big.getAttribute('data-to'), 10) || 0;
+  var fmt = function (n) { return new Intl.NumberFormat('es-ES').format(n); };
+  var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var land = function () {
+    for (var i = 0; i < out.length; i++) { out[i].textContent = fmt(to); }
+    sec.classList.add('is-in');
+  };
+  if (still || !('IntersectionObserver' in window)) { sec.classList.add('is-armed'); land(); return; }
+
+  sec.classList.add('is-armed');
+  var io = new IntersectionObserver(function (es) {
+    if (!es[0].isIntersecting) { return; }
+    io.disconnect();
+    sec.classList.add('is-in');            // the halves start travelling now
+    var t0 = null, RUN = 1400;
+    var step = function (t) {
+      if (t0 === null) { t0 = t; }
+      var p = Math.min(1, (t - t0) / RUN);
+      // out-cubic: fast at the start, so the size of the number reads immediately,
+      // then slow enough at the end that the last digits can be followed
+      var e = 1 - Math.pow(1 - p, 3);
+      var n = Math.round(to * e);
+      for (var i = 0; i < out.length; i++) { out[i].textContent = fmt(n); }
+      if (p < 1) { requestAnimationFrame(step); }
+    };
+    requestAnimationFrame(step);
+  }, { threshold: 0.35 });
+  io.observe(sec);
+})();
+</script>
+@endpush
 
 @push('js')
 <script>

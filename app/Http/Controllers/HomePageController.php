@@ -154,6 +154,37 @@ class HomePageController extends Controller
         return max(0.45, min(2.2, (float) $r));
     }
 
+    /**
+     * Where he is besides this website.
+     *
+     * TikTok is not one of three: it is the one that works — 600,000 plays — so it
+     * gets the section and the other two get a line each. Presenting them as three
+     * equal tiles would be presenting a fact that is not true, and would waste the
+     * only number here big enough to make anyone press anything.
+     *
+     * `plays` is the figure he gave. It is stated as reproducciones, which is what
+     * TikTok counts and what the number actually is; calling it followers or reach
+     * would be a different and unverified claim.
+     */
+    public const SOCIAL = [
+        'tiktok' => [
+            'name'   => 'TikTok',
+            'handle' => '@ivmotorclass',
+            'url'    => 'https://www.tiktok.com/@ivmotorclass',
+            'plays'  => 600000,
+        ],
+        'instagram' => [
+            'name'   => 'Instagram',
+            'handle' => '@ivmotorclass',
+            'url'    => 'https://www.instagram.com/ivmotorclass/',
+        ],
+        'facebook' => [
+            'name'   => 'Facebook',
+            'handle' => 'IV MOTORCLASS',
+            'url'    => 'https://www.facebook.com/ivmotorclass',
+        ],
+    ];
+
     public function index(): View
     {
         $available = Vehicle::where('status', 'available')->orderByDesc('price')->get();
@@ -229,6 +260,7 @@ class HomePageController extends Controller
             'total'     => $available->count(),
             'sold'      => $sold,
             'reviews'     => $reviews,
+            'social'      => self::SOCIAL,
             'reviewCount' => $reviews->count(),
             'months'    => self::MONTHS,
             'euros'     => fn ($n) => number_format((int) $n, 0, ',', '.') . ' €',
