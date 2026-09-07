@@ -154,6 +154,23 @@ Layout traps that cost a rebuild each (full-bleed grids and `100vw`, `overflow:
 hidden` killing sticky, `--mc-head-h` lying at 390px, sticky panels opening seams):
 §4b.
 
+## 4c. Images are automatic — do not add a manual step
+
+Photographs are served as resized WebP derivatives built by `App\Support\Img` and
+`/img/{w}`, cached forever under `/storage/cache/` and served from there by nginx
+without touching PHP. Templates use `<x-img>`; give it a path, a measured `sizes`
+and a `max`, nothing else.
+
+Nobody has to run anything. `VehicleObserver` queues the work on save,
+`motorclass-v2-queue.service` does it, and `motorclass-v2-images.timer` sweeps up
+hourly for whatever the observer cannot see. The units are in `docs/systemd/`.
+If you add a page with photographs, use `<x-img>` and you are done — measure the
+slot at 320/390/768/1000/1440/1800 first and put the real numbers in `sizes`.
+
+The trap: `sizes` must account for HEIGHT on an `object-fit: cover` box that is
+taller than the image's ratio, or the browser picks a file too small and scales it
+up. Details and the rest of the measurements: docs/DESIGN-GUIDE.md §3d.
+
 ## 5. Customer photographs: NEVER CROP. Ever.
 
 Scope: this rule is for CUSTOMER/TESTIMONIAL photographs — unknown ratio, uploaded by the

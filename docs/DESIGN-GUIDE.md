@@ -247,10 +247,33 @@ widths of the new cover exist afterwards. That process is one of six
 to. Anything past the budget is built on demand, which is the behaviour that
 existed before and is not a failure.
 
-For a bulk import, `php artisan images:warm --clicks` is still the right tool:
-1,993 derivatives in 19 minutes. A real queue worker would remove the 25 s ceiling
-and is one systemd unit, but it is a standing service and nobody has asked for
-one.
+### Nothing to run, ever
+
+The client: *"eu nu vreau ca dupa ce termina acest sistem sa mai lucrez la el sau
+sa mai fac ceva, acesta doar trebuie sa lucreze si atat."* So the last manual step
+was removed. Three units, copied into `docs/systemd/`:
+
+- **`motorclass-v2-queue.service`** — a real queue worker. `Restart=always`, so
+  killing it with -9 brought it back in under 8 seconds (tested);
+  `WantedBy=multi-user.target`, so it returns after a reboot; `--max-time=3600`,
+  so it restarts itself every hour and never runs stale code after a deploy.
+  With a worker there is no time ceiling on a job, and no PHP-FPM process is held
+  while GD works.
+- **`motorclass-v2-images.timer`** — hourly, runs `images:warm --clicks`. It costs
+  0.2 s when nothing is missing. This is the net for what the observer cannot see:
+  files copied in by hand, a cache directory emptied, a worker that was down
+  during an upload.
+- **`motorclass-v2-images.service`** — what the timer runs.
+
+So a new photograph is covered three ways, none of which is a person remembering
+something: the observer queues it on save, the timer sweeps up anything missed
+within the hour, and until either happens the endpoint still answers on demand at
+0.24-0.57 s. Measured end to end with the worker live: `save()` returned in 65 ms
+and all five widths existed shortly after, with no failed jobs.
+
+`php artisan images:warm --clicks` still exists and is still the fastest way to do
+a whole library at once (1,993 derivatives in 19 minutes), but nothing depends on
+anyone running it.
 
 ## 4. Research findings with sources (motion, images, carousels)
 

@@ -1,0 +1,10 @@
+[Unit]
+Description=v2design: comprueba cada hora que no falta ninguna imagen redimensionada
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=1h
+Persistent=true
+
+[Install]
+WantedBy=timers.target

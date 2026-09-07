@@ -1,0 +1,23 @@
+[Unit]
+Description=v2design: procesa la cola (genera las imagenes redimensionadas al subir fotos)
+After=network.target mysql.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/motorclass-v2
+# --max-time: el worker se reinicia cada hora por si mismo. Sin esto, un worker
+# que lleva dias levantado sigue ejecutando el codigo que habia cuando arranco.
+# --timeout 300: una foto grande cuesta hasta 1,8 s por tamano; un coche entero
+# con 59 fotos cabe de sobra.
+ExecStart=/usr/bin/php artisan queue:work --queue=default --sleep=3 --tries=2 --timeout=300 --max-time=3600
+Restart=always
+RestartSec=5
+Nice=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

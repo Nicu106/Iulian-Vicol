@@ -31,8 +31,14 @@ class VehicleObserver
         )));
 
         if ($paths) {
-            // afterResponse, not the queue: nothing on this server consumes one.
-            WarmVehicleImages::dispatchAfterResponse($paths);
+            // The queue. motorclass-v2-queue.service consumes it, restarts itself
+            // if it dies and comes back on boot, so there is no ceiling on how
+            // long the work may take and no PHP-FPM process is held while it runs.
+            // If the worker is ever down the hourly motorclass-v2-images.timer
+            // builds whatever is missing anyway, and until either happens the
+            // endpoint still answers on demand. Three ways for this to be right,
+            // none of which is somebody remembering to run a command.
+            WarmVehicleImages::dispatch($paths);
         }
     }
 }

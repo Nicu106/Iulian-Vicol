@@ -1,0 +1,15 @@
+[Unit]
+Description=v2design: red de seguridad — construye cualquier derivado que falte
+
+[Service]
+Type=oneshot
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/motorclass-v2
+# Cuesta 0,2 s cuando no falta nada, asi que puede correr cada hora sin coste.
+# Existe para lo que el observer no ve: ficheros copiados a mano, un worker caido
+# durante una subida, una cache borrada.
+ExecStart=/usr/bin/php artisan images:warm --clicks
+Nice=15
+StandardOutput=journal
+StandardError=journal

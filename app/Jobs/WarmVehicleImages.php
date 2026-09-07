@@ -18,16 +18,15 @@ use Illuminate\Foundation\Queue\Queueable;
  * Dispatched by the Vehicle observer whenever the photographs change, so this
  * happens between the admin pressing save and anyone arriving.
  *
- * It runs AFTER THE RESPONSE, not on a queue worker: this server has no worker, no
- * supervisor and no cron for the scheduler, so anything pushed onto the database
- * queue sits there forever — verified by queueing two jobs and watching nothing
- * happen. dispatchAfterResponse() runs it in the same PHP-FPM process once the
- * admin's page has already been sent, which needs no infrastructure at all.
+ * It runs on the queue, which motorclass-v2-queue.service consumes. There was no
+ * worker on this box until that unit was installed — the first version of this
+ * dispatched into the database queue and two jobs sat there forever, because
+ * `pgrep -f queue:work` had matched the grep's own command line and I believed it.
  *
- * That process is one of six (pm.max_children = 6), so the work is BOUNDED. It
- * builds what makes a car page fast in the order that matters and stops at the
- * budget; anything left is built on demand at 0.24-0.57 s per image, which is the
- * behaviour that existed before this class and is not a failure.
+ * With a real worker there is no ceiling: it is not holding a PHP-FPM process, so
+ * a car with 59 photographs finishes whatever it takes. The BUDGET below is what
+ * remains of the version that ran in-request, kept as a guard for the case where
+ * this is ever dispatched synchronously again.
  */
 class WarmVehicleImages implements ShouldQueue
 {
@@ -42,10 +41,11 @@ class WarmVehicleImages implements ShouldQueue
     {
     }
 
-    /** Seconds of GD this is allowed to hold a PHP-FPM process for. Measured cost
-     *  is 0.24 s at 320px and up to 1.8 s at 1600 depending on the source, so this
-     *  is roughly one car's first screen. */
-    private const BUDGET = 25.0;
+    /** A stop, not a schedule. On the worker this is never reached — 59 photographs
+     *  at three widths is a few minutes and nothing is waiting on it. It exists so
+     *  that if this job is ever run inside a request again it cannot hold one of
+     *  six PHP-FPM processes indefinitely. */
+    private const BUDGET = 600.0;
 
     public int $timeout = 120;
     public int $tries = 1;
