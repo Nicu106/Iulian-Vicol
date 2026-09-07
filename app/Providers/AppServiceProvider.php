@@ -43,6 +43,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // One IP may offer four cars an hour and ten a day. A person selling a car
+        // does it once; the second and third are a family's cars. Anything past
+        // that is a script, and it gets the same page with an explanation rather
+        // than a wall of text about rate limits.
+        \Illuminate\Support\Facades\RateLimiter::for('sell-car', function (\Illuminate\Http\Request $request) {
+            return [
+                \Illuminate\Cache\RateLimiting\Limit::perHour(4)->by($request->ip()),
+                \Illuminate\Cache\RateLimiting\Limit::perDay(10)->by($request->ip()),
+            ];
+        });
+
         // Photographs get their resized versions built as soon as they are saved,
         // not when the first visitor asks for them. See App\Observers\VehicleObserver.
         \App\Models\Vehicle::observe(\App\Observers\VehicleObserver::class);

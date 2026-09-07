@@ -107,6 +107,12 @@ node reviews-photos.mjs    # asserts: 0 cut and 0 quotes needing the scroll fall
 node reviews-widths.mjs    # every card renders at exactly its computed width (the Safari flex-shrink guard)
 node reviews-seam.mjs      # the loop seam is exactly one row: 0px error, every pair one stride apart
 node reviews-speed.mjs     # one sample of the speed profile, 24–110 px/s (scrollLeft rounds — this once caught 1px/frame)
+node sell-car-security.mjs  # attacks /vende: honeypot, a submission under 4 s, a
+                           # missing and a forged timestamp, links / markup / Cyrillic
+                           # in the text, no CSRF token, the rate limit WITH a real
+                           # token (without one every attempt is 419 and the limiter
+                           # is never reached), a PHP file renamed .jpg, a .php under
+                           # /storage — and that an honest seller still gets through.
 node header.mjs             # the shared header: all five links on every page, the
                            # current one marked, 100px tall from 320 to 768 and 72 from
                            # 900 — one row of links that scrolls sideways on a phone, the

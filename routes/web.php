@@ -31,7 +31,14 @@ Route::get('/img/{w}', [App\Http\Controllers\ImageController::class, 'resize'])
 Route::get('/vende', [App\Http\Controllers\SellCarController::class, 'index'])->name('sell-car');
 // the address the live site uses, kept so nothing that links to it breaks
 Route::redirect('/sell-car', '/vende', 301);
-Route::post('/sell-car', [App\Http\Controllers\SellCarController::class, 'store'])->name('sell-car.store');
+// The only unauthenticated POST on the site that writes a row and accepts files.
+// throttle:sell-car is defined in AppServiceProvider — 4 an hour and 10 a day per
+// IP, which no honest seller reaches and a script does in seconds.
+// PublicFormLimits puts back the memory and time limits that bootstrap/app.php
+// removes for the admin's 359 MB uploads.
+Route::post('/vende', [App\Http\Controllers\SellCarController::class, 'store'])
+    ->middleware(['throttle:sell-car', \App\Http\Middleware\PublicFormLimits::class])
+    ->name('sell-car.store');
 
 // Detaliu vehicul (din baza de date)
 Route::get('/vehicles/{slug}', [App\Http\Controllers\VehicleController::class, 'show'])->name('vehicle.show');

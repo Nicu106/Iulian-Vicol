@@ -59,6 +59,34 @@
 
   <form class="sl-form" method="post" action="{{ route('sell-car.store') }}" enctype="multipart/form-data" novalidate id="sl-form">
     @csrf
+    {{-- Two traps, neither of which asks the visitor anything.
+
+         The field: no person sees it, tabs to it, or is offered it by a password
+         manager. A bot reads the HTML and fills what it finds. Not display:none —
+         that is the first thing a modern bot checks for — but pushed out of the
+         viewport, hidden from the accessibility tree, and skipped by the keyboard.
+
+         The clock: an encrypted timestamp, so it cannot be back-dated. Under four
+         seconds nobody has read the page, chosen a marque and typed a phone
+         number. A person filling this as fast as they can takes about 25.
+
+         A CAPTCHA was the other option and was not taken: it charges every honest
+         seller — the ones with the worst eyesight and the oldest phones most of
+         all — for the few who are not. --}}
+    <div class="sl-hp" aria-hidden="true">
+      <label for="apellido_2">No rellenes esto</label>
+      <input type="text" id="apellido_2" name="apellido_2" tabindex="-1" autocomplete="off" value="">
+    </div>
+    <input type="hidden" name="t" value="{{ $stamp }}">
+
+    @if($errors->any())
+      <div class="sl-alert cat-wrap" role="alert" tabindex="-1" id="sl-alert">
+        <p class="sl-alert__h">No he podido guardarlo.</p>
+        <ul class="sl-alert__l">
+          @foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach
+        </ul>
+      </div>
+    @endif
 
     {{-- ---- 1 · la marca ------------------------------------------ --}}
     <fieldset class="sl-marques" aria-labelledby="marca-h">

@@ -305,6 +305,51 @@ was reachable at a guessable slug.
 **Trap, recorded in CLAUDE.md §4a:** `BrandbookOnly` serves a 200 holding page
 for any path not on its allowlist. /vende "worked" for two turns.
 
+## 3f. Securing /vende — what was actually open
+
+The only unauthenticated POST on the site that writes a row and accepts files.
+Measured before anything was written:
+
+**A `.php` file anywhere under `/storage/` executed.** A probe at
+`storage/app/public/_sec/probe.php` answered `EXECUTED-42` over HTTPS: the nginx
+block was `location ~ \.php$` with no path restriction, and `public/storage` is a
+symlink into the document root. There was no live path to it — every upload goes
+through Laravel's `->store()`, which renames to a random name with an extension
+guessed from content, and `getClientOriginalName()` is used only for logging — but
+it is one careless upload handler away from remote code execution on a form
+anyone can reach. Now `403`, verified, with images still served.
+
+**`bootstrap/app.php` removes every PHP limit on every request** — `memory_limit
+-1`, `max_execution_time 0`, `max_input_time -1` — and `public/.user.ini` sets
+`post_max_size` and `upload_max_filesize` to `0`. That exists for a real reason:
+the heaviest car folder here is 359 MB across 128 files and the admin uploads sets
+like that. But it applied to strangers too, and `pm.max_children` is 6 — six
+requests allocating without bound is the site down. `PublicFormLimits` puts the
+pool's own numbers back on the public route only, and refuses a body over 80 MB
+with a page instead of a dropped connection.
+
+**No rate limit, no bot trap, no content rules.** Now, in order of cost to an
+honest seller — which is zero for all of them:
+
+| layer | rule |
+|---|---|
+| throttle | 4/hour, 10/day per IP |
+| honeypot | a field off-screen, `aria-hidden`, `tabindex="-1"` |
+| clock | encrypted timestamp; under 4 s is refused, over 2 h is stale |
+| content | links, markup (`<a>`, `[url]`, `{{`), Cyrillic/CJK/Arabic |
+| files | `mimetypes` sniffed server-side, `getimagesize` must agree, min 200×200, 60 MB total |
+
+**No CAPTCHA, deliberately.** It charges every honest seller — the ones with the
+worst eyesight and the oldest phones most of all — for the few who are not. These
+five layers cost a real person nothing and stop the automated traffic this form
+will actually see.
+
+**A false result worth keeping:** the first throttle test looped `curl` without a
+session and read `419 419 419 419 419 419`, so the limiter looked broken. CSRF sits
+in the `web` group and runs before a route's `throttle`, so a tokenless loop never
+reaches it — which is the correct and cheaper order. Testing it needs a real
+cookie jar and a scraped token, which is what a bot has: `302 302 302 302 429 429`.
+
 ## 4. Research findings with sources (motion, images, carousels)
 
 **Speed / drift.** Libraries stating px/s pick 50 (Motion+ Ticker, react-fast-marquee);

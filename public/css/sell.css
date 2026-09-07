@@ -200,3 +200,24 @@
 .sl-done__note{ margin:var(--s-5) 0 0; max-width:46ch; font-size:var(--t-prose); line-height:1.6; color:var(--mc-ink-2); }
 .sl-done__go{ margin:var(--s-8) 0 0; display:flex; flex-wrap:wrap; align-items:center; gap:var(--s-5); }
 .sl-done__again{ display:inline-flex; align-items:center; min-height:var(--mc-tap); }
+
+/* ---- the trap ---------------------------------------------------------------
+   Off-screen rather than display:none. A bot that skips hidden fields checks for
+   display:none, visibility:hidden and opacity:0 first; a field that is simply
+   somewhere else is still in the DOM and still gets filled. Nobody reaches it:
+   aria-hidden keeps it out of the accessibility tree and tabindex -1 out of the
+   keyboard's path.
+   ========================================================================= */
+.sl-hp{ position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; }
+
+/* ---- what went wrong -------------------------------------------------------
+   At the top, before the marques, because a refused submission has to say so
+   where the eye starts and not eighteen fields down. */
+.sl-alert{
+  margin:var(--s-6) auto 0; padding:var(--s-5);
+  background:var(--mc-accent-tint); border:1px solid var(--mc-accent); border-left-width:3px;
+  border-radius:var(--mc-r);
+}
+.sl-alert__h{ margin:0; font-size:var(--t-value); font-weight:700; color:var(--mc-ink); }
+.sl-alert__l{ margin:var(--s-2) 0 0; padding-left:var(--s-5); font-size:var(--t-small); line-height:1.6; color:var(--mc-ink); }
+.sl-alert:focus-visible{ outline:3px solid var(--mc-focus); outline-offset:3px; }

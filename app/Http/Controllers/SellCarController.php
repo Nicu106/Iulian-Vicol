@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Vehicle;
+use App\Http\Requests\SellCarRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -30,11 +32,16 @@ class SellCarController extends Controller
     ];
 
     /** The site's own vocabulary — Vehicle::getFuelEsAttribute normalises to these. */
-    private const FUEL = ['Gasolina', 'Diésel', 'Híbrido', 'Eléctrico'];
-    private const GEAR = ['Manual', 'Automático'];
+    public const FUEL = ['Gasolina', 'Diésel', 'Híbrido', 'Eléctrico'];
+    public const GEAR = ['Manual', 'Automático'];
 
-    private const MAX_PHOTOS = 12;
-    private const MAX_PHOTO_KB = 12288;   // phone originals in this library run to 11 MB
+    public const MAX_PHOTOS = 12;
+    public const MAX_PHOTO_KB = 12288;   // phone originals in this library run to 11 MB
+    /** Twelve at 12 MB is 144 MB, which no honest submission reaches and a
+     *  malicious one would aim for. Past this the extra photographs are dropped
+     *  and the car is still saved: losing a seller over their tenth picture is a
+     *  worse outcome than storing nine. */
+    public const MAX_TOTAL_BYTES = 60 * 1024 * 1024;
 
     public function index(Request $request): View
     {
@@ -45,41 +52,14 @@ class SellCarController extends Controller
             'years'   => range((int) date('Y'), 2005),
             'sent'    => $request->boolean('enviado'),
             'maxPhotos' => self::MAX_PHOTOS,
+            // Encrypted, so the clock in SellCarRequest cannot be back-dated.
+            'stamp'   => Crypt::encryptString((string) time()),
         ]);
     }
 
-    public function store(Request $request)
+    public function store(SellCarRequest $request)
     {
-        $marqueKeys = array_column(self::MARQUES, 'key');
-
-        $data = $request->validate([
-            'brand'        => ['required', 'string', 'in:' . implode(',', array_merge($marqueKeys, ['otra']))],
-            'brand_other'  => ['nullable', 'string', 'max:60', 'required_if:brand,otra'],
-            'model'        => ['required', 'string', 'max:100'],
-            'year'         => ['required', 'integer', 'min:1990', 'max:' . date('Y')],
-            'mileage'      => ['required', 'integer', 'min:0', 'max:1500000'],
-            'fuel'         => ['nullable', 'string', 'in:' . implode(',', self::FUEL)],
-            'transmission' => ['nullable', 'string', 'in:' . implode(',', self::GEAR)],
-            'price'        => ['nullable', 'integer', 'min:0', 'max:2000000'],
-            'description'  => ['nullable', 'string', 'max:2000'],
-            'seller_name'  => ['required', 'string', 'max:120'],
-            'seller_phone' => ['required', 'string', 'max:30', 'regex:/^[+\d][\d\s().-]{6,}$/'],
-            'seller_email' => ['nullable', 'email', 'max:255'],
-            'photos'       => ['nullable', 'array', 'max:' . self::MAX_PHOTOS],
-            'photos.*'     => ['image', 'mimes:jpeg,png,webp,heic', 'max:' . self::MAX_PHOTO_KB],
-        ], [
-            'brand.required'        => 'Dime la marca.',
-            'brand_other.required_if' => 'Dime qué marca es.',
-            'model.required'        => 'Dime el modelo.',
-            'year.required'         => 'Dime el año.',
-            'mileage.required'      => 'Dime los kilómetros, aunque sea aproximado.',
-            'seller_name.required'  => 'Dime cómo te llamas.',
-            'seller_phone.required' => 'Necesito un teléfono para contestarte.',
-            'seller_phone.regex'    => 'Ese teléfono no parece un teléfono.',
-            'photos.max'            => 'Hasta ' . self::MAX_PHOTOS . ' fotos.',
-            'photos.*.max'          => 'Una de las fotos pesa más de 12 MB.',
-            'photos.*.image'        => 'Uno de los archivos no es una imagen.',
-        ]);
+        $data = $request->validated();
 
         $brandName = $data['brand'] === 'otra'
             ? trim((string) $data['brand_other'])
@@ -91,8 +71,23 @@ class SellCarController extends Controller
         // columns get them: `images` is what the admin's review screen reads, and
         // cover/gallery are what the public page reads once he approves it — the
         // old form filled only the first, so an approved car had no photograph.
+        //
+        // Every file is opened and read before it is kept. `mimetypes` checks what
+        // the server sniffs, which is stronger than the browser's claim, but a
+        // JPEG with a payload welded on the end still sniffs as a JPEG. getimagesize
+        // has to agree that there are real pixels, and ->store() names the file
+        // itself from that — the client's own filename never reaches the disk.
         $stored = [];
+        $bytes = 0;
         foreach ((array) $request->file('photos', []) as $file) {
+            $info = @getimagesize($file->getRealPath());
+            if (!$info || $info[0] < 200 || $info[1] < 200) {
+                continue;
+            }
+            $bytes += $file->getSize();
+            if ($bytes > self::MAX_TOTAL_BYTES) {
+                break;   // the rest are dropped rather than the submission lost
+            }
             $stored[] = '/storage/' . $file->store('sell-cars/' . $slug, 'public');
         }
 
