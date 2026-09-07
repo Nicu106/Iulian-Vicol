@@ -1,0 +1,202 @@
+/* ============================================================================
+   VENDE TU COCHE
+   ---------------------------------------------------------------------------
+   The page this replaces was a four-colour stack of Bootstrap cards asking for
+   seventeen required fields — an ad title, cylinder capacity, body type — in a
+   mix of Romanian and Spanish, before it would take a phone number.
+
+   What a private seller is actually doing is asking one man whether he wants
+   their car. So this is built as that conversation: the marque first, because
+   it is the one hard constraint he has and it is unfair to learn it after
+   seventeen fields; then what they know; then the photographs, which is what
+   he decides on; then how to reach them. Six required fields.
+
+   It borrows contact.css for the grid, the opening type and the statement
+   sizes, so the two pages that ask the visitor to write are the same voice.
+   ========================================================================= */
+
+.sl{ background:var(--mc-bg); }
+
+/* ---- the opening --------------------------------------------------------- */
+.sl-open{ padding-block:var(--s-9) 0; }
+.sl-open__say{ grid-column:main-start / span 8; }
+.sl-open__lead{ max-width:38ch; }
+@media (max-width:899.98px){
+  .sl-open{ padding-block:var(--s-7) 0; }
+  .sl-open__say{ grid-column:main-start / main-end; }
+}
+
+/* ---- the marques ----------------------------------------------------------
+   Six tiles on the catalogue's own colour fields: the same hex per marque as
+   /catalogo, so a Volkswagen owner sees the navy they will see when their car
+   is listed. A radio under each; the tile is its label. The chosen one lifts
+   and takes a hairline of white; the others stay lit — dimming the rest is
+   what makes a row of tiles read as a disabled toolbar.
+   ========================================================================= */
+.sl-marques{ margin:var(--s-7) 0 0; padding:0; border:0; min-width:0; }
+.sl-marques__row{
+  display:grid; gap:var(--s-3);
+  grid-template-columns:repeat(6, minmax(0,1fr));
+  max-width:var(--mc-container); margin-inline:auto;
+  padding-inline:var(--mc-gutter-d);
+}
+@media (max-width:899.98px){ .sl-marques__row{ grid-template-columns:repeat(3, minmax(0,1fr)); } }
+@media (max-width:759.98px){ .sl-marques__row{ padding-inline:var(--mc-gutter-m); gap:var(--s-2); } }
+@media (max-width:479.98px){ .sl-marques__row{ grid-template-columns:repeat(2, minmax(0,1fr)); } }
+
+.sl-marque{
+  position:relative; display:flex; flex-direction:column; justify-content:flex-end;
+  gap:var(--s-2); min-height:9rem; padding:var(--s-4);
+  background:var(--brand, var(--mc-navy)); color:#FFFFFF;
+  border-radius:var(--mc-r-card); cursor:pointer;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.10);
+  transition:transform var(--m-quick) var(--e-out), box-shadow var(--m-quick) var(--e-out);
+}
+.sl-marque:hover{ transform:translateY(-2px); }
+.sl-marque__logo{
+  width:44px; height:44px; background:#FFFFFF;
+  -webkit-mask:var(--logo) center/contain no-repeat; mask:var(--logo) center/contain no-repeat;
+  margin-bottom:auto;
+}
+.sl-marque__name{ font-size:var(--t-value); font-weight:600; letter-spacing:-.010em; line-height:1.2; }
+.sl-marque__sub{ font-size:var(--t-label); color:rgba(255,255,255,.72); line-height:1.35; }
+.sl-marque--other{
+  background:var(--mc-surface); color:var(--mc-ink);
+  box-shadow:inset 0 0 0 1px var(--mc-rule);
+}
+.sl-marque--other .sl-marque__sub{ color:var(--mc-ink-3); }
+.sl-marque:has(.sl-marque__in:checked){
+  box-shadow:inset 0 0 0 3px #FFFFFF, 0 0 0 1px var(--brand, var(--mc-navy)), var(--mc-shadow-2);
+  transform:translateY(-2px);
+}
+.sl-marque--other:has(.sl-marque__in:checked){
+  box-shadow:inset 0 0 0 3px var(--mc-ink), var(--mc-shadow-2);
+}
+.sl-marque:has(.sl-marque__in:focus-visible){ outline:3px solid var(--mc-focus); outline-offset:3px; }
+/* the one question "otra" asks, in the same column as the rest of the form */
+.sl-other{ max-width:var(--mc-container); margin:var(--s-5) auto 0; padding-inline:var(--mc-gutter-d); }
+.sl-other .mc-field{ max-width:24rem; margin:0; }
+@media (max-width:759.98px){ .sl-other{ padding-inline:var(--mc-gutter-m); } }
+.sl-marques > .mc-err{ max-width:var(--mc-container); margin:var(--s-3) auto 0; padding-inline:var(--mc-gutter-d); }
+
+/* ---- the form body --------------------------------------------------------- */
+.sl-body{ padding-block:var(--s-8) var(--s-10); }
+@media (max-width:759.98px){ .sl-body{ padding-block:var(--s-7) var(--s-9); } }
+
+/* Four movements, numbered. The number is the only ornament: a figure on the
+   band, the heading beside it, the sentence under. The sections are the same
+   shape so the page reads as one conversation and not four forms. */
+.sl-sec{ display:grid; gap:var(--s-5); grid-template-columns:minmax(0,1fr); }
+.sl-sec + .sl-sec{ margin-top:var(--s-9); }
+@media (max-width:759.98px){ .sl-sec + .sl-sec{ margin-top:var(--s-8); } }
+/* From 900 up each movement is two columns: the question on the left, the
+   answers on the right. Capped at 46rem on one column the form left 40% of a
+   1440 screen empty for two thousand pixels — the same fault the contact page
+   had. 4 | 8, so the fields keep a form's measure and the page keeps its width.
+   The two rows of one question are one row: heading beside its inputs. */
+@media (min-width:900px){
+  .sl-sec{ grid-template-columns:minmax(0,4fr) minmax(0,8fr); column-gap:var(--s-8); align-items:start; }
+  .sl-sec__body{ min-width:0; }
+}
+.sl-sec__body{ display:grid; gap:var(--s-5); }
+.sl-sec__head{ display:grid; grid-template-columns:auto minmax(0,1fr); column-gap:var(--s-4); align-items:baseline; }
+.sl-sec__n{
+  grid-row:1 / span 2; align-self:start;
+  width:2.25rem; height:2.25rem; display:grid; place-items:center;
+  background:var(--mc-navy); color:var(--mc-on-navy); border-radius:var(--mc-r-card);
+  font-size:var(--t-value); font-weight:700; font-variant-numeric:tabular-nums;
+}
+.sl-sec__p{ grid-column:2; margin:var(--s-2) 0 0; max-width:48ch; font-size:var(--t-prose); line-height:1.55; color:var(--mc-ink-2); }
+
+.sl-grid{ display:grid; gap:var(--s-4) var(--s-5); grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
+.sl-grid .mc-field{ margin:0; }
+.sl-span2{ grid-column:1 / -1; }
+@media (max-width:559.98px){ .sl-grid{ grid-template-columns:minmax(0,1fr); } .sl-span2{ grid-column:auto; } }
+
+/* a select that looks like the input beside it, with its own arrow */
+.sl-select{
+  padding-right:2.75rem;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23475467' stroke-width='1.5' d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right var(--s-3) center; background-size:16px;
+}
+
+/* fuel / gearbox as pills — a choice of two or four does not need a dropdown */
+.sl-pick{ margin:0; padding:0; border:0; min-width:0; }
+.sl-pick legend{ padding:0; }
+.sl-pick__row{ display:flex; flex-wrap:wrap; gap:var(--s-2); }
+.sl-pill{ position:relative; cursor:pointer; }
+.sl-pill input{ position:absolute; inset:0; opacity:0; margin:0; cursor:pointer; }
+.sl-pill span{
+  display:inline-flex; align-items:center; min-height:var(--mc-tap);
+  padding:0 var(--s-4); border:1px solid var(--mc-control); border-radius:var(--mc-r);
+  background:var(--mc-surface); font-size:var(--t-ui); color:var(--mc-ink);
+  transition:background var(--m-quick) var(--e-out), border-color var(--m-quick) var(--e-out);
+}
+.sl-pill:hover span{ border-color:var(--mc-ink-3); }
+.sl-pill input:checked + span{ background:var(--mc-navy); border-color:var(--mc-navy); color:var(--mc-on-navy); }
+.sl-pill input:focus-visible + span{ outline:3px solid var(--mc-focus); outline-offset:var(--s-1); }
+
+.sl-money{ position:relative; display:block; }
+.sl-money .mc-input{ padding-right:2.5rem; }
+.sl-money b{ position:absolute; right:var(--s-4); top:50%; translate:0 -50%; font-weight:600; color:var(--mc-ink-2); }
+
+/* ---- the photographs --------------------------------------------------------
+   A drop zone that is also the file input's label, so it is one tap on a
+   phone and one gesture on a desk. Previews are WHOLE: object-fit:contain on
+   the band. What someone hands us is not cropped, same as every customer
+   photograph on this site.
+   ========================================================================= */
+.sl-drop{
+  position:relative; padding:var(--s-5);
+  border:1px dashed var(--mc-control); border-radius:var(--mc-r);
+  background:var(--mc-surface);
+  transition:border-color var(--m-quick) var(--e-out), background var(--m-quick) var(--e-out);
+}
+.sl-drop.is-over{ border-color:var(--mc-ink); background:var(--mc-blue-tint); }
+.sl-drop__in{ position:absolute; width:1px; height:1px; opacity:0; overflow:hidden; }
+.sl-drop__label{
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:var(--s-1);
+  min-height:9rem; cursor:pointer; text-align:center;
+}
+.sl-drop__big{
+  display:inline-flex; align-items:center; min-height:var(--mc-tap-pref); padding:0 var(--s-5);
+  background:var(--mc-navy); color:var(--mc-on-navy); border-radius:var(--mc-r);
+  font-size:var(--t-ui); font-weight:600;
+}
+.sl-drop__small{ font-size:var(--t-small); color:var(--mc-ink-3); }
+.sl-drop.has-files .sl-drop__label{ min-height:0; flex-direction:row; justify-content:flex-start; margin-bottom:var(--s-4); }
+.sl-drop.has-files .sl-drop__big{ background:var(--mc-surface); color:var(--mc-ink); box-shadow:inset 0 0 0 1px var(--mc-control); }
+.sl-drop__label:has(.sl-drop__in:focus-visible) .sl-drop__big{ outline:3px solid var(--mc-focus); outline-offset:var(--s-1); }
+
+.sl-previews{ list-style:none; margin:0; padding:0; display:grid; gap:var(--s-2);
+  grid-template-columns:repeat(auto-fill, minmax(6.5rem, 1fr)); }
+.sl-previews:empty{ display:none; }
+.sl-prev{ position:relative; aspect-ratio:4 / 3; background:var(--mc-band); border-radius:var(--mc-r-card); overflow:hidden; }
+.sl-prev img{ width:100%; height:100%; object-fit:contain; display:block; }
+.sl-prev.is-over{ box-shadow:inset 0 0 0 3px var(--mc-accent); }
+.sl-prev__x{
+  position:absolute; top:var(--s-1); right:var(--s-1);
+  width:var(--mc-tap); height:var(--mc-tap); display:grid; place-items:center;
+  border:0; border-radius:var(--mc-r-pill); cursor:pointer;
+  background:rgba(var(--mc-scrim),.72); color:#FFFFFF; font-size:22px; line-height:1;
+}
+.sl-prev__x:focus-visible{ outline:3px solid #FFFFFF; outline-offset:2px; }
+.sl-drop__count{ margin:var(--s-3) 0 0; font-size:var(--t-small); color:var(--mc-ink-2); }
+.sl-drop__count.is-bad{ color:var(--mc-accent); font-weight:600; }
+
+.sl-text{ min-height:8rem; }
+
+/* ---- send ------------------------------------------------------------------- */
+.sl-send{ display:grid; gap:var(--s-3); margin-top:var(--s-3); }
+.sl-send__btn{ justify-self:start; min-height:var(--mc-tap-pref); padding-inline:var(--s-7); font-size:var(--t-value); }
+.sl-send__note{ margin:0; max-width:46ch; font-size:var(--t-small); line-height:1.55; color:var(--mc-ink-2); }
+.sl-form.is-sending{ opacity:.7; pointer-events:none; }
+
+/* ---- sent ------------------------------------------------------------------- */
+.sl-done{ padding-block:var(--s-10); min-height:calc(100svh - var(--mc-head-h)); align-content:start; }
+.sl-done__in{ grid-column:main-start / span 8; }
+@media (max-width:899.98px){ .sl-done{ padding-block:var(--s-8); } .sl-done__in{ grid-column:main-start / main-end; } }
+.sl-done .ct-say{ max-width:40ch; }
+.sl-done__note{ margin:var(--s-5) 0 0; max-width:46ch; font-size:var(--t-prose); line-height:1.6; color:var(--mc-ink-2); }
+.sl-done__go{ margin:var(--s-8) 0 0; display:flex; flex-wrap:wrap; align-items:center; gap:var(--s-5); }
+.sl-done__again{ display:inline-flex; align-items:center; min-height:var(--mc-tap); }

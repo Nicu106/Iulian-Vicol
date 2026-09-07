@@ -28,7 +28,9 @@ Route::get('/img/{w}', [App\Http\Controllers\ImageController::class, 'resize'])
     ->whereNumber('w')->name('img.resize');
 
 // Sell Your Car routes
-Route::get('/sell-car', [App\Http\Controllers\SellCarController::class, 'index'])->name('sell-car');
+Route::get('/vende', [App\Http\Controllers\SellCarController::class, 'index'])->name('sell-car');
+// the address the live site uses, kept so nothing that links to it breaks
+Route::redirect('/sell-car', '/vende', 301);
 Route::post('/sell-car', [App\Http\Controllers\SellCarController::class, 'store'])->name('sell-car.store');
 
 // Detaliu vehicul (din baza de date)

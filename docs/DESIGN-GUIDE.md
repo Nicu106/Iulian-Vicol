@@ -275,6 +275,36 @@ and all five widths existed shortly after, with no failed jobs.
 a whole library at once (1,993 derivatives in 19 minutes), but nothing depends on
 anyone running it.
 
+## 3e. /vende — the shape of the form is the design
+
+The live /sell-car asks seventeen required fields — an ad title, cylinder capacity,
+body type, colour, horsepower — in a mix of Romanian and Spanish, before it will
+take a phone number. A private seller does not know the cylinder capacity of their
+own car; that is the dealer's job to establish. Every required field they cannot
+answer is a closed tab.
+
+So the page is built as the conversation it actually is. **The marque comes first,
+as the opening**: he works with five and no others, that is the one hard constraint
+he has, and it is unfair to learn it after seventeen fields. The five tiles wear the
+catalogue's exact colours (`#022254 #930016 #004086 #01172E #C50007`) so a
+Volkswagen owner sees the navy their car will sit on. Then four movements —
+El coche · Fotos · Cómo está · Tú — each **question | answers** at 4 | 8 from 900px,
+stacked on a phone. Six required questions.
+
+Photographs preview whole (`object-fit: contain`): what someone hands us is not
+cropped, same rule as every customer photograph. Removing a preview rebuilds the
+file input through a `DataTransfer`, so the input stays the truth.
+
+Two things that were quietly wrong underneath and are fixed with it: the old
+controller `json_encode`d into a column the model already casts to array (double
+encoding the admin then un-picked with `is_string`), and an approved submission
+had no `cover_image`, so it rendered on the catalogue with no photograph. And
+`CarPageController` now 404s a `pending` car — a stranger's unreviewed submission
+was reachable at a guessable slug.
+
+**Trap, recorded in CLAUDE.md §4a:** `BrandbookOnly` serves a 200 holding page
+for any path not on its allowlist. /vende "worked" for two turns.
+
 ## 4. Research findings with sources (motion, images, carousels)
 
 **Speed / drift.** Libraries stating px/s pick 50 (Motion+ Ticker, react-fast-marquee);

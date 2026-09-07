@@ -1,261 +1,328 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="robots" content="noindex, nofollow">
+<title>Vende tu coche — IV MOTORCLASS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&display=swap">
+<link rel="stylesheet" href="{{ asset('css/mc-tokens.css') }}">
+<link rel="stylesheet" href="{{ asset('css/brandbook.css') }}">
+<link rel="stylesheet" href="{{ asset('css/catalog.css') }}">
+<link rel="stylesheet" href="{{ asset('css/contact.css') }}">
+<link rel="stylesheet" href="{{ asset('css/foot.css') }}">
+<link rel="stylesheet" href="{{ asset('css/sell.css') }}">
+</head>
+<body class="bb cat">
 
-@section('title', 'Sell Your Car - Vinde mașina ta cu MOTORCLASS')
-@section('description', 'Vinde mașina ta rapid și sigur cu MOTORCLASS. Proces simplu, evaluare gratuită și prețuri competitive.')
+@include('partials.head', ['current' => 'vender'])
 
-@push('styles')
-  <link rel="stylesheet" href="{{ asset('css/pages/sell-car.css') }}">
-@endpush
+<main class="sl">
 
-@section('content')
-<div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
-      <!-- Header -->
-      <div class="text-center mb-5">
-        <h1 class="display-5 fw-bold text-primary">Vende tu coche</h1>
-        <p class="lead text-secondary">Completa el formulario y nuestro equipo te contactará lo antes posible.</p>
-      </div>
-
-      @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-          <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-      @endif
-
-      @if($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-          <i class="bi bi-exclamation-triangle me-2"></i>
-          <ul class="mb-0">
-            @foreach($errors->all() as $error)
-              <li>{{ $error }}</li>
-            @endforeach
-          </ul>
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-      @endif
-
-      <!-- Form -->
-      <form action="{{ route('sell-car.store') }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
-        @csrf
-        
-        <!-- Informații despre mașină -->
-        <div class="card mb-4">
-          <div class="card-header bg-primary text-white">
-            <h5 class="mb-0"><i class="bi bi-car-front me-2"></i>Información del vehículo</h5>
-          </div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label for="title" class="form-label">Título del anuncio *</label>
-                <input type="text" class="form-control" id="title" name="title" value="{{ old('title') }}" required>
-              </div>
-              <div class="col-md-3">
-                <label for="brand" class="form-label">Marca *</label>
-                <select class="form-select" id="brand" name="brand" required>
-                  <option value="">Selectează marca</option>
-                  <option value="BMW" {{ old('brand') == 'BMW' ? 'selected' : '' }}>BMW</option>
-                  <option value="Audi" {{ old('brand') == 'Audi' ? 'selected' : '' }}>Audi</option>
-                  <option value="Mercedes" {{ old('brand') == 'Mercedes' ? 'selected' : '' }}>Mercedes</option>
-                  <option value="Volkswagen" {{ old('brand') == 'Volkswagen' ? 'selected' : '' }}>Volkswagen</option>
-                  <option value="Toyota" {{ old('brand') == 'Toyota' ? 'selected' : '' }}>Toyota</option>
-                  <option value="Honda" {{ old('brand') == 'Honda' ? 'selected' : '' }}>Honda</option>
-                  <option value="Ford" {{ old('brand') == 'Ford' ? 'selected' : '' }}>Ford</option>
-                  <option value="Nissan" {{ old('brand') == 'Nissan' ? 'selected' : '' }}>Nissan</option>
-                  <option value="Otros" {{ old('brand') == 'Otros' ? 'selected' : '' }}>Otros</option>
-                </select>
-              </div>
-              <div class="col-md-3">
-                <label for="model" class="form-label">Modelo *</label>
-                <input type="text" class="form-control" id="model" name="model" value="{{ old('model') }}" required>
-              </div>
-              <div class="col-md-3">
-                <label for="year" class="form-label">Año *</label>
-                <select class="form-select" id="year" name="year" required>
-                  <option value="">Selectează anul</option>
-                  @for($i = date('Y'); $i >= 1990; $i--)
-                    <option value="{{ $i }}" {{ old('year') == $i ? 'selected' : '' }}>{{ $i }}</option>
-                  @endfor
-                </select>
-              </div>
-              <div class="col-md-3">
-                <label for="price" class="form-label">Preț (EUR) *</label>
-                <input type="number" class="form-control" id="price" name="price" value="{{ old('price') }}" min="0" step="100" required>
-              </div>
-              <div class="col-md-3">
-                <label for="mileage" class="form-label">Kilometraj *</label>
-                <input type="number" class="form-control" id="mileage" name="mileage" value="{{ old('mileage') }}" min="0" required>
-              </div>
-              <div class="col-md-3">
-                <label for="fuel_type" class="form-label">Combustibil *</label>
-                <select class="form-select" id="fuel_type" name="fuel_type" required>
-                  <option value="">Selectează</option>
-                  <option value="Benzina" {{ old('fuel_type') == 'Benzina' ? 'selected' : '' }}>Benzina</option>
-                  <option value="Diésel" {{ old('fuel_type') == 'Diésel' ? 'selected' : '' }}>Diésel</option>
-                  <option value="Híbrido" {{ old('fuel_type') == 'Híbrido' ? 'selected' : '' }}>Híbrido</option>
-                  <option value="Electric" {{ old('fuel_type') == 'Electric' ? 'selected' : '' }}>Electric</option>
-                </select>
-              </div>
-              <div class="col-md-3">
-                <label for="transmission" class="form-label">Transmisión *</label>
-                <select class="form-select" id="transmission" name="transmission" required>
-                  <option value="">Selectează</option>
-                  <option value="Manual" {{ old('transmission') == 'Manual' ? 'selected' : '' }}>Manual</option>
-                  <option value="Automático" {{ old('transmission') == 'Automático' ? 'selected' : '' }}>Automático</option>
-                </select>
-              </div>
-              <div class="col-md-3">
-                <label for="body_type" class="form-label">Tipo de carrocería *</label>
-                <select class="form-select" id="body_type" name="body_type" required>
-                  <option value="">Selectează</option>
-                  <option value="Sedan" {{ old('body_type') == 'Sedan' ? 'selected' : '' }}>Sedan</option>
-                  <option value="SUV" {{ old('body_type') == 'SUV' ? 'selected' : '' }}>SUV</option>
-                  <option value="Hatchback" {{ old('body_type') == 'Hatchback' ? 'selected' : '' }}>Hatchback</option>
-                  <option value="Coupe" {{ old('body_type') == 'Coupe' ? 'selected' : '' }}>Coupe</option>
-                  <option value="Convertible" {{ old('body_type') == 'Convertible' ? 'selected' : '' }}>Convertible</option>
-                  <option value="Wagon" {{ old('body_type') == 'Wagon' ? 'selected' : '' }}>Wagon</option>
-                </select>
-              </div>
-              <div class="col-md-3">
-                <label for="color" class="form-label">Color *</label>
-                <input type="text" class="form-control" id="color" name="color" value="{{ old('color') }}" required>
-              </div>
-              <div class="col-md-3">
-                <label for="engine_capacity" class="form-label">Cilindrada (cm³) *</label>
-                <input type="number" class="form-control" id="engine_capacity" name="engine_capacity" value="{{ old('engine_capacity') }}" min="0" required>
-              </div>
-              <div class="col-md-3">
-                <label for="power" class="form-label">Potencia (CV) *</label>
-                <input type="number" class="form-control" id="power" name="power" value="{{ old('power') }}" min="0" required>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Imagini -->
-        <div class="card mb-4">
-          <div class="card-header bg-success text-white">
-            <h5 class="mb-0"><i class="bi bi-images me-2"></i>Imágenes (máx 10)</h5>
-          </div>
-          <div class="card-body">
-            <div class="mb-3">
-              <label for="images" class="form-label">Selecciona imágenes *</label>
-              <input type="file" class="form-control" id="images" name="images[]" multiple accept="image/*" required>
-              <div class="form-text">Formatos: JPG, PNG, GIF. Tamaño máximo: 5MB por imagen.</div>
-            </div>
-            <div id="imagePreview" class="row g-2"></div>
-          </div>
-        </div>
-
-        <!-- Descriere -->
-        <div class="card mb-4">
-          <div class="card-header bg-info text-white">
-            <h5 class="mb-0"><i class="bi bi-file-text me-2"></i>Descripción</h5>
-          </div>
-          <div class="card-body">
-            <div class="mb-3">
-              <label for="description" class="form-label">Descripción detallada *</label>
-              <textarea class="form-control" id="description" name="description" rows="5" required>{{ old('description') }}</textarea>
-              <div class="form-text">Describe el estado del coche, opciones, historial, etc.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Informații contact -->
-        <div class="card mb-4">
-          <div class="card-header bg-warning text-dark">
-            <h5 class="mb-0"><i class="bi bi-person me-2"></i>Información de contacto</h5>
-          </div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label for="seller_name" class="form-label">Tu nombre *</label>
-                <input type="text" class="form-control" id="seller_name" name="seller_name" value="{{ old('seller_name') }}" required>
-              </div>
-              <div class="col-md-6">
-                <label for="seller_phone" class="form-label">Teléfono *</label>
-                <input type="tel" class="form-control" id="seller_phone" name="seller_phone" value="{{ old('seller_phone') }}" required>
-              </div>
-              <div class="col-12">
-                <label for="seller_email" class="form-label">Email *</label>
-                <input type="email" class="form-control" id="seller_email" name="seller_email" value="{{ old('seller_email') }}" required>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Submit -->
-        <div class="text-center">
-          <button type="submit" class="btn btn-success btn-lg px-5">
-            <i class="bi bi-send me-2"></i>Enviar anuncio
-          </button>
-        </div>
-      </form>
+@if($sent)
+  {{-- ================================================================
+       Sent. A state of the page, not a green bar over the form: what happens
+       next is the content now, and it has to survive a refresh.
+       ================================================================ --}}
+  <section class="sl-done ct-grid" aria-labelledby="done-h">
+    <div class="sl-done__in">
+      <p class="ct-open__kick">Recibido</p>
+      <h1 class="ct-open__h" id="done-h">Lo tengo.<br>Te escribo&nbsp;yo.</h1>
+      <p class="ct-say">Miro las fotos, te llamo o te escribo por WhatsApp, y si
+        el coche me encaja quedamos para verlo. Normalmente el mismo día.</p>
+      <p class="sl-done__note">No te llegará nada automático: cuando recibas un
+        mensaje, seré yo.</p>
+      <p class="sl-done__go">
+        <a class="mc-btn" href="/catalogo">Ver lo que tengo ahora</a>
+        <a class="mc-link sl-done__again" href="/vende">Enviar otro coche</a>
+      </p>
     </div>
-  </div>
-</div>
-@endsection
+  </section>
+@else
 
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Image preview
-  const imageInput = document.getElementById('images');
-  const imagePreview = document.getElementById('imagePreview');
-  
-  imageInput.addEventListener('change', function(e) {
-    imagePreview.innerHTML = '';
-    const files = Array.from(e.target.files);
-    
-    files.forEach((file, index) => {
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const col = document.createElement('div');
-          col.className = 'col-md-3';
-          col.innerHTML = `
-            <div class="position-relative">
-              <img src="${e.target.result}" class="img-thumbnail" style="width: 100%; height: 150px; object-fit: cover;">
-              <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1" onclick="removeImage(${index})">
-                <i class="bi bi-x"></i>
-              </button>
+  {{-- ================================================================
+       The opening IS the first question. He works with five marques and no
+       others — that is the one hard constraint on this page, so it is said
+       before anything is typed, in the catalogue's own colours. A Renault
+       owner learns it here, not after seventeen fields.
+       ================================================================ --}}
+  <section class="sl-open ct-grid" aria-labelledby="sl-h">
+    <div class="sl-open__say">
+      <p class="ct-open__kick">Málaga · compro coches alemanes</p>
+      <h1 class="ct-open__h" id="sl-h">Vende tu coche<br>a quien lo va a&nbsp;vender.</h1>
+      <p class="ct-say sl-open__lead">Trabajo con cinco marcas. Si la tuya es una
+        de ellas, dime cuál y te digo qué puedo hacer.</p>
+    </div>
+  </section>
+
+  <form class="sl-form" method="post" action="{{ route('sell-car.store') }}" enctype="multipart/form-data" novalidate id="sl-form">
+    @csrf
+
+    {{-- ---- 1 · la marca ------------------------------------------ --}}
+    <fieldset class="sl-marques" aria-labelledby="marca-h">
+      <legend class="mc-vh" id="marca-h">Marca</legend>
+      <div class="sl-marques__row">
+        @foreach($marques as $m)
+          <label class="sl-marque" style="--brand:{{ $m['colour'] }}">
+            <input class="sl-marque__in mc-vh" type="radio" name="brand" value="{{ $m['key'] }}"
+                   {{ old('brand') === $m['key'] ? 'checked' : '' }} required>
+            <span class="sl-marque__logo" style="--logo:url('{{ asset('img/marques/'.$m['key'].'.svg') }}')" aria-hidden="true"></span>
+            <span class="sl-marque__name">{{ $m['name'] }}</span>
+          </label>
+        @endforeach
+        <label class="sl-marque sl-marque--other">
+          <input class="sl-marque__in mc-vh" type="radio" name="brand" value="otra" {{ old('brand') === 'otra' ? 'checked' : '' }}>
+          <span class="sl-marque__name">Otra marca</span>
+          <span class="sl-marque__sub">Normalmente no, pero pregunta.</span>
+        </label>
+      </div>
+      @error('brand')<p class="mc-err">{{ $message }}</p>@enderror
+      <div class="sl-other" id="sl-other" hidden>
+        <label class="mc-field">
+          <span class="mc-field__label">¿Qué marca?</span>
+          <input class="mc-input" type="text" name="brand_other" value="{{ old('brand_other') }}" maxlength="60" autocomplete="off">
+        </label>
+        @error('brand_other')<p class="mc-err">{{ $message }}</p>@enderror
+      </div>
+    </fieldset>
+
+    <div class="sl-body cat-wrap">
+
+      {{-- ---- 2 · el coche ------------------------------------------ --}}
+      <section class="sl-sec" aria-labelledby="coche-h">
+        <div class="sl-sec__head">
+          <span class="sl-sec__n" aria-hidden="true">1</span>
+          <h2 class="ct-h2" id="coche-h">El coche</h2>
+          <p class="sl-sec__p">Lo que ya sabes. Lo demás lo miro yo.</p>
+        </div>
+        <div class="sl-sec__body">
+        <div class="sl-grid">
+          <label class="mc-field sl-span2">
+            <span class="mc-field__label">Modelo</span>
+            <input class="mc-input" type="text" name="model" value="{{ old('model') }}" placeholder="Golf, A4, Serie 3, Clase C…" required maxlength="100" autocomplete="off">
+            @error('model')<span class="mc-err">{{ $message }}</span>@enderror
+          </label>
+          <label class="mc-field">
+            <span class="mc-field__label">Año</span>
+            <select class="mc-input sl-select" name="year" required>
+              <option value="">—</option>
+              @foreach($years as $y)<option value="{{ $y }}" {{ (string) old('year') === (string) $y ? 'selected' : '' }}>{{ $y }}</option>@endforeach
+            </select>
+            @error('year')<span class="mc-err">{{ $message }}</span>@enderror
+          </label>
+          <label class="mc-field">
+            <span class="mc-field__label">Kilómetros</span>
+            <input class="mc-input" type="number" name="mileage" value="{{ old('mileage') }}" inputmode="numeric" min="0" step="1000" placeholder="120000" required>
+            @error('mileage')<span class="mc-err">{{ $message }}</span>@enderror
+          </label>
+
+          <fieldset class="sl-pick sl-span2">
+            <legend class="mc-field__label">Combustible <span class="mc-field__opt">(si lo sabes)</span></legend>
+            <div class="sl-pick__row">
+              @foreach($fuels as $f)
+                <label class="sl-pill"><input type="radio" name="fuel" value="{{ $f }}" {{ old('fuel') === $f ? 'checked' : '' }}><span>{{ $f }}</span></label>
+              @endforeach
             </div>
-          `;
-          imagePreview.appendChild(col);
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-  });
-  
-  // Form validation
-  const form = document.querySelector('.needs-validation');
-  form.addEventListener('submit', function(e) {
-    if (!form.checkValidity()) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    form.classList.add('was-validated');
-  });
-});
+          </fieldset>
+          <fieldset class="sl-pick sl-span2">
+            <legend class="mc-field__label">Cambio <span class="mc-field__opt">(si lo sabes)</span></legend>
+            <div class="sl-pick__row">
+              @foreach($gears as $g)
+                <label class="sl-pill"><input type="radio" name="transmission" value="{{ $g }}" {{ old('transmission') === $g ? 'checked' : '' }}><span>{{ $g }}</span></label>
+              @endforeach
+            </div>
+          </fieldset>
 
-function removeImage(index) {
-  const imageInput = document.getElementById('images');
-  const dt = new DataTransfer();
-  const files = Array.from(imageInput.files);
-  
-  files.forEach((file, i) => {
-    if (i !== index) {
-      dt.items.add(file);
+          <label class="mc-field sl-span2">
+            <span class="mc-field__label">Lo que pides <span class="mc-field__opt">(opcional — si no lo tienes claro, te digo yo)</span></span>
+            <span class="sl-money"><input class="mc-input" type="number" name="price" value="{{ old('price') }}" inputmode="numeric" min="0" step="100" placeholder="14500"><b>€</b></span>
+            @error('price')<span class="mc-err">{{ $message }}</span>@enderror
+          </label>
+        </div>
+        </div>
+      </section>
+
+      {{-- ---- 3 · las fotos ------------------------------------------
+           The centre of the page. He buys on photographs; the ones he takes of
+           his own stock are the argument of the whole site. Previews are shown
+           WHOLE — object-fit:contain — the same rule as every customer
+           photograph here: nothing anyone hands us gets cropped. --}}
+      <section class="sl-sec" aria-labelledby="fotos-h">
+        <div class="sl-sec__head">
+          <span class="sl-sec__n" aria-hidden="true">2</span>
+          <h2 class="ct-h2" id="fotos-h">Fotos</h2>
+          <p class="sl-sec__p">Las del móvil valen. Exterior por los cuatro lados,
+            el interior, el cuentakilómetros, y lo que no esté bien — eso también.
+            Hasta {{ $maxPhotos }}.</p>
+        </div>
+        <div class="sl-sec__body">
+        <div class="sl-drop" id="sl-drop">
+          {{-- The input lives INSIDE its label. The target a finger meets is the
+               label — the whole zone — and the audit measures it that way only
+               when the control is nested, which is also how every other field on
+               this site is built. --}}
+          <label class="sl-drop__label">
+            <input class="sl-drop__in" type="file" name="photos[]" id="sl-files" accept="image/*" multiple>
+            <span class="sl-drop__big">Elige las fotos</span>
+            <span class="sl-drop__small">o arrástralas aquí</span>
+          </label>
+          <ul class="sl-previews" id="sl-previews" aria-live="polite"></ul>
+          <p class="sl-drop__count" id="sl-count" hidden></p>
+        </div>
+        @error('photos')<p class="mc-err">{{ $message }}</p>@enderror
+        @error('photos.*')<p class="mc-err">{{ $message }}</p>@enderror
+        </div>
+      </section>
+
+      {{-- ---- 4 · cómo está ----------------------------------------- --}}
+      <section class="sl-sec" aria-labelledby="estado-h">
+        <div class="sl-sec__head">
+          <span class="sl-sec__n" aria-hidden="true">3</span>
+          <h2 class="ct-h2" id="estado-h">Cómo está</h2>
+          <p class="sl-sec__p">Opcional. Golpes, averías, cuántos dueños, si tiene
+            libro. Cuanto más claro ahora, menos sorpresas después.</p>
+        </div>
+        <div class="sl-sec__body">
+        <label class="mc-field">
+          <span class="mc-vh">Estado del coche</span>
+          <textarea class="mc-textarea sl-text" name="description" rows="4" maxlength="2000"
+                    placeholder="Un dueño, siempre en garaje, revisiones en la casa. Un roce en la puerta trasera.">{{ old('description') }}</textarea>
+        </label>
+        </div>
+      </section>
+
+      {{-- ---- 5 · tú ------------------------------------------------- --}}
+      <section class="sl-sec" aria-labelledby="tu-h">
+        <div class="sl-sec__head">
+          <span class="sl-sec__n" aria-hidden="true">4</span>
+          <h2 class="ct-h2" id="tu-h">Tú</h2>
+          <p class="sl-sec__p">Te contesto por WhatsApp o te llamo. Contesto yo.</p>
+        </div>
+        <div class="sl-sec__body">
+        <div class="sl-grid">
+          <label class="mc-field">
+            <span class="mc-field__label">Tu nombre</span>
+            <input class="mc-input" type="text" name="seller_name" value="{{ old('seller_name') }}" autocomplete="name" required maxlength="120">
+            @error('seller_name')<span class="mc-err">{{ $message }}</span>@enderror
+          </label>
+          <label class="mc-field">
+            <span class="mc-field__label">Tu teléfono</span>
+            <input class="mc-input" type="tel" name="seller_phone" value="{{ old('seller_phone') }}" autocomplete="tel" inputmode="tel" required placeholder="6xx xxx xxx">
+            @error('seller_phone')<span class="mc-err">{{ $message }}</span>@enderror
+          </label>
+          <label class="mc-field sl-span2">
+            <span class="mc-field__label">Email <span class="mc-field__opt">(opcional)</span></span>
+            <input class="mc-input" type="email" name="seller_email" value="{{ old('seller_email') }}" autocomplete="email">
+            @error('seller_email')<span class="mc-err">{{ $message }}</span>@enderror
+          </label>
+        </div>
+
+        <div class="sl-send">
+          <button class="mc-btn sl-send__btn" type="submit" id="sl-submit">Enviar</button>
+          <p class="sl-send__note">Esto no publica nada. Me llega a mí, lo miro, y
+            te escribo.</p>
+        </div>
+        </div>
+      </section>
+
+    </div>
+  </form>
+@endif
+
+</main>
+
+@include('partials.foot')
+
+<script>
+(function () {
+  document.documentElement.className += ' js';
+  var form = document.getElementById('sl-form');
+  if (!form) { return; }
+
+  /* ---- "otra marca" reveals its one question ------------------------------ */
+  var other = document.getElementById('sl-other');
+  var radios = form.querySelectorAll('input[name=brand]');
+  var syncOther = function () {
+    var on = form.querySelector('input[name=brand]:checked');
+    var show = !!on && on.value === 'otra';
+    other.hidden = !show;
+    other.querySelector('input').required = show;
+  };
+  for (var i = 0; i < radios.length; i++) { radios[i].addEventListener('change', syncOther); }
+  syncOther();
+
+  /* ---- photographs: previews, whole, and honest counts ---------------------
+     The file input keeps the truth. The previews are drawn from it, never the
+     other way round, so a removed preview really removes the file: a DataTransfer
+     is rebuilt without it and handed back to the input. */
+  var input = document.getElementById('sl-files');
+  var list  = document.getElementById('sl-previews');
+  var count = document.getElementById('sl-count');
+  var drop  = document.getElementById('sl-drop');
+  var MAX   = {{ (int) $maxPhotos }};
+  var MAX_KB = 12288;
+
+  var render = function () {
+    list.textContent = '';
+    var files = input.files, total = 0, over = 0;
+    for (var i = 0; i < files.length; i++) {
+      var f = files[i]; total += f.size;
+      if (f.size > MAX_KB * 1024) { over++; }
+      var li = document.createElement('li'); li.className = 'sl-prev' + (f.size > MAX_KB * 1024 ? ' is-over' : '');
+      var img = document.createElement('img'); img.alt = ''; img.decoding = 'async';
+      img.src = URL.createObjectURL(f);
+      img.onload = function () { URL.revokeObjectURL(this.src); };
+      var x = document.createElement('button'); x.type = 'button'; x.className = 'sl-prev__x';
+      x.setAttribute('aria-label', 'Quitar la foto ' + (i + 1)); x.textContent = '×'; x.dataset.i = i;
+      li.appendChild(img); li.appendChild(x); list.appendChild(li);
     }
+    if (files.length) {
+      count.hidden = false;
+      count.textContent = files.length + (files.length === 1 ? ' foto' : ' fotos') + ' · ' + (total / 1048576).toFixed(1) + ' MB'
+        + (files.length > MAX ? ' — son más de ' + MAX + ', quita ' + (files.length - MAX) : '')
+        + (over ? ' — ' + over + (over === 1 ? ' pesa' : ' pesan') + ' más de 12 MB' : '');
+      count.className = 'sl-drop__count' + (files.length > MAX || over ? ' is-bad' : '');
+    } else { count.hidden = true; }
+    drop.classList.toggle('has-files', files.length > 0);
+  };
+
+  var setFiles = function (arr) {
+    var dt = new DataTransfer();
+    for (var i = 0; i < arr.length; i++) { dt.items.add(arr[i]); }
+    input.files = dt.files;
+    render();
+  };
+
+  input.addEventListener('change', render);
+  list.addEventListener('click', function (e) {
+    var b = e.target.closest('.sl-prev__x'); if (!b) { return; }
+    var keep = []; for (var i = 0; i < input.files.length; i++) { if (i !== +b.dataset.i) { keep.push(input.files[i]); } }
+    setFiles(keep);
   });
-  
-  imageInput.files = dt.files;
-  
-  // Refresh preview
-  imageInput.dispatchEvent(new Event('change'));
-}
+
+  // drag and drop adds to what is there; it does not replace it
+  ['dragenter', 'dragover'].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.add('is-over'); }); });
+  ['dragleave', 'drop'].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.remove('is-over'); }); });
+  drop.addEventListener('drop', function (e) {
+    var add = []; var dt = e.dataTransfer; if (!dt) { return; }
+    for (var i = 0; i < dt.files.length; i++) { if (/^image\//.test(dt.files[i].type)) { add.push(dt.files[i]); } }
+    var all = []; for (var j = 0; j < input.files.length; j++) { all.push(input.files[j]); }
+    setFiles(all.concat(add));
+  });
+
+  /* ---- sending: say so, once ------------------------------------------------
+     Twelve phone photographs are 50 MB on a 4G upload; a button that looks
+     asleep for twenty seconds gets pressed again. */
+  var btn = document.getElementById('sl-submit');
+  form.addEventListener('submit', function (e) {
+    if (input.files.length > MAX) { e.preventDefault(); count.focus(); return; }
+    if (!form.checkValidity()) { e.preventDefault(); form.reportValidity(); return; }
+    btn.disabled = true; btn.textContent = 'Enviando…';
+    form.classList.add('is-sending');
+  });
+})();
 </script>
-@endpush
-
+</body>
+</html>

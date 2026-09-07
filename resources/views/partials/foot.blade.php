@@ -17,6 +17,7 @@
         <li><a href="/catalogo#entregados">Entregados</a></li>
         <li><a href="/brandbook">Quién soy</a></li>
         <li><a href="/contacto">Contacto</a></li>
+        <li><a href="/vende">Vende tu coche</a></li>
       </ul>
     </nav>
 

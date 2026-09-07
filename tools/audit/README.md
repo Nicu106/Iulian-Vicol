@@ -107,6 +107,13 @@ node reviews-photos.mjs    # asserts: 0 cut and 0 quotes needing the scroll fall
 node reviews-widths.mjs    # every card renders at exactly its computed width (the Safari flex-shrink guard)
 node reviews-seam.mjs      # the loop seam is exactly one row: 0px error, every pair one stride apart
 node reviews-speed.mjs     # one sample of the speed profile, 24–110 px/s (scrollLeft rounds — this once caught 1px/frame)
+node sell-car.mjs           # /vende: served past the BrandbookOnly allowlist, /sell-car
+                           # 301s to it, five marques + "otra" in the catalogue's exact
+                           # colours, six required questions, question | answers at 1440
+                           # and stacked on a phone, previews whole, a REAL submission
+                           # (two photographs) that lands on the received state and is
+                           # stored pending with an images array and a cover, 404s on
+                           # the public car page, then is deleted again.
 node images.mjs             # what a first-time visitor downloads: every page inside
                            # its byte budget, no original files served, nothing over
                            # 400 KB, no photograph scaled up to fill its box, the

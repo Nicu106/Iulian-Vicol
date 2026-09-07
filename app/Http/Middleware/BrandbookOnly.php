@@ -24,6 +24,8 @@ class BrandbookOnly
     private const ALLOW = [
         'brandbook',
         'brandbook/*',
+        'vende',            // sell your car — GET the page, POST its form
+        'sell-car',         // the live site's address for it, 301 → /vende
         'catalogo',      // the catalogue page, in design
         'coche/*',       // one car, reached from the catalogue
         'inicio',        // the home page, in design

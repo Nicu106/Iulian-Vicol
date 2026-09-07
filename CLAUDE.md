@@ -134,6 +134,14 @@ table predates the square-card decision — the token file wins where they disag
 - **`prefers-reduced-motion`**: nothing moves, and every piece of content must still be
   reachable (the reviews go static: photo above, words below). Same for no-JS.
 
+## 4a. A new page returns 200 and is not your page: the allowlist
+
+`app/Http/Middleware/BrandbookOnly.php` holds this environment closed. Any path not in
+its `ALLOW` list gets `pages/held.blade.php` — status 200, navy, titled "Brandbook".
+It is not a 404, so a curl looks fine and the contrast audit reports 15 elements
+checked. /vende was "working" for two turns before I noticed. Add the path (and any
+POST or redirect alias) to `ALLOW` when you add a route.
+
 ## 4b. Before you put type on a photograph, read the photograph
 
 Draw the file into a canvas and reduce it to three grids — mean luminance, mean

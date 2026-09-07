@@ -25,7 +25,10 @@ class CarPageController extends Controller
 
     public function show(string $slug): View
     {
-        $car = Vehicle::where('slug', $slug)->firstOrFail();
+        // Not `pending`: a submission from /vende is a Vehicle row until he approves
+        // it, and this page must not show a stranger's unreviewed car at a guessable
+        // URL. Anything he has not approved does not exist here.
+        $car = Vehicle::where('slug', $slug)->where('status', '!=', 'pending')->firstOrFail();
 
         $all = array_values(array_filter(array_merge(
             [$car->cover_image],

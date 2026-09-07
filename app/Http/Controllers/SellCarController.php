@@ -2,78 +2,125 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use App\Models\Vehicle;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\View\View;
 
+/**
+ * "Vende tu coche": a private owner asking whether he will buy theirs.
+ *
+ * The page it replaces asked for seventeen required fields — an ad title, engine
+ * capacity, body type, colour, horsepower — before it would take a phone number.
+ * Those are the dealer's job to establish, and a seller who does not know the
+ * cylinder capacity of their own car closes the tab. What he actually needs to
+ * answer is: what car, roughly what state, a few photographs, how to reach you.
+ * Six required fields. Everything else is optional and says so.
+ */
 class SellCarController extends Controller
 {
-    public function index()
+    /** The five he works with, in the catalogue's own order and colours, so the
+     *  tiles on this page and the rows on /catalogo are the same objects. */
+    public const MARQUES = [
+        ['key' => 'volkswagen', 'name' => 'Volkswagen',    'colour' => '#022254'],
+        ['key' => 'audi',       'name' => 'Audi',          'colour' => '#930016'],
+        ['key' => 'bmw',        'name' => 'BMW',           'colour' => '#004086'],
+        ['key' => 'mercedes',   'name' => 'Mercedes-Benz', 'colour' => '#01172E'],
+        ['key' => 'porsche',    'name' => 'Porsche',       'colour' => '#C50007'],
+    ];
+
+    /** The site's own vocabulary — Vehicle::getFuelEsAttribute normalises to these. */
+    private const FUEL = ['Gasolina', 'Diésel', 'Híbrido', 'Eléctrico'];
+    private const GEAR = ['Manual', 'Automático'];
+
+    private const MAX_PHOTOS = 12;
+    private const MAX_PHOTO_KB = 12288;   // phone originals in this library run to 11 MB
+
+    public function index(Request $request): View
     {
-        return view('pages.sell-car');
+        return view('pages.sell-car', [
+            'marques' => self::MARQUES,
+            'fuels'   => self::FUEL,
+            'gears'   => self::GEAR,
+            'years'   => range((int) date('Y'), 2005),
+            'sent'    => $request->boolean('enviado'),
+            'maxPhotos' => self::MAX_PHOTOS,
+        ]);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'brand' => 'required|string|max:100',
-            'model' => 'required|string|max:100',
-            'year' => 'required|integer|min:1990|max:' . date('Y'),
-            'price' => 'required|numeric|min:0',
-            'mileage' => 'required|integer|min:0',
-            'fuel_type' => 'required|string|in:Benzina,Diésel,Híbrido,Electric',
-            'transmission' => 'required|string|in:Manual,Automático',
-            'body_type' => 'required|string|max:50',
-            'color' => 'required|string|max:50',
-            'engine_capacity' => 'required|integer|min:0',
-            'power' => 'required|integer|min:0',
-            'description' => 'required|string|max:2000',
-            'seller_name' => 'required|string|max:255',
-            'seller_phone' => 'required|string|max:20',
-            'seller_email' => 'required|email|max:255',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB max per image
+        $marqueKeys = array_column(self::MARQUES, 'key');
+
+        $data = $request->validate([
+            'brand'        => ['required', 'string', 'in:' . implode(',', array_merge($marqueKeys, ['otra']))],
+            'brand_other'  => ['nullable', 'string', 'max:60', 'required_if:brand,otra'],
+            'model'        => ['required', 'string', 'max:100'],
+            'year'         => ['required', 'integer', 'min:1990', 'max:' . date('Y')],
+            'mileage'      => ['required', 'integer', 'min:0', 'max:1500000'],
+            'fuel'         => ['nullable', 'string', 'in:' . implode(',', self::FUEL)],
+            'transmission' => ['nullable', 'string', 'in:' . implode(',', self::GEAR)],
+            'price'        => ['nullable', 'integer', 'min:0', 'max:2000000'],
+            'description'  => ['nullable', 'string', 'max:2000'],
+            'seller_name'  => ['required', 'string', 'max:120'],
+            'seller_phone' => ['required', 'string', 'max:30', 'regex:/^[+\d][\d\s().-]{6,}$/'],
+            'seller_email' => ['nullable', 'email', 'max:255'],
+            'photos'       => ['nullable', 'array', 'max:' . self::MAX_PHOTOS],
+            'photos.*'     => ['image', 'mimes:jpeg,png,webp,heic', 'max:' . self::MAX_PHOTO_KB],
+        ], [
+            'brand.required'        => 'Dime la marca.',
+            'brand_other.required_if' => 'Dime qué marca es.',
+            'model.required'        => 'Dime el modelo.',
+            'year.required'         => 'Dime el año.',
+            'mileage.required'      => 'Dime los kilómetros, aunque sea aproximado.',
+            'seller_name.required'  => 'Dime cómo te llamas.',
+            'seller_phone.required' => 'Necesito un teléfono para contestarte.',
+            'seller_phone.regex'    => 'Ese teléfono no parece un teléfono.',
+            'photos.max'            => 'Hasta ' . self::MAX_PHOTOS . ' fotos.',
+            'photos.*.max'          => 'Una de las fotos pesa más de 12 MB.',
+            'photos.*.image'        => 'Uno de los archivos no es una imagen.',
         ]);
 
-        // Create slug for the vehicle
-        $slug = Str::slug($request->brand . ' ' . $request->model . ' ' . $request->year . ' ' . Str::random(6));
+        $brandName = $data['brand'] === 'otra'
+            ? trim((string) $data['brand_other'])
+            : collect(self::MARQUES)->firstWhere('key', $data['brand'])['name'];
 
-        // Handle image uploads
-        $imagePaths = [];
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                $path = $image->store('sell-cars/' . $slug, 'public');
-                $imagePaths[] = $path;
-            }
+        $slug = Str::slug($brandName . ' ' . $data['model'] . ' ' . $data['year'] . ' ' . Str::lower(Str::random(5)));
+
+        // Under /storage/ so the same resizer, cache and warming cover them. Two
+        // columns get them: `images` is what the admin's review screen reads, and
+        // cover/gallery are what the public page reads once he approves it — the
+        // old form filled only the first, so an approved car had no photograph.
+        $stored = [];
+        foreach ((array) $request->file('photos', []) as $file) {
+            $stored[] = '/storage/' . $file->store('sell-cars/' . $slug, 'public');
         }
 
-        // Create vehicle record
-        $vehicle = Vehicle::create([
-            'title' => $request->title,
-            'brand' => $request->brand,
-            'model' => $request->model,
-            'year' => $request->year,
-            'price' => $request->price,
-            'mileage' => $request->mileage,
-            'fuel_type' => $request->fuel_type,
-            'transmission' => $request->transmission,
-            'body_type' => $request->body_type,
-            'color' => $request->color,
-            'engine_capacity' => $request->engine_capacity,
-            'power' => $request->power,
-            'description' => $request->description,
-            'slug' => $slug,
-            'is_featured' => false,
-            'offer_type' => 'Vânzare',
-            'seller_name' => $request->seller_name,
-            'seller_phone' => $request->seller_phone,
-            'seller_email' => $request->seller_email,
-            'images' => json_encode($imagePaths),
-            'status' => 'pending', // Pending admin approval
+        Vehicle::create([
+            'title'        => trim($brandName . ' ' . $data['model'] . ' ' . $data['year']),
+            'brand'        => $brandName,
+            'model'        => $data['model'],
+            'year'         => $data['year'],
+            'mileage'      => $data['mileage'],
+            'fuel'         => $data['fuel'] ?? null,
+            'fuel_type'    => $data['fuel'] ?? null,
+            'transmission' => $data['transmission'] ?? null,
+            'price'        => $data['price'] ?? 0,
+            'description'  => $data['description'] ?? null,
+            'slug'         => $slug,
+            'featured'     => false,
+            'offer_type'   => 'Compra',
+            'seller_name'  => $data['seller_name'],
+            'seller_phone' => $data['seller_phone'],
+            'seller_email' => $data['seller_email'] ?? null,
+            'images'       => $stored,                 // cast to array on the model; json_encode here double-encoded
+            'cover_image'  => $stored[0] ?? null,
+            'gallery_images' => array_slice($stored, 1),
+            'status'       => 'pending',
         ]);
 
-        return redirect()->route('sell-car')->with('success', 'Anunțul tău a fost trimis cu succes! Va fi verificat de echipa noastră înainte de publicare.');
+        // A state on the same page, not a flash: the confirmation is content, and it
+        // has to survive a refresh.
+        return redirect()->route('sell-car', ['enviado' => 1]);
     }
 }
-
