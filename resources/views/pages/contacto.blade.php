@@ -1,13 +1,13 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-<meta name="robots" content="noindex, nofollow">
-<title>Contacto — IV MOTORCLASS</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&display=swap">
+@extends('layouts.site')
+
+@section('title', 'Contacto — IV MOTORCLASS')
+@section('current', 'contacto')
+
+@push('css')
+<link rel="stylesheet" href="{{ asset('css/contact.css') }}">
+@endpush
+
+@push('head')
 {{-- The preload has to name the same candidate the <img> will choose, srcset and
      sizes included. Preloading a bare href next to a responsive img is how a page
      downloads its hero twice. --}}
@@ -15,16 +15,9 @@
       href="{{ \App\Support\Img::url($hero, 1080) ?? $hero }}"
       imagesrcset="{{ \App\Support\Img::srcset($hero, 1600) }}"
       imagesizes="(min-width:2000px) 920px, (min-width:900px) 800px, 100vw">
-<link rel="stylesheet" href="{{ asset('css/mc-tokens.css') }}">
-<link rel="stylesheet" href="{{ asset('css/brandbook.css') }}">
-<link rel="stylesheet" href="{{ asset('css/catalog.css') }}">
-<link rel="stylesheet" href="{{ asset('css/foot.css') }}">
-<link rel="stylesheet" href="{{ asset('css/contact.css') }}">
-</head>
-<body class="bb cat">
+@endpush
 
-@include('partials.head', ['current' => 'contacto'])
-
+@section('content')
 <main class="ct">
 
   {{-- ==================================================================
@@ -167,9 +160,9 @@
 
 
 </main>
+@endsection
 
-@include('partials.foot')
-
+@section('after')
 <div class="cat-dock" role="complementary" aria-label="Contacto">
   <div class="mc-bar">
     <span class="cat-dock__t">¿Hablamos?<b>Contesto yo</b></span>
@@ -179,7 +172,9 @@
     </span>
   </div>
 </div>
+@endsection
 
+@push('js')
 <script>
 (function () {
   document.documentElement.className += ' js';
@@ -241,5 +236,4 @@
   });
 })();
 </script>
-</body>
-</html>
+@endpush

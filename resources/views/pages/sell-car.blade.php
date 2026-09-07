@@ -1,24 +1,14 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-<meta name="robots" content="noindex, nofollow">
-<title>Vende tu coche — IV MOTORCLASS</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&display=swap">
-<link rel="stylesheet" href="{{ asset('css/mc-tokens.css') }}">
-<link rel="stylesheet" href="{{ asset('css/brandbook.css') }}">
-<link rel="stylesheet" href="{{ asset('css/catalog.css') }}">
+@extends('layouts.site')
+
+@section('title', 'Vende tu coche — IV MOTORCLASS')
+@section('current', 'vender')
+
+@push('css')
 <link rel="stylesheet" href="{{ asset('css/contact.css') }}">
-<link rel="stylesheet" href="{{ asset('css/foot.css') }}">
 <link rel="stylesheet" href="{{ asset('css/sell.css') }}">
-</head>
-<body class="bb cat">
+@endpush
 
-@include('partials.head', ['current' => 'vender'])
-
+@section('content')
 <main class="sl">
 
 @if($sent)
@@ -260,9 +250,9 @@
 @endif
 
 </main>
+@endsection
 
-@include('partials.foot')
-
+@push('js')
 <script>
 (function () {
   document.documentElement.className += ' js';
@@ -352,5 +342,4 @@
   });
 })();
 </script>
-</body>
-</html>
+@endpush

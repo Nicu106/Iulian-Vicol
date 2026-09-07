@@ -1,23 +1,14 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-<meta name="robots" content="noindex, nofollow">
-<title>IV MOTORCLASS — Coches alemanes premium en Málaga</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&display=swap">
-<link rel="stylesheet" href="{{ asset('css/mc-tokens.css') }}">
-<link rel="stylesheet" href="{{ asset('css/brandbook.css') }}">
-<link rel="stylesheet" href="{{ asset('css/catalog.css') }}">
-<link rel="stylesheet" href="{{ asset('css/foot.css') }}">
+@extends('layouts.site')
+
+@section('title', 'IV MOTORCLASS — Coches alemanes premium en Málaga')
+@section('current', 'inicio')
+@section('body', 'home')
+
+@push('css')
 <link rel="stylesheet" href="{{ asset('css/home.css') }}">
-</head>
-<body class="bb cat home">
+@endpush
 
-@include('partials.head', ['current' => 'inicio'])
-
+@section('content')
 <main>
 
   {{-- ============ the hero ============ --}}
@@ -284,9 +275,9 @@
     </div>
   </section>
 </main>
+@endsection
 
-@include('partials.foot')
-
+@section('after')
 <div class="cat-dock" role="complementary" aria-label="Contacto">
   <div class="mc-bar">
     <span class="cat-dock__t">¿Buscas algo concreto?<b>Te lo busco yo</b></span>
@@ -296,7 +287,9 @@
     </span>
   </div>
 </div>
+@endsection
 
+@push('js')
 <script>
 (function () {
   /* ---- the row -----------------------------------------------------------
@@ -684,5 +677,4 @@
   fillMax(); fillModels(); count();
 })();
 </script>
-</body>
-</html>
+@endpush

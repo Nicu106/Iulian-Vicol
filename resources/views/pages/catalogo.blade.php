@@ -1,27 +1,15 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-<meta name="robots" content="noindex, nofollow">
-<title>Catálogo — IV MOTORCLASS</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&display=swap">
-<link rel="stylesheet" href="{{ asset('css/mc-tokens.css') }}">
-<link rel="stylesheet" href="{{ asset('css/brandbook.css') }}">
-<link rel="stylesheet" href="{{ asset('css/catalog.css') }}">
-<link rel="stylesheet" href="{{ asset('css/foot.css') }}">
-</head>
-<body class="bb cat">
+@extends('layouts.site')
 
+@section('title', 'Catálogo — IV MOTORCLASS')
+@section('current', 'catalogo')
+
+@section('content')
 @php
   $euros = fn($n) => number_format($n, 0, ',', '.').' €';
   $km    = fn($n) => number_format($n, 0, ',', '.').' km';
   $words = ['','Un','Dos','Tres','Cuatro','Cinco','Seis','Siete','Ocho','Nueve','Diez','Once','Doce'];
 @endphp
 
-@include('partials.head', ['current' => 'catalogo'])
 
 <main>
   {{-- The banner. The photograph is atmosphere, not an advert: the words on it are
@@ -128,12 +116,13 @@
       </section>
     @endforeach
 </main>
+@endsection
 
+@section('after')
 {{-- Over 60% of car shopping happens on a phone, and the one action worth having
      always to hand belongs in the lower half of the screen, not in a header that
      scrolls away. Phone only: on a desktop the header's own button is always
      visible. --}}
-@include('partials.foot')
 
 <div class="cat-dock" role="complementary" aria-label="Contacto">
   <div class="mc-bar">
@@ -144,7 +133,9 @@
     </span>
   </div>
 </div>
+@endsection
 
+@push('js')
 <script>
 (function () {
   document.documentElement.className += ' js';
@@ -430,5 +421,4 @@
   }, 6000);
 })();
 </script>
-</body>
-</html>
+@endpush

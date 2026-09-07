@@ -15,6 +15,8 @@ const exe  = `${dir}/${readdirSync(dir).filter(d => d.startsWith('linux-')).sort
 // the shell's double quotes every `$v` in the snippet expanded to nothing and
 // tinker was handed a parse error. `"$TINK"` expands once, to the code, and the
 // code's own dollars are never seen by the shell.
+// the security suite may have spent this IP's four-an-hour allowance
+execSync(`cd ${ROOT} && php artisan cache:clear >/dev/null 2>&1`);
 const tinker = (code) => execSync(`cd ${ROOT} && php artisan tinker --execute="$TINK" 2>/dev/null`,
   { env: { ...process.env, TINK: code } }).toString().trim();
 
@@ -90,6 +92,10 @@ const b = await p.launch({ executablePath: exe,
   const left = await pg.evaluate(() => document.getElementById('sl-files').files.length);
   is(left === 1, 'removing a preview really removes the file from the input', `${left} left`);
   await (await pg.$('#sl-files')).uploadFile(...files); await new Promise(r => setTimeout(r, 400));
+  // The form refuses anything sent inside four seconds — see sell-car-security.mjs
+  // and the clock in SellCarRequest. A person takes about 25; this suite is faster
+  // than any bot and has to wait like everyone else.
+  await new Promise(r => setTimeout(r, 4500));
   await Promise.all([pg.waitForNavigation({ waitUntil: 'networkidle0', timeout: 120000 }), pg.click('#sl-submit')]);
   const landed = pg.url().endsWith('/vende?enviado=1');
   const h1 = await pg.evaluate(() => document.querySelector('h1')?.textContent.replace(/\s+/g, ' ').trim());

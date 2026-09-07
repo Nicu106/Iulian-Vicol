@@ -1,24 +1,18 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-<meta name="robots" content="noindex, nofollow">
-<title>{{ $car->brand }} {{ $car->model }} {{ $car->year }} — IV MOTORCLASS</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&display=swap">
-<link rel="stylesheet" href="{{ asset('css/mc-tokens.css') }}">
-<link rel="stylesheet" href="{{ asset('css/brandbook.css') }}">
-<link rel="stylesheet" href="{{ asset('css/catalog.css') }}">
-<link rel="stylesheet" href="{{ asset('css/foot.css') }}">
+@extends('layouts.site')
+
+@section('title', $car->brand.' '.$car->model.' '.$car->year.' — IV MOTORCLASS')
+@section('current', '')
+{{-- A car that is gone dresses the whole document, header and footer
+     included — see the SOLD block in car.css. --}}
+@section('body', ($car->status ?? '') === 'sold' ? 'car--sold' : '')
+
+@push('css')
 <link rel="stylesheet" href="{{ asset('css/car.css') }}">
-</head>
+@endpush
+
 @php $gone = ($car->status ?? '') === 'sold'; @endphp
-<body class="bb cat {{ $gone ? 'car--sold' : '' }}">
 
-@include('partials.head', ['current' => ''])
-
+@section('content')
 <main class="cat-wrap car">
 
   <a class="car-back mc-link" href="/catalogo">← Todos los coches</a>
@@ -239,7 +233,10 @@
   @endif
 
 </main>
+@endsection
 
+{{-- Below the footer: the full-screen photograph viewer, and the phone dock. --}}
+@section('after')
 {{-- Full screen. Built empty; the script fills and opens it. --}}
 <div class="car-view" id="view" hidden role="dialog" aria-modal="true" aria-label="Fotografía a pantalla completa">
   <button class="car-view__x" type="button" id="view-x" aria-label="Cerrar">&times;</button>
@@ -253,8 +250,6 @@
 </div>
 
 @if($gone)<p class="car-tab-sold" aria-hidden="true">Vendido</p>@endif
-
-@include('partials.foot')
 
 <div class="cat-dock" role="complementary" aria-label="Contacto">
   <div class="mc-bar">
@@ -284,7 +279,9 @@
     @endif
   </div>
 </div>
+@endsection
 
+@push('js')
 <script>
 (function () {
   document.documentElement.className += ' js';
@@ -472,5 +469,4 @@
   }
 })();
 </script>
-</body>
-</html>
+@endpush

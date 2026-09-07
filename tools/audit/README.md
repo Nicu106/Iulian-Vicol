@@ -113,6 +113,12 @@ node sell-car-security.mjs  # attacks /vende: honeypot, a submission under 4 s, 
                            # token (without one every attempt is 419 and the limiter
                            # is never reached), a PHP file renamed .jpg, a .php under
                            # /storage — and that an honest seller still gets through.
+node layout.mjs             # one document for the site: no page declares its own,
+                           # all five extend layouts/site, exactly one header/main/footer
+                           # in that order, five nav links, the four shared stylesheets,
+                           # the shared viewport and robots meta, each page's own title
+                           # and nav mark — and a page can still dress the whole
+                           # document, which is how the sold theme reaches the header.
 node header.mjs             # the shared header: all five links on every page, the
                            # current one marked, 100px tall from 320 to 768 and 72 from
                            # 900 — one row of links that scrolls sideways on a phone, the

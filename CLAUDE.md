@@ -134,6 +134,30 @@ table predates the square-card decision — the token file wins where they disag
 - **`prefers-reduced-motion`**: nothing moves, and every piece of content must still be
   reachable (the reviews go static: photo above, words below). Same for no-JS.
 
+## 4. One layout: `resources/views/layouts/site.blade.php`
+
+Every page extends it. A page brings its content and nothing else:
+
+    @section('title')    the WHOLE title — /inicio leads with the company name,
+                         the others trail it, so the layout appends nothing
+    @section('current')  which nav item is marked
+    @section('body')     extra <body> classes (the sold theme uses this)
+    @push('css')         page-only stylesheets, after the shared four
+    @push('head')        preloads
+    @section('content')  the page
+    @section('after')    below the footer — the phone dock, the photo viewer
+    @push('js')          page scripts
+
+The layout owns charset, viewport, robots, the fonts, and mc-tokens + brandbook +
+catalog + foot. Do not repeat them in a page. Before this there were five
+standalone documents and they had already drifted: /coche carried
+`interactive-widget=resizes-content` and /catalogo did not.
+
+`tools/audit/suites/layout.mjs` holds it. When refactoring anything structural,
+capture a fingerprint first (doc height, box geometry, stylesheet list, nav, title)
+and diff it after — that is what caught /inicio silently losing its `home` body
+class and having its title rewritten.
+
 ## 4a. A new page returns 200 and is not your page: the allowlist
 
 `app/Http/Middleware/BrandbookOnly.php` holds this environment closed. Any path not in
