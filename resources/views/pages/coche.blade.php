@@ -89,6 +89,12 @@
           <a class="car-thumb {{ $i === 0 ? 'is-on' : '' }}"
              href="{{ \App\Support\Img::url($p['path'], 1600) ?? $p['path'] }}"
              data-stage="{{ \App\Support\Img::url($p['path'], 1080) ?? $p['path'] }}"
+             {{-- The stage carries a srcset, and srcset BEATS src: setting only
+                  .src on it changed the attribute and left the picture alone,
+                  which is exactly what "the photo does not really change" looks
+                  like. Each thumbnail carries the candidates for the slot it is
+                  about to fill. --}}
+             data-set="{{ \App\Support\Img::srcset($p['path'], 1600) }}"
              data-group="{{ $p['group'] ?? 'none' }}"
              data-n="{{ $p['n'] }}"
              aria-label="Foto {{ $p['n'] }}{{ $p['group'] ? ' · '.($groups[$p['group']] ?? '') : '' }}">
@@ -297,12 +303,37 @@
     exterior: 'Todavía no he clasificado las fotos del exterior de este coche.'
   };
 
+  /* Swap the stage without a gap.
+
+     srcset has to move with src or nothing changes on screen. And the new file is
+     decoded BEFORE it is shown: assigning straight to the visible element blanks
+     it for as long as the download takes — on a laptop the first press of a
+     thumbnail meant waiting for a 1080px file with an empty frame in the meantime.
+     The old photograph stays up until the new one can be painted in one go.
+
+     decode() can reject if the swap is overtaken by a faster press; the guard on
+     `token` means only the most recent one is allowed to land. */
+  var swapToken = 0;
+  function swapStage(a) {
+    var url = a.getAttribute('data-stage') || a.getAttribute('href');
+    var set = a.getAttribute('data-set') || '';
+    var token = ++swapToken;
+    var next = new Image();
+    if (set) { next.srcset = set; next.sizes = stage.sizes || ''; }
+    next.src = url;
+    var show = function () {
+      if (token !== swapToken) { return; }
+      if (set) { stage.srcset = set; } else { stage.removeAttribute('srcset'); }
+      stage.src = url;
+    };
+    if (next.decode) { next.decode().then(show, show); } else { next.onload = show; next.onerror = show; }
+  }
+
   function pick(a) {
     var was = thumbs.querySelector('.car-thumb.is-on');
     if (was) was.classList.remove('is-on');
     a.classList.add('is-on');
-    // the stage is 750px at most; the viewer's copy is four times its area
-    stage.src = a.getAttribute('data-stage') || a.getAttribute('href');
+    swapStage(a);
     stageN.textContent = a.getAttribute('data-n');
     // keep the chosen thumbnail in view without yanking the page
     if (a.scrollIntoView) a.scrollIntoView({ block: 'nearest', inline: 'nearest' });
@@ -350,11 +381,20 @@
   var vImg  = document.getElementById('view-img');
   var vCnt  = document.getElementById('view-count');
   var lastFocus = null;
+  var viewToken = 0;
 
   function paint() {
     var list = shown(), i = indexNow(), a = list[i];
     if (!a) return;
-    vImg.src = a.getAttribute('href');
+    // Same reason as the stage: assigning to the visible element empties it for
+    // the length of the download. Here the frame is black, so an empty one is a
+    // black hole in the middle of the screen between two photographs.
+    var url = a.getAttribute('href');
+    var token = ++viewToken;
+    var next = new Image();
+    next.src = url;
+    var show = function () { if (token === viewToken) { vImg.src = url; } };
+    if (next.decode) { next.decode().then(show, show); } else { next.onload = show; next.onerror = show; }
     vImg.alt = a.getAttribute('aria-label') || '';
     vCnt.textContent = (i + 1) + ' / ' + list.length;
   }

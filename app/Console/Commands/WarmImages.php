@@ -22,6 +22,7 @@ use Illuminate\Console\Command;
 class WarmImages extends Command
 {
     protected $signature = 'images:warm
+        {--clicks : also the stage size for every gallery photograph, so pressing a thumbnail is instant}
         {--all : every gallery photograph at every width, not just the first screen}
         {--force : rebuild derivatives that already exist}';
 
@@ -34,6 +35,14 @@ class WarmImages extends Command
     private const THUMB  = [320];
     private const FACE   = [320, 480, 720];         // testimonial portraits
     private const ABOVE_FOLD_THUMBS = 8;
+
+    /** Pressing a thumbnail swaps the stage, and the stage wants 1080 on a normal
+     *  laptop. Left on demand that press cost 1.4 s of GD with the old photograph
+     *  still up — "un pic cam nu prea se schimba poza". 1,366 gallery photographs,
+     *  about 34 minutes single-threaded, so it is behind --clicks rather than in
+     *  the default run. 1600 (retina, and the full-screen viewer) stays on demand:
+     *  it would double the time and it is the second press, not the first. */
+    private const CLICK  = [1080];
 
     public function handle(): int
     {
@@ -64,6 +73,10 @@ class WarmImages extends Command
             if ($this->option('all')) {
                 foreach ($rest as $p) {
                     $this->add($jobs, $p, self::STAGE);
+                }
+            } elseif ($this->option('clicks')) {
+                foreach ($rest as $p) {
+                    $this->add($jobs, $p, self::CLICK);
                 }
             }
         }

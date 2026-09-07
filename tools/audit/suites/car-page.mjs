@@ -112,6 +112,35 @@ for (const w of [1800, 1440, 1100, 1000, 900, 768, 600, 390, 320]) {
 await pg.setViewport({ width: 1440, height: 900 });
 await new Promise(r => setTimeout(r, 300));
 
+/* --- pressing a thumbnail actually changes the photograph -----------------
+   srcset beats src. Once the stage carried a srcset, setting only .src changed
+   the attribute and left the picture alone — the page looked like it was ignoring
+   the thumbnails. currentSrc is the only thing that says what is on screen. */
+await pg.setViewport({ width: 1440, height: 900 });
+await pg.goto(B + href, { waitUntil: 'networkidle0' });
+await new Promise(r => setTimeout(r, 700));
+{
+  const swap = await pg.evaluate(async () => {
+    const stage = document.getElementById('stage');
+    const before = stage.currentSrc;
+    const thumbs = document.querySelectorAll('.car-thumb');
+    if (thumbs.length < 4) return { skip: true };
+    thumbs[3].click();
+    // decode-before-show means the change lands a beat after the click
+    for (let i = 0; i < 60 && stage.currentSrc === before; i++) {
+      await new Promise(r => setTimeout(r, 100));
+    }
+    return { before: before.split('/').pop(), after: stage.currentSrc.split('/').pop(),
+             marked: thumbs[3].classList.contains('is-on'),
+             hasSet: !!stage.getAttribute('srcset') };
+  });
+  is(swap.skip || swap.before !== swap.after,
+     'pressing a thumbnail changes the photograph on the stage',
+     swap.skip ? 'too few photos' : `${swap.before.slice(0, 18)} → ${swap.after.slice(0, 18)}`);
+  is(swap.skip || swap.marked, 'and the thumbnail is marked as the one being shown');
+  is(swap.skip || swap.hasSet, 'and the stage keeps a srcset after the swap, not a bare src');
+}
+
 /* --- the full-screen viewer's arrows ------------------------------------
    They are absolutely positioned children of a grid container. With a definite
    grid-column they are laid out against their GRID AREA, not the container's
