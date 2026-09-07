@@ -220,6 +220,38 @@ and no cwebp/avifenc binary, so WebP is the format without a system change. AVIF
 would save roughly another 20-30% on photographs; it needs a decision about
 installing an encoder.
 
+### Does this work for photographs uploaded LATER?
+
+Yes, and it was tested rather than assumed. A file that had never been seen
+before: `Img::size()` read it, the srcset was built from it, the endpoint produced
+0.24 s at 320px and 0.57 s at 1080, and the second request took 0.026 s. Nothing
+has to be told about a new photograph.
+
+What did NOT happen on its own was pre-building, so the first visitor after an
+upload paid that cost. `App\Observers\VehicleObserver` now watches the model —
+not the admin controller, because a seeder, an import or whatever replaces that
+screen later are other ways in — and fires when `cover_image` or `gallery_images`
+change. Editing a price queues nothing.
+
+**It runs after the response, not on a queue.** This server has no queue worker,
+no supervisor and no cron for the scheduler. That was verified the hard way: the
+first version dispatched to the database queue, two jobs were queued by a save,
+and nothing ever ran them. `pgrep -f queue:work` had matched the grep's own
+command line — a false positive worth remembering.
+
+So `dispatchAfterResponse()` runs it inside the same PHP-FPM process once the
+admin's page has been sent. Measured: `save()` returns in 14 ms and all five
+widths of the new cover exist afterwards. That process is one of six
+(`pm.max_children = 6`), so the job is bounded to 25 s and works in visible order
+— card and stage, then the thumbnail strip, then the size a thumbnail press swaps
+to. Anything past the budget is built on demand, which is the behaviour that
+existed before and is not a failure.
+
+For a bulk import, `php artisan images:warm --clicks` is still the right tool:
+1,993 derivatives in 19 minutes. A real queue worker would remove the 25 s ceiling
+and is one systemd unit, but it is a standing service and nobody has asked for
+one.
+
 ## 4. Research findings with sources (motion, images, carousels)
 
 **Speed / drift.** Libraries stating px/s pick 50 (Motion+ Ticker, react-fast-marquee);

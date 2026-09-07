@@ -43,6 +43,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Photographs get their resized versions built as soon as they are saved,
+        // not when the first visitor asks for them. See App\Observers\VehicleObserver.
+        \App\Models\Vehicle::observe(\App\Observers\VehicleObserver::class);
 
         // Force PHP settings for file uploads - ABSOLUTELY NO LIMITS
         if (function_exists('ini_set')) {
