@@ -29,6 +29,18 @@ each of which reported a defect that was not there until the check was corrected
   the spec rows behind it is the demonstration. Reported separately, never as a failure.
 - **The target is the label, not the control.** A 24px checkbox inside a 356x57 label
   is a 356x57 target.
+- **`naturalWidth` is not the file's width once a `w`-descriptor srcset is used.**
+  The browser divides the intrinsic size by the chosen candidate's density, so it
+  comes back equal to the slot and any "is this upscaled?" comparison against it is
+  a tautology. Fetch `currentSrc` and read the real header.
+- **Chrome does not surface `Content-Encoding` through the devtools protocol** — it
+  hands back the decoded body. Reading that header reports every stylesheet as
+  uncompressed whether it is or not. Compare `transferSize` with `decodedBodySize`.
+- **A `sizes` computed from the slot's WIDTH is wrong on a tall `object-fit: cover`
+  box.** The contact hero is 531px wide and 1049 tall; a 3:4 photograph in it is
+  bound by the height, so the file has to supply 1049 x 0.75 = 787px. Sized by
+  width the browser picked 720 and scaled it up 1.09x — an upscaled photograph on
+  the page rebuilt specifically to stop those.
 - **The contrast check ran at one width.** It opened `WIDTHS.at(-1)` and nothing
   else, so everything that only exists on a phone — the contact dock, the phone-only
   footer grid, the phone reviews sequence — had never been contrast-checked at all.
@@ -95,6 +107,10 @@ node reviews-photos.mjs    # asserts: 0 cut and 0 quotes needing the scroll fall
 node reviews-widths.mjs    # every card renders at exactly its computed width (the Safari flex-shrink guard)
 node reviews-seam.mjs      # the loop seam is exactly one row: 0px error, every pair one stride apart
 node reviews-speed.mjs     # one sample of the speed profile, 24–110 px/s (scrollLeft rounds — this once caught 1px/frame)
+node images.mjs             # what a first-time visitor downloads: every page inside
+                           # its byte budget, no original files served, nothing over
+                           # 400 KB, no photograph scaled up to fill its box, the
+                           # largest image never lazy, stylesheets compressed.
 node car-page.mjs           # the car page: the two offer panels sit under the
                            # specifications, three warranty steps and two maintenance
                            # steps, the ladder is one row from 560px up and one step

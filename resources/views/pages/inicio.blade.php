@@ -22,8 +22,10 @@
 
   {{-- ============ the hero ============ --}}
   <section class="hm-hero">
-    <img class="hm-hero__img" src="{{ asset('img/banner/home.jpg') }}" alt=""
-         width="2400" height="3600" fetchpriority="high" decoding="async">
+    {{-- Was the 456 KB JPEG straight out of public/. Full-bleed, so 100vw is the
+         truth; the ladder tops out at 2000 because nothing here is retina-4K. --}}
+    <x-img class="hm-hero__img" src="/img/banner/home.jpg" alt=""
+           sizes="100vw" :max="2000" :fallback="1080" :priority="true" />
     <div class="hm-hero__in cat-wrap">
       <div class="hm-hero__copy">
         <span class="hm-hero__eyebrow">Málaga · {{ $sold }} coches entregados</span>
@@ -158,13 +160,19 @@
       @foreach(range(0, $copies - 1) as $pass)
         <div class="hm-fb__row" @if($pass) aria-hidden="true" @endif>
           @foreach($reviews as $t)
-            @php $src = fn ($w) => route('img.resize', ['w' => $w]) . '?p=' . urlencode($t->img); @endphp
+            @php $src = fn ($w) => \App\Support\Img::url($t->img, $w) ?? $t->img; @endphp
             <figure class="fb" style="--w:{{ $t->w }}px; --ratio:{{ $t->ratio }}; --scale:{{ $t->scale }}; --scale-m:{{ $t->scaleM }}">
               <div class="fb__flip">
                 <div class="fb__face fb__face--front">
-                  <img src="{{ $src(600) }}"
-                       srcset="{{ $src(400) }} 400w, {{ $src(600) }} 600w, {{ $src(900) }} 900w"
-                       sizes="(min-width:1000px) 420px, 80vw"
+                  {{-- On the ladder now (480/720), and `sizes` cut to what these
+                       actually render at: 272px up to 768 and 317px from 1000, so
+                       420px was buying a third more pixels than any of them show.
+                       The card width varies per photograph — the no-crop system
+                       sets it from the file's own ratio — so 360 is the widest of
+                       them, not a guess. --}}
+                  <img src="{{ $src(480) }}"
+                       srcset="{{ $src(320) }} 320w, {{ $src(480) }} 480w, {{ $src(720) }} 720w"
+                       sizes="(min-width:1000px) 360px, 80vw"
                        alt="{{ $pass ? '' : $t->name . ', con su coche' }}"
                        loading="{{ !$pass && $loop->index < 8 ? 'eager' : 'lazy' }}" decoding="async">
                 </div>

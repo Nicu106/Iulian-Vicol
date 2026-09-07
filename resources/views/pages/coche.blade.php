@@ -50,10 +50,14 @@
       {{-- The one being looked at. Without JavaScript this is simply the first
            photograph and every other one is reachable below as its own link. --}}
       <figure class="car-stage">
-        <img class="car-stage__img" id="stage"
-             src="{{ $photos[0]['path'] }}"
-             alt="{{ $car->brand }} {{ $car->model }} {{ $car->year }}"
-             width="1600" height="1067" fetchpriority="high" decoding="async">
+        {{-- Measured: 286px wide at 320, 356 at 390, 702 at 768, and it stops
+             growing at 750 from 1000px up, because the gallery column stops
+             growing. --}}
+        <x-img class="car-stage__img" id="stage"
+               :src="$photos[0]['path']"
+               :alt="$car->brand.' '.$car->model.' '.$car->year"
+               sizes="(min-width:1000px) 750px, calc(100vw - 2rem)"
+               :max="1600" :fallback="1080" :priority="true" />
         {{-- Arrows and the full-screen open are written by the script: without it the
              stage is a photograph, which is honest, rather than dead furniture. --}}
         <figcaption class="car-stage__count"><b id="stage-n">1</b> / {{ count($photos) }}</figcaption>
@@ -76,12 +80,21 @@
            grid of 58 thumbnails is a wall, not a gallery. --}}
       <div class="car-thumbs" id="thumbs">
         @foreach($photos as $i => $p)
+          {{-- href is a derivative, not the original. The script reads it to swap
+               the stage and to fill the full-screen viewer, so every thumbnail
+               press used to pull the raw file — 3.59 MB for the heaviest in this
+               car's set. 1600 is what the viewer can actually show on the largest
+               screen this site is used on; the original stays reachable, it is
+               just not what a tap costs. --}}
           <a class="car-thumb {{ $i === 0 ? 'is-on' : '' }}"
-             href="{{ $p['path'] }}"
+             href="{{ \App\Support\Img::url($p['path'], 1600) ?? $p['path'] }}"
+             data-stage="{{ \App\Support\Img::url($p['path'], 1080) ?? $p['path'] }}"
              data-group="{{ $p['group'] ?? 'none' }}"
              data-n="{{ $p['n'] }}"
              aria-label="Foto {{ $p['n'] }}{{ $p['group'] ? ' · '.($groups[$p['group']] ?? '') : '' }}">
-            <img src="{{ $p['path'] }}" alt="" width="240" height="160" loading="lazy" decoding="async">
+            {{-- 102px at 320, 118px from 1000 up. 160 covers it at DPR 2 and the
+                 ladder rounds that to the 320 step. --}}
+            <x-img :src="$p['path']" alt="" sizes="120px" :max="320" :fallback="320" />
           </a>
         @endforeach
       </div>
@@ -288,7 +301,8 @@
     var was = thumbs.querySelector('.car-thumb.is-on');
     if (was) was.classList.remove('is-on');
     a.classList.add('is-on');
-    stage.src = a.getAttribute('href');
+    // the stage is 750px at most; the viewer's copy is four times its area
+    stage.src = a.getAttribute('data-stage') || a.getAttribute('href');
     stageN.textContent = a.getAttribute('data-n');
     // keep the chosen thumbnail in view without yanking the page
     if (a.scrollIntoView) a.scrollIntoView({ block: 'nearest', inline: 'nearest' });

@@ -176,6 +176,50 @@ back from `getComputedStyle`, believed and documented for weeks. Only sampling t
 painted pixels showed it was inert. **Reading back the property you just set proves
 you set it, not that it did anything.**
 
+## 3d. Image delivery: what was actually wrong, measured
+
+The client: *"vreau sa faci asa ca paginile astea sa se incarce super super rapid
+... chiar daca cineva va intra pentru prima data."* Measured first, at 390px with a
+cold cache:
+
+| page | image bytes before | after |
+|---|---|---|
+| /coche | **7.17 MB** | 0.22 MB |
+| /inicio | 1.94 MB | 1.15 MB |
+| /contacto | 1.07 MB | 0.11 MB |
+| /catalogo | 0.74 MB | 0.46 MB |
+
+**The car page was serving the dealer's originals.** The stage photograph and all
+42 thumbnails pointed straight at `/storage/...`: one file of 3.59 MB and another
+of 1.80 MB, on a phone. The resizing endpoint existed and that page simply never
+called it. Nothing about this is visible in a screenshot.
+
+**Five things that were wrong, in order of what they cost:**
+
+1. Originals served instead of derivatives — 7.17 MB → 0.22 MB.
+2. Page banners served as raw JPEGs out of `public/` (contacto.jpg alone: 1.06 MB
+   → 43 KB at 720px WebP). The endpoint bounced anything that was not `/storage/`.
+3. `immutable, max-age=1y` on a URL with nothing in it that changes when the photo
+   does. Replace a picture and returning visitors keep the old one until 2027. The
+   URL now carries the source's mtime.
+4. Derivatives served through PHP. Routing the banners through the endpoint cut
+   /catalogo's hero from 253 KB to 48 KB **and pushed LCP from 532 ms to 680**,
+   because a static file had become a Laravel boot. Built derivatives are now
+   linked as files and nginx serves them; LCP fell to 324 ms.
+5. Stylesheets uncompressed. `gzip on` with `gzip_types` commented out means
+   text/html alone — 82 KB of CSS per page going out raw.
+
+**Generation cost is the "first visitor" problem.** GD on this box: 1.36 s at
+400px, 1.76 s at 1600, from a 4.68 MB source. Routing /coche through the endpoint
+took its cold load from 1.3 s to 3.0 s before anything was pre-built.
+`php artisan images:warm` builds what the first screen of every page needs — 630
+derivatives, 228 s — and leaves the rest on demand. Run it after a bulk upload.
+
+**What is NOT available here:** GD reports `AVIF Support: no`, there is no Imagick
+and no cwebp/avifenc binary, so WebP is the format without a system change. AVIF
+would save roughly another 20-30% on photographs; it needs a decision about
+installing an encoder.
+
 ## 4. Research findings with sources (motion, images, carousels)
 
 **Speed / drift.** Libraries stating px/s pick 50 (Motion+ Ticker, react-fast-marquee);

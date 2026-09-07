@@ -2,7 +2,8 @@
      'available' | 'sold' | 'demo'. --}}
 @php
   $g = fn($k) => is_array($car) ? ($car[$k] ?? null) : ($car->$k ?? null);
-  $img = $kind === 'demo' ? asset('storage/'.$g('img')) : $car->thumbUrl(800);
+  // The path, not a built URL: <x-img> needs the source to derive a srcset from.
+  $imgPath = $kind === 'demo' ? '/storage/'.ltrim((string) $g('img'), '/') : $car->primary_image;
   // 'demo' is an invented example and has no page. Everything real does, sold
   // included: the photographs are the record of what he has actually delivered.
   $href = in_array($kind, ['available', 'sold'], true) ? '/coche/'.$g('slug') : null;
@@ -11,8 +12,12 @@
 <article class="mc-card {{ $kind === 'sold' ? 'mc-card--sold' : '' }} {{ $kind === 'demo' ? 'mc-card--demo' : '' }}">
   @if($href)<a class="mc-card__link" href="{{ $href }}">@else<div class="mc-card__link">@endif
     <div class="mc-frame mc-frame--card">
-      <img class="mc-img mc-img--vehicle" src="{{ $img }}" alt="{{ $alt }}"
-           width="800" height="600" loading="lazy" decoding="async">
+      {{-- Measured across the column ladder: 228px at 320, 279 at 390, 302 at
+           768 (two up), 202-210 from 900 (three and four up). It was fetching one
+           800px file for all of them. --}}
+      <x-img class="mc-img mc-img--vehicle" :src="$imgPath" :alt="$alt"
+             sizes="(min-width:900px) 210px, (min-width:560px) 40vw, 72vw"
+             :max="720" :fallback="480" />
       @if($kind === 'sold')<span class="mc-badge mc-badge--sold">Entregado</span>@endif
       @if($kind === 'demo')<span class="mc-badge mc-badge--demo">Ejemplo</span>@endif
     </div>

@@ -28,8 +28,9 @@
        about him, not about this car, because he has never had a Panamera. Marked as
        a stock photograph in §10 of the brandbook, to be replaced by one of his own. --}}
   <header class="cat-hero">
-    <img class="cat-hero__img" src="{{ asset('img/banner/panamera.jpg') }}"
-         alt="" width="1800" height="1200" fetchpriority="high" decoding="async">
+    {{-- Was the 253 KB JPEG served raw. Full-bleed: 100vw. --}}
+    <x-img class="cat-hero__img" src="/img/banner/panamera.jpg" alt=""
+           sizes="100vw" :max="2000" :fallback="1080" :priority="true" />
     <div class="cat-hero__in cat-wrap">
       <span class="cat-hero__eyebrow">Málaga · {{ $sold }} coches entregados</span>
       <h1 class="cat-hero__h"><span>{{ $words[$total] ?? $total }} coches.</span>

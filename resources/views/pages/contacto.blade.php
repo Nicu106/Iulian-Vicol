@@ -8,7 +8,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&display=swap">
-<link rel="preload" as="image" href="{{ $hero }}" fetchpriority="high">
+{{-- The preload has to name the same candidate the <img> will choose, srcset and
+     sizes included. Preloading a bare href next to a responsive img is how a page
+     downloads its hero twice. --}}
+<link rel="preload" as="image" fetchpriority="high"
+      href="{{ \App\Support\Img::url($hero, 1080) ?? $hero }}"
+      imagesrcset="{{ \App\Support\Img::srcset($hero, 1600) }}"
+      imagesizes="(min-width:2000px) 920px, (min-width:900px) 800px, 100vw">
 <link rel="stylesheet" href="{{ asset('css/mc-tokens.css') }}">
 <link rel="stylesheet" href="{{ asset('css/brandbook.css') }}">
 <link rel="stylesheet" href="{{ asset('css/catalog.css') }}">
@@ -66,9 +72,18 @@
 
     <div class="ct-open__pic">
       <div class="ct-open__hold">
-        <img class="ct-open__img" id="hero-img" src="{{ $hero }}" width="2400" height="3200"
-             alt="Un Porsche Cayman con matrícula alemana, fotografiado en un garaje de Málaga"
-             fetchpriority="high" decoding="async">
+        {{-- `sizes` here is set by HEIGHT, not width. The column is 531px wide at 1440
+             but 1049px tall, and object-fit:cover on a 3:4 photograph in a box that
+             narrow has to satisfy the HEIGHT — so the file must supply
+             1049 x 0.75 = 787 CSS px, not 531. Sized by width alone the browser
+             chose the 720w file and scaled it up 1.09x to fill: an upscaled
+             photograph, which is the one thing this page was rebuilt to stop.
+             Measured across 390 → 2200: 390, 768, then 746-787 from 900 up, 911 at
+             2200. --}}
+        <x-img class="ct-open__img" id="hero-img" :src="$hero"
+               alt="Un Porsche Cayman con matrícula alemana, fotografiado en un garaje de Málaga"
+               sizes="(min-width:2000px) 920px, (min-width:900px) 800px, 100vw"
+               :max="1600" :fallback="1080" :priority="true" />
       </div>
     </div>
   </section>

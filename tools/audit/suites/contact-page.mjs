@@ -35,15 +35,24 @@ const b = await p.launch({
   // a box wider than 2400 is an upscale, and an upscaled photograph is the single
   // thing that reads as cheap however good the type is. The first version opened
   // on one at scale(2.6).
-  const pic = await pg.evaluate(() => {
+  // naturalWidth is NOT the file's width once a w-descriptor srcset is in play:
+  // the browser divides the intrinsic size by the candidate's density, so it
+  // always comes back equal to the slot and the comparison is a tautology.
+  // Fetch the chosen file and read its real header instead.
+  const pic = await pg.evaluate(async () => {
     const i = document.getElementById('hero-img');
     const r = i.getBoundingClientRect();
-    return { nat: [i.naturalWidth, i.naturalHeight], box: [r.width, r.height],
+    const bmp = await createImageBitmap(await (await fetch(i.currentSrc)).blob());
+    const real = [bmp.width, bmp.height];
+    bmp.close();
+    return { real, box: [r.width, r.height], src: i.currentSrc.split('/').pop(),
              transform: getComputedStyle(i).transform };
   });
-  is(pic.box[0] <= pic.nat[0] && pic.box[1] <= pic.nat[1],
-     'the photograph is never drawn larger than the file',
-     `${Math.round(pic.box[0])}x${Math.round(pic.box[1])} from ${pic.nat.join('x')}`);
+  // object-fit:cover scales by whichever edge is short, so both have to fit.
+  const scale = Math.max(pic.box[0] / pic.real[0], pic.box[1] / pic.real[1]);
+  is(scale <= 1.001,
+     'the photograph is never drawn larger than the file it came from',
+     `box ${Math.round(pic.box[0])}x${Math.round(pic.box[1])} from ${pic.real.join('x')} — cover scale ${scale.toFixed(2)}x`);
   is(pic.transform === 'none',
      'and it carries no transform, so nothing is resampled', pic.transform);
 

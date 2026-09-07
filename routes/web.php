@@ -12,7 +12,20 @@ Route::get('/catalog', [App\Http\Controllers\CatalogController::class, 'index'])
 Route::post('/contact/send', [App\Http\Controllers\ContactController::class, 'store'])->name('contact.send');
 
 // Lightweight image resize with caching (local files only)
-Route::get('/img/{w}', [App\Http\Controllers\ImageController::class, 'resize'])->whereNumber('w')->name('img.resize');
+// No session, no cookies, no CSRF token: this route answers with an image and
+// never reads or writes a session, but sitting in the `web` group it booted one —
+// started a session, read the cookie, queued a Set-Cookie — on every cold image
+// request. It only runs when a derivative is missing (built ones are served by
+// nginx straight off disk), and that is exactly the request that is already
+// paying 1.4-1.8 s of GD.
+Route::get('/img/{w}', [App\Http\Controllers\ImageController::class, 'resize'])
+    ->withoutMiddleware([
+        \Illuminate\Session\Middleware\StartSession::class,
+        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+        \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+    ])
+    ->whereNumber('w')->name('img.resize');
 
 // Sell Your Car routes
 Route::get('/sell-car', [App\Http\Controllers\SellCarController::class, 'index'])->name('sell-car');
