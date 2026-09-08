@@ -149,6 +149,11 @@ The brandbook's `mc-*` set still holds. These are new, and are page-scoped by pr
 | `.hm-soc` | the TikTok band | the number carries TikTok's chromatic split. Borrowing the visual language *of the thing linked to* is what stops it being decoration |
 | `<x-img>` | every photograph | §7 |
 
+The ten above are the ones that carry an argument. The **complete** list — all 85
+parts across the five stylesheets, each with its rule — is Appendix D of the
+brandbook, and it is read out of the CSS at render: a part added without a rule
+written for it turns red on the page. Add the component there, not here.
+
 ---
 
 ## 7 · Photographs

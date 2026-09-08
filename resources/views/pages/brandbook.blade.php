@@ -37,6 +37,7 @@
     ['A','Appendix — the contrast maths','contrast'],
     ['B','Appendix — space, motion, build order','appendix'],
     ['C','Appendix — the system as built','built'],
+    ['D','Appendix — the parts list','parts'],
   ];
   $draft = 3;
   $fmt   = fn($n) => number_format($n);
@@ -1848,6 +1849,323 @@
     {{ count(glob(base_path('tools/audit/suites/*.mjs'))) }} of them.</p>
   <p class="bb-prose bb-small">Full inventory, with the eleven traps that each cost real time:
     <code>docs/DESIGN-SYSTEM.md</code>.</p>
+</section>
+
+{{-- ═══════════════════════════════════ APPENDIX D · THE PARTS LIST ══════════
+     Appendix C is the shape of the system. This is its parts list, and it reads
+     the five page stylesheets at render: a class defined in the CSS with no
+     entry written here is printed as MISSING rather than quietly left out, and
+     a class that has strayed into a stylesheet that is not its own is printed
+     too. A parts list that cannot fall behind the code is the only kind worth
+     keeping — every other one is true on the day it is written.
+     ══════════════════════════════════════════════════════════════════════ --}}
+<section class="bb-section" id="parts">
+  @php
+    $fam = [
+      'hm'  => ['Inicio',           'home.css'],
+      'ct'  => ['Contacto',         'contact.css'],
+      'car' => ['Ficha del coche',  'car.css'],
+      'sl'  => ['Vende tu coche',   'sell.css'],
+      'cat' => ['Catálogo',         'catalog.css'],
+    ];
+
+    /* What each part is, and the decision inside it. Written by hand, because a
+       rule is the one thing a machine cannot read off a stylesheet. */
+    $rules = [
+      /* ---- Inicio ---- */
+      'hm-hero'     => ['the opening', 'photograph full-bleed, a floor under the words only — the body of the car keeps its black. On a phone the card leaves the photograph and takes the ground below it, because over a tall crop it would sit on the car, and the car is the point'],
+      'hm-search'   => ['the search card', 'overlaps the hero and carries the action radius (10), not the card radius. Its tabs sit in the card’s own negative margin'],
+      'hm-f'        => ['one field of it', 'label above, input below, note under. The note’s bold is re-coloured: a global b{} rule put ink on the blue'],
+      'hm-seg'      => ['a two-way choice', 'a segmented pair, 44px each. Checked inverts to ink; never a dropdown for two options'],
+      'hm-marques'  => ['the six marques', 'a row on the surface tone, hairline between the cells and nothing around them'],
+      'hm-marque'   => ['one marque in it', 'mark, name, count. The count is tabular so the row does not jitter'],
+      'hm-sec'      => ['a section of the page', 'air on top only; the section below supplies its own. Head is a baseline row, heading left, link right at 44px of target'],
+      'hm-h2'       => ['a section heading', 'the h2 step, tightened -.018em. The same size on every page'],
+      'hm-wall'     => ['the customer grid', 'the people, before the questions'],
+      'hm-how'      => ['how it actually goes', 'a numbered ladder. The spine sits on the column boundary so it is the line the numbers end at; the number column is fixed, so 01 and 04 share one left margin. On a phone the number goes above the words — at 390 a 34px figure and a 32px gutter left fourteen characters to the line'],
+      'hm-q'        => ['the questions', 'native <details>, a + that turns, no widget. The measure is on the rows, not the wrap, or the block centres itself on a page that is left-aligned everywhere'],
+      'hm-cta'      => ['the ask', 'the band tone, two doors at the end of the page: into the stock, or the other way round'],
+      'hm-fb'       => ['what they wrote', 'a window the cards pass through, not a container with them clipped at its edge. The only control that stops it is not there until a keyboard finds it — a visible pause button is the widget chrome this section exists to avoid'],
+      'hm-soc'      => ['the social band', 'black, which is TikTok’s ground and not ours: the section is quoting them, and the navy footer below must not merge with it into one long dark stretch. The number wears the chromatic split and settles into register on arrival'],
+
+      /* ---- Contacto ---- */
+      'ct'          => ['the page', 'the page ground. Every page but inicio sets its own, and it is the only thing the root class does'],
+      'ct-grid'     => ['the page grid', 'the gutter switches at exactly the width .cat-wrap switches at, and the main track is the container MINUS its two gutters — built from the token, never from 100vw'],
+      'ct-sec'      => ['a section', '96 of air a side, 48 on a phone. 128 was tried and two of them meeting is 256px of nothing'],
+      'ct-open'     => ['the first act', 'statement, the ways under it, and one photograph holding both — split into two elements so that on a phone the photograph can sit between them'],
+      'ct-lede'     => ['the opening line', 'the h2 step at 700'],
+      'ct-h2'       => ['a section heading', 'shared with /vende, so the two pages that ask the visitor to write speak in one voice'],
+      'ct-say'      => ['the one-sentence statement', '--t-km, which is named for where it was first needed but is a size, and is the size this sentence wants'],
+      'ct-ways'     => ['the ways to reach him', 'a ladder: label small above, value large below, no rules between them — the space does that, which is why the space is large'],
+      'ct-way'      => ['one of them', 'the value is larger than the heading above it: on a contact page the number you can call is the content. Faint rule at rest, ink on hover, so it reads as a link without relying on colour'],
+      'ct-far'      => ['the distance band', 'navy, not a tint — --mc-blue-tint measures under 5% saturation and would not have registered at all'],
+      'ct-trips'    => ['the three journeys in it', 'three equal columns; the figures are tabular so the columns line up as numbers rather than as words'],
+      'ct-trip'     => ['one journey', 'exists only as its parts (__km, __who, __said) — the row itself is the arrival hook'],
+      'ct-where'    => ['the map', 'begins on the photograph’s last line: dark field, then light field, one edge, on purpose. 96px of ground between them made the photograph look like it had run out'],
+      'ct-write'    => ['the form’s column', 'span 7 to the main line; the caption keeps 5'],
+      'ct-form'     => ['the form', 'the column is its measure — no max-width of its own'],
+      'ct-f'        => ['one field', 'label, optional hint in the lighter ink, then the control'],
+      'ct-note'     => ['the note under it', 'small, 52ch, the second ink'],
+      'ct-rise'     => ['the arrival', '16px on --m-reveal and --e-out, 60ms apart, once. Armed by script, so with JavaScript off nothing is ever left invisible'],
+
+      /* ---- Ficha ---- */
+      'car'         => ['the page', 'air above and below; everything else is the grid'],
+      'car--sold'   => ['the sold theme', 'one token block on the page root and nothing else: every accent is remapped to ink, so no component knows it happened. \u{201C}Tema gri total\u{201D} means the header and the footer too — the footer\u{2019}s green button on an otherwise grey archive is exactly the leftover the client notices. --mc-ok and --mc-warn are literals rather than aliases, so they are listed too; that is the whole point of doing it with tokens'],
+      'car-grid'    => ['the page', 'the sidebar spans every row of the other column. In row 1 it sized that row instead, and the description started ~790px below the thumbnails — the hole the client photographed'],
+      'car-back'    => ['back to the catalogue', 'small, above the name'],
+      'car-h'       => ['the car’s name', 'the h1 step, -.022em'],
+      'car-stage'   => ['the photograph', '3:2, which is what the camera gave. A squarer crop cuts the nose or the tail off exactly when the buyer is judging the shape'],
+      'car-thumbs'  => ['the strip', 'scrolled, never wrapped: 58 thumbnails in a grid is a wall to read, a strip is one to flick through. Edge to edge on a phone so the last is half-visible and the strip says it continues'],
+      'car-thumb'   => ['one thumbnail', 'the one on the stage takes a solid ink edge, not a glow — it has to survive a photograph of any colour, which a shadow does not'],
+      'car-view'    => ['full screen', 'black, because at this size the surround is most of what the eye sees and any colour of mine would sit in judgement on the photograph. The arrows are positioned as a pair around one point, so a notch moves both together'],
+      'car-side'    => ['the column beside it', 'price, facts and the two panels. Not stretched: if the left side ends up taller the space falls under the panels, where a sidebar ending is what anyone expects'],
+      'car-price'   => ['the price', 'baseline row; the old price, when there is one, sits beside it struck'],
+      'car-specs'   => ['the six facts', 'one column whatever the sheet says — the panel is 336px, and two columns leave 160px a row, which is how "Diesel" ended up set one letter per line'],
+      'car-tabs'    => ['state and labels', 'the row of marks above the name'],
+      'car-tab'     => ['one of them', 'the flat chip, not a pill'],
+      'car-tab-sold'=> ['the sold stamp', '72px square with square corners — rounded corners would make it a button, and it is not pressable. Fixed bottom-left; on a phone it gives way to the dock'],
+      'car-off'     => ['warranty / maintenance', 'two panels of one shape, because the thing that differs is the only thing worth reading: one starts at Incluido, the other at a price. The included step is the only one that inverts to navy'],
+      'car-sec'     => ['a section below the fold', 'inside the grid, in column 1, so the left side has something to run beside the panels'],
+      'car-text'    => ['the description', '60ch'],
+      'car-tech'    => ['the long spec list', 'two columns of pairs, which reads faster than one long ladder and does not become a wall like a table would'],
+      'car-tags'    => ['the equipment', 'chips, wrapped'],
+      'car-with'    => ['what comes with it', 'a heading and its list'],
+      'car-gone'    => ['the sold sentence', 'above the fold, 52ch, so a buyer is told before they read the price'],
+      'car-empty'   => ['nothing to show', 'the same tone as a note, never an error'],
+
+      /* ---- Vende tu coche ---- */
+      'sl'          => ['the page', 'the same ground as /contacto, because it is the same conversation continued'],
+      'sl-open'     => ['the opening', 'borrowed from contact.css — the two pages that ask the visitor to write are one voice'],
+      'sl-marques'  => ['the marque question', 'first, because five marques is his one hard constraint and it is unfair to learn it after seventeen fields'],
+      'sl-marque'   => ['a marque tile', 'the catalogue’s exact hex, a radio underneath, the tile is its label. The chosen one lifts and takes a hairline of white; the others stay lit — dimming the rest is what makes a row of tiles read as a disabled toolbar'],
+      'sl-other'    => ['the one question "otra" asks', 'in the same column as the rest of the form'],
+      'sl-body'     => ['the form', 'four movements, numbered'],
+      'sl-sec'      => ['one movement', '4 | 8 from 900 up: the question left, the answers right. Capped at 46rem on one column it left 40% of a 1440 screen empty for two thousand pixels — the same fault the contact page had'],
+      'sl-grid'     => ['the fields in it', 'two columns, one below 560'],
+      'sl-span2'    => ['a field that takes both', ''],
+      'sl-pick'     => ['a set of choices', 'a fieldset with no border of its own'],
+      'sl-pill'     => ['one choice', 'a choice of two or four does not need a dropdown'],
+      'sl-select'   => ['a select', 'looks like the input beside it, with its own arrow — never the platform’s'],
+      'sl-text'     => ['the message', '8rem, so it invites more than one line'],
+      'sl-money'    => ['a price field', 'the currency sits inside the control, not beside it'],
+      'sl-drop'     => ['the photographs', 'the drop zone IS the file input’s label: one tap on a phone, one gesture on a desk'],
+      'sl-previews' => ['what they chose', 'a band of them'],
+      'sl-prev'     => ['one preview', 'object-fit: contain. What someone hands us is not cropped, the same rule as every customer photograph on this site. Removing one rebuilds the input through a DataTransfer, so the input stays the truth'],
+      'sl-send'     => ['the send', 'one button, left, at the preferred tap height'],
+      'sl-done'     => ['sent', 'a whole screen, not a toast'],
+      'sl-alert'    => ['what went wrong', 'at the top, before the marques: a refused submission has to say so where the eye starts and not eighteen fields down'],
+      'sl-form'     => ['the form element', ''],
+      'sl-hp'       => ['the trap', 'off-screen rather than display:none. A bot that skips hidden fields checks display:none, visibility:hidden and opacity:0 first; a field that is simply somewhere else still gets filled. aria-hidden keeps it out of the accessibility tree, tabindex -1 out of the keyboard’s path'],
+
+      /* ---- Catálogo ---- */
+      'cat'         => ['the page', 'the surface tone rather than the page ground: the marque rows are full-bleed colour and need a ground that is not white between them'],
+      'cat-page'    => ['the page', 'one row per marque, no filter bar'],
+      'cat-hero'    => ['the opening', 'isolated, so the watermark can sit above the fill and below the cards'],
+      'cat-head'    => ['the heading block', ''],
+      'cat-row'     => ['a marque row', 'the row runs edge to edge, the grid inside keeps the container measure. The colour is painted behind everything and clipped from one side; a second copy of the grid inside the fill carries a white mark, so the logo lights up as the colour reaches it'],
+      'cat-hint'    => ['"Ver todos"', 'under the marque’s own count, in the row’s colour reversed out, so it reads as part of the marque rather than as site furniture'],
+      'cat-wrap'    => ['the container', 'site-level despite the prefix — every page measures from it'],
+      'cat-dock'    => ['the fixed bar', 'site-level despite the prefix. Phone only, with the safe area taken'],
+    ];
+
+    /* Read the stylesheets. A block class is .<prefix>-<name>; __elements and
+       --modifiers belong to the block they hang off and are not parts. */
+    $defined = $foreign = [];
+    foreach ($fam as $pre => [$label, $file]) {
+      $css = @file_get_contents(public_path('css/'.$file)) ?: '';
+      preg_match_all('~\.((?:hm|ct|car|sl|cat)(?:--?[a-z0-9-]+)?)~', $css, $m);
+      foreach (array_unique($m[1]) as $raw) {
+        $cls = preg_replace('~--.*$~', '', $raw);
+        /* Stripping a --modifier off .cat-row--open leaves a block. Stripping it
+           off .car--sold leaves the bare prefix, which means it was never a
+           modifier of a block: it is the page's own theme switch, and a part. */
+        if ($cls === $pre) $cls = $raw;
+        $own = strtok($cls, '-');
+        if ($own === $pre) $defined[$pre][$cls] = true;
+        else $foreign[$file][$cls] = true;
+      }
+    }
+    foreach ($defined as $p => $set) { ksort($set); $defined[$p] = $set; }
+    $partCount = array_sum(array_map('count', $defined));
+    $missing = [];
+    foreach ($defined as $set) foreach ($set as $cls => $_) if (!array_key_exists($cls, $rules)) $missing[] = $cls;
+    $stray  = [];
+    foreach ($foreign as $file => $set) foreach ($set as $cls => $_) $stray[] = [$cls, $file];
+  @endphp
+
+  <div class="bb-head">
+    <span class="bb-num bb-label">Appendix D</span>
+    <h2>The parts list</h2>
+  </div>
+
+  <p class="bb-prose">Section 03 documents the <code>mc-</code> layer: the atoms every
+    page shares. Everything built after it carries the prefix of the page it belongs to —
+    <code>hm-</code> inicio, <code>ct-</code> contacto, <code>car-</code> ficha,
+    <code>sl-</code> vende, <code>cat-</code> catálogo — and a page's class is never worn
+    by another page. <strong>{{ $partCount }} parts</strong> are defined across the five
+    stylesheets. They are all below, read out of the CSS at render.</p>
+
+  @if($missing)
+    <p class="bb-fail" style="margin-top:var(--s-4)"><strong>{{ count($missing) }} defined in the
+      CSS with no rule written here:</strong> {{ implode(', ', $missing) }}. Write them, or
+      delete them from the stylesheet.</p>
+  @else
+    <p class="bb-pass" style="margin-top:var(--s-4)">Every one of the {{ $partCount }} has a rule.
+      This line is computed; if a component is added tomorrow and not described, it turns red.</p>
+  @endif
+
+  @foreach($fam as $pre => [$label, $file])
+    <h3>{{ $label }} <span class="bb-label" style="font-weight:400">{{ $file }} ·
+      {{ count($defined[$pre] ?? []) }} parts</span></h3>
+    <div class="bb-scroll">
+    <table class="bb-t" style="min-width:0">
+      <thead><tr><th>Part</th><th>What</th><th>The rule</th></tr></thead>
+      <tbody>
+        @foreach(($defined[$pre] ?? []) as $cls => $_)
+          @php $r = $rules[$cls] ?? null; @endphp
+          <tr>
+            <td><code>.{{ $cls }}</code></td>
+            <td>{{ $r[0] ?? '—' }}</td>
+            <td>{!! $r ? e($r[1]) : '<b class="bb-fail">no rule written</b>' !!}</td>
+          </tr>
+        @endforeach
+      </tbody>
+    </table>
+    </div>
+  @endforeach
+
+  <h3>The classes that crossed a page</h3>
+  <p class="bb-prose">Computed the same way: a class worn by a stylesheet that is not its
+    own. {{ count($stray) }} crossings, {{ count(array_unique(array_column($stray, 0))) }}
+    classes, and all of them deliberate — the container and the fixed bar were written for
+    the catalogue and became site furniture, and <code>/vende</code> borrows the contact
+    page's statement type on purpose. They keep the wrong prefix, and this table is the
+    reason that is a decision rather than a mess.</p>
+  <div class="bb-scroll">
+  <table class="bb-t" style="min-width:0">
+    <thead><tr><th>Class</th><th>Found in</th></tr></thead>
+    <tbody>
+      @foreach($stray as [$cls, $file])
+        <tr><td><code>.{{ $cls }}</code></td><td><code>{{ $file }}</code></td></tr>
+      @endforeach
+    </tbody>
+  </table>
+  </div>
+  <p class="bb-prose" style="margin-top:var(--s-4)">Two more break the law by having no prefix
+    at all: <code>.fb</code>, the review card, and <code>.home-rail</code>. They were written
+    before the law was, and renaming them is the kind of change that is all risk and no
+    result — so they are recorded here instead of pretended away.</p>
+
+  <h3>Four parts worth looking at</h3>
+
+  <article class="bb-el" id="EL-TRIP-01">
+    <div class="bb-el__bar">
+      <span class="bb-el__id">EL-TRIP-01</span>
+      <span class="bb-el__name">Han venido desde</span>
+      <div class="bb-el__where"><span>Contacto</span></div>
+    </div>
+    <div class="bb-el__stage" style="padding:0">
+      <div class="ct-far" style="padding:var(--s-7) var(--s-6)">
+        <ol class="ct-trips" style="margin-top:0">
+          <li><span class="ct-trip__km">540<i>km</i></span>
+              <span class="ct-trip__who">Javier, desde Madrid</span>
+              <span class="ct-trip__said">Vine por la mañana y me volví con el coche.</span></li>
+          <li><span class="ct-trip__km">1.020<i>km</i></span>
+              <span class="ct-trip__who">Marta, desde Bilbao</span>
+              <span class="ct-trip__said">Me mandó vídeo de todo antes de coger el tren.</span></li>
+          <li><span class="ct-trip__km">210<i>km</i></span>
+              <span class="ct-trip__who">Andrés, desde Sevilla</span>
+              <span class="ct-trip__said">Lo vi el sábado, me lo llevé el sábado.</span></li>
+        </ol>
+      </div>
+    </div>
+  </article>
+
+  <article class="bb-el" id="EL-STEP-01">
+    <div class="bb-el__bar">
+      <span class="bb-el__id">EL-STEP-01</span>
+      <span class="bb-el__name">Cómo va, paso a paso</span>
+      <div class="bb-el__where"><span>Inicio</span></div>
+    </div>
+    <div class="bb-el__stage">
+      <span class="bb-stagecap">The figure is the only ornament. Its column is a fixed
+        width and the words start at the column's edge, so 01 and 04 keep one left margin —
+        a figure sized to its own glyphs put four headings on four different ones.</span>
+      <ol class="hm-how__list" style="max-width:44rem">
+        <li class="hm-how__step">
+          <span class="hm-how__n" aria-hidden="true">01</span>
+          <div class="hm-how__t">
+            <h3>Escribes</h3>
+            <p>Al WhatsApp que hay en toda la web. Contesto yo, y normalmente en minutos.
+              No hay nadie más al otro lado.</p>
+          </div>
+        </li>
+        <li class="hm-how__step">
+          <span class="hm-how__n" aria-hidden="true">02</span>
+          <div class="hm-how__t">
+            <h3>Te mando vídeo</h3>
+            <p>Del coche entero, y de lo que no está perfecto también.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </article>
+
+  <article class="bb-el" id="EL-SOC-01">
+    <div class="bb-el__bar">
+      <span class="bb-el__id">EL-SOC-01</span>
+      <span class="bb-el__name">Las redes</span>
+      <div class="bb-el__where"><span>Inicio</span></div>
+    </div>
+    <div class="bb-el__stage" style="padding:0">
+      <div style="background:#000000;padding:var(--s-6)">
+        <span class="bb-stagecap" style="color:rgba(255,255,255,.66)">Black is TikTok's
+          ground, not ours — the band is quoting them. The first row inverts to white
+          because one of the three is doing the work and the other two are courtesy.</span>
+        <ul class="hm-soc__list" style="max-width:26rem">
+          <li class="hm-soc__row hm-soc__row--lead">
+            <a class="hm-soc__link" href="#parts">
+              <span class="hm-soc__ico hm-soc__ico--tiktok" aria-hidden="true"></span>
+              <span class="hm-soc__t"><b>Ver los coches en TikTok</b><em>@ivmotorclass</em></span>
+              <span class="hm-soc__go" aria-hidden="true"></span>
+            </a>
+          </li>
+          <li class="hm-soc__row">
+            <a class="hm-soc__link" href="#parts">
+              <span class="hm-soc__ico hm-soc__ico--instagram" aria-hidden="true"></span>
+              <span class="hm-soc__t"><b>Instagram</b><em>@ivmotorclass</em></span>
+              <span class="hm-soc__go" aria-hidden="true"></span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </article>
+
+  <article class="bb-el" id="EL-SPEC-01">
+    <div class="bb-el__bar">
+      <span class="bb-el__id">EL-SPEC-01</span>
+      <span class="bb-el__name">Los datos</span>
+      <div class="bb-el__where"><span>Ficha</span></div>
+    </div>
+    <div class="bb-el__stage">
+      <span class="bb-stagecap">One column, whatever the sheet says. The panel is 336px in
+        the sidebar; two columns of it leave 160px to a row, which is not enough for a label
+        and a value — it is how <em>Diésel</em> ended up set one letter per line.</span>
+      <dl class="mc-specs car-specs" style="max-width:21rem">
+        <div class="mc-specs__row"><dt>Año</dt><dd>2017</dd></div>
+        <div class="mc-specs__row"><dt>Kilómetros</dt><dd>96.400 km</dd></div>
+        <div class="mc-specs__row"><dt>Combustible</dt><dd>Diésel</dd></div>
+        <div class="mc-specs__row"><dt>Cambio</dt><dd>Automático</dd></div>
+        <div class="mc-specs__row"><dt>Potencia</dt><dd>150 CV</dd></div>
+        <div class="mc-specs__row"><dt>Color</dt><dd>Gris Nardo</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <p class="bb-prose" style="margin-top:var(--s-6)">The reasoning behind each decision, and the
+    eleven traps that each cost real time, are in <code>docs/DESIGN-SYSTEM.md</code>. This page
+    is the part that has to stay true on its own.</p>
 </section>
 
 </main>

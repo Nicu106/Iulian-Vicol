@@ -706,3 +706,13 @@ b,strong{ font-weight:600; color:var(--mc-ink); } .bb-top b,.bb-foot b{ color:va
 #built .bb-marques{ display:grid; gap:var(--s-3); max-width:34rem;
   grid-template-columns:repeat(3, minmax(0,1fr)); }
 @media (max-width:479.98px){ #built .bb-marques{ grid-template-columns:repeat(2, minmax(0,1fr)); } }
+
+/* ---- Appendix D: the parts list -------------------------------------------
+   The class is the row's identity and must not wrap; the "what" is two or three
+   words and does not need a third of the table. Both only above the phone,
+   where 358px has to hold three columns and nowrap would push the table into a
+   scroller for the sake of one long class name. */
+@media (min-width:601px){
+  #parts table.bb-t td:first-child{ white-space:nowrap; }
+  #parts table.bb-t th:nth-child(2){ width:13ch; }
+}
