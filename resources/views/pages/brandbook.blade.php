@@ -11,6 +11,14 @@
 <link rel="stylesheet" href="{{ asset('css/mc-tokens.css') }}">
 <link rel="stylesheet" href="{{ asset('css/brandbook.css') }}">
 <script>document.documentElement.className += ' js';</script>
+{{-- Appendix C renders the real classes from the pages built after this
+     document was written, so it needs their stylesheets. All four are scoped by
+     prefix — ct- sl- car- hm- — and the fingerprint of every section above was
+     compared before and after adding them: unchanged. --}}
+<link rel="stylesheet" href="{{ asset('css/home.css') }}">
+<link rel="stylesheet" href="{{ asset('css/contact.css') }}">
+<link rel="stylesheet" href="{{ asset('css/car.css') }}">
+<link rel="stylesheet" href="{{ asset('css/sell.css') }}">
 </head>
 <body class="bb">
 
@@ -28,6 +36,7 @@
     ['10','Sign-off sheet','signoff'],
     ['A','Appendix — the contrast maths','contrast'],
     ['B','Appendix — space, motion, build order','appendix'],
+    ['C','Appendix — the system as built','built'],
   ];
   $draft = 3;
   $fmt   = fn($n) => number_format($n);
@@ -1636,6 +1645,209 @@
     </tbody>
   </table>
   </div>
+</section>
+
+{{-- ═══════════════════════════════════ APPENDIX C · THE SYSTEM AS BUILT ══
+     Everything above was the proposal. This is what got built, in the pages that
+     came after it: /inicio, /catalogo, /coche, /contacto, /vende. Same rule as the
+     rest of this document — every specimen is the real class on real markup, so if
+     one looks wrong here, the site is wrong. The reasoning behind each decision is
+     in docs/DESIGN-SYSTEM.md; this appendix is for looking.
+     ══════════════════════════════════════════════════════════════════════ --}}
+<section class="bb-section" id="built">
+  <div class="bb-head">
+    <span class="bb-num bb-label">Appendix C</span>
+    <h2>The system, as built</h2>
+  </div>
+
+  <p class="bb-prose">Five pages now share one document — <code>layouts/site.blade.php</code>
+    — and a page brings its content and nothing else. Before that they were five standalone
+    files repeating the same twenty lines of head, and they had already drifted: one carried
+    a viewport meta the others did not.</p>
+
+  <h3>The slots a page may fill</h3>
+  <div class="bb-scroll">
+  <table class="bb-t" style="min-width:0">
+    <thead><tr><th>Slot</th><th>For</th></tr></thead>
+    <tbody>
+      <tr><td><code>title</code></td><td>the <strong>whole</strong> title. <code>/inicio</code> leads with the company name, the others trail it — a layout that appends cannot express both</td></tr>
+      <tr><td><code>current</code></td><td>which nav item is marked</td></tr>
+      <tr><td><code>body</code></td><td>extra <code>&lt;body&gt;</code> classes — the sold theme uses this to dress the header and footer too</td></tr>
+      <tr><td><code>css</code> / <code>head</code></td><td>page-only stylesheets, after the four shared ones; preloads</td></tr>
+      <tr><td><code>content</code></td><td>the page</td></tr>
+      <tr><td><code>after</code></td><td>below the footer: the phone dock, the full-screen photo viewer</td></tr>
+      <tr><td><code>js</code></td><td>page scripts</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>The grid, and the spine</h3>
+  <p class="bb-prose">A section that reaches the screen edge keeps its text on the same
+    vertical line as every other section — 152px at 1440. The tracks are built from the
+    container token, <strong>never from <code>100vw</code></strong>: <code>calc((100vw -
+    1200px)/2)</code> is the usual way to write it and it is wrong by half a scrollbar, which
+    puts a full-bleed section a few pixels off everything above it. That shipped twice, once
+    32px out and once 16px, and neither was visible by eye.</p>
+
+  <h3>The five patterns, and nothing else</h3>
+  <div class="bb-scroll">
+  <table class="bb-t">
+    <thead><tr><th>Pattern</th><th>Where</th><th>The rule</th></tr></thead>
+    <tbody>
+      <tr><td>Split opening</td><td><code>/contacto</code> 7&nbsp;|&nbsp;5, <code>/vende</code></td><td>words on the page ground, photograph in a field shaped like its own ratio. No headline over a photograph unless the frame has been measured first</td></tr>
+      <tr><td>Full-bleed band</td><td><code>/contacto</code> distances, <code>/inicio</code> social</td><td>for the one section that carries weight. Quiet only reads as quiet with something loud either side</td></tr>
+      <tr><td>Question | answers</td><td><code>/vende</code> 4&nbsp;|&nbsp;8</td><td>heading and its sentence left, the fields right. Stacks below 900</td></tr>
+      <tr><td>Ladder rows</td><td>contact ways, prices, warranty</td><td>label small above, value large below. No rules between them — the space does that, which is why the space is large</td></tr>
+      <tr><td>Column beside content</td><td><code>/coche</code></td><td>the sidebar spans every row of the other column, or it dictates the height of row one and opens a hole</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p class="bb-prose" style="margin-top:var(--s-4)">Section air is 96 a side, 48 on a phone. <strong>128 a side is a
+    hole</strong> — measured: two of them meeting is 256px of nothing, and it reads as a
+    mistake rather than as air.</p>
+
+  <article class="bb-el" id="EL-WAY-01" style="margin-top:var(--s-6)">
+    <div class="bb-el__bar">
+      <span class="bb-el__id">EL-WAY-01</span>
+      <span class="bb-el__name">Forma de contacto</span>
+      <div class="bb-el__where"><span>Contacto</span></div>
+    </div>
+    <div class="bb-el__stage">
+      <span class="bb-stagecap">The value is larger than the heading above it — on a contact
+        page the number you can call <em>is</em> the content. It was 18px in a 1,440 layout.
+        The rule underneath is faint at rest and ink on hover, so it reads as a link without
+        relying on colour.</span>
+      <ul class="ct-ways" style="margin:0">
+        <li><a class="ct-way" href="#built">
+          <span class="ct-way__k">WhatsApp</span>
+          <span class="ct-way__v">+34 614 753 187</span>
+          <span class="ct-way__n">Lo leo en minutos. Te mando vídeo del coche, incluido lo que no está perfecto.</span>
+        </a></li>
+      </ul>
+    </div>
+  </article>
+
+  <article class="bb-el" id="EL-OFFER-01">
+    <div class="bb-el__bar">
+      <span class="bb-el__id">EL-OFFER-01</span>
+      <span class="bb-el__name">Lo que va con el coche</span>
+      <div class="bb-el__where"><span>Coche</span></div>
+    </div>
+    <div class="bb-el__stage">
+      <span class="bb-stagecap">Two panels of the same shape; the only difference is that one
+        starts at <em>Incluido</em> and the other at a price. A price table is the fastest way
+        to make a page look like a template, so the figures are not in a table — each option is
+        a cell and the row reads as a scale. In a 21rem column it becomes lines instead.</span>
+      <article class="car-off" style="max-width:22rem">
+        <h3 class="car-off__h">Garantía</h3>
+        <p class="car-off__say">Un año va incluido con cada coche que vendo. Si quieres más tiempo, se amplía.</p>
+        <ul class="car-off__steps">
+          <li class="car-off__step car-off__step--inc"><span class="car-off__t">1 año</span><span class="car-off__p">Incluido</span></li>
+          <li class="car-off__step"><span class="car-off__t">2 años</span><span class="car-off__p">600 €</span></li>
+          <li class="car-off__step"><span class="car-off__t">3 años</span><span class="car-off__p">900 €</span></li>
+        </ul>
+        <p class="car-off__note">Es una garantía nacional: vale en toda España, no sólo en Málaga.</p>
+      </article>
+    </div>
+  </article>
+
+  <article class="bb-el" id="EL-PICK-01">
+    <div class="bb-el__bar">
+      <span class="bb-el__id">EL-PICK-01</span>
+      <span class="bb-el__name">Elegir marca y opción</span>
+      <div class="bb-el__where"><span>Vende tu coche</span></div>
+    </div>
+    <div class="bb-el__stage">
+      <span class="bb-stagecap">The marque is the first question on that page, because five
+        marques is his one hard constraint and it is unfair to learn it after seventeen fields.
+        The tile is the radio's label and wears the catalogue's exact colour. The chosen one
+        lifts and takes a white ring; the others stay lit — dimming them reads as a disabled
+        toolbar. Four options never need a dropdown.</span>
+      <div class="bb-marques">
+        @foreach(array_slice(\App\Http\Controllers\SellCarController::MARQUES, 0, 3) as $i => $m)
+          <label class="sl-marque" style="--brand:{{ $m['colour'] }}">
+            <input class="sl-marque__in mc-vh" type="radio" name="bb-marca" {{ $i === 1 ? 'checked' : '' }}>
+            <span class="sl-marque__logo" style="--logo:url('{{ asset('img/marques/'.$m['key'].'.svg') }}')" aria-hidden="true"></span>
+            <span class="sl-marque__name">{{ $m['name'] }}</span>
+          </label>
+        @endforeach
+      </div>
+      <div class="sl-pick__row" style="margin-top:var(--s-4)">
+        @foreach(['Gasolina','Diésel','Híbrido','Eléctrico'] as $i => $f)
+          <label class="sl-pill"><input type="radio" name="bb-fuel" {{ $i === 1 ? 'checked' : '' }}><span>{{ $f }}</span></label>
+        @endforeach
+      </div>
+    </div>
+  </article>
+
+  <article class="bb-el" id="EL-SOLD-01">
+    <div class="bb-el__bar">
+      <span class="bb-el__id">EL-SOLD-01</span>
+      <span class="bb-el__name">Vendido</span>
+      <div class="bb-el__where"><span>Coche</span><span>Catálogo</span></div>
+    </div>
+    <div class="bb-el__stage">
+      <span class="bb-stagecap">A car that is gone still shows: 31 of the 32 sold cars carry
+        five or more of his own photographs, and they are the evidence that he sells what he
+        says he sells. The whole document goes grey — one token block, so no component knows it
+        happened — and only the photographs keep a trace of colour, at 82% grey. The stamp is
+        square with square corners: rounded corners would make it a button, and it is not
+        pressable.</span>
+      <div style="display:flex;align-items:center;gap:var(--s-5);flex-wrap:wrap">
+        <p class="car-tab-sold" style="position:static;transform:none;box-shadow:0 0 0 1px rgba(255,255,255,.16)">Vendido</p>
+        <span class="mc-badge mc-badge--sold">Entregado</span>
+        <span class="bb-cap" style="margin:0">72px square · <code>--mc-r-card</code> 0</span>
+      </div>
+    </div>
+  </article>
+
+  <h3>Photographs</h3>
+  <p class="bb-prose">Everything goes through one component: a path, a <strong>measured</strong>
+    <code>sizes</code>, and a ceiling. Derivatives are WebP served straight off disk by nginx
+    without waking PHP, and nobody has to run anything — saving a car queues the work and an
+    hourly sweep catches whatever that missed.</p>
+  <div class="bb-scroll">
+  <table class="bb-t" style="min-width:0">
+    <thead><tr><th>Rule</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Read the frame before writing on it</td><td>luminance, gradient and saturation on a 12×16 grid. A gradient scrim under a headline nearly always means the type is in the wrong place</td></tr>
+      <tr><td><code>sizes</code> counts the <strong>height</strong> on a tall <code>cover</code> box</td><td>a 3:4 photograph in a 531×1049 slot needs 787px, not 531. Sized by width the browser picks too small and scales up</td></tr>
+      <tr><td>Nothing is drawn larger than its file</td><td>an upscaled crop is the single thing that reads as cheap however good the type is</td></tr>
+      <tr><td>Customer photographs are never cropped</td><td>vehicle cards deliberately are, at 4/3</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="bb-prose" style="margin-top:var(--s-4)">Measured on the car page: <strong>7.17 MB → 0.22 MB</strong> on a 390px
+    phone, LCP 1536 ms → 360. It had been serving the original files.</p>
+
+  <h3>Forms, and what keeps the spam out</h3>
+  <p class="bb-prose">Six required questions on <code>/vende</code>, not seventeen: ask what
+    the person <em>knows</em> and establish the rest yourself. A seller who cannot answer
+    <em>cilindrada</em> closes the tab.</p>
+  <div class="bb-scroll">
+  <table class="bb-t" style="min-width:0">
+    <thead><tr><th>Layer</th><th>Rule</th></tr></thead>
+    <tbody>
+      <tr><td>Throttle</td><td>4 an hour, 10 a day, per IP</td></tr>
+      <tr><td>Honeypot</td><td>a field off-screen, <code>aria-hidden</code>, <code>tabindex="-1"</code> — not <code>display:none</code>, which is the first thing a bot checks</td></tr>
+      <tr><td>Clock</td><td>an encrypted timestamp; under four seconds refused. A person filling it as fast as they can takes about 25</td></tr>
+      <tr><td>Content</td><td>links, markup, and non-Latin scripts in a Spanish form</td></tr>
+      <tr><td>Files</td><td>the server sniffs the type and <code>getimagesize</code> has to agree; 200×200 minimum, 60 MB total</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="bb-prose" style="margin-top:var(--s-4)"><strong>No CAPTCHA, deliberately.</strong> It charges every honest
+    seller — the ones with the worst eyesight and the oldest phones most of all — for the few
+    who are not.</p>
+
+  <h3>The floor</h3>
+  <p class="bb-prose">Nothing ships until the contrast, overflow, target-size and no-script
+    checks pass on every page, and the regression suites pass. When something goes wrong the
+    fix is <strong>a suite</strong>, not remembering. There are
+    {{ count(glob(base_path('tools/audit/suites/*.mjs'))) }} of them.</p>
+  <p class="bb-prose bb-small">Full inventory, with the eleven traps that each cost real time:
+    <code>docs/DESIGN-SYSTEM.md</code>.</p>
 </section>
 
 </main>
