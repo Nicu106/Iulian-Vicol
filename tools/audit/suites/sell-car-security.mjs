@@ -147,7 +147,23 @@ for (const [text, what] of [
   sh(`rm -rf ${ROOT}/storage/app/public/_sec`);
 }
 
-/* ---- 9. and an honest seller still gets through --------------------------- */
+/* ---- 9. two more the vault had catalogued and v2 still had ---------------- */
+{
+  // SEC-04. /img is on the BrandbookOnly allowlist, so this one was reachable
+  // while everything else on the site was hidden behind a holding page.
+  const r = sh(`curl -sk --resolve ${HOST}:443:127.0.0.1 -o /dev/null -w '%{http_code} %{redirect_url}' '${B}/img/720?p=https%3A%2F%2Fexample.com%2Fx.jpg'`);
+  is(r.startsWith('404'), 'the image endpoint is not an open redirect', r);
+
+  // SEC-05 / SEC-02. Deleted, and checked with the lockdown OFF because a holding
+  // page answers 200 and makes a live debug route look gone.
+  sh(`cd ${ROOT} && sed -i 's/^BRANDBOOK_ONLY=true/BRANDBOOK_ONLY=false/' .env && php artisan config:clear >/dev/null 2>&1`);
+  const gone = ['/check-php', '/test-upload-form', '/test-controller-settings']
+    .map(u => u + ':' + sh(`curl -sk --resolve ${HOST}:443:127.0.0.1 -o /dev/null -w '%{http_code}' ${B}${u}`));
+  sh(`cd ${ROOT} && sed -i 's/^BRANDBOOK_ONLY=false/BRANDBOOK_ONLY=true/' .env && php artisan config:clear >/dev/null 2>&1`);
+  is(gone.every(g => g.endsWith('404')), 'the TEMPORARY debug endpoints are gone, lockdown or not', gone.join(' '));
+}
+
+/* ---- 10. and an honest seller still gets through -------------------------- */
 {
   clearLimiter();
   const MARK = 'SEC-OK-' + Date.now().toString(36);

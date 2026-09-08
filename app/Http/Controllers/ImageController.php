@@ -49,7 +49,13 @@ class ImageController extends Controller
             $relative     = ltrim($parsed, '/');
             $sourceFsPath = public_path($relative);
         } else {
-            return redirect()->away($path);
+            // 404, never a redirect. This used to `redirect()->away($path)`, which
+            // made GET /img/720?p=https://anywhere a working open redirect off
+            // ivmotorclass.com — catalogued as SEC-04 in the vault and still live
+            // here, because /img is on the BrandbookOnly allowlist and so bypasses
+            // the lockdown that hides everything else. Verified before the fix:
+            // 302 -> https://example.com/x.jpg.
+            return response('Not found', 404);
         }
 
         // realpath before the is_file check: '..' inside p must not walk out of the

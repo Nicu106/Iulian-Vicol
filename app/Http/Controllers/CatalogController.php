@@ -12,7 +12,15 @@ class CatalogController extends Controller
         $query = Vehicle::query();
         
         // Status filter (default to available)
-        $status = $request->get('status');
+        // Allow-list, not whatever arrives. `?status=pending` went straight into
+        // the where clause and returned the unapproved "vende tu coche"
+        // submissions — rows carrying seller_name, seller_phone and seller_email.
+        // SEC-06 in docs/vault/70-Audit; verified live here with the lockdown off,
+        // seven pieces of personal data on one page. A stranger's phone number is
+        // not catalogue content.
+        $status = in_array($request->get('status'), ['available', 'sold'], true)
+            ? $request->get('status')
+            : null;
         if ($status) {
             $query->where('status', $status);
         } else {

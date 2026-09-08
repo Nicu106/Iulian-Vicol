@@ -105,74 +105,12 @@ Route::post('/admin/vehicles/bulk-action', [VehicleController::class, 'bulkActio
 
 require __DIR__.'/auth.php';
 
-// TEMPORARY: Check PHP settings
-Route::get('/check-php', function() {
-    return [
-        'upload_max_filesize' => ini_get('upload_max_filesize'),
-        'post_max_size' => ini_get('post_max_size'),
-        'max_file_uploads' => ini_get('max_file_uploads'),
-        'memory_limit' => ini_get('memory_limit'),
-        'max_execution_time' => ini_get('max_execution_time'),
-        'max_input_time' => ini_get('max_input_time'),
-        'php_version' => PHP_VERSION,
-        'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'unknown'
-    ];
-});
-
-// TEMPORARY: Test PHP settings in controller context
-Route::get('/test-controller-settings', function() {
-    // Force PHP settings for this request
-    ini_set('upload_max_filesize', '0');
-    ini_set('post_max_size', '0');
-    ini_set('memory_limit', '512M');
-    ini_set('max_execution_time', '0');
-    
-    return [
-        'before_upload_max' => '2M (default)',
-        'after_upload_max' => ini_get('upload_max_filesize'),
-        'before_post_max' => '8M (default)',
-        'after_post_max' => ini_get('post_max_size'),
-        'memory_limit' => ini_get('memory_limit'),
-        'max_execution_time' => ini_get('max_execution_time')
-    ];
-});
-
-// TEMPORARY: Test file upload directly (no CSRF for debugging)
-Route::get('/test-upload-form', function() {
-    return '
-    <form method="POST" enctype="multipart/form-data" action="/test-upload">
-        <input type="file" name="test_file" required>
-        <button type="submit">Test Upload</button>
-    </form>';
-});
-
-Route::post('/test-upload', function(\Illuminate\Http\Request $request) {
-    $file = $request->file('test_file');
-    
-    if ($file && $file->isValid()) {
-        try {
-            $path = $file->store('test-uploads', 'public');
-            return [
-                'success' => true,
-                'file_name' => $file->getClientOriginalName(),
-                'file_size' => $file->getSize(),
-                'stored_path' => $path,
-                'public_url' => \Illuminate\Support\Facades\Storage::url($path)
-            ];
-        } catch (\Exception $e) {
-            return [
-                'success' => false,
-                'error' => $e->getMessage(),
-                'file_name' => $file->getClientOriginalName(),
-                'file_size' => $file->getSize()
-            ];
-        }
-    } else {
-        return [
-            'success' => false,
-            'has_file' => $request->hasFile('test_file'),
-            'file_object' => $file ? 'exists' : 'null',
-            'error' => $file ? $file->getError() : 'no file'
-        ];
-    }
-});
+// The four routes that stood here — /check-php, /test-controller-settings,
+// /test-upload-form and POST /test-upload — were all marked "TEMPORARY" by their
+// author. They printed the server's PHP configuration and offered an
+// unauthenticated file upload into a web-served directory: SEC-05 and SEC-02 in
+// docs/vault/70-Audit.
+//
+// They read as harmless because BrandbookOnly was serving a holding page over
+// them. Probed with the lockdown switched off, which is what launch does, all
+// three GETs answered 200 with the real content. Removed 2026-09-08.
