@@ -46,15 +46,15 @@
         {{-- Next Page Link --}}
         @if ($paginator->hasMorePages())
             <li class="page-item">
-                <a class="page-link" href="{{ $paginator->nextPageUrl() }}" rel="next" aria-label="Următor">
-                    <span class="d-none d-sm-inline me-1">Următor</span>
+                <a class="page-link" href="{{ $paginator->nextPageUrl() }}" rel="next" aria-label="Siguiente">
+                    <span class="d-none d-sm-inline me-1">Siguiente</span>
                     <i class="bi bi-chevron-right"></i>
                 </a>
             </li>
         @else
             <li class="page-item disabled" aria-disabled="true">
-                <span class="page-link" aria-label="Următor">
-                    <span class="d-none d-sm-inline me-1">Următor</span>
+                <span class="page-link" aria-label="Siguiente">
+                    <span class="d-none d-sm-inline me-1">Siguiente</span>
                     <i class="bi bi-chevron-right"></i>
                 </span>
             </li>

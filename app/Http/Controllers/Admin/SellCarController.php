@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\SellCarController as PublicSellCar;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -11,7 +12,12 @@ class SellCarController extends Controller
 {
     public function index()
     {
-        $vehicles = Vehicle::where('offer_type', 'Vânzare')
+        /* This looked for offer_type 'Vânzare' — Romanian, from the old site —
+           while the public form has always written 'Compra'. The page could not
+           have shown a single offer no matter how many arrived. Both ends read
+           the same constant now. Approved and rejected ones stay in the list
+           with their state on the row, so nothing a seller sent disappears. */
+        $vehicles = Vehicle::where('offer_type', PublicSellCar::OFFER_TYPE)
                           ->orderBy('created_at', 'desc')
                           ->paginate(15);
 
@@ -24,6 +30,24 @@ class SellCarController extends Controller
         });
 
         return view('admin.sell-cars.index', compact('vehicles'));
+    }
+
+    /**
+     * A stored photograph, as a key on the 'public' disk.
+     *
+     * The public form stores "/storage/sell-cars/{slug}/{file}" — a URL, so the
+     * page can print it — and every consumer in this class treated it as a disk
+     * key instead. Storage::delete() therefore deleted nothing (files were
+     * orphaned on every removal), and downloadPhotos() built
+     * storage/app/public/storage/sell-cars/... and produced an EMPTY zip for
+     * every real offer. One conversion, in one place, tolerant of both shapes
+     * because rows written by the old admin edit are already the other one.
+     */
+    private static function key(string $stored): string
+    {
+        $s = ltrim($stored, '/');
+
+        return str_starts_with($s, 'storage/') ? substr($s, strlen('storage/')) : $s;
     }
 
     public function show(Vehicle $vehicle)
@@ -78,8 +102,9 @@ class SellCarController extends Controller
         $newImagePaths = [];
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
-                $path = $image->store('sell-cars/' . $vehicle->slug, 'public');
-                $newImagePaths[] = $path;
+                /* Same shape the public form writes, or the array ends up
+                   half URLs and half disk keys and only half of it displays. */
+                $newImagePaths[] = '/storage/' . $image->store('sell-cars/' . $vehicle->slug, 'public');
             }
         }
 
@@ -92,10 +117,10 @@ class SellCarController extends Controller
             if (is_array($removedImages)) {
                 // Delete files from storage
                 foreach ($removedImages as $removedImage) {
-                    Storage::disk('public')->delete($removedImage);
+                    Storage::disk('public')->delete(self::key($removedImage));
                 }
                 // Remove from existing images array
-                $existingImages = array_diff($existingImages, $removedImages);
+                $existingImages = array_values(array_diff($existingImages, $removedImages));
             }
         }
         
@@ -120,22 +145,29 @@ class SellCarController extends Controller
             'seller_name' => $request->seller_name,
             'seller_phone' => $request->seller_phone,
             'seller_email' => $request->seller_email,
-            'images' => json_encode($allImages),
+            /* 'images' is cast to array on the model. Encoding it here stored
+               a JSON string INSIDE a JSON column, so the photographs of any
+               offer edited in the panel came back double-encoded and did not
+               render. The public form already had this fixed; this end did not. */
+            'images' => array_values($allImages),
         ]);
 
         return redirect()->route('admin.sell-cars.show', $vehicle)
-                        ->with('success', 'Anunțul a fost actualizat cu succes!');
+                        ->with('status', 'Guardado.');
     }
 
     public function approve(Vehicle $vehicle)
     {
+        /* 'is_featured' was neither a column nor fillable, so mass-assignment
+           protection dropped it silently on every approval. The column is
+           'featured'. */
         $vehicle->update([
-            'status' => 'available',
-            'is_featured' => false
+            'status'   => 'available',
+            'featured' => false,
         ]);
 
         return redirect()->route('admin.sell-cars.index')
-                        ->with('success', 'Anunțul a fost aprobat și publicat cu succes!');
+                        ->with('status', 'Publicado. Ya está en el catálogo.');
     }
 
     public function reject(Vehicle $vehicle)
@@ -145,7 +177,7 @@ class SellCarController extends Controller
         ]);
 
         return redirect()->route('admin.sell-cars.index')
-                        ->with('success', 'Anunțul a fost respins.');
+                        ->with('status', 'Rechazado. Sigue aquí por si cambias de idea.');
     }
 
     public function destroy(Vehicle $vehicle)
@@ -155,7 +187,7 @@ class SellCarController extends Controller
             $images = is_string($vehicle->images) ? json_decode($vehicle->images, true) : $vehicle->images;
             if (is_array($images)) {
                 foreach ($images as $image) {
-                    Storage::disk('public')->delete($image);
+                    Storage::disk('public')->delete(self::key($image));
                 }
             }
         }
@@ -163,11 +195,11 @@ class SellCarController extends Controller
         $vehicle->delete();
 
         return redirect()->route('admin.sell-cars.index')
-                        ->with('success', 'Anunțul a fost șters cu succes!');
+                        ->with('status', 'Oferta borrada.');
     }
 
     /**
-     * Descarcă o arhivă ZIP cu toate pozele încărcate de proprietar
+     * A ZIP of every photograph the seller uploaded.
      */
     public function downloadPhotos(Vehicle $vehicle)
     {
@@ -178,21 +210,21 @@ class SellCarController extends Controller
         $images = is_array($images) ? array_values($images) : [];
 
         if (empty($images)) {
-            return redirect()->back()->with('success', 'Nu există imagini de descărcat.');
+            return redirect()->back()->with('error', 'Esta oferta no tiene fotos.');
         }
 
         $tmpDir = storage_path('app/tmp');
         if (!is_dir($tmpDir)) { @mkdir($tmpDir, 0755, true); }
-        $zipName = 'poze-proprietar-' . ($vehicle->slug ?? $vehicle->id) . '-' . date('Ymd_His') . '.zip';
+        $zipName = 'fotos-' . ($vehicle->slug ?? $vehicle->id) . '-' . date('Ymd_His') . '.zip';
         $zipPath = $tmpDir . DIRECTORY_SEPARATOR . $zipName;
 
         $zip = new \ZipArchive();
         if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
-            return redirect()->back()->with('success', 'Nu s-a putut crea arhiva ZIP.');
+            return redirect()->back()->with('error', 'No se ha podido preparar el archivo.');
         }
 
         foreach ($images as $imgPath) {
-            $absolute = storage_path('app/public/' . ltrim($imgPath, '/'));
+            $absolute = storage_path('app/public/' . self::key($imgPath));
             if (is_file($absolute)) {
                 $zip->addFile($absolute, basename($absolute));
             }

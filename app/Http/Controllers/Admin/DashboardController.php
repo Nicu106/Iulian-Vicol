@@ -61,7 +61,12 @@ class DashboardController extends Controller
             ];
         }
 
-        $offers = Vehicle::where('offer_type', 'sell')->where('status', 'pending')->count();
+        /* 'sell' was a third spelling of this, alongside 'Compra' in the
+           public form and 'Vânzare' in the admin list. The panel counted
+           zero for the same reason the list showed nothing. */
+        $offers = Vehicle::where('offer_type', \App\Http\Controllers\SellCarController::OFFER_TYPE)
+            ->where('status', \App\Http\Controllers\SellCarController::OFFER_STATUS)
+            ->count();
         if ($offers > 0) {
             $todo[] = [
                 'n'    => $offers,

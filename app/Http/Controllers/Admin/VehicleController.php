@@ -271,7 +271,7 @@ class VehicleController extends BaseController
         if (!empty($validated['offer_price']) && $validated['offer_price'] >= $validated['price']) {
             return redirect()->back()
                 ->withInput()
-                ->withErrors(['offer_price' => 'Prețul ofertei trebuie să fie mai mic decât prețul normal.']);
+                ->withErrors(['offer_price' => 'El precio de oferta tiene que ser menor que el precio normal.']);
         }
 
         $slug = Str::slug($validated['brand'] . ' ' . $validated['model'] . ' ' . $validated['year'] . ' ' . Str::random(5));
@@ -481,7 +481,7 @@ class VehicleController extends BaseController
         if (!empty($validated['offer_price']) && $validated['offer_price'] >= $validated['price']) {
             return redirect()->back()
                 ->withInput()
-                ->withErrors(['offer_price' => 'Prețul ofertei trebuie să fie mai mic decât prețul normal.']);
+                ->withErrors(['offer_price' => 'El precio de oferta tiene que ser menor que el precio normal.']);
         }
 
         $vehicle = Vehicle::query()->where('slug', $slug)->first();
@@ -650,7 +650,7 @@ class VehicleController extends BaseController
         // delete uploads dir
         $dir = public_path('uploads/vehicles/' . $slug);
         if (File::isDirectory($dir)) { File::deleteDirectory($dir); }
-        return redirect()->route('admin.vehicles.index')->with('status', 'Vehicul șters');
+        return redirect()->route('admin.vehicles.index')->with('status', 'Coche borrado.');
     }
 
     /**

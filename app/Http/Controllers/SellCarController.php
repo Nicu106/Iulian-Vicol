@@ -33,6 +33,18 @@ class SellCarController extends Controller
 
     /** The site's own vocabulary — Vehicle::getFuelEsAttribute normalises to these. */
     public const FUEL = ['Gasolina', 'Diésel', 'Híbrido', 'Eléctrico'];
+
+    /**
+     * What a row written by this form is called, and the state it starts in.
+     *
+     * These were literals in three places and all three disagreed: this
+     * controller wrote 'Compra', Admin\SellCarController::index looked for
+     * 'Vânzare' and the dashboard counted 'sell'. Nothing a seller submitted
+     * could ever appear in the panel — the page would have stayed empty
+     * however many offers arrived. One constant, read by all of them.
+     */
+    public const OFFER_TYPE = 'Compra';
+    public const OFFER_STATUS = 'pending';
     public const GEAR = ['Manual', 'Automático'];
 
     public const MAX_PHOTOS = 12;
@@ -104,14 +116,14 @@ class SellCarController extends Controller
             'description'  => $data['description'] ?? null,
             'slug'         => $slug,
             'featured'     => false,
-            'offer_type'   => 'Compra',
+            'offer_type'   => self::OFFER_TYPE,
             'seller_name'  => $data['seller_name'],
             'seller_phone' => $data['seller_phone'],
             'seller_email' => $data['seller_email'] ?? null,
             'images'       => $stored,                 // cast to array on the model; json_encode here double-encoded
             'cover_image'  => $stored[0] ?? null,
             'gallery_images' => array_slice($stored, 1),
-            'status'       => 'pending',
+            'status'       => self::OFFER_STATUS,
         ]);
 
         // A state on the same page, not a flash: the confirmation is content, and it

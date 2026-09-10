@@ -97,7 +97,12 @@ Route::middleware('auth')->group(function () {
     // Enhanced pricing and offers management
     Route::post('/admin/vehicles/bulk-pricing', [VehicleController::class, 'bulkPricingUpdate'])->name('admin.vehicles.bulk-pricing');
     Route::get('/admin/vehicles/export-pricing', [VehicleController::class, 'exportPricingReport'])->name('admin.vehicles.export-pricing');
-    Route::get('/admin/vehicles/pricing-analytics', [VehicleController::class, 'pricingAnalytics'])->name('admin.vehicles.pricing-analytics');
+    /* /admin/vehicles/pricing-analytics is gone. The route pointed at
+       VehicleController@pricingAnalytics, which does not exist and never
+       has, so opening it raised "Call to undefined method" — a 500, not a
+       page. Its view was 350 lines of Bootstrap still written in Romanian
+       and nothing in the panel linked to either. Removed rather than
+       translated: there was no page to translate. */
     
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

@@ -557,3 +557,30 @@ select.ad-in {
 .ad-pairs > div { display: grid; grid-template-columns: minmax(9ch, 12ch) minmax(0, 1fr); gap: var(--s-3); align-items: baseline; }
 .ad-pairs dt { font-size: var(--t-label); color: var(--mc-ink-3); }
 .ad-pairs dd { margin: 0; font-size: var(--t-small); font-weight: 500; color: var(--mc-ink); }
+
+/* ---- the way in ----------------------------------------------------------
+   Navy ground, one white panel, nothing else. What it replaces: a radial
+   gradient over #0b1220, a 16px radius and a 60px shadow, in Figtree — a
+   typeface this site does not use anywhere.
+   ========================================================================= */
+.ad-gate {
+  display: grid; place-items: center;
+  min-height: 100svh; padding: var(--s-6) var(--mc-gutter-m);
+  background: var(--mc-navy);
+}
+.ad-gate__in { width: 100%; max-width: 26rem; }
+.ad-gate__mark { display: block; margin-bottom: var(--s-6); text-decoration: none; }
+.ad-gate__mark b {
+  display: block; font-size: var(--t-h3); font-weight: 700; letter-spacing: .04em;
+  color: var(--mc-on-navy);
+}
+.ad-gate__mark span { display: block; margin-top: var(--s-1); font-size: var(--t-small); color: var(--mc-on-navy-2); }
+.ad-gate__card {
+  background: var(--mc-surface);
+  border-radius: var(--mc-r-card);
+  padding: var(--s-6);
+}
+.ad-gate__lost {
+  display: inline-flex; align-items: center; min-height: var(--mc-tap);
+  font-size: var(--t-small); color: var(--mc-blue);
+}

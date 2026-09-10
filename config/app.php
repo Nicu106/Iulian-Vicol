@@ -84,7 +84,12 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    /* The site, the panel and the man who runs it are Spanish. This was 'en',
+       so every validation message the admin forms produced came out in
+       English ("The brand field is required."). /vende was unaffected only
+       because SellCarRequest carries its own Spanish messages. The default
+       lives here rather than only in .env, which is not deployed. */
+    'locale' => env('APP_LOCALE', 'es'),
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 

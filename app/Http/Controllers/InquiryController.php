@@ -21,7 +21,7 @@ class InquiryController extends Controller
 
         Inquiry::create($validated + ['status' => 'new']);
 
-        return back()->with('status', 'Solicitarea a fost trimisă. Vă contactăm în curând.');
+        return back()->with('status', 'Mensaje enviado. Te contesto enseguida.');
     }
 }
 
