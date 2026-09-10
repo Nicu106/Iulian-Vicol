@@ -1,335 +1,107 @@
-@extends('layouts.admin')
+@extends('layouts.ad')
 
-@section('title', 'Editează mașină de vânzare - Admin')
+@section('title', 'Editar la oferta — IV MOTORCLASS')
 
 @section('content')
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-  <h1 class="h2"><i class="bi bi-pencil me-2"></i>Editează mașină de vânzare</h1>
-  <div class="btn-toolbar mb-2 mb-md-0">
-    <div class="btn-group me-2">
-      <a href="{{ route('admin.sell-cars.index') }}" class="btn btn-sm btn-outline-secondary">
-        <i class="bi bi-arrow-left me-1"></i>Înapoi la listă
-      </a>
-      <a href="{{ route('admin.sell-cars.show', $vehicle) }}" class="btn btn-sm btn-outline-primary">
-        <i class="bi bi-eye me-1"></i>Vezi detalii
-      </a>
-    </div>
+
+@php
+  $f = fn ($k, $d = '') => old($k, $vehicle->$k ?? $d);
+  $fuels = \App\Http\Controllers\SellCarController::FUEL;
+  $gears = \App\Http\Controllers\SellCarController::GEAR;
+@endphp
+
+<div class="ad-head">
+  <div class="ad-head__t">
+    <h1 class="ad-h1">Editar la oferta</h1>
+    <p class="ad-head__p">Corrige lo que haga falta antes de publicarla.</p>
+  </div>
+  <div class="ad-head__go">
+    <a class="ad-btn ad-btn--q" href="{{ route('admin.sell-cars.show', $vehicle) }}">Volver</a>
   </div>
 </div>
 
-@if(session('success'))
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-  </div>
-@endif
-
 @if($errors->any())
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <i class="bi bi-exclamation-triangle me-2"></i>
-    <ul class="mb-0">
-      @foreach($errors->all() as $error)
-        <li>{{ $error }}</li>
-      @endforeach
-    </ul>
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-  </div>
+  <div class="ad-flash ad-flash--bad"><span>Revisa los campos marcados.</span></div>
 @endif
 
-<form action="{{ route('admin.sell-cars.update', $vehicle) }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+<form class="ad-form" action="{{ route('admin.sell-cars.update', $vehicle) }}" method="POST" enctype="multipart/form-data">
   @csrf
   @method('PUT')
-  
-  <div class="row">
-    <div class="col-lg-8">
-      <!-- Informații despre mașină -->
-      <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-          <h5 class="mb-0"><i class="bi bi-car-front me-2"></i>Informații despre mașină</h5>
-        </div>
-        <div class="card-body">
-          <div class="row g-3">
-            <div class="col-md-6">
-              <label for="title" class="form-label">Titlu anunț *</label>
-              <input type="text" class="form-control" id="title" name="title" value="{{ old('title', $vehicle->title) }}" required>
-            </div>
-            <div class="col-md-3">
-              <label for="brand" class="form-label">Marca *</label>
-              <select class="form-select" id="brand" name="brand" required>
-                <option value="">Selectează marca</option>
-                <option value="BMW" {{ old('brand', $vehicle->brand) == 'BMW' ? 'selected' : '' }}>BMW</option>
-                <option value="Audi" {{ old('brand', $vehicle->brand) == 'Audi' ? 'selected' : '' }}>Audi</option>
-                <option value="Mercedes" {{ old('brand', $vehicle->brand) == 'Mercedes' ? 'selected' : '' }}>Mercedes</option>
-                <option value="Volkswagen" {{ old('brand', $vehicle->brand) == 'Volkswagen' ? 'selected' : '' }}>Volkswagen</option>
-                <option value="Toyota" {{ old('brand', $vehicle->brand) == 'Toyota' ? 'selected' : '' }}>Toyota</option>
-                <option value="Honda" {{ old('brand', $vehicle->brand) == 'Honda' ? 'selected' : '' }}>Honda</option>
-                <option value="Ford" {{ old('brand', $vehicle->brand) == 'Ford' ? 'selected' : '' }}>Ford</option>
-                <option value="Nissan" {{ old('brand', $vehicle->brand) == 'Nissan' ? 'selected' : '' }}>Nissan</option>
-                <option value="Altele" {{ old('brand', $vehicle->brand) == 'Altele' ? 'selected' : '' }}>Altele</option>
-              </select>
-            </div>
-            <div class="col-md-3">
-              <label for="model" class="form-label">Model *</label>
-              <input type="text" class="form-control" id="model" name="model" value="{{ old('model', $vehicle->model) }}" required>
-            </div>
-            <div class="col-md-3">
-              <label for="year" class="form-label">Anul *</label>
-              <select class="form-select" id="year" name="year" required>
-                <option value="">Selectează anul</option>
-                @for($i = date('Y'); $i >= 1990; $i--)
-                  <option value="{{ $i }}" {{ old('year', $vehicle->year) == $i ? 'selected' : '' }}>{{ $i }}</option>
-                @endfor
-              </select>
-            </div>
-            <div class="col-md-3">
-              <label for="price" class="form-label">Preț (EUR) *</label>
-              <input type="number" class="form-control" id="price" name="price" value="{{ old('price', $vehicle->price) }}" min="0" step="100" required>
-            </div>
-            <div class="col-md-3">
-              <label for="mileage" class="form-label">Kilometraj *</label>
-              <input type="number" class="form-control" id="mileage" name="mileage" value="{{ old('mileage', $vehicle->mileage) }}" min="0" required>
-            </div>
-            <div class="col-md-3">
-              <label for="fuel_type" class="form-label">Combustibil *</label>
-              <select class="form-select" id="fuel_type" name="fuel_type" required>
-                <option value="">Selectează</option>
-                <option value="Benzină" {{ old('fuel_type', $vehicle->fuel_type) == 'Benzină' ? 'selected' : '' }}>Benzină</option>
-                <option value="Diesel" {{ old('fuel_type', $vehicle->fuel_type) == 'Diesel' ? 'selected' : '' }}>Diesel</option>
-                <option value="Hibrid" {{ old('fuel_type', $vehicle->fuel_type) == 'Hibrid' ? 'selected' : '' }}>Hibrid</option>
-                <option value="Electric" {{ old('fuel_type', $vehicle->fuel_type) == 'Electric' ? 'selected' : '' }}>Electric</option>
-              </select>
-            </div>
-            <div class="col-md-3">
-              <label for="transmission" class="form-label">Transmisie *</label>
-              <select class="form-select" id="transmission" name="transmission" required>
-                <option value="">Selectează</option>
-                <option value="Manuală" {{ old('transmission', $vehicle->transmission) == 'Manuală' ? 'selected' : '' }}>Manuală</option>
-                <option value="Automată" {{ old('transmission', $vehicle->transmission) == 'Automată' ? 'selected' : '' }}>Automată</option>
-              </select>
-            </div>
-            <div class="col-md-3">
-              <label for="body_type" class="form-label">Tip caroserie *</label>
-              <select class="form-select" id="body_type" name="body_type" required>
-                <option value="">Selectează</option>
-                <option value="Sedan" {{ old('body_type', $vehicle->body_type) == 'Sedan' ? 'selected' : '' }}>Sedan</option>
-                <option value="SUV" {{ old('body_type', $vehicle->body_type) == 'SUV' ? 'selected' : '' }}>SUV</option>
-                <option value="Hatchback" {{ old('body_type', $vehicle->body_type) == 'Hatchback' ? 'selected' : '' }}>Hatchback</option>
-                <option value="Coupe" {{ old('body_type', $vehicle->body_type) == 'Coupe' ? 'selected' : '' }}>Coupe</option>
-                <option value="Convertible" {{ old('body_type', $vehicle->body_type) == 'Convertible' ? 'selected' : '' }}>Convertible</option>
-                <option value="Wagon" {{ old('body_type', $vehicle->body_type) == 'Wagon' ? 'selected' : '' }}>Wagon</option>
-              </select>
-            </div>
-            <div class="col-md-3">
-              <label for="color" class="form-label">Culoarea *</label>
-              <input type="text" class="form-control" id="color" name="color" value="{{ old('color', $vehicle->color) }}" required>
-            </div>
-            <div class="col-md-3">
-              <label for="engine_capacity" class="form-label">Capacitate motor (cm³) *</label>
-              <input type="number" class="form-control" id="engine_capacity" name="engine_capacity" value="{{ old('engine_capacity', $vehicle->engine_capacity) }}" min="0" required>
-            </div>
-            <div class="col-md-3">
-              <label for="power" class="form-label">Putere (CP) *</label>
-              <input type="number" class="form-control" id="power" name="power" value="{{ old('power', $vehicle->power) }}" min="0" required>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- Imagini existente -->
-      @if($vehicle->images && is_array($vehicle->images) && count($vehicle->images) > 0)
-      <div class="card mb-4">
-        <div class="card-header bg-info text-white">
-          <h5 class="mb-0"><i class="bi bi-images me-2"></i>Imagini existente ({{ count($vehicle->images) }})</h5>
-        </div>
-        <div class="card-body">
-          <div class="row g-2" id="existingImages">
-            @foreach($vehicle->images as $index => $image)
-              <div class="col-md-3" data-image="{{ $image }}">
-                <div class="position-relative">
-                  <img src="{{ Storage::url($image) }}" 
-                       class="img-thumbnail" 
-                       style="width: 100%; height: 150px; object-fit: cover;">
-                  <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1" 
-                          onclick="removeExistingImage(this, '{{ $image }}')">
-                    <i class="bi bi-x"></i>
-                  </button>
-                </div>
-              </div>
-            @endforeach
-          </div>
-        </div>
-      </div>
-      @endif
-
-      <!-- Imagini noi -->
-      <div class="card mb-4">
-        <div class="card-header bg-success text-white">
-          <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Adaugă imagini noi (opțional)</h5>
-        </div>
-        <div class="card-body">
-          <div class="mb-3">
-            <label for="images" class="form-label">Selectează imagini noi</label>
-            <input type="file" class="form-control" id="images" name="images[]" multiple accept="image/*">
-            <div class="form-text">Format acceptat: JPG, PNG, GIF. Dimensiune maximă: 5MB per imagine.</div>
-          </div>
-          <div id="imagePreview" class="row g-2"></div>
-        </div>
-      </div>
-
-      <!-- Descriere -->
-      <div class="card mb-4">
-        <div class="card-header bg-warning text-dark">
-          <h5 class="mb-0"><i class="bi bi-file-text me-2"></i>Descriere</h5>
-        </div>
-        <div class="card-body">
-          <div class="mb-3">
-            <label for="description" class="form-label">Descriere detaliată *</label>
-            <textarea class="form-control" id="description" name="description" rows="5" required>{{ old('description', $vehicle->description) }}</textarea>
-            <div class="form-text">Descrie starea mașinii, opțiunile, istoricul, etc.</div>
-          </div>
-        </div>
-      </div>
+  <fieldset class="ad-fs">
+    <h2 class="ad-fs__h">El coche</h2>
+    <div class="ad-grid">
+      <label class="ad-field ad-wide"><span>Título</span>
+        <input class="ad-in {{ $errors->has('title') ? 'is-bad' : '' }}" type="text" name="title" value="{{ $f('title') }}" required>
+        @error('title')<span class="ad-err">{{ $message }}</span>@enderror</label>
+      <label class="ad-field"><span>Marca</span><input class="ad-in" type="text" name="brand" value="{{ $f('brand') }}" required></label>
+      <label class="ad-field"><span>Modelo</span><input class="ad-in" type="text" name="model" value="{{ $f('model') }}" required></label>
+      <label class="ad-field"><span>Año</span><input class="ad-in" type="number" name="year" value="{{ $f('year') }}" min="1990" max="{{ date('Y') }}" required></label>
+      <label class="ad-field"><span>Precio</span>
+        <span class="ad-unit"><input class="ad-in" type="number" name="price" value="{{ $f('price') }}" min="0" required><span class="ad-unit__u">€</span></span></label>
+      <label class="ad-field"><span>Kilómetros</span>
+        <span class="ad-unit"><input class="ad-in" type="number" name="mileage" value="{{ $f('mileage') }}" min="0" required><span class="ad-unit__u">km</span></span></label>
+      <label class="ad-field"><span>Carrocería</span><input class="ad-in" type="text" name="body_type" value="{{ $f('body_type') }}" required></label>
+      <label class="ad-field"><span>Color</span><input class="ad-in" type="text" name="color" value="{{ $f('color') }}" required></label>
+      <label class="ad-field"><span>Cilindrada</span>
+        <span class="ad-unit"><input class="ad-in" type="number" name="engine_capacity" value="{{ $f('engine_capacity') }}" min="0" required><span class="ad-unit__u">cc</span></span></label>
+      <label class="ad-field"><span>Potencia</span>
+        <span class="ad-unit"><input class="ad-in" type="number" name="power" value="{{ $f('power') }}" min="0" required><span class="ad-unit__u">CV</span></span></label>
     </div>
 
-    <div class="col-lg-4">
-      <!-- Informații contact -->
-      <div class="card mb-4">
-        <div class="card-header bg-secondary text-white">
-          <h5 class="mb-0"><i class="bi bi-person me-2"></i>Informații contact</h5>
-        </div>
-        <div class="card-body">
-          <div class="row g-3">
-            <div class="col-12">
-              <label for="seller_name" class="form-label">Numele vânzătorului *</label>
-              <input type="text" class="form-control" id="seller_name" name="seller_name" value="{{ old('seller_name', $vehicle->seller_name) }}" required>
-            </div>
-            <div class="col-12">
-              <label for="seller_phone" class="form-label">Telefon *</label>
-              <input type="tel" class="form-control" id="seller_phone" name="seller_phone" value="{{ old('seller_phone', $vehicle->seller_phone) }}" required>
-            </div>
-            <div class="col-12">
-              <label for="seller_email" class="form-label">Email *</label>
-              <input type="email" class="form-control" id="seller_email" name="seller_email" value="{{ old('seller_email', $vehicle->seller_email) }}" required>
-            </div>
-          </div>
-        </div>
+    <div class="ad-field" style="margin-top:var(--s-4)">
+      <span>Combustible</span>
+      <div class="ad-pills">
+        @foreach($fuels as $x)
+          <label class="ad-pill"><input type="radio" name="fuel_type" value="{{ $x }}" @checked($f('fuel_type') === $x) required><span>{{ $x }}</span></label>
+        @endforeach
       </div>
-
-      <!-- Status -->
-      <div class="card mb-4">
-        <div class="card-header bg-dark text-white">
-          <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Status</h5>
-        </div>
-        <div class="card-body">
-          <div class="mb-2">
-            <small class="text-muted">Status curent:</small> 
-            <span class="badge bg-{{ $vehicle->status === 'pending' ? 'warning' : ($vehicle->status === 'available' ? 'success' : 'danger') }}">
-              {{ $vehicle->status }}
-            </span>
-          </div>
-          <div class="mb-2">
-            <small class="text-muted">Creat la:</small> {{ $vehicle->created_at->format('d.m.Y H:i') }}
-          </div>
-          <div class="mb-2">
-            <small class="text-muted">Actualizat la:</small> {{ $vehicle->updated_at->format('d.m.Y H:i') }}
-          </div>
-        </div>
-      </div>
-
-      <!-- Acțiuni -->
-      <div class="card">
-        <div class="card-header bg-primary text-white">
-          <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Acțiuni</h5>
-        </div>
-        <div class="card-body">
-          <div class="d-grid gap-2">
-            <button type="submit" class="btn btn-success">
-              <i class="bi bi-check me-2"></i>Salvează modificările
-            </button>
-            <a href="{{ route('admin.sell-cars.show', $vehicle) }}" class="btn btn-outline-secondary">
-              <i class="bi bi-x me-2"></i>Anulează
-            </a>
-          </div>
-        </div>
-      </div>
+      @error('fuel_type')<span class="ad-err">{{ $message }}</span>@enderror
     </div>
+
+    <div class="ad-field" style="margin-top:var(--s-4)">
+      <span>Cambio</span>
+      <div class="ad-pills">
+        @foreach($gears as $x)
+          <label class="ad-pill"><input type="radio" name="transmission" value="{{ $x }}" @checked($f('transmission') === $x) required><span>{{ $x }}</span></label>
+        @endforeach
+      </div>
+      @error('transmission')<span class="ad-err">{{ $message }}</span>@enderror
+    </div>
+  </fieldset>
+
+  <fieldset class="ad-fs">
+    <h2 class="ad-fs__h">Lo que cuenta</h2>
+    <label class="ad-field">
+      <span class="ad-vh">Descripción</span>
+      <textarea class="ad-in {{ $errors->has('description') ? 'is-bad' : '' }}" name="description" rows="8" maxlength="2000" required>{{ $f('description') }}</textarea>
+      @error('description')<span class="ad-err">{{ $message }}</span>@enderror
+    </label>
+  </fieldset>
+
+  <fieldset class="ad-fs">
+    <h2 class="ad-fs__h">Quién lo vende</h2>
+    <div class="ad-grid">
+      <label class="ad-field"><span>Nombre</span><input class="ad-in" type="text" name="seller_name" value="{{ $f('seller_name') }}" required></label>
+      <label class="ad-field"><span>Teléfono</span><input class="ad-in" type="tel" name="seller_phone" value="{{ $f('seller_phone') }}" maxlength="20" required></label>
+      <label class="ad-field ad-wide"><span>Correo</span><input class="ad-in" type="email" name="seller_email" value="{{ $f('seller_email') }}" required></label>
+    </div>
+  </fieldset>
+
+  <fieldset class="ad-fs">
+    <h2 class="ad-fs__h">Añadir fotos</h2>
+    <label class="ad-drop">
+      <span class="ad-drop__t">Elegir fotos</span>
+      <span class="ad-drop__n">Se suman a las que ya mandó</span>
+      <input type="file" name="images[]" accept="image/*" multiple>
+    </label>
+    @error('images.*')<p class="ad-err">{{ $message }}</p>@enderror
+  </fieldset>
+
+  <div class="ad-go">
+    <button class="ad-btn" type="submit">Guardar</button>
+    <a class="ad-btn ad-btn--q" href="{{ route('admin.sell-cars.show', $vehicle) }}">Cancelar</a>
   </div>
 </form>
 
-<!-- Hidden input for removed images -->
-<input type="hidden" id="removedImages" name="removed_images" value="">
 @endsection
-
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Image preview for new images
-  const imageInput = document.getElementById('images');
-  const imagePreview = document.getElementById('imagePreview');
-  
-  imageInput.addEventListener('change', function(e) {
-    imagePreview.innerHTML = '';
-    const files = Array.from(e.target.files);
-    
-    files.forEach((file, index) => {
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const col = document.createElement('div');
-          col.className = 'col-md-3';
-          col.innerHTML = `
-            <div class="position-relative">
-              <img src="${e.target.result}" class="img-thumbnail" style="width: 100%; height: 150px; object-fit: cover;">
-              <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1" onclick="removeNewImage(${index})">
-                <i class="bi bi-x"></i>
-              </button>
-            </div>
-          `;
-          imagePreview.appendChild(col);
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-  });
-  
-  // Form validation
-  const form = document.querySelector('.needs-validation');
-  form.addEventListener('submit', function(e) {
-    if (!form.checkValidity()) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    form.classList.add('was-validated');
-  });
-});
-
-let removedImages = [];
-
-function removeExistingImage(button, imagePath) {
-  if (confirm('Ești sigur că vrei să ștergi această imagine?')) {
-    const col = button.closest('.col-md-3');
-    col.remove();
-    removedImages.push(imagePath);
-    document.getElementById('removedImages').value = JSON.stringify(removedImages);
-  }
-}
-
-function removeNewImage(index) {
-  const imageInput = document.getElementById('images');
-  const dt = new DataTransfer();
-  const files = Array.from(imageInput.files);
-  
-  files.forEach((file, i) => {
-    if (i !== index) {
-      dt.items.add(file);
-    }
-  });
-  
-  imageInput.files = dt.files;
-  
-  // Refresh preview
-  imageInput.dispatchEvent(new Event('change'));
-}
-</script>
-@endpush
-

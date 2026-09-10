@@ -55,8 +55,14 @@ class SellCarController extends Controller
             'year' => 'required|integer|min:1990|max:' . date('Y'),
             'price' => 'required|numeric|min:0',
             'mileage' => 'required|integer|min:0',
-            'fuel_type' => 'required|string|in:Benzină,Diesel,Hibrid,Electric',
-            'transmission' => 'required|string|in:Manuală,Automată',
+            /* The public form writes Spanish (App\Http\Controllers\SellCarController::FUEL
+               and ::GEAR). These two lists were Romanian — "Benzină, Diesel,
+               Hibrid, Electric" and "Manuală, Automată" — left over from the old
+               site, so any offer that actually arrived through /vende would have
+               been refused the moment he opened it and pressed save. Read from
+               the constants now, so the two cannot drift apart again. */
+            'fuel_type' => 'required|string|in:' . implode(',', \App\Http\Controllers\SellCarController::FUEL),
+            'transmission' => 'required|string|in:' . implode(',', \App\Http\Controllers\SellCarController::GEAR),
             'body_type' => 'required|string|max:50',
             'color' => 'required|string|max:50',
             'engine_capacity' => 'required|integer|min:0',

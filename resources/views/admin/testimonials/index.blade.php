@@ -1,65 +1,62 @@
-@extends('layouts.admin')
+@extends('layouts.ad')
 
-@section('title', 'Admin • Opiniones de clientes')
+@section('title', 'Opiniones — IV MOTORCLASS')
 
 @section('content')
-<div class="py-3">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h4 mb-0">Opiniones de clientes</h1>
-    <a href="{{ route('admin.testimonials.create') }}" class="btn btn-primary">
-      <i class="bi bi-plus-circle me-1"></i>Añadir testimonio
-    </a>
+
+<div class="ad-head">
+  <div class="ad-head__t">
+    <h1 class="ad-h1">Opiniones</h1>
+    <p class="ad-head__p">{{ $testimonials->total() }} en total. Salen en la portada, con su foto entera.</p>
   </div>
-
-  @if(session('status'))
-    <div class="alert alert-success">{{ session('status') }}</div>
-  @endif
-
-  <div class="card">
-    <div class="table-responsive">
-      <table class="table table-striped align-middle mb-0">
-        <thead>
-          <tr>
-            <th>Orden</th>
-            <th>Autor</th>
-            <th>Ubicación</th>
-            <th>Cita</th>
-            <th>Activo</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          @foreach($testimonials as $t)
-          <tr>
-            <td>{{ $t->order_index }}</td>
-            <td>{{ $t->author_name }}</td>
-            <td class="text-muted small">{{ $t->author_location }}</td>
-            <td class="small" style="max-width: 500px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $t->quote }}</td>
-            <td>
-              @if($t->is_active)
-                <span class="badge bg-success">Sí</span>
-              @else
-                <span class="badge bg-secondary">No</span>
-              @endif
-            </td>
-            <td class="text-end">
-              <a href="{{ route('admin.testimonials.edit', $t) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
-              <form action="{{ route('admin.testimonials.destroy', $t) }}" method="POST" class="d-inline" onsubmit="return confirm('Eliminar testimonio?')">
-                @csrf
-                @method('DELETE')
-                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-              </form>
-            </td>
-          </tr>
-          @endforeach
-        </tbody>
-      </table>
-    </div>
-    <div class="card-footer">
-      {{ $testimonials->links('custom-pagination') }}
-    </div>
+  <div class="ad-head__go">
+    <a class="ad-btn" href="{{ route('admin.testimonials.create') }}">Añadir opinión</a>
   </div>
 </div>
+
+@if($testimonials->isNotEmpty())
+  {{-- The quote was a single table cell with white-space:nowrap and an
+       ellipsis, so every opinion showed its first eight words and the whole
+       point of the page — reading what people wrote — was not on it. --}}
+  <ul class="ad-list">
+    @foreach($testimonials as $t)
+      <li>
+        <article class="ad-say">
+          @if($t->image_path)
+            <img class="ad-say__i" src="{{ $t->image_path }}" alt="Foto de {{ $t->author_name }}" loading="lazy" decoding="async">
+          @endif
+          <div class="ad-say__b">
+            <div class="ad-msg__h">
+              <span class="ad-msg__who">{{ $t->author_name }}</span>
+              <span class="ad-chip {{ $t->is_active ? 'ad-chip--live' : '' }}">{{ $t->is_active ? 'En la portada' : 'Oculta' }}</span>
+              <span class="ad-msg__when">Orden {{ $t->order_index }}</span>
+            </div>
+            <p class="ad-msg__body">{{ $t->quote }}</p>
+            <div class="ad-msg__act">
+              <a class="ad-btn ad-btn--q ad-btn--s" href="{{ route('admin.testimonials.edit', $t) }}">Editar</a>
+            </div>
+          </div>
+        </article>
+      </li>
+    @endforeach
+  </ul>
+
+  @if($testimonials->hasPages())
+    <nav class="ad-pages" aria-label="Páginas">
+      @foreach($testimonials->getUrlRange(1, $testimonials->lastPage()) as $n => $url)
+        @if($n === $testimonials->currentPage())
+          <span class="is-on" aria-current="page">{{ $n }}</span>
+        @else
+          <a href="{{ $url }}">{{ $n }}</a>
+        @endif
+      @endforeach
+    </nav>
+  @endif
+@else
+  <div class="ad-empty">
+    <p class="ad-empty__t">Todavía no hay opiniones</p>
+    <p class="ad-empty__p">La portada enseña esta sección sólo cuando hay algo que enseñar.</p>
+  </div>
+@endif
+
 @endsection
-
-

@@ -90,8 +90,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/admin/sell-cars/{vehicle}', [App\Http\Controllers\Admin\SellCarController::class, 'destroy'])->name('admin.sell-cars.destroy');
     
     // Advanced admin actions
-Route::post('/admin/vehicles/{slug}/toggle-featured', [VehicleController::class, 'toggleFeatured'])->name('admin.vehicles.toggle-featured');
-Route::post('/admin/vehicles/bulk-action', [VehicleController::class, 'bulkAction'])->name('admin.vehicles.bulk-action');
+    Route::post('/admin/vehicles/{slug}/status', [VehicleController::class, 'setStatus'])->name('admin.vehicles.status');
+    Route::post('/admin/vehicles/{slug}/toggle-featured', [VehicleController::class, 'toggleFeatured'])->name('admin.vehicles.toggle-featured');
+    Route::post('/admin/vehicles/bulk-action', [VehicleController::class, 'bulkAction'])->name('admin.vehicles.bulk-action');
     
     // Enhanced pricing and offers management
     Route::post('/admin/vehicles/bulk-pricing', [VehicleController::class, 'bulkPricingUpdate'])->name('admin.vehicles.bulk-pricing');

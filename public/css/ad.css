@@ -1,0 +1,559 @@
+/* ============================================================================
+   ADMIN — the site, seen from the other side
+   ---------------------------------------------------------------------------
+   What this replaces: Bootstrap 5.3 and bootstrap-icons from two CDNs, a dark
+   navbar, a sidebar written twice (once as an offcanvas, once as a rail), six
+   purple-to-pink gradient stat cards, 12px radii, soft grey shadows and a
+   hover-lift on everything. Every one of those is on the client's own list of
+   forbidden defaults, and together they are why the panel read as a template
+   next to the site it administers.
+
+   mc-tokens.css is canonical and nothing here is a literal that has a token.
+   The admin does NOT load catalog.css or brandbook.css — it is a different
+   application that shares the language, not the pages — so the few atoms it
+   needs (bar, container, button, field) are defined once, here, with the ad-
+   prefix.
+
+   Layout law, measured: the old shell put a Bootstrap .row inside a
+   .container-fluid, and .row carries margin-inline:-12px. At 390 the content
+   box came out 414px wide, so every admin page scrolled sideways on every
+   screen because of the shell alone. There is no negative margin in this file.
+   ========================================================================= */
+
+/* ---- the ground ---------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body.ad {
+  margin: 0;
+  background: var(--mc-bg);
+  color: var(--mc-ink);
+  font-family: var(--f-ui);
+  font-size: var(--t-ui);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.ad img { max-width: 100%; }
+
+.ad :focus-visible { outline: 3px solid var(--mc-focus); outline-offset: 2px; }
+
+/* The measure. The same container token as every page on the site, so the
+   admin sits on the same spine: a man who knows where /catalogo starts knows
+   where this starts. */
+.ad-wrap {
+  width: 100%;
+  max-width: var(--mc-container);
+  margin-inline: auto;
+  padding-inline: var(--mc-gutter-m);
+}
+@media (min-width: 768px) { .ad-wrap { padding-inline: var(--mc-gutter-d); } }
+
+.ad-vh {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+
+/* ---- the bar -------------------------------------------------------------
+   Navy, like every fixed surface on the site. Not fixed: the admin scrolls
+   long lists and a bar pinned to the top of a phone eats the one thing in
+   short supply. Below 900 the links take their own line and that line SCROLLS
+   sideways. Wrapping is what made the old public header 148px tall at 320 with
+   four links; this is the solution that header already ships.
+   ========================================================================= */
+.ad-top { background: var(--mc-navy); color: var(--mc-on-navy); }
+
+.ad-top__in { display: flex; align-items: center; gap: var(--s-5); min-height: 60px; }
+
+.ad-mark {
+  display: inline-flex; align-items: baseline; gap: .5ch;
+  font-size: var(--t-ui); font-weight: 700; letter-spacing: -.01em;
+  color: var(--mc-on-navy); text-decoration: none; white-space: nowrap;
+}
+.ad-mark b { font-weight: 700; color: var(--mc-on-navy); }
+.ad-mark span { font-weight: 400; color: var(--mc-on-navy-2); }
+
+.ad-nav { display: flex; align-items: center; gap: var(--s-1); margin: 0; padding: 0; list-style: none; min-width: 0; }
+
+.ad-nav__i {
+  display: inline-flex; align-items: center;
+  min-height: var(--mc-tap); padding-inline: var(--s-3);
+  font-size: var(--t-small); font-weight: 500;
+  color: var(--mc-on-navy-2); text-decoration: none; white-space: nowrap;
+  transition: color var(--m-quick) var(--e-out);
+}
+.ad-nav__i:hover { color: var(--mc-on-navy); }
+
+/* The current page is marked by a rule under the words, not by a filled pill:
+   a pill in a navy bar is a second button competing with the real one. */
+.ad-nav__i.is-on { color: var(--mc-on-navy); box-shadow: inset 0 -2px 0 0 var(--mc-on-navy); }
+
+.ad-nav__n {
+  margin-left: .6ch; padding: 1px 5px;
+  background: var(--mc-blue); color: #FFFFFF;
+  font-size: var(--t-label); font-weight: 700; line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+}
+
+.ad-top__end { display: flex; align-items: center; gap: var(--s-2); margin-left: auto; }
+
+.ad-out {
+  display: inline-flex; align-items: center;
+  min-height: var(--mc-tap); padding-inline: var(--s-3);
+  background: none; border: 0;
+  font-family: inherit; font-size: var(--t-small); font-weight: 500;
+  color: var(--mc-on-navy-2); text-decoration: none; cursor: pointer; white-space: nowrap;
+  transition: color var(--m-quick) var(--e-out);
+}
+.ad-out:hover { color: var(--mc-on-navy); }
+
+@media (max-width: 899.98px) {
+  .ad-top__in { flex-wrap: wrap; gap: var(--s-2); padding-block: var(--s-2); min-height: 0; }
+  .ad-navwrap {
+    order: 3; flex: 1 0 100%;
+    margin-inline: calc(var(--mc-gutter-m) * -1);
+    overflow-x: auto; overflow-y: hidden;
+    -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .ad-navwrap::-webkit-scrollbar { display: none; }
+  /* the gutter is inside the scrolling box, so the last link is not cut at the edge */
+  .ad-nav { padding-inline: var(--mc-gutter-m); }
+}
+
+/* ---- the page ------------------------------------------------------------ */
+.ad-main { padding-block: var(--s-6) var(--s-9); }
+
+.ad-head {
+  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+  gap: var(--s-4); margin-bottom: var(--s-6);
+}
+.ad-head__t { min-width: 0; }
+.ad-h1 { margin: 0; font-size: var(--t-h2); line-height: 1.08; letter-spacing: -.02em; color: var(--mc-ink); }
+.ad-head__p { margin: var(--s-2) 0 0; font-size: var(--t-small); color: var(--mc-ink-2); }
+.ad-head__go { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+
+.ad-h2 { margin: 0 0 var(--s-4); font-size: var(--t-h3); line-height: 1.2; letter-spacing: -.012em; color: var(--mc-ink); }
+
+.ad-sec { margin-top: var(--s-8); }
+.ad-lede { margin: 0 0 var(--s-5); max-width: 56ch; font-size: var(--t-small); color: var(--mc-ink-2); }
+.ad-note { margin: var(--s-4) 0 0; font-size: var(--t-label); color: var(--mc-ink-3); }
+
+/* ---- buttons -------------------------------------------------------------
+   Three, and no more: the one thing this screen is for, the ordinary thing,
+   and the dangerous thing. Square, like everything else on this site.
+   ========================================================================= */
+.ad-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
+  min-height: var(--mc-tap-pref); padding-inline: var(--s-5);
+  border: 1px solid transparent; border-radius: var(--mc-r-card);
+  font-family: inherit; font-size: var(--t-small); font-weight: 600;
+  text-decoration: none; cursor: pointer; white-space: nowrap;
+  background: var(--mc-blue); color: #FFFFFF;
+  transition: background var(--m-quick) var(--e-out);
+}
+.ad-btn:hover { background: var(--mc-blue-dark); }
+.ad-btn--q { background: var(--mc-surface); color: var(--mc-ink); border-color: var(--mc-rule); }
+.ad-btn--q:hover { background: var(--mc-band); }
+.ad-btn--bad { background: none; color: var(--mc-accent); border-color: var(--mc-rule); }
+.ad-btn--bad:hover { background: var(--mc-accent-tint); border-color: var(--mc-accent); }
+.ad-btn--s { min-height: var(--mc-tap); padding-inline: var(--s-4); font-size: var(--t-label); }
+
+/* ---- panels --------------------------------------------------------------
+   A hairline and a white ground. No shadow: a shadow on a panel that never
+   moves is decoration, and twelve of them on one screen is what a template
+   looks like.
+   ========================================================================= */
+.ad-panel {
+  background: var(--mc-surface);
+  border: 1px solid var(--mc-hairline);
+  border-radius: var(--mc-r-card);
+  padding: var(--s-5);
+}
+@media (min-width: 768px) { .ad-panel { padding: var(--s-6); } }
+.ad-panel__h { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-4); margin-bottom: var(--s-4); }
+.ad-panel__h h2, .ad-panel__h h3 { margin: 0; font-size: var(--t-h3); letter-spacing: -.012em; }
+
+/* ---- the numbers ---------------------------------------------------------
+   The ladder the contact page uses: label small above, value large below, and
+   the space does the separating, so there are no rules between them. Six
+   gradient tiles were doing this job and three of them showed a permanent
+   zero. Only numbers that can change are allowed here.
+   ========================================================================= */
+.ad-facts {
+  display: grid; gap: var(--s-5) var(--s-6);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0; padding: 0; list-style: none;
+}
+@media (min-width: 700px) { .ad-facts { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+.ad-fact { min-width: 0; display: block; text-decoration: none; }
+.ad-fact__k { display: block; margin-bottom: var(--s-1); font-size: var(--t-label); font-weight: 500; color: var(--mc-ink-2); }
+.ad-fact__v {
+  display: block; font-size: var(--t-h1); font-weight: 700; line-height: 1;
+  letter-spacing: -.03em; color: var(--mc-ink); font-variant-numeric: tabular-nums;
+}
+.ad-fact__n { display: block; margin-top: var(--s-2); font-size: var(--t-label); color: var(--mc-ink-3); }
+a.ad-fact:hover .ad-fact__v { color: var(--mc-blue); }
+
+/* ---- state ---------------------------------------------------------------
+   Flat, square, and the sold one is grey — the same decision the catalogue
+   made. A coloured pill per state turns a list into a paint chart.
+   ========================================================================= */
+.ad-chip {
+  display: inline-flex; align-items: center; padding: 3px var(--s-2);
+  border-radius: var(--mc-r-s);
+  font-size: var(--t-label); font-weight: 600; line-height: 1.3; white-space: nowrap;
+  background: var(--mc-band); color: var(--mc-ink-2);
+}
+.ad-chip--live { background: var(--mc-ok-tint); color: var(--mc-ok); }
+.ad-chip--gone { background: var(--mc-band); color: var(--mc-ink-3); }
+.ad-chip--wait { background: var(--mc-warn-tint); color: var(--mc-warn); }
+.ad-chip--bad  { background: var(--mc-accent-tint); color: var(--mc-accent); }
+
+/* ---- a list of things ----------------------------------------------------
+   Not a table. The old vehicle list had nine columns with fixed widths inside
+   a col-lg-10: at 1440 the price was already cut off at the right edge and
+   Estado, Vistas, Destacado, Fecha and Acciones were off the page entirely; at
+   390 it overflowed by 730px. A row that is a grid re-flows; a table does not.
+   ========================================================================= */
+.ad-list {
+  margin: 0; padding: 0; list-style: none;
+  background: var(--mc-surface);
+  border: 1px solid var(--mc-hairline);
+  border-radius: var(--mc-r-card);
+}
+.ad-list > li + li { border-top: 1px solid var(--mc-hairline); }
+
+/* ---- one car -------------------------------------------------------------
+   Photograph, name, the facts a person scans, price, state, and the two things
+   you can do to it. On a phone the photograph and the words share the first
+   row and the actions take the second; nothing hides behind a menu.
+   ========================================================================= */
+.ad-car {
+  display: grid; align-items: start;
+  grid-template-columns: 88px minmax(0, 1fr) auto;
+  grid-template-areas: "shot body price" "act act act";
+  gap: var(--s-3) var(--s-4); padding: var(--s-4);
+}
+@media (min-width: 900px) {
+  .ad-car {
+    align-items: center;
+    grid-template-columns: 112px minmax(0, 1fr) auto auto;
+    grid-template-areas: "shot body price act";
+    gap: var(--s-5); padding: var(--s-4) var(--s-5);
+  }
+}
+.ad-car__shot {
+  grid-area: shot; display: block; width: 100%; aspect-ratio: var(--ar-card);
+  overflow: hidden; background: var(--mc-band); border-radius: var(--mc-r-card);
+}
+.ad-car__shot img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ad-car--gone .ad-car__shot img { filter: var(--mc-sold-img); }
+
+.ad-car__body { grid-area: body; min-width: 0; }
+.ad-car__n { margin: 0; font-size: var(--t-ui); font-weight: 600; letter-spacing: -.008em; color: var(--mc-ink); }
+.ad-car__n a { color: inherit; text-decoration: none; }
+.ad-car__n a:hover { color: var(--mc-blue); }
+.ad-car__f { margin: var(--s-1) 0 0; font-size: var(--t-label); color: var(--mc-ink-3); font-variant-numeric: tabular-nums; }
+.ad-car__s { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-2); }
+
+.ad-car__p {
+  grid-area: price; font-size: var(--t-value); font-weight: 700; letter-spacing: -.02em;
+  color: var(--mc-price); white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+.ad-car--gone .ad-car__p { color: var(--mc-ink-3); }
+/* The price is a SIBLING of the body, not a child of it. An earlier version
+   gave it `grid-area: body` on phones to sit it beside the title, and two grid
+   items in one named area stack: the price printed straight over the second
+   line of "2016 · 114.000 km · Diesel · Manual". It gets its own track. */
+@media (max-width: 899.98px) { .ad-car__p { font-size: var(--t-ui); } }
+.ad-car__act { grid-area: act; display: flex; flex-wrap: wrap; gap: var(--s-2); }
+@media (min-width: 900px) { .ad-car__act { justify-content: flex-end; } }
+
+/* ---- a message -----------------------------------------------------------
+   The whole message, never a truncated column. The old table cut every body at
+   the right edge of the screen and gave no way to open one.
+   ========================================================================= */
+.ad-msg { display: grid; gap: var(--s-3); padding: var(--s-4) var(--s-5); }
+.ad-msg__h { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s-2) var(--s-4); }
+.ad-msg__who { font-size: var(--t-ui); font-weight: 600; color: var(--mc-ink); }
+.ad-msg__when { font-size: var(--t-label); color: var(--mc-ink-3); font-variant-numeric: tabular-nums; }
+.ad-msg__body {
+  margin: 0; max-width: 74ch;
+  font-size: var(--t-small); line-height: 1.55; color: var(--mc-ink-2);
+  overflow-wrap: anywhere;
+}
+.ad-msg__ways { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-5); }
+.ad-msg__way {
+  display: inline-flex; align-items: center; min-height: var(--mc-tap);
+  font-size: var(--t-small); color: var(--mc-blue); text-decoration: none; overflow-wrap: anywhere;
+}
+.ad-msg__way:hover { text-decoration: underline; }
+.ad-msg__act { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+
+/* junk is not deleted, it is set back: less ink, and nothing to press */
+.ad-msg--junk .ad-msg__who, .ad-msg--junk .ad-msg__body { color: var(--mc-ink-3); }
+.ad-msg--junk .ad-msg__way { color: var(--mc-ink-3); pointer-events: none; }
+/* Four lines, in this pile only. One of the 230 is a 4,000-character essay
+   about satellite weapons and it made the spam page 11,754px tall on a phone,
+   with a single message filling three screens. Four lines is enough to see
+   that the classifier was right — and if it was wrong, enough to see that
+   too. Nothing on the public site is ever clipped; this is a bin. */
+.ad-msg--junk .ad-msg__body {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4;
+  overflow: hidden;
+}
+
+/* ---- the two piles -------------------------------------------------------
+   Measured over the 233 rows in the table: 197 carry a link, 168 have a body
+   that is not unique, 104 bodies are distinct. The panel used to show one
+   number — 233 — as if it were an achievement.
+   ========================================================================= */
+.ad-seg {
+  display: inline-flex; margin-bottom: var(--s-5);
+  border: 1px solid var(--mc-rule); border-radius: var(--mc-r-card);
+  background: var(--mc-surface); overflow: hidden;
+}
+.ad-seg__o {
+  display: inline-flex; align-items: center; gap: var(--s-2);
+  min-height: var(--mc-tap); padding-inline: var(--s-4);
+  font-size: var(--t-small); font-weight: 600; color: var(--mc-ink-2);
+  text-decoration: none; white-space: nowrap;
+}
+.ad-seg__o + .ad-seg__o { border-left: 1px solid var(--mc-rule); }
+.ad-seg__o:hover { background: var(--mc-band); }
+.ad-seg__o.is-on { background: var(--mc-ink); color: #FFFFFF; }
+.ad-seg__n { font-variant-numeric: tabular-nums; font-weight: 500; opacity: .72; }
+
+/* ---- forms ---------------------------------------------------------------
+   One column of questions at a readable measure. The old create form put
+   seventeen fields above the photographs; the photographs are the work.
+   ========================================================================= */
+.ad-form { display: grid; gap: var(--s-7); }
+
+.ad-fs { border: 0; margin: 0; padding: 0; min-width: 0; }
+.ad-fs__h { margin: 0 0 var(--s-4); font-size: var(--t-h3); letter-spacing: -.012em; color: var(--mc-ink); }
+.ad-fs__p { margin: calc(var(--s-3) * -1) 0 var(--s-4); font-size: var(--t-label); color: var(--mc-ink-3); }
+
+.ad-grid { display: grid; gap: var(--s-4) var(--s-5); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 559.98px) { .ad-grid { grid-template-columns: minmax(0, 1fr); } }
+.ad-wide { grid-column: 1 / -1; }
+
+.ad-field { display: grid; gap: var(--s-2); min-width: 0; }
+.ad-field > span { font-size: var(--t-label); font-weight: 500; color: var(--mc-ink-2); }
+.ad-field > span em { font-style: normal; color: var(--mc-ink-3); font-weight: 400; }
+
+.ad-in {
+  width: 100%; min-height: var(--mc-control);
+  padding: var(--s-2) var(--s-3);
+  background: var(--mc-surface);
+  border: 1px solid var(--mc-rule); border-radius: var(--mc-r-card);
+  font-family: inherit; font-size: var(--t-ui); color: var(--mc-ink);
+}
+.ad-in::placeholder { color: var(--mc-ink-3); }
+.ad-in:focus-visible { outline: 3px solid var(--mc-focus); outline-offset: -1px; border-color: var(--mc-blue); }
+textarea.ad-in { min-height: 9rem; line-height: 1.55; resize: vertical; }
+
+/* a select that looks like the input beside it, with its own mark */
+select.ad-in {
+  appearance: none; -webkit-appearance: none; padding-right: 2.5rem;
+  background-image: linear-gradient(45deg, transparent 50%, var(--mc-ink-2) 50%),
+                    linear-gradient(135deg, var(--mc-ink-2) 50%, transparent 50%);
+  background-position: right 1.15rem center, right .9rem center;
+  background-size: 5px 5px, 5px 5px; background-repeat: no-repeat;
+}
+
+/* a number with its unit inside the control, not beside it */
+.ad-unit { position: relative; display: block; }
+.ad-unit .ad-in { padding-right: 3.25rem; }
+.ad-unit__u {
+  position: absolute; top: 50%; right: var(--s-3); translate: 0 -50%;
+  font-size: var(--t-small); color: var(--mc-ink-3); pointer-events: none;
+}
+
+.ad-err { margin-top: var(--s-1); font-size: var(--t-label); color: var(--mc-accent); }
+.ad-in.is-bad { border-color: var(--mc-accent); }
+
+/* pills for a choice of two to four: a dropdown for four options is a menu
+   guarding a decision that fits on one line */
+.ad-pills { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+.ad-pill { position: relative; display: inline-flex; }
+.ad-pill input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.ad-pill span {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: var(--mc-tap); padding-inline: var(--s-4);
+  border: 1px solid var(--mc-rule); border-radius: var(--mc-r-card);
+  background: var(--mc-surface);
+  font-size: var(--t-small); font-weight: 500; color: var(--mc-ink);
+}
+.ad-pill input:checked + span { background: var(--mc-ink); border-color: var(--mc-ink); color: #FFFFFF; font-weight: 600; }
+.ad-pill input:focus-visible + span { outline: 3px solid var(--mc-focus); outline-offset: 2px; }
+
+.ad-check { display: inline-flex; align-items: center; gap: var(--s-3); min-height: var(--mc-tap); cursor: pointer; }
+.ad-check input { width: 20px; height: 20px; accent-color: var(--mc-blue); flex: 0 0 auto; }
+.ad-check span { font-size: var(--t-small); color: var(--mc-ink); }
+
+.ad-go { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3); padding-top: var(--s-5); border-top: 1px solid var(--mc-hairline); }
+
+/* ---- the photographs -----------------------------------------------------
+   1,366 files across 41 cars: a median of 30 per car and a maximum of 126.
+   This is the work, so it gets the room. The drop zone is the file input's own
+   label — one tap on a phone, one gesture on a desk — and the thumbnails are
+   large enough to tell two silver estates apart.
+   ========================================================================= */
+.ad-drop {
+  position: relative;
+  display: grid; place-items: center; gap: var(--s-2);
+  min-height: 8.5rem; padding: var(--s-5);
+  background: var(--mc-surface);
+  border: 1px dashed var(--mc-rule); border-radius: var(--mc-r-card);
+  text-align: center; cursor: pointer;
+  transition: border-color var(--m-quick) var(--e-out), background var(--m-quick) var(--e-out);
+}
+.ad-drop:hover, .ad-drop.is-over { border-color: var(--mc-blue); background: var(--mc-blue-tint); }
+.ad-drop:focus-within { border-color: var(--mc-blue); }
+.ad-drop__t { font-size: var(--t-ui); font-weight: 600; color: var(--mc-ink); }
+.ad-drop__n { font-size: var(--t-label); color: var(--mc-ink-3); }
+.ad-drop input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; }
+
+.ad-shots {
+  display: grid; gap: var(--s-3);
+  grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
+  margin: var(--s-4) 0 0; padding: 0; list-style: none;
+}
+.ad-shot { position: relative; }
+.ad-shot__i {
+  display: block; width: 100%; aspect-ratio: var(--ar-card);
+  object-fit: cover; background: var(--mc-band);
+  border: 1px solid var(--mc-hairline); border-radius: var(--mc-r-card);
+}
+/* The cover is named by a mark on the picture, not by a radio in a legend
+   twenty rows away. */
+.ad-shot__flag {
+  position: absolute; top: 0; left: 0; padding: 3px var(--s-2);
+  background: var(--mc-ink); color: #FFFFFF;
+  font-size: var(--t-label); font-weight: 600; line-height: 1.3;
+}
+.ad-shot__x {
+  position: absolute; top: var(--s-1); right: var(--s-1);
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px;
+  background: var(--mc-surface); color: var(--mc-accent);
+  border: 1px solid var(--mc-rule); border-radius: var(--mc-r-card);
+  font-family: inherit; font-size: var(--t-small); font-weight: 700; line-height: 1; cursor: pointer;
+}
+.ad-shot__x:hover { background: var(--mc-accent-tint); border-color: var(--mc-accent); }
+.ad-shot__n {
+  position: absolute; bottom: 0; left: 0; padding: 2px var(--s-2);
+  background: rgba(var(--mc-scrim), .72); color: #FFFFFF;
+  font-size: var(--t-label); line-height: 1.4; font-variant-numeric: tabular-nums;
+}
+
+/* ---- flashes -------------------------------------------------------------
+   One line, in the page, above the thing it is about. Never a toast that
+   leaves before it is read.
+   ========================================================================= */
+.ad-flash {
+  display: flex; align-items: flex-start; gap: var(--s-3);
+  margin-bottom: var(--s-5); padding: var(--s-4) var(--s-5);
+  border-left: 3px solid var(--mc-ok); background: var(--mc-ok-tint);
+  font-size: var(--t-small); color: var(--mc-ink);
+}
+.ad-flash--bad { border-left-color: var(--mc-accent); background: var(--mc-accent-tint); }
+.ad-flash a { color: inherit; }
+
+/* ---- nothing here -------------------------------------------------------- */
+.ad-empty {
+  padding: var(--s-8) var(--s-5);
+  background: var(--mc-surface); border: 1px solid var(--mc-hairline);
+  text-align: center;
+}
+.ad-empty__t { margin: 0 0 var(--s-2); font-size: var(--t-h3); color: var(--mc-ink); }
+.ad-empty__p { margin: 0 auto; max-width: 44ch; font-size: var(--t-small); color: var(--mc-ink-2); }
+
+/* ---- pages --------------------------------------------------------------- */
+.ad-pages { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-1); margin-top: var(--s-5); }
+.ad-pages a, .ad-pages span {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: var(--mc-tap); min-height: var(--mc-tap); padding-inline: var(--s-2);
+  font-size: var(--t-small); color: var(--mc-ink-2); text-decoration: none;
+  border: 1px solid transparent; font-variant-numeric: tabular-nums;
+}
+.ad-pages a:hover { border-color: var(--mc-rule); color: var(--mc-ink); }
+.ad-pages .is-on { background: var(--mc-ink); color: #FFFFFF; font-weight: 600; }
+.ad-pages .is-off { color: var(--mc-ink-3); }
+
+/* ---- reduced motion ------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .ad *, .ad *::before, .ad *::after { transition-duration: 1ms !important; }
+}
+
+/* ---- the search line ----------------------------------------------------- */
+.ad-find { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--s-2); margin-bottom: var(--s-5); }
+.ad-find .ad-field { flex: 1 1 16rem; }
+
+/* ---- the fold ------------------------------------------------------------
+   Native <details>. The fields inside are real and the controller accepts
+   every one of them, but they are not touched on most cars, so they do not
+   get to stand between the man and the save button.
+   ========================================================================= */
+.ad-more { border: 1px solid var(--mc-hairline); background: var(--mc-surface); }
+.ad-more > summary {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s-4);
+  min-height: var(--mc-tap-pref); padding: var(--s-3) var(--s-5);
+  font-size: var(--t-ui); font-weight: 600; color: var(--mc-ink);
+  cursor: pointer; list-style: none;
+}
+.ad-more > summary::-webkit-details-marker { display: none; }
+.ad-more > summary::after { content: "+"; font-size: 1.4em; font-weight: 400; color: var(--mc-ink-3); }
+.ad-more[open] > summary::after { content: "–"; }
+.ad-more > summary:focus-visible { outline: 3px solid var(--mc-focus); outline-offset: -3px; }
+.ad-more__in { padding: 0 var(--s-5) var(--s-5); }
+
+/* ---- choosing the cover from what is already there ----------------------- */
+.ad-shot__pick { position: absolute; inset: auto 0 0 0; display: block; }
+.ad-shot__pick input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.ad-shot__pick span {
+  display: block; padding: 4px var(--s-2);
+  background: rgba(var(--mc-scrim), .72); color: #FFFFFF;
+  font-size: var(--t-label); font-weight: 600; text-align: center;
+  opacity: 0; transition: opacity var(--m-quick) var(--e-out);
+}
+.ad-shot:hover .ad-shot__pick span,
+.ad-shot__pick input:focus-visible + span { opacity: 1; }
+.ad-shot__pick input:checked + span { opacity: 1; background: var(--mc-blue); }
+/* Not shown on touch. The first version made the label permanent under
+   `@media (hover: none)` so a finger could find it, and on a car with 41
+   photographs that printed the word "Portada" forty-one times down the page.
+   The sentence above the grid says you can tap one; the grid stays quiet. */
+
+/* a photograph marked for removal: still on the page, clearly on its way out */
+.ad-shot.is-gone .ad-shot__i { opacity: .35; filter: grayscale(1); }
+.ad-shot.is-gone .ad-shot__pick { display: none; }
+
+/* ---- the dangerous thing, kept away from the save button ----------------- */
+.ad-danger { margin-top: var(--s-9); padding-top: var(--s-5); border-top: 1px solid var(--mc-hairline); }
+
+/* ---- one opinion ---------------------------------------------------------
+   The quote used to be a table cell with white-space:nowrap and an ellipsis,
+   so every opinion showed its first eight words: the one thing this page is
+   for was not on it. Here the photograph is small and square-cropped — the
+   NEVER-CROP rule is about the public page, where these are shown whole; this
+   is a list of rows and a face at 72px is an identifier, not a photograph.
+   ========================================================================= */
+.ad-say { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: var(--s-4); padding: var(--s-4) var(--s-5); }
+.ad-say__i {
+  width: 72px; height: 72px; object-fit: cover;
+  background: var(--mc-band); border: 1px solid var(--mc-hairline);
+}
+.ad-say__b { display: grid; gap: var(--s-3); min-width: 0; }
+@media (max-width: 559.98px) { .ad-say { grid-template-columns: 56px minmax(0, 1fr); } .ad-say__i { width: 56px; height: 56px; } }
+
+/* ---- label and value, in two columns ------------------------------------- */
+.ad-pairs { display: grid; gap: var(--s-3) var(--s-6); grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; }
+@media (max-width: 559.98px) { .ad-pairs { grid-template-columns: minmax(0, 1fr); } }
+.ad-pairs > div { display: grid; grid-template-columns: minmax(9ch, 12ch) minmax(0, 1fr); gap: var(--s-3); align-items: baseline; }
+.ad-pairs dt { font-size: var(--t-label); color: var(--mc-ink-3); }
+.ad-pairs dd { margin: 0; font-size: var(--t-small); font-weight: 500; color: var(--mc-ink); }

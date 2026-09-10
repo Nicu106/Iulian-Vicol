@@ -341,6 +341,17 @@ class VehicleController extends BaseController
             \Log::info('STORE - No gallery images to process');
         }
 
+        /* If he did not upload a separate cover, the first photograph is the
+           cover. Asking a man who has just chosen thirty pictures to choose a
+           thirty-first — usually the same one again — is a question with an
+           obvious answer, and a car saved without one shows a grey box in the
+           catalogue. He can change it afterwards from the grid on the edit
+           page, where all thirty are in front of him. */
+        if (empty($coverUrl) && ! empty($galleryUrls)) {
+            $coverUrl = $galleryUrls[0];
+            try { $this->warmResizeCache($coverUrl); } catch (\Throwable $e) { /* ignore */ }
+        }
+
         $features = array_filter(array_map('trim', explode(',', $validated['features'] ?? '')));
         $badges = array_filter(array_map('trim', explode(',', $validated['badges'] ?? '')));
         $tags = array_filter(array_map('trim', explode(',', $validated['tags'] ?? '')));
@@ -500,14 +511,18 @@ class VehicleController extends BaseController
             }
         }
 
-        // DEBUG: Detailed logging for gallery images
-        \Log::info('UPDATE DEBUG - Gallery Images', [
-            'has_gallery_files' => $request->hasFile('gallery_images'),
-            'all_files_keys' => array_keys($request->allFiles()),
-            'gallery_files_count' => $request->hasFile('gallery_images') ? count($request->file('gallery_images')) : 0,
-            'request_method' => $request->method(),
-            'content_type' => $request->header('Content-Type'),
-        ]);
+        /* Choose the lead photograph from the ones already uploaded.
+           A car carries a median of 30 photographs and the cover could only be
+           set by uploading a thirty-first — the same picture again, under a
+           different name. Only a URL that is already on this car is accepted,
+           so the field cannot be used to point the cover anywhere else. */
+        if ($request->filled('cover_from')) {
+            $owned = $vehicleData['gallery_images'] ?? [];
+            if (in_array($request->input('cover_from'), $owned, true)) {
+                $vehicleData['cover_image'] = $request->input('cover_from');
+                try { $this->warmResizeCache($vehicleData['cover_image']); } catch (\Throwable $e) { /* ignore */ }
+            }
+        }
 
         if ($request->hasFile('gallery_images')) {
             $galleryUrls = $vehicleData['gallery_images'] ?? [];
@@ -638,15 +653,55 @@ class VehicleController extends BaseController
         return redirect()->route('admin.vehicles.index')->with('status', 'Vehicul șters');
     }
 
+    /**
+     * There is no read-only view of a car in the panel any more.
+     *
+     * It showed the same fields as the edit form with nothing to press, and
+     * nothing linked to it — the list now goes to the edit form for changing
+     * the car and to /coche/{slug} for seeing it the way a buyer does, which
+     * are the only two things anyone wants. The route stays so old bookmarks
+     * and any link left in the wild still land somewhere useful.
+     */
     public function show(string $slug)
     {
+        return redirect()->route('admin.vehicles.edit', $slug);
+    }
+
+    /**
+     * Mark one car sold, or put it back on sale.
+     *
+     * Selling a car is the second most frequent thing that happens here — 32
+     * of the 41 cars have been through it — and there was no way to do it
+     * except opening the edit form, finding "Estado" among seventeen fields
+     * and saving the whole record back. bulkAction() can set 'available' and
+     * 'draft' but not 'sold', and it answers in JSON, so it needs script to
+     * drive it. This is a form post that redirects: it works with the
+     * keyboard, on a phone, and with JavaScript off.
+     */
+    public function setStatus(Request $request, string $slug)
+    {
+        $status = $request->input('status');
+        abort_unless(in_array($status, ['available', 'sold', 'reserved'], true), 422);
+
         $vehicle = Vehicle::query()->where('slug', $slug)->first();
-        if (!$vehicle) {
-            $items = $this->readStore();
-            $vehicle = collect($items)->firstWhere('slug', $slug);
-        }
         abort_unless($vehicle, 404);
-        return view('admin.vehicles.show', ['vehicle' => is_array($vehicle) ? $vehicle : $vehicle->toArray()]);
+
+        $vehicle->status = $status;
+        /* The car page and the catalogue both read sold_date. Setting the
+           status without it leaves a car "vendido" with no date, which is the
+           one field the sold theme has to print. */
+        if ($status === 'sold' && empty($vehicle->sold_date)) {
+            $vehicle->sold_date = now()->toDateString();
+        }
+        $vehicle->save();
+
+        $said = match ($status) {
+            'sold'     => 'marcado como vendido.',
+            'reserved' => 'marcado como reservado.',
+            default    => 'de vuelta a la venta.',
+        };
+
+        return back()->with('status', trim($vehicle->brand . ' ' . $vehicle->model) . ' — ' . $said);
     }
 
     public function toggleFeatured(string $slug)

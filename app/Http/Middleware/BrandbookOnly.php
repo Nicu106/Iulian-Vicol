@@ -33,6 +33,10 @@ class BrandbookOnly
         'img',        // the /img/{w} resize service — vehicle and customer photos
         'img/*',
         'up',         // the health check
+        'login',      // the admin sign-in
+        'admin',      // the admin panel, in design
+        'admin/*',
+        'logout',
     ];
 
     public function handle(Request $request, Closure $next): Response

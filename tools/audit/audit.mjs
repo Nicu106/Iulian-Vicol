@@ -25,7 +25,12 @@ const [, , check = 'contrast', route = '/'] = process.argv;
 const wArg = process.argv.indexOf('--w');
 const WIDTHS = wArg > -1 ? process.argv[wArg + 1].split(',').map(Number) : [390, 768, 1400];
 const HOST = process.env.AUDIT_HOST || 'v2design.ivmotorclass.com';
-const TARGET = `https://${HOST}${route.startsWith('/') ? route : '/' + route}`;
+// A full URL is taken as-is. The admin sits behind auth and cannot be fetched
+// over HTTP by this tool, so its pages are rendered to disk and audited as
+// file:// — same checks, same false-positive guards, no second implementation.
+const TARGET = /^[a-z][a-z0-9+.-]*:\/\//i.test(route)
+  ? route
+  : `https://${HOST}${route.startsWith('/') ? route : '/' + route}`;
 
 const lum = (r, g, b) => { const f = c => { c /= 255; return c <= .03928 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4; };
   return .2126 * f(r) + .7152 * f(g) + .0722 * f(b); };
