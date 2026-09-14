@@ -9,7 +9,7 @@
      So no tiles. Each mark is the brand's own form:
        TikTok     the note in ink with its cyan and red halves offset, which is
                   how TikTok itself sits on a light ground (the lead row is white)
-       Instagram  the camera glyph filled with Instagram's gradient
+       Instagram  the app icon: the gradient square with the camera in white
        Facebook   the blue disc with the f knocked out in white
 
      The TikTok note is a tall narrow shape, so its viewBox is cropped tighter
@@ -28,17 +28,37 @@
       <path fill="currentColor" d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5 2.59 2.59 0 0 1 0-5.18c.27 0 .52.04.76.12v-3.2a5.74 5.74 0 0 0-.76-.05A5.72 5.72 0 0 0 4.15 15.3 5.72 5.72 0 0 0 9.86 21a5.72 5.72 0 0 0 5.71-5.71V9.01a7.35 7.35 0 0 0 4.28 1.38V7.3a4.28 4.28 0 0 1-3.25-1.48z"/>
     </svg>
   @elseif($k === 'instagram')
+    {{-- The app icon: Instagram's gradient square with the camera in white.
+         The glyph used before came from an old icon set and was not the
+         mark — measured at 3x its frame was taller than wide, thin at the top
+         and a thick band at the bottom, with the lens off centre. Redrawn
+         from primitives on the official proportions (corner 29%, camera
+         frame 57%, lens 27.5%), the gradient in two layers: yellow to orange
+         to magenta from the bottom-left, and the blue-violet wash from the
+         top-left. Filled rather than outlined, so it carries the same weight
+         as the Facebook disc beside it. --}}
     <svg viewBox="0 0 24 24" focusable="false">
       <defs>
-        <radialGradient id="{{ $gid }}" cx="0.28" cy="1.02" r="1.25">
-          <stop offset="0"    stop-color="#FFD776"/>
-          <stop offset="0.24" stop-color="#F3A554"/>
-          <stop offset="0.48" stop-color="#F13C5E"/>
-          <stop offset="0.72" stop-color="#C62F97"/>
-          <stop offset="1"    stop-color="#7B3BE3"/>
+        <radialGradient id="{{ $gid }}a" gradientUnits="userSpaceOnUse" cx="7.3" cy="23.5" r="23">
+          <stop offset="0"   stop-color="#FFDD55"/>
+          <stop offset="0.1" stop-color="#FFDD55"/>
+          <stop offset="0.5" stop-color="#FF543E"/>
+          <stop offset="1"   stop-color="#C837AB"/>
+        </radialGradient>
+        <radialGradient id="{{ $gid }}b" gradientUnits="userSpaceOnUse" cx="-1.4" cy="3.4" r="10.5"
+                        gradientTransform="matrix(.2 1 -4.1 .8 12.8 1)">
+          <stop offset="0"    stop-color="#3771C8"/>
+          <stop offset="0.13" stop-color="#3771C8"/>
+          <stop offset="1"    stop-color="#6600FF" stop-opacity="0"/>
         </radialGradient>
       </defs>
-      <path fill="url(#{{ $gid }})" d="M12 2.2c3.2 0 3.6 0 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.25.07 1.65.07 4.85s0 3.6-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.25.06-1.65.07-4.85.07s-3.6 0-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.8 3.8 0 0 1-1.38-.9 3.8 3.8 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.21 15.6 2.2 15.2 2.2 12s0-3.6.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.44 2.21 8.84 2.2 12 2.2zm0 1.98c-3.14 0-3.51.01-4.75.07-1.15.05-1.77.24-2.18.4-.55.22-.94.47-1.35.88-.41.41-.66.8-.88 1.35-.16.41-.35 1.03-.4 2.18-.06 1.24-.07 1.61-.07 4.75s.01 3.51.07 4.75c.05 1.15.24 1.77.4 2.18.22.55.47.94.88 1.35.41.41.8.66 1.35.88.41.16 1.03.35 2.18.4 1.24.06 1.61.07 4.75.07s3.51-.01 4.75-.07c1.15-.05 1.77-.24 2.18-.4.55-.22.94-.47 1.35-.88.41-.41.66-.8.88-1.35.16-.41.35-1.03.4-2.18.06-1.24.07-1.61.07-4.75s-.01-3.51-.07-4.75c-.05-1.15-.24-1.77-.4-2.18a3.6 3.6 0 0 0-.88-1.35 3.6 3.6 0 0 0-1.35-.88c-.41-.16-1.03-.35-2.18-.4-1.24-.06-1.61-.07-4.75-.07zm0 3.37a5.45 5.45 0 1 1 0 10.9 5.45 5.45 0 0 1 0-10.9zm0 8.99a3.54 3.54 0 1 0 0-7.08 3.54 3.54 0 0 0 0 7.08zm6.94-9.21a1.27 1.27 0 1 1-2.55 0 1.27 1.27 0 0 1 2.55 0z"/>
+      <rect x="2" y="2" width="20" height="20" rx="5.8" fill="url(#{{ $gid }}a)"/>
+      <rect x="2" y="2" width="20" height="20" rx="5.8" fill="url(#{{ $gid }}b)"/>
+      <g fill="none" stroke="#FFFFFF" stroke-width="1.75">
+        <rect x="6.3" y="6.3" width="11.4" height="11.4" rx="3.4"/>
+        <circle cx="12" cy="12" r="2.75"/>
+      </g>
+      <circle cx="15.3" cy="8.7" r="0.85" fill="#FFFFFF"/>
     </svg>
   @else
     <svg viewBox="0 0 24 24" focusable="false">
