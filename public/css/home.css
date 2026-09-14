@@ -551,20 +551,13 @@ html:not(.js) .hm-fb__step{ display:none; }
 .hm-soc__t em{ font-style:normal; font-size:var(--t-small); color:rgba(255,255,255,.60); }
 .hm-soc__row--lead .hm-soc__t em{ color:rgba(0,0,0,.56); }
 
-/* ---- the marks ------------------------------------------------------------ */
-/* One size for all three. The lead's tile was 48px and the others 40px, and
-   the words beside them started 8px apart — "Ver los coches en TikTok" at one
-   left edge, "Instagram" and "Facebook" at another. The lead is already the
-   white one; it does not also need a bigger tile. */
-.hm-soc__mark{ display:grid; place-items:center; width:44px; height:44px; }
-.hm-soc__mark svg{ display:block; width:26px; height:26px; }
-.hm-soc__mark--tiktok{ background:#000000; }
-/* On the black band a black tile would vanish; only the lead row is white. */
-.hm-soc__row:not(.hm-soc__row--lead) .hm-soc__mark--tiktok{ box-shadow:inset 0 0 0 1px rgba(255,255,255,.22); }
-.hm-soc__mark--instagram{
-  background:radial-gradient(circle at 30% 107%, #FDF497 0%, #FDF497 5%, #FD5949 45%, #D6249F 60%, #285AEB 90%);
-}
-.hm-soc__mark--facebook{ background:#1877F2; }
+/* ---- the marks ------------------------------------------------------------
+   No tiles: each platform's own mark, at one optical size. 34px in a 36px slot
+   so the labels beside all three start on one left edge. The TikTok note takes
+   the row's text colour — ink on the white lead, white if it ever sits on the
+   black — and keeps its cyan and red either way. */
+.hm-soc__mark{ display:grid; place-items:center; width:36px; height:36px; color:inherit; }
+.hm-soc__mark svg{ display:block; width:34px; height:34px; overflow:visible; }
 
 .hm-soc__go{ width:20px; height:20px; background:currentColor; opacity:.6;
   transition:opacity var(--m-quick) var(--e-out), translate var(--m-quick) var(--e-out);
