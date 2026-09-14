@@ -9,8 +9,8 @@
   <div class="ad-head">
     <div class="ad-head__t">
       <h1 class="ad-h1">Panel</h1>
-      {{-- APP_LOCALE is 'en' and changing it would reach the public site's
-           validation messages, so the locale is set on this one call. --}}
+      {{-- The app locale is 'es' now; the explicit locale stays so this line
+           cannot turn English if .env on some server still says otherwise. --}}
       <p class="ad-head__p">{{ \Illuminate\Support\Str::ucfirst(now()->locale('es')->translatedFormat('l, j \d\e F')) }}</p>
     </div>
     <div class="ad-head__go">
@@ -62,15 +62,14 @@
       <ul class="ad-list">
         @foreach($todo as $t)
           <li>
-            <div class="ad-msg">
-              <div class="ad-msg__h">
-                <span class="ad-msg__who">{{ $t['n'] }} {{ $t['what'] }}</span>
-              </div>
-              <p class="ad-msg__body">{{ $t['why'] }}</p>
-              <div class="ad-msg__act">
-                <a class="ad-btn ad-btn--q ad-btn--s" href="{{ $t['to'] }}">Ver</a>
-              </div>
-            </div>
+            <a class="ad-todo" href="{{ $t['to'] }}">
+              <span class="ad-todo__n">{{ $t['n'] }}</span>
+              <span class="ad-todo__t">
+                <b>{{ $t['what'] }}</b>
+                <em>{{ $t['why'] }}</em>
+              </span>
+              <span class="ad-todo__go" aria-hidden="true">Ver</span>
+            </a>
           </li>
         @endforeach
       </ul>

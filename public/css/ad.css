@@ -55,75 +55,181 @@ body.ad {
   clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
 }
 
-/* ---- the bar -------------------------------------------------------------
-   Navy, like every fixed surface on the site. Not fixed: the admin scrolls
-   long lists and a bar pinned to the top of a phone eats the one thing in
-   short supply. Below 900 the links take their own line and that line SCROLLS
-   sideways. Wrapping is what made the old public header 148px tall at 320 with
-   four links; this is the solution that header already ships.
-   ========================================================================= */
-.ad-top { background: var(--mc-navy); color: var(--mc-on-navy); }
+/* ---- the rail ------------------------------------------------------------
+   One navigation, written once, in two shapes.
 
-.ad-top__in { display: flex; align-items: center; gap: var(--s-5); min-height: 60px; }
+   From 1000 it is a classic vertical rail on the left: always there, no
+   pressing to reveal it, and the page keeps the whole of the rest.
+
+   Below 1000 the same element becomes a bar across the BOTTOM of the screen,
+   where the thumb already is, plus a 48px strip at the top holding the
+   wordmark and the way out. A rail on a phone would eat a quarter of the one
+   dimension that is in short supply, and a drawer behind a hamburger — which
+   is what this panel used to have — hides every destination behind a press
+   and a wait for an animation.
+
+   `display: contents` on the rail is what lets the two pieces go to opposite
+   ends of the viewport without the markup being written twice. The old layout
+   printed the whole four-section menu twice, once for the drawer and once for
+   the desktop rail, and the two had already drifted apart.
+   ========================================================================= */
+.ad-shell { display: grid; grid-template-columns: minmax(0, 1fr); min-height: 100svh; }
+
+.ad-rail { background: var(--mc-navy); color: var(--mc-on-navy); }
+
+.ad-rail__head { display: flex; align-items: center; gap: var(--s-4); }
 
 .ad-mark {
-  display: inline-flex; align-items: baseline; gap: .5ch;
-  font-size: var(--t-ui); font-weight: 700; letter-spacing: -.01em;
-  color: var(--mc-on-navy); text-decoration: none; white-space: nowrap;
+  display: block; min-width: 0;
+  font-size: var(--t-small); font-weight: 700; letter-spacing: -.01em;
+  color: var(--mc-on-navy); text-decoration: none;
 }
-.ad-mark b { font-weight: 700; color: var(--mc-on-navy); }
-.ad-mark span { font-weight: 400; color: var(--mc-on-navy-2); }
+.ad-mark b { display: block; font-weight: 700; color: var(--mc-on-navy); }
+.ad-mark span { display: block; font-weight: 400; color: var(--mc-on-navy-2); }
 
-.ad-nav { display: flex; align-items: center; gap: var(--s-1); margin: 0; padding: 0; list-style: none; min-width: 0; }
+.ad-nav { display: flex; margin: 0; padding: 0; list-style: none; min-width: 0; }
 
 .ad-nav__i {
-  display: inline-flex; align-items: center;
-  min-height: var(--mc-tap); padding-inline: var(--s-3);
-  font-size: var(--t-small); font-weight: 500;
+  display: flex; align-items: center; gap: .6ch;
   color: var(--mc-on-navy-2); text-decoration: none; white-space: nowrap;
-  transition: color var(--m-quick) var(--e-out);
+  transition: color var(--m-quick) var(--e-out), background var(--m-quick) var(--e-out);
 }
 .ad-nav__i:hover { color: var(--mc-on-navy); }
+.ad-nav__i.is-on { color: var(--mc-on-navy); }
 
-/* The current page is marked by a rule under the words, not by a filled pill:
-   a pill in a navy bar is a second button competing with the real one. */
-.ad-nav__i.is-on { color: var(--mc-on-navy); box-shadow: inset 0 -2px 0 0 var(--mc-on-navy); }
-
+/* The count rides the label rather than sitting in a circle of its own: it is
+   a number of messages, not a notification. */
 .ad-nav__n {
-  margin-left: .6ch; padding: 1px 5px;
+  padding: 1px 5px;
   background: var(--mc-blue); color: #FFFFFF;
   font-size: var(--t-label); font-weight: 700; line-height: 1.3;
   font-variant-numeric: tabular-nums;
 }
 
-.ad-top__end { display: flex; align-items: center; gap: var(--s-2); margin-left: auto; }
+.ad-rail__end { display: flex; align-items: center; gap: var(--s-2); }
 
 .ad-out {
   display: inline-flex; align-items: center;
-  min-height: var(--mc-tap); padding-inline: var(--s-3);
+  min-height: var(--mc-tap); padding-inline: var(--s-2);
   background: none; border: 0;
-  font-family: inherit; font-size: var(--t-small); font-weight: 500;
+  font-family: inherit; font-size: var(--t-label); font-weight: 500;
   color: var(--mc-on-navy-2); text-decoration: none; cursor: pointer; white-space: nowrap;
   transition: color var(--m-quick) var(--e-out);
 }
 .ad-out:hover { color: var(--mc-on-navy); }
 
-@media (max-width: 899.98px) {
-  .ad-top__in { flex-wrap: wrap; gap: var(--s-2); padding-block: var(--s-2); min-height: 0; }
-  .ad-navwrap {
-    order: 3; flex: 1 0 100%;
-    margin-inline: calc(var(--mc-gutter-m) * -1);
-    overflow-x: auto; overflow-y: hidden;
-    -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
-    scrollbar-width: none;
+/* ---- from 1000: the rail ------------------------------------------------- */
+@media (min-width: 1000px) {
+  .ad-shell { grid-template-columns: 15rem minmax(0, 1fr); }
+  /* The rail is sticky and one viewport tall, so on a page longer than the
+     screen its navy stopped at 100svh and left a white column under it.
+     The first fix painted the column as a gradient on the whole shell — navy
+     for 15rem, transparent after — and the contrast audit, which reads the
+     first opaque background behind each piece of text, read that gradient as
+     NAVY behind every heading on the page: 16 failures on the panel and 28 on
+     the create form at 1400, all "ink on navy, 1.26:1", on text that is ink
+     on light grey on screen. A fixed strip behind the rail paints the same
+     column and never sits under the content, so nothing has to be explained
+     away. */
+  .ad-shell::before {
+    content: ""; position: fixed; inset: 0 auto 0 0; width: 15rem; z-index: 0;
+    background: var(--mc-navy); pointer-events: none;
   }
-  .ad-navwrap::-webkit-scrollbar { display: none; }
-  /* the gutter is inside the scrolling box, so the last link is not cut at the edge */
-  .ad-nav { padding-inline: var(--mc-gutter-m); }
+  .ad-rail { z-index: 1; }
+
+  .ad-rail {
+    grid-column: 1;
+    position: sticky; top: 0; align-self: start;
+    display: flex; flex-direction: column; gap: var(--s-6);
+    height: 100svh; padding: var(--s-6) var(--s-4);
+    overflow-y: auto;
+  }
+  /* The head dissolves so the mark and the way out become direct children of
+     the rail: only then can `margin-top: auto` push "Salir" to the bottom,
+     which is where a rail puts it. Wrapped, both sat above the navigation —
+     the two least-used links first. */
+  .ad-rail__head { display: contents; }
+  .ad-mark { font-size: var(--t-ui); }
+  .ad-rail__end { margin-top: auto; flex-direction: column; align-items: flex-start; gap: 0; }
+  /* Dissolving the head made the way out a child of the rail BEFORE the
+     navigation in source order, so it rendered between the wordmark and
+     the links. The order is set, not left to the markup. */
+  .ad-mark { order: 0; }
+  .ad-rail__nav { order: 1; }
+  .ad-rail__end { order: 2; }
+
+  .ad-nav { flex-direction: column; gap: 1px; }
+  .ad-nav__i {
+    min-height: var(--mc-tap); padding: var(--s-2) var(--s-3);
+    font-size: var(--t-small); font-weight: 500;
+  }
+  .ad-nav__i:hover { background: rgba(255, 255, 255, .06); }
+  /* A bar on the leading edge, not a filled pill: the pill would be a second
+     button competing with the real one on the page. */
+  .ad-nav__i.is-on { background: rgba(255, 255, 255, .10); box-shadow: inset 2px 0 0 0 var(--mc-on-navy); }
+  .ad-nav__n { margin-left: auto; }
+}
+
+/* ---- below 1000: a strip at the top, the tabs at the bottom -------------- */
+@media (max-width: 999.98px) {
+  .ad-rail { display: contents; }
+
+  .ad-rail__head {
+    position: fixed; inset: 0 0 auto 0; z-index: 40;
+    justify-content: space-between;
+    min-height: 48px; padding-inline: var(--mc-gutter-m);
+    padding-top: env(safe-area-inset-top);
+    background: var(--mc-navy);
+  }
+  .ad-mark b, .ad-mark span { display: inline; }
+  .ad-mark span { margin-left: .5ch; }
+
+  .ad-rail__nav {
+    position: fixed; inset: auto 0 0 0; z-index: 40;
+    background: var(--mc-navy);
+    border-top: 1px solid var(--mc-navy-line);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .ad-nav { flex-direction: row; }
+  /* The <li> is the flex item, not the <a> inside it. Flexing the link left
+     the five tabs at their text widths — 36, 50, 61, 65 and 46 — bunched in
+     258px of a 390px bar with 132px of navy doing nothing on the right. */
+  .ad-nav > li { flex: 1 1 0; min-width: 0; display: flex; }
+  .ad-nav__i {
+    flex: 1 1 auto; min-width: 0;
+    flex-direction: column; justify-content: center; gap: 2px;
+    min-height: 54px; padding: var(--s-2) 2px;
+    font-size: var(--t-label); font-weight: 500; text-align: center;
+    /* Five destinations in 390px is 78px each, and "Opiniones" is the longest
+       at nine characters. It fits at the 13px floor; it does not fit if the
+       label is allowed to keep its normal tracking. */
+    letter-spacing: -.01em;
+  }
+  /* The mark sits on the top edge of the tab, over the line, so the active
+     destination reads as attached to the page above it. */
+  .ad-nav__i.is-on { box-shadow: inset 0 2px 0 0 var(--mc-on-navy); background: rgba(255, 255, 255, .08); }
+  /* The count sits over the label's corner. In the flow it dropped under
+     "Mensajes" and lifted that one label 10px above the other four. */
+  .ad-nav__i { position: relative; }
+  .ad-nav__n {
+    position: absolute; top: 3px; left: calc(50% + 2.3em);
+    padding: 0 4px; font-size: 11px; line-height: 16px;
+  }
 }
 
 /* ---- the page ------------------------------------------------------------ */
-.ad-main { padding-block: var(--s-6) var(--s-9); }
+.ad-main { grid-column: -2; min-width: 0; padding-block: var(--s-6) var(--s-9); }
+
+/* Room for the two fixed strips, plus the notch and the home indicator. 48 and
+   54 are the measured heights of the strip and the tab bar; the extra --s-5 at
+   the bottom keeps the last row of a list clear of the bar rather than ending
+   flush against it. */
+@media (max-width: 999.98px) {
+  .ad-main {
+    padding-top: calc(48px + env(safe-area-inset-top) + var(--s-4));
+    padding-bottom: calc(54px + env(safe-area-inset-bottom) + var(--s-5));
+  }
+}
 
 .ad-head {
   display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
@@ -257,10 +363,14 @@ a.ad-fact:hover .ad-fact__v { color: var(--mc-blue); }
 .ad-car__n a { color: inherit; text-decoration: none; }
 .ad-car__n a:hover { color: var(--mc-blue); }
 .ad-car__f { margin: var(--s-1) 0 0; font-size: var(--t-label); color: var(--mc-ink-3); font-variant-numeric: tabular-nums; }
-.ad-car__s { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-2); }
+.ad-car__s { display: flex; flex-wrap: wrap; gap: var(--s-2); margin: var(--s-2) 0 0; }
 
+/* Both are <p>. Neither reset the user-agent margin, so every car carried 16px
+   under its chips and 16px over its price: 34px of unexplained air between
+   the two at 320, and 16px of height added to every row at every width. */
 .ad-car__p {
-  grid-area: price; font-size: var(--t-value); font-weight: 700; letter-spacing: -.02em;
+  grid-area: price; margin: 0;
+  font-size: var(--t-value); font-weight: 700; letter-spacing: -.02em;
   color: var(--mc-price); white-space: nowrap; font-variant-numeric: tabular-nums;
 }
 .ad-car--gone .ad-car__p { color: var(--mc-ink-3); }
@@ -583,4 +693,134 @@ select.ad-in {
 .ad-gate__lost {
   display: inline-flex; align-items: center; min-height: var(--mc-tap);
   font-size: var(--t-small); color: var(--mc-blue);
+}
+
+/* ============================================================================
+   COMPACT — the phone is where the work happens
+   ---------------------------------------------------------------------------
+   A car goes up about once a week with thirty photographs and the man doing it
+   is standing next to the car, not sitting at a desk. Below 1000 everything
+   loses a step of air: the page can hold two more rows before he has to
+   scroll, and nothing drops below the 13px type floor or the 44px target.
+   ========================================================================= */
+@media (max-width: 999.98px) {
+  .ad-head { margin-bottom: var(--s-5); gap: var(--s-3); }
+  .ad-h1 { font-size: var(--t-h3); }
+  .ad-head__p { margin-top: var(--s-1); font-size: var(--t-label); }
+  .ad-sec { margin-top: var(--s-6); }
+  .ad-h2 { margin-bottom: var(--s-3); }
+
+  /* The four numbers keep their size — they are the one thing worth reading
+     from arm's length — but lose the space around them. */
+  .ad-facts { gap: var(--s-4) var(--s-5); }
+  /* "siguen publicados, con sus fotos" wrapped to two lines under a number
+     that already says what it is. On a phone the label and the figure are
+     the whole message. */
+  .ad-fact__n { display: none; }
+
+  .ad-panel { padding: var(--s-4); }
+  .ad-form { gap: var(--s-6); }
+  .ad-fs__h { margin-bottom: var(--s-3); }
+
+  /* Price keeps its own column on the right. Moving it under the words was
+     tried and measured: it added a row to every car and the list at 390 grew
+     from 8,764px to 9,759px. The width the name needs comes from a narrower
+     photograph instead — 72px, not 88 — which is still enough to tell a
+     black estate from a white one. */
+  .ad-car {
+    grid-template-columns: 72px minmax(0, 1fr) auto;
+    grid-template-areas: "shot body price" "act act act";
+    padding: var(--s-3); gap: var(--s-2) var(--s-3);
+  }
+  .ad-car__p { font-size: var(--t-small); }
+  .ad-car__act { gap: var(--s-1); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ad-car__act form { display: contents; }
+  .ad-car__act .ad-btn { width: 100%; padding-inline: var(--s-1); }
+
+  .ad-msg { padding: var(--s-4); gap: var(--s-2); }
+  .ad-say { padding: var(--s-3); gap: var(--s-3); }
+
+  .ad-empty { padding: var(--s-7) var(--s-4); }
+
+  /* The one loud action on a page is worth the full width of a thumb. */
+  /* Only the primary action. Every head on a page used to go full width, so
+     "Ver los 41" became a second slab as wide as "Añadir coche" and the two
+     read as equals. */
+  .ad-head__go:has(> .ad-btn:not(.ad-btn--q)) { width: 100%; }
+  .ad-head__go > .ad-btn:not(.ad-btn--q) { flex: 1 1 auto; }
+}
+
+/* A phone in landscape, and the small phones: two of the four numbers per row
+   is already the layout, so only the gaps come down again. */
+@media (max-width: 400px) {
+  .ad-facts { gap: var(--s-4); }
+  .ad-fact__v { font-size: var(--t-h2); }
+}
+
+/* ---- what is waiting ------------------------------------------------------
+   One row, and the whole row is the press. It was a panel with a heading, a
+   sentence and a small "Ver" button in its bottom-left corner: three things to
+   read before finding the one thing to touch.
+   ========================================================================= */
+.ad-todo {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center;
+  gap: var(--s-4); min-height: var(--mc-tap-pref); padding: var(--s-4) var(--s-5);
+  color: inherit; text-decoration: none;
+  transition: background var(--m-quick) var(--e-out);
+}
+.ad-todo:hover { background: var(--mc-band); }
+.ad-todo__n {
+  min-width: 2ch;
+  font-size: var(--t-h3); font-weight: 700; line-height: 1; letter-spacing: -.02em;
+  color: var(--mc-ink); font-variant-numeric: tabular-nums;
+}
+.ad-todo__t { display: grid; gap: 2px; min-width: 0; }
+.ad-todo__t b { font-size: var(--t-small); font-weight: 600; color: var(--mc-ink); }
+.ad-todo__t em { font-style: normal; font-size: var(--t-label); color: var(--mc-ink-2); }
+.ad-todo__go { font-size: var(--t-label); font-weight: 600; color: var(--mc-blue); white-space: nowrap; }
+@media (max-width: 999.98px) { .ad-todo { padding: var(--s-3) var(--s-4); gap: var(--s-3); } }
+
+/* ---- the narrowest phones ------------------------------------------------
+   Price under the words, below 360 only. Chosen by A/B over the 41 cars — the
+   sum of the car rows, price in its column vs. under the name — measured with
+   the paragraph margins reset (an earlier A/B, taken before that fix, put the
+   switch at 340; the margins cost the under-layout more, and removing them
+   moved the crossover):
+
+     320   10,008 vs 8,263   under wins, no name past 3 lines (column: 4)
+     340    9,278 vs 8,220   under wins, no name past 2 lines (column: 4)
+     360    7,854 vs 8,026   column wins
+     390    7,310 vs 7,783   column wins
+   */
+@media (max-width: 359.98px) {
+  .ad-car {
+    grid-template-columns: 64px minmax(0, 1fr);
+    grid-template-areas: "shot body" "shot price" "act act";
+    row-gap: 2px;
+  }
+  .ad-car__p { justify-self: start; }
+  .ad-car__act { margin-top: var(--s-2); }
+}
+
+/* ---- small phones: the strip and the three buttons ------------------------
+   At 320 "IV MOTORCLASS Panel · Ver la web · Salir" is wider than the screen
+   and "Salir" was cut off at the right edge — the way out, clipped. The word
+   "Panel" goes; the page title below already says where you are.
+   A third of the row is about 96px at 320 and "Volver a la venta" is 108px at
+   the 13px floor, so the label pressed against its own border. It may wrap to
+   two lines inside the same 44px target instead of spilling. */
+@media (max-width: 399.98px) {
+  .ad-mark span { display: none; }
+  .ad-car__act .ad-btn { white-space: normal; line-height: 1.15; text-align: center; text-wrap: balance; }
+}
+
+/* ---- the switch on small phones -------------------------------------------
+   "En la web 9 | Vendidos 32 | Todos 41" is 329px at its natural width and it
+   could not shrink, so at 320 the page was 345px wide. On a phone that widens
+   the layout viewport itself, which is why the fixed strip's "Salir" was
+   clipped at the right edge even though nothing inside the strip overflowed.
+   Below 400 the switch takes the width it is given and shares it. */
+@media (max-width: 399.98px) {
+  .ad-seg { display: flex; width: 100%; }
+  .ad-seg__o { flex: 1 1 0; min-width: 0; justify-content: center; padding-inline: var(--s-2); gap: var(--s-1); }
 }

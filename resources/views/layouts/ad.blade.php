@@ -46,48 +46,54 @@
   ];
 @endphp
 
-<header class="ad-top">
-  <div class="ad-wrap ad-top__in">
-    <a class="ad-mark" href="{{ route('admin.home') }}"><b>IV MOTORCLASS</b> <span>Panel</span></a>
+<div class="ad-shell">
 
-    <div class="ad-navwrap">
-      <nav aria-label="Secciones">
-        <ul class="ad-nav">
-          @foreach($nav as [$route, $label, $count])
-            <li>
-              <a class="ad-nav__i {{ request()->routeIs(str_replace('.index', '.*', $route)) ? 'is-on' : '' }}"
-                 href="{{ route($route) }}"
-                 @if(request()->routeIs(str_replace('.index', '.*', $route))) aria-current="page" @endif>
-                {{ $label }}@if($count)<span class="ad-nav__n">{{ $count }}</span>@endif
-              </a>
-            </li>
-          @endforeach
-        </ul>
-      </nav>
+  {{-- One navigation. A rail on the left from 1000, the same element as a
+       bottom bar below it. The old layout printed this whole menu twice — once
+       inside a Bootstrap offcanvas, once in a desktop column — with a JS
+       bundle and a hand-rolled fallback to open the drawer. --}}
+  <header class="ad-rail">
+    <div class="ad-rail__head">
+      <a class="ad-mark" href="{{ route('admin.home') }}"><b>IV MOTORCLASS</b> <span>Panel</span></a>
+      <div class="ad-rail__end">
+        <a class="ad-out" href="{{ route('inicio') }}">Ver la web</a>
+        <form action="{{ route('logout') }}" method="POST">
+          @csrf
+          <button class="ad-out" type="submit">Salir</button>
+        </form>
+      </div>
     </div>
 
-    <div class="ad-top__end">
-      <a class="ad-out" href="{{ route('inicio') }}">Ver la web</a>
-      <form action="{{ route('logout') }}" method="POST">
-        @csrf
-        <button class="ad-out" type="submit">Salir</button>
-      </form>
+    <nav class="ad-rail__nav" aria-label="Secciones">
+      <ul class="ad-nav">
+        @foreach($nav as [$route, $label, $count])
+          @php $on = request()->routeIs(str_replace('.index', '.*', $route)); @endphp
+          <li>
+            <a class="ad-nav__i {{ $on ? 'is-on' : '' }}" href="{{ route($route) }}"
+               @if($on) aria-current="page" @endif>
+              <span>{{ $label }}</span>
+              @if($count)<span class="ad-nav__n">{{ $count }}</span>@endif
+            </a>
+          </li>
+        @endforeach
+      </ul>
+    </nav>
+  </header>
+
+  <main class="ad-main">
+    <div class="ad-wrap">
+      @if(session('status'))
+        <p class="ad-flash">{{ session('status') }}</p>
+      @endif
+      @if(session('error'))
+        <p class="ad-flash ad-flash--bad">{{ session('error') }}</p>
+      @endif
+
+      @yield('content')
     </div>
-  </div>
-</header>
+  </main>
 
-<main class="ad-main">
-  <div class="ad-wrap">
-    @if(session('status'))
-      <p class="ad-flash">{{ session('status') }}</p>
-    @endif
-    @if(session('error'))
-      <p class="ad-flash ad-flash--bad">{{ session('error') }}</p>
-    @endif
-
-    @yield('content')
-  </div>
-</main>
+</div>
 
 @stack('js')
 </body>
