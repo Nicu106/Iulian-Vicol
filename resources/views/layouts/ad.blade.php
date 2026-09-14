@@ -36,14 +36,12 @@
 <body class="ad">
 
 @php
-  $inbox = \App\Support\Inbox::counts();
-  $nav = [
-    ['admin.home',              'Panel',     null],
-    ['admin.vehicles.index',    'Coches',    null],
-    ['admin.contacts.index',    'Mensajes',  $inbox['real'] ?: null],
-    ['admin.testimonials.index','Opiniones', null],
-    ['admin.sell-cars.index',   'Ventas',    null],
-  ];
+  /* Sections, and the rule for how many fit on a phone, live in
+     App\Support\AdminNav. Add one there; nothing here changes. */
+  $items = \App\Support\AdminNav::items();
+  [$bar, $over] = \App\Support\AdminNav::split($items);
+  $overOn = collect($over)->contains('on', true) || \App\Support\AdminNav::current() === 'admin.more';
+  $overCount = collect($over)->sum(fn ($i) => (int) $i['count']);
 @endphp
 
 <div class="ad-shell">
@@ -66,19 +64,45 @@
 
     <nav class="ad-rail__nav" aria-label="Secciones">
       <ul class="ad-nav">
-        @foreach($nav as [$route, $label, $count])
-          @php $on = request()->routeIs(str_replace('.index', '.*', $route)); @endphp
-          <li>
-            <a class="ad-nav__i {{ $on ? 'is-on' : '' }}" href="{{ route($route) }}"
-               @if($on) aria-current="page" @endif>
-              <span>{{ $label }}</span>
-              @if($count)<span class="ad-nav__n">{{ $count }}</span>@endif
+        @php $g = null; @endphp
+        @foreach($items as $idx => $i)
+          @if($i['group'] && $i['group'] !== $g)
+            <li class="ad-nav__g">{{ $i['group'] }}</li>
+          @endif
+          @php $g = $i['group']; @endphp
+          <li class="{{ $idx >= count($bar) ? 'is-over' : '' }}">
+            <a class="ad-nav__i {{ $i['on'] ? 'is-on' : '' }}" href="{{ $i['href'] }}"
+               @if($i['on']) aria-current="page" @endif>
+              <span class="ad-nav__l"><span class="ad-nav__rail">{{ $i['label'] }}</span><span class="ad-nav__tab">{{ $i['tab'] }}</span>@if($i['count'])<span class="ad-nav__n">{{ $i['count'] }}</span>@endif</span>
             </a>
           </li>
         @endforeach
+
+        {{-- Only on a phone, and only past five sections. A link to a real
+             page, so it works everywhere; where the popover API exists the
+             script below opens the same list as a sheet instead. --}}
+        @if($over)
+          <li class="ad-nav__more">
+            <a class="ad-nav__i {{ $overOn ? 'is-on' : '' }}" href="{{ route('admin.more') }}"
+               data-sheet="ad-more" aria-haspopup="dialog" aria-controls="ad-more" aria-expanded="false"
+               @if(\App\Support\AdminNav::current() === 'admin.more') aria-current="page" @endif>
+              <span class="ad-nav__l"><span>Más</span>@if($overCount)<span class="ad-nav__n">{{ $overCount }}</span>@endif</span>
+            </a>
+          </li>
+        @endif
       </ul>
     </nav>
   </header>
+
+  @if($over)
+    <div class="ad-sheet" id="ad-more" popover aria-label="Más secciones">
+      <div class="ad-sheet__head">
+        <p class="ad-sheet__t">Más secciones</p>
+        <button class="ad-btn ad-btn--q ad-btn--s" type="button" popovertarget="ad-more" popovertargetaction="hide">Cerrar</button>
+      </div>
+      @include('admin.partials.nav-list', ['items' => $over])
+    </div>
+  @endif
 
   <main class="ad-main">
     <div class="ad-wrap">
@@ -95,6 +119,30 @@
 
 </div>
 
+@if($over)
+<script>
+/* "Más" is a link to /admin/mas. Where the browser has the popover API it opens
+   the same list as a sheet instead of loading a page; without it (JavaScript
+   off, Safari before 17) the link simply works. */
+(function () {
+  var sheet = document.getElementById('ad-more');
+  if (!sheet || typeof sheet.showPopover !== 'function') return;
+  var tabs = document.querySelectorAll('[data-sheet="ad-more"]');
+  tabs.forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      sheet.showPopover();
+    });
+  });
+  sheet.addEventListener('toggle', function (e) {
+    var open = e.newState === 'open';
+    tabs.forEach(function (a) { a.setAttribute('aria-expanded', open ? 'true' : 'false'); });
+    if (open) { var first = sheet.querySelector('.ad-navlist__i'); if (first) first.focus({ preventScroll: true }); }
+  });
+})();
+</script>
+@endif
 @stack('js')
 </body>
 </html>

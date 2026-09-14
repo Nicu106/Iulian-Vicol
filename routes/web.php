@@ -59,6 +59,9 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/admin', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.home');
+    // The sections that do not fit the phone bar, as a page. The "Más" tab opens
+    // them in a sheet; this is where it goes when the sheet cannot open.
+    Route::view('/admin/mas', 'admin.more')->name('admin.more');
     Route::get('/admin/vehicles', [VehicleController::class, 'index'])->name('admin.vehicles.index');
     Route::get('/admin/inquiries', [App\Http\Controllers\Admin\InquiryAdminController::class, 'index'])->name('admin.inquiries.index');
     Route::delete('/admin/inquiries/{inquiry}', [App\Http\Controllers\Admin\InquiryAdminController::class, 'destroy'])->name('admin.inquiries.destroy');

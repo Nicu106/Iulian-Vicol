@@ -208,13 +208,22 @@ body.ad {
   /* The mark sits on the top edge of the tab, over the line, so the active
      destination reads as attached to the page above it. */
   .ad-nav__i.is-on { box-shadow: inset 0 2px 0 0 var(--mc-on-navy); background: rgba(255, 255, 255, .08); }
-  /* The count sits over the label's corner. In the flow it dropped under
-     "Mensajes" and lifted that one label 10px above the other four. */
+  /* The count sits in the TAB's top-right corner. Two earlier placements hung
+     it off the label — 50% + 2.3em, then left:100% of the label — and on a
+     78px tab "Mensajes" is 61px wide, so the count ran 7px into the next tab.
+     The tab is the one box whose width is known; the label is not. The suite
+     checks the count stays inside its tab and does not touch its label. */
+  /* The tab is the containing block. Without this the count anchored to the
+     fixed bar and printed "3" in the corner of Ventas, the last tab. */
   .ad-nav__i { position: relative; }
   .ad-nav__n {
-    position: absolute; top: 3px; left: calc(50% + 2.3em);
-    padding: 0 4px; font-size: 11px; line-height: 16px;
+    position: absolute; top: 3px; right: 3px;
+    padding: 0 4px; font-size: 11px; line-height: 14px;
   }
+  /* The label sits 2px below the tab's centre so a count in the corner clears
+     it: centred, "Mensajes" at 13px met the count's bottom edge (the suite's
+     "a count never sits on top of its label" failed on it). */
+  .ad-nav__i { padding: 11px 2px 7px; }
 }
 
 /* ---- the page ------------------------------------------------------------ */
@@ -823,4 +832,78 @@ select.ad-in {
 @media (max-width: 399.98px) {
   .ad-seg { display: flex; width: 100%; }
   .ad-seg__o { flex: 1 1 0; min-width: 0; justify-content: center; padding-inline: var(--s-2); gap: var(--s-1); }
+}
+
+/* ============================================================================
+   MORE SECTIONS THAN FIT — the rule lives in App\Support\AdminNav
+   ---------------------------------------------------------------------------
+   Rail (desk): every section, grouped under a heading once there are enough to
+   need one. Phone: at most five tabs; from six sections, four plus "Más".
+   ========================================================================= */
+
+/* Two labels in each link: the full one for the rail and the sheet, the short
+   one for the bar. Only one is ever displayed. */
+.ad-nav__tab { display: none; }
+.ad-nav__more { display: none; }
+.ad-nav__g { display: none; }
+
+@media (min-width: 1000px) {
+  .ad-nav__l { display: flex; flex: 1 1 auto; align-items: center; gap: .6ch; min-width: 0; }
+  /* Sentence case, the label size, the second ink: a heading that orders the
+     list without shouting over it. */
+  /* Measured in the twelve-section render: at 13px against the links' 14px, in
+     the same ink, "Contenido" and "Gestión" read as two more links. The rule
+     above a group does the grouping; the heading only names it, and sits a
+     step lighter in weight than the links it heads. */
+  .ad-nav__g {
+    display: block; margin: var(--s-4) 0 var(--s-1); padding: var(--s-4) var(--s-3) 0;
+    border-top: 1px solid var(--mc-navy-line);
+    font-size: var(--t-label); font-weight: 400; color: var(--mc-on-navy-2);
+  }
+  .ad-nav__g:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+}
+
+@media (max-width: 999.98px) {
+  .ad-nav__rail { display: none; }
+  .ad-nav__tab { display: inline; }
+  .ad-nav > li.is-over,
+  .ad-nav > li.ad-nav__g { display: none; }
+  .ad-nav > li.ad-nav__more { display: flex; }
+}
+
+/* ---- the sheet ------------------------------------------------------------
+   Native popover: top layer, Escape and a tap outside close it, no library.
+   Hidden by a plain rule and shown by :popover-open, so in a browser without
+   the API the second rule is invalid and dropped, the element stays hidden,
+   and "Más" is an ordinary link to /admin/mas. */
+.ad-sheet { display: none; }
+.ad-sheet:popover-open {
+  display: block;
+  position: fixed; inset: auto 0 0 0; margin: 0;
+  width: 100%; max-width: none; max-height: min(80svh, 40rem); overflow-y: auto;
+  border: 0; padding: var(--s-4) var(--mc-gutter-m) calc(var(--s-5) + env(safe-area-inset-bottom));
+  background: var(--mc-bg); color: var(--mc-ink);
+  box-shadow: 0 -1px 0 0 var(--mc-hairline);
+  translate: 0 0;
+  transition: translate var(--m-move) var(--e-out);
+}
+@starting-style { .ad-sheet:popover-open { translate: 0 100%; } }
+.ad-sheet::backdrop { background: rgba(var(--mc-scrim), .45); }
+@media (prefers-reduced-motion: reduce) { .ad-sheet:popover-open { transition: none; } }
+
+.ad-sheet__head { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); margin-bottom: var(--s-3); }
+.ad-sheet__t { margin: 0; font-size: var(--t-h3); font-weight: 700; color: var(--mc-ink); }
+
+/* ---- a section as a full row, in the sheet and on /admin/mas -------------- */
+.ad-navlist__i {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s-3);
+  min-height: var(--mc-tap-pref); padding: var(--s-3) var(--s-4);
+  font-size: var(--t-ui); font-weight: 500; color: var(--mc-ink); text-decoration: none;
+}
+.ad-navlist__i:hover { background: var(--mc-band); }
+.ad-navlist__i.is-on { font-weight: 600; box-shadow: inset 3px 0 0 0 var(--mc-ink); }
+.ad-navlist__i .ad-nav__n { position: static; margin: 0; }
+.ad-navlist__g {
+  padding: var(--s-3) var(--s-4) var(--s-1);
+  font-size: var(--t-label); font-weight: 500; color: var(--mc-ink-2); background: var(--mc-bg);
 }

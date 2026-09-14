@@ -271,6 +271,22 @@ Each component's design intent and the reasons behind it are in `docs/DESIGN-GUI
 and in the commit messages — read `git log` for the file you are about to touch; the
 messages are written as design rationale with the measurements that justified them.
 
+## 7a. The admin panel (`/admin`)
+
+Its own layout (`layouts/ad.blade.php`) and stylesheet (`public/css/ad.css`,
+prefix `ad-`); it loads mc-tokens and nothing else from the site. No Bootstrap.
+
+**Adding a section is one line in `App\Support\AdminNav::items()`** — nothing in
+the layout changes. The ORDER is the priority. Desk: every section in the left
+rail (add `'group' => '…'` once there are more than ~8). Phone: a bottom bar of at
+most five tabs; from six sections it shows the first four plus "Más", which
+opens the rest in a native popover sheet, or `/admin/mas` where popover is
+unavailable. Give long names a short `'tab' => '…'` (≤ 9 chars fits 78px).
+`tools/audit/suites/admin-nav.mjs` renders 5/6/8/12 sections and must pass.
+
+The admin is behind auth: audit it by rendering views to disk with PHP and
+passing a `file://` URL to `audit.mjs` (it accepts full URLs).
+
 ## 8. How to work here
 
 - Do the direction + audit first for anything new (contract §1). Then build the whole
