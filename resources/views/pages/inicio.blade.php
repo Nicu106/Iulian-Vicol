@@ -237,7 +237,7 @@
       <ul class="hm-soc__list">
         <li class="hm-soc__row hm-soc__row--lead">
           <a class="hm-soc__link" href="{{ $social['tiktok']['url'] }}" target="_blank" rel="noopener">
-            <span class="hm-soc__ico hm-soc__ico--tiktok" aria-hidden="true"></span>
+            @include('partials.social-mark', ['k' => 'tiktok'])
             <span class="hm-soc__t">
               <b>Ver los coches en TikTok</b>
               <em>{{ $social['tiktok']['handle'] }}</em>
@@ -248,7 +248,7 @@
         @foreach(['instagram', 'facebook'] as $k)
           <li class="hm-soc__row">
             <a class="hm-soc__link" href="{{ $social[$k]['url'] }}" target="_blank" rel="noopener">
-              <span class="hm-soc__ico hm-soc__ico--{{ $k }}" aria-hidden="true"></span>
+              @include('partials.social-mark', ['k' => $k])
               <span class="hm-soc__t">
                 <b>{{ $social[$k]['name'] }}</b>
                 <em>{{ $social[$k]['handle'] }}</em>

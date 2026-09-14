@@ -455,7 +455,7 @@ html:not(.js) .hm-fb__step{ display:none; }
   .hm-soc__in{ grid-template-columns:minmax(0,7fr) minmax(0,5fr); column-gap:var(--s-8); align-items:start; }
   .hm-soc__say{  grid-column:1 / -1; grid-row:1; }
   .hm-soc__num{  grid-column:1; grid-row:2; }
-  .hm-soc__list{ grid-column:2; grid-row:2; align-self:end; }
+  .hm-soc__list{ grid-column:2; grid-row:2; align-self:start; }
 }
 
 .hm-soc__kick{ margin:0 0 var(--s-4); font-size:var(--t-prose); color:rgba(255,255,255,.66); }
@@ -501,24 +501,46 @@ html:not(.js) .hm-fb__step{ display:none; }
 
 /* ---- the ways in ----------------------------------------------------------
    Rows, not tiles. The first one is the errand — it says what pressing it does,
-   not the name of an app.
+   not the name of an app — and it is the only filled one.
+
+   Second pass (client: "the icons and the buttons should look better").
+   Measured and looked at first: 24px grey glyphs on 82px rounded grey boxes,
+   three of them the same weight, Instagram and Facebook identical but for the
+   word; the list hung 140px below the top of the number beside it; and the
+   rounded corners were the only rounded surfaces on a site that is square.
+     - each platform's mark on a square tile in its own colours
+       (partials/social-mark)
+     - the two quiet rows lose their boxes and are separated by rules, the
+       device the contact page's ways and the car page's ladders already use
+     - square, everywhere
+     - the list's top edge sits on the number's top edge
+   The brand hexes are literals because they are TikTok's, Instagram's and
+   Facebook's, not ours; there is nothing in mc-tokens for them to be.
    ========================================================================= */
-.hm-soc__list{ list-style:none; margin:0; padding:0; display:grid; gap:var(--s-2); }
+.hm-soc__list{ list-style:none; margin:0; padding:0; display:grid; }
+
 .hm-soc__link{
   display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center;
-  gap:var(--s-4); padding:var(--s-4) var(--s-5); min-height:var(--mc-tap-pref);
-  border-radius:var(--mc-r); text-decoration:none; color:#FFFFFF;
-  background:rgba(255,255,255,.06);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);
-  transition:background var(--m-quick) var(--e-out), box-shadow var(--m-quick) var(--e-out);
+  gap:var(--s-4); min-height:var(--mc-tap-pref);
+  padding:var(--s-4) var(--s-5) var(--s-4) var(--s-4);
+  text-decoration:none; color:#FFFFFF;
+  border-top:1px solid rgba(255,255,255,.16);
+  transition:background var(--m-quick) var(--e-out);
 }
-.hm-soc__link:hover{ background:rgba(255,255,255,.12); box-shadow:inset 0 0 0 1px rgba(255,255,255,.28); }
+.hm-soc__row:last-child .hm-soc__link{ border-bottom:1px solid rgba(255,255,255,.16); }
+.hm-soc__link:hover{ background:rgba(255,255,255,.05); }
 .hm-soc__link:focus-visible{ outline:3px solid #FFFFFF; outline-offset:3px; }
+
+.hm-soc__row--lead{ margin-bottom:var(--s-4); }
 .hm-soc__row--lead .hm-soc__link{
+  border:0; background:#FFFFFF; color:#000000;
+  /* A step more air than the quiet rows. With the boxes gone the rows grew by
+     their rules and the lead measured 82px against their 83 — the one that
+     works was the shortest of the three. social.mjs holds it taller. */
   padding-block:var(--s-5);
-  background:#FFFFFF; color:#000000; box-shadow:none;
 }
-.hm-soc__row--lead .hm-soc__link:hover{ background:#F0F0F0; }
+.hm-soc__row--lead .hm-soc__link:hover{ background:#EDEDED; }
+
 .hm-soc__t{ display:grid; gap:2px; min-width:0; }
 /* The colour is stated, not inherited. brandbook.css carries a global
    `b, strong { color: var(--mc-ink) }` which beats the white this link passes
@@ -529,13 +551,27 @@ html:not(.js) .hm-fb__step{ display:none; }
 .hm-soc__t em{ font-style:normal; font-size:var(--t-small); color:rgba(255,255,255,.60); }
 .hm-soc__row--lead .hm-soc__t em{ color:rgba(0,0,0,.56); }
 
-/* the marks, as masks so they take the row's own colour */
-.hm-soc__ico{ width:24px; height:24px; background:currentColor;
-  -webkit-mask:var(--m) center/contain no-repeat; mask:var(--m) center/contain no-repeat; }
-.hm-soc__ico--tiktok{ --m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5 2.59 2.59 0 0 1 0-5.18c.27 0 .52.04.76.12v-3.2a5.74 5.74 0 0 0-.76-.05A5.72 5.72 0 0 0 4.15 15.3 5.72 5.72 0 0 0 9.86 21a5.72 5.72 0 0 0 5.71-5.71V9.01a7.35 7.35 0 0 0 4.28 1.38V7.3a4.28 4.28 0 0 1-3.25-1.48z'/%3E%3C/svg%3E"); }
-.hm-soc__ico--instagram{ --m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.2c3.2 0 3.6 0 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.25.07 1.65.07 4.85s0 3.6-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.25.06-1.65.07-4.85.07s-3.6 0-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.8 3.8 0 0 1-1.38-.9 3.8 3.8 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.21 15.6 2.2 15.2 2.2 12s0-3.6.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.44 2.21 8.84 2.2 12 2.2zm0 1.98c-3.14 0-3.51.01-4.75.07-1.15.05-1.77.24-2.18.4-.55.22-.94.47-1.35.88-.41.41-.66.8-.88 1.35-.16.41-.35 1.03-.4 2.18-.06 1.24-.07 1.61-.07 4.75s.01 3.51.07 4.75c.05 1.15.24 1.77.4 2.18.22.55.47.94.88 1.35.41.41.8.66 1.35.88.41.16 1.03.35 2.18.4 1.24.06 1.61.07 4.75.07s3.51-.01 4.75-.07c1.15-.05 1.77-.24 2.18-.4.55-.22.94-.47 1.35-.88.41-.41.66-.8.88-1.35.16-.41.35-1.03.4-2.18.06-1.24.07-1.61.07-4.75s-.01-3.51-.07-4.75c-.05-1.15-.24-1.77-.4-2.18a3.6 3.6 0 0 0-.88-1.35 3.6 3.6 0 0 0-1.35-.88c-.41-.16-1.03-.35-2.18-.4-1.24-.06-1.61-.07-4.75-.07zm0 3.37a5.45 5.45 0 1 1 0 10.9 5.45 5.45 0 0 1 0-10.9zm0 8.99a3.54 3.54 0 1 0 0-7.08 3.54 3.54 0 0 0 0 7.08zm6.94-9.21a1.27 1.27 0 1 1-2.55 0 1.27 1.27 0 0 1 2.55 0z'/%3E%3C/svg%3E"); }
-.hm-soc__ico--facebook{ --m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.52 1.5-3.91 3.77-3.91 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.45 2.91h-2.33V22c4.78-.76 8.44-4.92 8.44-9.94z'/%3E%3C/svg%3E"); }
-.hm-soc__go{ width:20px; height:20px; background:currentColor; opacity:.5;
+/* ---- the marks ------------------------------------------------------------ */
+/* One size for all three. The lead's tile was 48px and the others 40px, and
+   the words beside them started 8px apart — "Ver los coches en TikTok" at one
+   left edge, "Instagram" and "Facebook" at another. The lead is already the
+   white one; it does not also need a bigger tile. */
+.hm-soc__mark{ display:grid; place-items:center; width:44px; height:44px; }
+.hm-soc__mark svg{ display:block; width:26px; height:26px; }
+.hm-soc__mark--tiktok{ background:#000000; }
+/* On the black band a black tile would vanish; only the lead row is white. */
+.hm-soc__row:not(.hm-soc__row--lead) .hm-soc__mark--tiktok{ box-shadow:inset 0 0 0 1px rgba(255,255,255,.22); }
+.hm-soc__mark--instagram{
+  background:radial-gradient(circle at 30% 107%, #FDF497 0%, #FDF497 5%, #FD5949 45%, #D6249F 60%, #285AEB 90%);
+}
+.hm-soc__mark--facebook{ background:#1877F2; }
+
+.hm-soc__go{ width:20px; height:20px; background:currentColor; opacity:.6;
+  transition:opacity var(--m-quick) var(--e-out), translate var(--m-quick) var(--e-out);
   -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' d='M7 17L17 7M9 7h8v8'/%3E%3C/svg%3E") center/contain no-repeat;
           mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' d='M7 17L17 7M9 7h8v8'/%3E%3C/svg%3E") center/contain no-repeat; }
-.hm-soc__link:hover .hm-soc__go{ opacity:1; }
+.hm-soc__row--lead .hm-soc__go{ opacity:1; }
+/* The arrow moves the way the link goes — out — by 2px. It is the only motion
+   on the row, and it only happens under a pointer. */
+.hm-soc__link:hover .hm-soc__go{ opacity:1; translate:2px -2px; }
+@media (prefers-reduced-motion:reduce){ .hm-soc__link:hover .hm-soc__go{ translate:none; } }
