@@ -167,21 +167,30 @@ class HomePageController extends Controller
      * would be a different and unverified claim.
      */
     public const SOCIAL = [
+        /* All three are the accounts the client sent links from (2026-09-14),
+           resolved by following each link: a TikTok video under @_ivmotorclass,
+           an Instagram reel whose og:url is /_ivmotorclass/, and a Facebook post
+           on page 61574684734979, "IV MotorClass". The addresses here before
+           were guesses without the underscore — @ivmotorclass — and pointed at
+           accounts that are not his. The Facebook page has no vanity name; the
+           address is the canonical one Facebook itself declares for it (og:url
+           of profile.php?id=61574684734979). Checked: the TikTok profile
+           reports uniqueId "_ivmotorclass", nickname "IVmotorclass". */
         'tiktok' => [
             'name'   => 'TikTok',
-            'handle' => '@ivmotorclass',
-            'url'    => 'https://www.tiktok.com/@ivmotorclass',
+            'handle' => '@_ivmotorclass',
+            'url'    => 'https://www.tiktok.com/@_ivmotorclass',
             'plays'  => 600000,
         ],
         'instagram' => [
             'name'   => 'Instagram',
-            'handle' => '@ivmotorclass',
-            'url'    => 'https://www.instagram.com/ivmotorclass/',
+            'handle' => '@_ivmotorclass',
+            'url'    => 'https://www.instagram.com/_ivmotorclass/',
         ],
         'facebook' => [
             'name'   => 'Facebook',
-            'handle' => 'IV MOTORCLASS',
-            'url'    => 'https://www.facebook.com/ivmotorclass',
+            'handle' => 'IV MotorClass',
+            'url'    => 'https://www.facebook.com/p/IV-MotorClass-61574684734979/',
         ],
     ];
 

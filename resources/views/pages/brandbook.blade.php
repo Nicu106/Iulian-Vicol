@@ -2126,14 +2126,14 @@
           <li class="hm-soc__row hm-soc__row--lead">
             <a class="hm-soc__link" href="#parts">
               <span class="hm-soc__ico hm-soc__ico--tiktok" aria-hidden="true"></span>
-              <span class="hm-soc__t"><b>Ver los coches en TikTok</b><em>@ivmotorclass</em></span>
+              <span class="hm-soc__t"><b>Ver los coches en TikTok</b><em>@_ivmotorclass</em></span>
               <span class="hm-soc__go" aria-hidden="true"></span>
             </a>
           </li>
           <li class="hm-soc__row">
             <a class="hm-soc__link" href="#parts">
               <span class="hm-soc__ico hm-soc__ico--instagram" aria-hidden="true"></span>
-              <span class="hm-soc__t"><b>Instagram</b><em>@ivmotorclass</em></span>
+              <span class="hm-soc__t"><b>Instagram</b><em>@_ivmotorclass</em></span>
               <span class="hm-soc__go" aria-hidden="true"></span>
             </a>
           </li>
