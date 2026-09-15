@@ -4,46 +4,65 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ReferralRequest;
 use App\Models\Referrer;
-use App\Models\ReferralVisit;
+use App\Support\Journey;
 use App\Support\Referral;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 
-/** The public side of recommendations: the link, and /recomienda. */
+/** The public side of recommendations: the link, /recomienda, and the click beacon. */
 class ReferralController extends Controller
 {
     /**
-     * /r/{code}: count the visit, remember the code, go to the home page.
+     * /r/{code}: record who opened it, remember the code, go to the home page.
      * An unknown code goes to the home page too — a mistyped link should still
      * land somewhere useful, and should not tell anyone which codes exist.
      */
     public function visit(Request $request, string $code)
     {
         $to = redirect()->route('inicio');
-        $referrer = Referral::findByCode($code);
 
-        if (! $referrer) {
+        // WhatsApp's preview fetcher and other bots: not a person opening the
+        // link. Not counted, and no cookie.
+        if (Journey::isBot($request->userAgent())) {
             return $to;
         }
 
-        ReferralVisit::firstOrCreate([
-            'referrer_id' => $referrer->id,
-            'visitor'     => Referral::visitorHash($request),
-            'day'         => now()->toDateString(),
-        ]);
-
-        // The first link opened wins; a second one is counted but does not
-        // take the visitor over.
-        if (Referral::fromRequest($request)) {
+        $clicked = Referral::findByCode($code);
+        if (! $clicked) {
             return $to;
         }
 
-        // Not HttpOnly: the script that adds the code to WhatsApp links has to
-        // read it. It holds a random code and nothing else.
-        return $to->withCookie(cookie(
-            Referral::COOKIE, $referrer->code, Referral::days() * 24 * 60,
-            '/', null, $request->isSecure(), false, false, 'lax'
-        ));
+        $attributed = Referral::fromRequest($request);   // the first link opened wins
+        $visitor = Journey::begin($request, $clicked, $attributed);
+        Journey::record($visitor, 'open', ['referrer_id' => $clicked->id]);
+
+        // No scheduler runs on this box, so old rows are cleared here, now and
+        // then, like session garbage collection.
+        if (random_int(1, 50) === 1) {
+            Journey::prune();
+        }
+
+        $minutes = Referral::days() * 24 * 60;
+        $to->withCookie(cookie(Journey::COOKIE, $visitor->uuid, $minutes, '/', null, $request->isSecure(), true, false, 'lax'));
+
+        // Not HttpOnly: the script that adds the code to WhatsApp links reads it.
+        // It holds a random code and nothing else.
+        if (! $attributed) {
+            $to->withCookie(cookie(Referral::COOKIE, $clicked->code, $minutes, '/', null, $request->isSecure(), false, false, 'lax'));
+        }
+
+        return $to;
+    }
+
+    /** POST /r/e — what the page script reports as a WhatsApp or e-mail press leaves the site. */
+    public function event(Request $request)
+    {
+        $type = $request->input('t');
+        if (in_array($type, ['whatsapp', 'email'], true)) {
+            Journey::track($request, $type, ['path' => '/' . ltrim((string) $request->input('p'), '/')]);
+        }
+
+        return response()->noContent();
     }
 
     public function show()
@@ -69,6 +88,9 @@ class ReferralController extends Controller
             'phone'  => $phone,
             'source' => 'web',
         ]);
+
+        // A referred visitor asking for their own link is worth knowing.
+        Journey::track($request, 'form_refer', ['path' => '/recomienda']);
 
         // Kept in the session rather than put in the URL, so a link page cannot
         // be opened by guessing codes.

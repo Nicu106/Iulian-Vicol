@@ -52,6 +52,9 @@ Route::get('/inicio', [App\Http\Controllers\HomePageController::class, 'index'])
 Route::get('/contacto', [App\Http\Controllers\ContactPageController::class, 'index'])->name('contacto');
 
 // Recommendations without accounts — App\Support\Referral has the rules.
+// What the page script reports as a WhatsApp or e-mail press leaves the site.
+Route::post('/r/e', [App\Http\Controllers\ReferralController::class, 'event'])
+    ->middleware('throttle:120,1')->name('refer.event');
 Route::get('/r/{code}', [App\Http\Controllers\ReferralController::class, 'visit'])->name('refer.visit');
 Route::get('/recomienda', [App\Http\Controllers\ReferralController::class, 'show'])->name('refer');
 Route::post('/recomienda', [App\Http\Controllers\ReferralController::class, 'store'])
@@ -72,6 +75,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/recomendaciones', [App\Http\Controllers\Admin\ReferralController::class, 'index'])->name('admin.referrals.index');
     Route::get('/admin/recomendaciones/como-funciona', [App\Http\Controllers\Admin\ReferralController::class, 'how'])->name('admin.referrals.how');
     Route::get('/admin/recomendaciones/nuevo', [App\Http\Controllers\Admin\ReferralController::class, 'create'])->name('admin.referrals.create');
+    Route::get('/admin/recomendaciones/{referrer}', [App\Http\Controllers\Admin\ReferralController::class, 'show'])->name('admin.referrals.show');
     Route::post('/admin/recomendaciones', [App\Http\Controllers\Admin\ReferralController::class, 'store'])->name('admin.referrals.store');
     Route::post('/admin/recomendaciones/premios/{reward}', [App\Http\Controllers\Admin\ReferralController::class, 'reward'])->name('admin.referrals.reward');
     Route::delete('/admin/recomendaciones/{referrer}', [App\Http\Controllers\Admin\ReferralController::class, 'destroy'])->name('admin.referrals.destroy');

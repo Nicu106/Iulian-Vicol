@@ -17,9 +17,16 @@ class Referrer extends Model
         return $this->belongsTo(Vehicle::class);
     }
 
-    public function visits(): HasMany
+    /** Every time this link was opened by a person (link previews are not counted). */
+    public function opens(): HasMany
     {
-        return $this->hasMany(ReferralVisit::class);
+        return $this->hasMany(ReferralEvent::class, 'referrer_id')->where('type', 'open');
+    }
+
+    /** The people attributed to this link: those for whom it was the first link opened. */
+    public function visitors(): HasMany
+    {
+        return $this->hasMany(ReferralVisitor::class);
     }
 
     public function rewards(): HasMany

@@ -71,13 +71,22 @@
 (function () {
   var m = document.cookie.match(/(?:^|;\s*)mc_ref=([A-Z0-9]{4,16})(?:;|$)/);
   window.mcRefNote = m ? '\n\n(Código de recomendación: ' + m[1] + ')' : '';
+  // Reports a press that leaves the site (WhatsApp, e-mail) for the recommendation
+  // journey. A no-op for anyone who did not arrive through a link.
+  window.mcRefTrack = function (t) {
+    if (!m || !navigator.sendBeacon) return;
+    try { navigator.sendBeacon('/r/e', new URLSearchParams({ t: t, p: location.pathname })); } catch (e) {}
+  };
   if (!m) return;
   var code = m[1];
+  function isWa(a) {
+    try { var h = new URL(a.href).hostname; return /(^|\.)wa\.me$/.test(h) || /(^|\.)whatsapp\.com$/.test(h); }
+    catch (e) { return false; }
+  }
   function tag(a) {
-    if (a.hasAttribute('data-no-ref')) return;
+    if (a.hasAttribute('data-no-ref') || !isWa(a)) return;
     try {
       var u = new URL(a.href);
-      if (!/(^|\.)wa\.me$/.test(u.hostname) && !/(^|\.)whatsapp\.com$/.test(u.hostname)) return;
       var t = u.searchParams.get('text') || '';
       if (t.indexOf(code) !== -1) return;
       u.searchParams.set('text', (t || 'Hola') + window.mcRefNote);
@@ -87,8 +96,10 @@
   document.querySelectorAll('a[href*="wa.me"], a[href*="whatsapp.com"]').forEach(tag);
   // Links whose href is set by script after load are tagged at the moment they are pressed.
   document.addEventListener('click', function (e) {
-    var a = e.target.closest && e.target.closest('a[href*="wa.me"], a[href*="whatsapp.com"]');
-    if (a) tag(a);
+    var a = e.target.closest && e.target.closest('a[href]');
+    if (!a || a.hasAttribute('data-no-ref')) return;
+    if (isWa(a)) { tag(a); window.mcRefTrack('whatsapp'); }
+    else if (/^mailto:/i.test(a.getAttribute('href') || '')) { window.mcRefTrack('email'); }
   }, true);
 })();
 </script>

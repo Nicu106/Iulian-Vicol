@@ -8,7 +8,8 @@
     El enlace lleva un código, por ejemplo <b>MARIA7K2</b>, y ningún dato personal.</span></li>
   <li><span><b>El amigo abre el enlace.</b> La web lo recuerda durante
     {{ \App\Support\Referral::days() }} días. Si te escribe por WhatsApp desde la web, el
-    mensaje ya lleva el código y lo verás en la conversación.</span></li>
+    mensaje ya lleva el código y lo verás en la conversación. En la ficha de cada enlace
+    ves qué pasó: cuántas personas lo abrieron, qué coches miraron y si pulsaron WhatsApp.</span></li>
   <li><span><b>Cuando le vendes un coche,</b> abre la ficha del coche y elige a la persona
     en «Vino de parte de». Se crea un premio pendiente.</span></li>
   <li><span><b>Tú decides.</b> Apruebas el premio y, cuando lo das, lo marcas como
@@ -20,6 +21,8 @@
   <li>Cuenta el primer enlace que abrió el amigo. Uno abierto después no lo cambia.</li>
   <li>Un premio por coche vendido. Nunca por un clic o por rellenar un formulario.</li>
   <li>No hay premio por la compra de la propia persona.</li>
-  <li>No se piden ni se guardan los datos del amigo.</li>
+  <li>No se piden ni se guardan los datos del amigo. Quien abre el enlace es una persona
+    anónima: sin nombre y sin IP, y se borra a los {{ \App\Support\Referral::days() }} días de su última visita.</li>
+  <li>Las vistas previas que crea WhatsApp al enviar el enlace no cuentan como aperturas.</li>
   <li>Un enlace que ya tiene premios no se puede borrar, para no perder el registro.</li>
 </ul>

@@ -84,12 +84,6 @@ final class Referral
         return self::findByCode($request->cookie(self::COOKIE));
     }
 
-    /** Counts a person once a day without keeping their IP. */
-    public static function visitorHash(Request $request): string
-    {
-        return hash_hmac('sha256', $request->ip() . '|' . $request->userAgent(), (string) config('app.key'));
-    }
-
     /**
      * Keep a car's reward in step with the car. Called by ReferralObserver on
      * every save that touches status, referred_by or the buyer's phone, so the

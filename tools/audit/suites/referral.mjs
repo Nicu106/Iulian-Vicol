@@ -40,9 +40,11 @@ const browser = await p.launch({ executablePath: exe,
   args: ['--no-sandbox', '--ignore-certificate-errors', `--host-resolver-rules=MAP ${HOST} 127.0.0.1`] });
 
 // every visitor gets their own cookie jar
+const IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1';
 const fresh = async (w = 390) => {
   const ctx = await browser.createBrowserContext();
   const pg = await ctx.newPage();
+  await pg.setUserAgent(IPHONE);
   await pg.setViewport({ width: w, height: 844 });
   return { ctx, pg };
 };
@@ -150,9 +152,47 @@ let codeA = null, codeB = null;
   const note = await pg.evaluate(() => window.mcRefNote || '');
   is(note.includes(codeA), 'the contact page, which opens WhatsApp from script, has the code to add', note.trim());
 
-  const visits = php(`echo App\\Models\\Referrer::where('code','${codeA}')->first()->visits()->count().','.App\\Models\\Referrer::where('code','${codeB}')->first()->visits()->count();`);
-  is(visits === '1,1', 'both openings are counted, once each', visits);
+  const opens = php(`echo App\\Models\\Referrer::where('code','${codeA}')->first()->opens()->count().','.App\\Models\\Referrer::where('code','${codeB}')->first()->opens()->count().','.App\\Models\\Referrer::where('code','${codeB}')->first()->visitors()->count();`);
+  is(opens === '1,1,0', 'both openings are counted once each, and the person stays with the first link', opens);
+
+  const rv = (await pg.cookies()).find(k => k.name === 'mc_rv');
+  is(rv && rv.httpOnly, 'the person is a random id in an HttpOnly cookie');
+
+  // the journey: a car page, then a WhatsApp press (navigation to wa.me held back)
+  const slug = php(`echo App\\Models\\Vehicle::where('status','available')->value('slug');`);
+  const carId = php(`echo App\\Models\\Vehicle::where('slug','${slug}')->value('id');`);
+  await pg.goto(`${B}/coche/${slug}`, { waitUntil: 'networkidle0' });
+  await pg.evaluate(() => document.addEventListener('click', e => e.preventDefault()));
+  await pg.$eval('a[href*="wa.me"]', a => a.click());
+  await new Promise(r => setTimeout(r, 900));
+  const j = JSON.parse(php(`$v = App\\Models\\ReferralVisitor::whereHas('referrer', fn($q) => $q->where('code','${codeA}'))->first();
+    echo json_encode(['types' => $v->events()->orderBy('id')->pluck('type')->all(),
+      'car' => (string) $v->events()->where('type','car')->value('vehicle_id'),
+      'wa' => $v->events()->where('type','whatsapp')->value('path'),
+      'device' => $v->device, 'os' => $v->os, 'browser' => $v->browser]);`));
+  is(['open', 'page', 'car', 'whatsapp'].every(t => j.types.includes(t)), 'the journey is recorded: opened, saw pages, saw a car, pressed WhatsApp', j.types.join(' → '));
+  is(j.car === carId, 'the car seen is recorded as that car', `vehicle ${j.car}`);
+  is(j.wa === `/coche/${slug}`, 'and the WhatsApp press as made on that car\'s page', j.wa);
+  is(j.device === 'mobile' && j.os === 'iOS' && j.browser === 'Safari', 'the device is described, not identified', `${j.device} · ${j.os} · ${j.browser}`);
   await ctx.close();
+}
+{
+  const { ctx, pg } = await fresh();
+  await pg.setUserAgent('WhatsApp/2.23.20.0 A');
+  const count = () => php(`echo App\\Models\\Referrer::where('code','${codeA}')->first()->opens()->count();`);
+  const before = count();
+  await pg.goto(`${B}/r/${codeA}`, { waitUntil: 'networkidle0' });
+  const after = count();
+  const jar = await pg.cookies();
+  is(before === after && !jar.some(k => k.name === 'mc_ref' || k.name === 'mc_rv'),
+     "WhatsApp's link preview is not an opening, and gets no cookie", `${before} → ${after}`);
+  await ctx.close();
+}
+{
+  const html = JSON.parse(php(`Auth::loginUsingId(1); View::share('errors', new Illuminate\\Support\\ViewErrorBag);
+    $h = app(App\\Http\\Controllers\\Admin\\ReferralController::class)->show(App\\Models\\Referrer::where('code','${codeA}')->first())->render();
+    echo json_encode(['person' => str_contains($h, 'Persona 1'), 'car' => str_contains($h, 'Vio el '), 'wa' => str_contains($h, 'Pulsó WhatsApp'), 'cars' => str_contains($h, 'Los coches que miraron')]);`));
+  is(html.person && html.car && html.wa && html.cars, 'the panel shows that person, the car they looked at and the WhatsApp press', JSON.stringify(html));
 }
 {
   const { ctx, pg } = await fresh();

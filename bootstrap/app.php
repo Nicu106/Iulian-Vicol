@@ -27,6 +27,13 @@ return Application::configure(basePath: dirname(__DIR__))
         // The recommendation cookie holds a random code and nothing else, and the
         // script that adds it to WhatsApp links has to read it.
         $middleware->encryptCookies(except: ['mc_ref']);
+
+        // The pages a referred visitor sees (only those with the mc_rv cookie).
+        $middleware->web(append: [\App\Http\Middleware\TrackReferralJourney::class]);
+
+        // navigator.sendBeacon cannot carry a CSRF token. The endpoint only
+        // appends an event for the visitor in the requester's own cookie.
+        $middleware->validateCsrfTokens(except: ['r/e']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

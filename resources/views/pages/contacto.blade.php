@@ -226,6 +226,7 @@
     var tel  = form.querySelector('#f-tel').value.trim();
     var msg  = form.querySelector('#f-msg').value.trim();
     var body = 'Hola' + (name ? ', soy ' + name : '') + '. ' + msg + (tel ? '\n\nMi teléfono: ' + tel : '');
+    if (window.mcRefTrack) { window.mcRefTrack(via === 'mail' ? 'email' : 'whatsapp'); }
     if (via === 'mail') {
       window.location.href = 'mailto:' + MAIL
         + '?subject=' + encodeURIComponent('Consulta de ' + (name || 'la web'))

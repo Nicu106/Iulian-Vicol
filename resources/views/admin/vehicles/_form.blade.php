@@ -155,15 +155,31 @@
       </div>
       {{-- Who sent the buyer. When the car is sold with this set, a pending
            reward is created (App\Support\Referral::syncReward). --}}
-      @php $referrers = \App\Models\Referrer::orderBy('name')->get(['id', 'name', 'code']); @endphp
+      @php
+        /* Links whose people looked at THIS car, strongest first: when he sells it,
+           the likely answer to "Vino de parte de" is already at the top. */
+        $viewers = ($isEdit && ! empty($v['id']))
+          ? \App\Models\ReferralEvent::query()
+              ->join('referral_visitors', 'referral_visitors.id', '=', 'referral_events.visitor_id')
+              ->where('referral_events.type', 'car')->where('referral_events.vehicle_id', $v['id'])
+              ->selectRaw('referral_visitors.referrer_id as rid, count(distinct referral_visitors.id) as people')
+              ->groupBy('referral_visitors.referrer_id')->pluck('people', 'rid')
+          : collect();
+        $referrers = \App\Models\Referrer::orderBy('name')->get(['id', 'name', 'code'])
+          ->sortByDesc(fn ($r) => (int) ($viewers[$r->id] ?? 0))->values();
+      @endphp
       <div class="ad-field ad-wide">
         <span>Vino de parte de <em>— si alguien te lo recomendó</em></span>
         <select class="ad-in" name="referred_by">
           <option value="">Nadie</option>
           @foreach($referrers as $r)
-            <option value="{{ $r->id }}" @selected((string) $f('referred_by') === (string) $r->id)>{{ $r->name }} · {{ $r->code }}</option>
+            <option value="{{ $r->id }}" @selected((string) $f('referred_by') === (string) $r->id)>{{ $r->name }} · {{ $r->code }}@if($viewers[$r->id] ?? 0) — {{ $viewers[$r->id] === 1 ? '1 persona suya vio este coche' : $viewers[$r->id] . ' personas suyas vieron este coche' }}@endif</option>
           @endforeach
         </select>
+        @if($viewers->isNotEmpty())
+          <span class="ad-note" style="margin:0">Llegaron por una recomendación y miraron este coche:
+            {{ $referrers->filter(fn ($r) => $viewers[$r->id] ?? 0)->map(fn ($r) => $r->name . ' (' . $viewers[$r->id] . ')')->implode(', ') }}.</span>
+        @endif
         @if($referrers->isEmpty())
           <span class="ad-note" style="margin:0">Todavía no hay enlaces de recomendación.
             <a href="{{ route('admin.referrals.index') }}">Ver cómo funciona</a>.</span>

@@ -91,16 +91,19 @@
         <li>
           <article class="ad-ref {{ $fresh === $p->id ? 'is-fresh' : '' }}" id="enlace-{{ $p->id }}">
             <div class="ad-ref__h">
-              <span class="ad-ref__who">{{ $p->name }}</span>
+              <a class="ad-ref__who" href="{{ route('admin.referrals.show', $p) }}">{{ $p->name }}</a>
               <span class="ad-chip ad-ref__code">{{ $p->code }}</span>
               <span class="ad-chip">{{ $p->source === 'web' ? 'Desde la web' : 'Creado por ti' }}</span>
             </div>
             <p class="ad-ref__f">
-              {{ $p->visits_count }} {{ $p->visits_count === 1 ? 'apertura' : 'aperturas' }}
+              {{ $p->opens_count }} {{ $p->opens_count === 1 ? 'apertura' : 'aperturas' }}
+              · {{ $p->visitors_count }} {{ $p->visitors_count === 1 ? 'persona' : 'personas' }}
+              · {{ $p->pressed_count }} {{ $p->pressed_count === 1 ? 'pulsó contactar' : 'pulsaron contactar' }}
               · {{ $p->sales_count }} {{ $p->sales_count === 1 ? 'venta' : 'ventas' }}
               @if($p->vehicle) · compró el {{ $carName($p->vehicle) }}@endif
             </p>
             <div class="ad-ref__act">
+              <a class="ad-btn ad-btn--q ad-btn--s" href="{{ route('admin.referrals.show', $p) }}">Ver qué pasó</a>
               <a class="ad-btn ad-btn--s" target="_blank" rel="noopener"
                  href="https://wa.me/{{ $p->phone }}?text={{ rawurlencode(Referral::messageFor($p)) }}">Enviarle su enlace</a>
               <button class="ad-btn ad-btn--q ad-btn--s" type="button" data-copy="{{ $p->link }}">Copiar enlace</button>

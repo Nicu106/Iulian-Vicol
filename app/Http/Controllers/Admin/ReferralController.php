@@ -15,7 +15,12 @@ class ReferralController extends Controller
     public function index(Request $request)
     {
         $referrers = Referrer::query()
-            ->withCount(['visits', 'referredVehicles as sales_count' => fn ($q) => $q->where('status', 'sold')])
+            ->withCount([
+                'opens',
+                'visitors',
+                'visitors as pressed_count' => fn ($q) => $q->whereHas('events', fn ($e) => $e->whereIn('type', ['whatsapp', 'email'])),
+                'referredVehicles as sales_count' => fn ($q) => $q->where('status', 'sold'),
+            ])
             ->with('vehicle:id,slug,brand,model,year')
             ->latest()
             ->get();
@@ -31,6 +36,39 @@ class ReferralController extends Controller
             'rewards'   => $rewards,
             'fresh'     => (int) $request->get('nuevo'),
         ]);
+    }
+
+    /** One link: who opened it, and what each of those people did. */
+    public function show(Referrer $referrer)
+    {
+        $referrer->loadCount([
+            'opens',
+            'visitors',
+            'referredVehicles as sales_count' => fn ($q) => $q->where('status', 'sold'),
+        ])->load('vehicle:id,slug,brand,model,year');
+
+        $visitors = $referrer->visitors()
+            ->with(['events' => fn ($q) => $q->orderBy('created_at')->orderBy('id')
+                ->with(['vehicle:id,slug,brand,model,year', 'referrer:id,name'])])
+            ->orderByDesc('last_seen_at')
+            ->get();
+
+        $sawCars = $visitors->filter(fn ($v) => $v->events->contains('type', 'car'))->count();
+        $pressed = $visitors->filter(fn ($v) => $v->events->contains(fn ($e) => in_array($e->type, ['whatsapp', 'email'], true)))->count();
+
+        $cars = $visitors->flatMap->events
+            ->where('type', 'car')
+            ->filter(fn ($e) => $e->vehicle)
+            ->groupBy('vehicle_id')
+            ->map(fn ($g) => [
+                'vehicle' => $g->first()->vehicle,
+                'views'   => $g->count(),
+                'people'  => $g->pluck('visitor_id')->unique()->count(),
+            ])
+            ->sortByDesc('views')
+            ->values();
+
+        return view('admin.referrals.show', compact('referrer', 'visitors', 'sawCars', 'pressed', 'cars'));
     }
 
     /** The explanation, as a page: where "Cómo funciona" goes when the popup cannot open. */
@@ -135,6 +173,6 @@ class ReferralController extends Controller
 
         $referrer->delete();
 
-        return back()->with('status', 'Enlace borrado.');
+        return redirect()->route('admin.referrals.index')->with('status', 'Enlace borrado.');
     }
 }

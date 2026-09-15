@@ -301,6 +301,22 @@ opts a link out; `window.mcRefNote` for WhatsApp opened from script, as on
 with `referred_by` set — one per car, never for the person's own purchase — and
 the owner approves / marks it paid. What the reward IS is undecided: set
 `REFERRAL_REWARD` in .env; while null, no page promises anything.
+
+What happens after a link is opened: `App\Support\Journey` (docblock first).
+Only people who arrived through a link are recorded — an anonymous visitor
+(`referral_visitors`, random uuid in the encrypted HttpOnly `mc_rv` cookie; no IP,
+no name, only device / system / browser / "via") and their events
+(`referral_events`: open, page, car, whatsapp, email, form_sell, form_refer).
+Pages come from the `TrackReferralJourney` middleware (web group; a no-op without
+`mc_rv`); WhatsApp / e-mail presses from `window.mcRefTrack()` → `POST /r/e`
+(sendBeacon, CSRF-exempt). A press is not proof they wrote — label it "pulsó",
+never "te escribió". Bots and link previews (WhatsApp's fetcher above all) are
+never counted — `Journey::isBot`, and the suite must keep a real phone UA.
+The owner reads it at `/admin/recomendaciones/{referrer}`; the car form's
+"Vino de parte de" puts links whose people viewed that car first. Rows are pruned
+90 days after last seen (`referrals:prune`, also run 1-in-50 on link opens — no
+scheduler here). Legal: recording journeys needs the cookie notice / privacy
+policy to mention it before this goes to the real domain.
 `tools/audit/suites/referral.mjs` covers all of it and cleans up after itself.
 
 ## 8. How to work here

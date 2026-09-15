@@ -951,3 +951,26 @@ select.ad-in {
     transition: none; translate: none;
   }
 }
+
+/* ---- one link's detail: /admin/recomendaciones/{referrer} ----------------- */
+/* Five numbers from opening to buying: five across from 1000, two on a phone. */
+@media (min-width: 700px) { .ad-facts--five { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1000px) { .ad-facts--five { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+a.ad-ref__who { text-decoration: none; }
+a.ad-ref__who:hover { color: var(--mc-blue); text-decoration: underline; text-underline-offset: 3px; }
+
+.ad-person { display: grid; gap: var(--s-2); padding: var(--s-4) var(--s-5); }
+@media (max-width: 999.98px) { .ad-person { padding: var(--s-4); } }
+
+/* The trail: time on the left, what happened on the right, a rule for a spine.
+   A press on WhatsApp or e-mail is the moment that matters and is the one line
+   in ink; the rest is second ink. */
+.ad-trail { display: grid; gap: var(--s-2); margin: var(--s-2) 0 0; padding: 0 0 0 var(--s-3);
+  list-style: none; border-left: 2px solid var(--mc-hairline); }
+.ad-trail__i { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: var(--s-3);
+  font-size: var(--t-small); line-height: 1.45; color: var(--mc-ink-2); }
+.ad-trail__i time { font-size: var(--t-label); color: var(--mc-ink-3); font-variant-numeric: tabular-nums; }
+.ad-trail__i em { font-style: normal; color: var(--mc-ink-3); }
+.ad-trail__i--whatsapp span, .ad-trail__i--email span,
+.ad-trail__i--form_sell span, .ad-trail__i--form_refer span { color: var(--mc-ink); font-weight: 600; }
+@media (max-width: 559.98px) { .ad-trail__i { grid-template-columns: minmax(0, 1fr); gap: 0; } }

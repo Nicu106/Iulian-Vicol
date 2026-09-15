@@ -128,6 +128,9 @@ class SellCarController extends Controller
 
         // A state on the same page, not a flash: the confirmation is content, and it
         // has to survive a refresh.
+        // A referred visitor offering their own car is part of what the link brought.
+        \App\Support\Journey::track($request, 'form_sell', ['path' => '/vende']);
+
         return redirect()->route('sell-car', ['enviado' => 1]);
     }
 }
