@@ -261,6 +261,7 @@ class VehicleController extends BaseController
             'meta_description' => 'nullable|string|max:160',
             'tags' => 'nullable|string',
             'internal_notes' => 'nullable|string',
+            'referred_by' => 'nullable|integer|exists:referrers,id',   // "Vino de parte de"
         ]);
 
         // Additional validation for offer fields
@@ -394,6 +395,9 @@ class VehicleController extends BaseController
             'meta_description' => $validated['meta_description'] ?? null,
             'tags' => $tags,
             'internal_notes' => $validated['internal_notes'] ?? null,
+            // Saving through the model fires ReferralObserver, which creates or removes
+            // the reward for this car (App\Support\Referral::syncReward).
+            'referred_by' => $validated['referred_by'] ?? null,
             'created_at' => now()->toISOString(),
             'updated_at' => now()->toISOString(),
         ];
@@ -471,6 +475,7 @@ class VehicleController extends BaseController
             'meta_description' => 'nullable|string|max:160',
             'tags' => 'nullable|string',
             'internal_notes' => 'nullable|string',
+            'referred_by' => 'nullable|integer|exists:referrers,id',   // "Vino de parte de"
         ]);
 
         // Additional validation for offer fields
@@ -613,6 +618,9 @@ class VehicleController extends BaseController
             'meta_description' => $validated['meta_description'] ?? null,
             'tags' => $tags,
             'internal_notes' => $validated['internal_notes'] ?? null,
+            // Saving through the model fires ReferralObserver, which creates or removes
+            // the reward for this car (App\Support\Referral::syncReward).
+            'referred_by' => $validated['referred_by'] ?? null,
             'updated_at' => now()->toISOString(),
         ]);
 

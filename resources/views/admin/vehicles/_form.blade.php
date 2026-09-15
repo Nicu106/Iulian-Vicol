@@ -153,7 +153,39 @@
           @endforeach
         </select>
       </div>
+      {{-- Who sent the buyer. When the car is sold with this set, a pending
+           reward is created (App\Support\Referral::syncReward). --}}
+      @php $referrers = \App\Models\Referrer::orderBy('name')->get(['id', 'name', 'code']); @endphp
+      <div class="ad-field ad-wide">
+        <span>Vino de parte de <em>— si alguien te lo recomendó</em></span>
+        <select class="ad-in" name="referred_by">
+          <option value="">Nadie</option>
+          @foreach($referrers as $r)
+            <option value="{{ $r->id }}" @selected((string) $f('referred_by') === (string) $r->id)>{{ $r->name }} · {{ $r->code }}</option>
+          @endforeach
+        </select>
+        @if($referrers->isEmpty())
+          <span class="ad-note" style="margin:0">Todavía no hay enlaces de recomendación.
+            <a href="{{ route('admin.referrals.index') }}">Ver cómo funciona</a>.</span>
+        @endif
+      </div>
     </div>
+
+    {{-- A sold car's buyer is the best person to give a link to. --}}
+    @if($isEdit && ($v['status'] ?? null) === 'sold')
+      @php $buyerLink = \App\Models\Referrer::where('vehicle_id', $v['id'] ?? 0)->first(); @endphp
+      <div class="ad-panel" style="margin-top:var(--s-5)">
+        <div class="ad-panel__h"><h3>Enlace de recomendación del comprador</h3></div>
+        @if($buyerLink)
+          <p class="ad-lede" style="margin-bottom:var(--s-3)">{{ $buyerLink->name }} ya tiene su enlace: <b>{{ $buyerLink->code }}</b>.</p>
+          <a class="ad-btn ad-btn--q ad-btn--s" target="_blank" rel="noopener"
+             href="https://wa.me/{{ $buyerLink->phone }}?text={{ rawurlencode(\App\Support\Referral::messageFor($buyerLink)) }}">Enviarle su enlace</a>
+        @else
+          <p class="ad-lede" style="margin-bottom:var(--s-3)">Quien compró este coche puede recomendarte a otros. Crea su enlace y mándaselo por WhatsApp.</p>
+          <a class="ad-btn ad-btn--q ad-btn--s" href="{{ route('admin.referrals.create', ['coche' => $v['slug'] ?? null]) }}">Crear enlace para el comprador</a>
+        @endif
+      </div>
+    @endif
   </fieldset>
 
   {{-- ---------------------------------------------------------------- 3 --}}

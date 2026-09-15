@@ -51,6 +51,12 @@ Route::get('/coche/{slug}', [App\Http\Controllers\CarPageController::class, 'sho
 Route::get('/inicio', [App\Http\Controllers\HomePageController::class, 'index'])->name('inicio');
 Route::get('/contacto', [App\Http\Controllers\ContactPageController::class, 'index'])->name('contacto');
 
+// Recommendations without accounts — App\Support\Referral has the rules.
+Route::get('/r/{code}', [App\Http\Controllers\ReferralController::class, 'visit'])->name('refer.visit');
+Route::get('/recomienda', [App\Http\Controllers\ReferralController::class, 'show'])->name('refer');
+Route::post('/recomienda', [App\Http\Controllers\ReferralController::class, 'store'])
+    ->middleware('throttle:referral')->name('refer.store');
+
 Route::view('/saved-vehicles', 'pages.saved-vehicles')->name('saved-vehicles');
 
 Route::get('/dashboard', function () {
@@ -62,6 +68,13 @@ Route::middleware('auth')->group(function () {
     // The sections that do not fit the phone bar, as a page. The "Más" tab opens
     // them in a sheet; this is where it goes when the sheet cannot open.
     Route::view('/admin/mas', 'admin.more')->name('admin.more');
+
+    Route::get('/admin/recomendaciones', [App\Http\Controllers\Admin\ReferralController::class, 'index'])->name('admin.referrals.index');
+    Route::get('/admin/recomendaciones/como-funciona', [App\Http\Controllers\Admin\ReferralController::class, 'how'])->name('admin.referrals.how');
+    Route::get('/admin/recomendaciones/nuevo', [App\Http\Controllers\Admin\ReferralController::class, 'create'])->name('admin.referrals.create');
+    Route::post('/admin/recomendaciones', [App\Http\Controllers\Admin\ReferralController::class, 'store'])->name('admin.referrals.store');
+    Route::post('/admin/recomendaciones/premios/{reward}', [App\Http\Controllers\Admin\ReferralController::class, 'reward'])->name('admin.referrals.reward');
+    Route::delete('/admin/recomendaciones/{referrer}', [App\Http\Controllers\Admin\ReferralController::class, 'destroy'])->name('admin.referrals.destroy');
     Route::get('/admin/vehicles', [VehicleController::class, 'index'])->name('admin.vehicles.index');
     Route::get('/admin/inquiries', [App\Http\Controllers\Admin\InquiryAdminController::class, 'index'])->name('admin.inquiries.index');
     Route::delete('/admin/inquiries/{inquiry}', [App\Http\Controllers\Admin\InquiryAdminController::class, 'destroy'])->name('admin.inquiries.destroy');

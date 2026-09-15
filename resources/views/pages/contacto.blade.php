@@ -231,7 +231,8 @@
         + '?subject=' + encodeURIComponent('Consulta de ' + (name || 'la web'))
         + '&body=' + encodeURIComponent(body);
     } else {
-      window.open('https://wa.me/' + PHONE + '?text=' + encodeURIComponent(body), '_blank', 'noopener');
+      // + the recommendation code, if this visitor came through someone's link (layouts/site)
+      window.open('https://wa.me/' + PHONE + '?text=' + encodeURIComponent(body + (window.mcRefNote || '')), '_blank', 'noopener');
     }
   });
 })();

@@ -76,6 +76,16 @@ class DashboardController extends Controller
             ];
         }
 
+        $owed = \App\Models\ReferralReward::whereIn('status', \App\Models\ReferralReward::OPEN)->count();
+        if ($owed > 0) {
+            $todo[] = [
+                'n'    => $owed,
+                'what' => $owed === 1 ? 'premio de recomendación por dar' : 'premios de recomendación por dar',
+                'why'  => 'Alguien te trajo un comprador. Apruébalo y márcalo pagado cuando lo des.',
+                'to'   => route('admin.referrals.index'),
+            ];
+        }
+
         $tests = Inquiry::count();
         if ($tests > 0) {
             $todo[] = [

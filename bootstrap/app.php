@@ -23,6 +23,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // Design-copy lockdown: serve the brandbook and nothing else while the
         // rest of the site is unfinished. Toggle with BRANDBOOK_ONLY in .env.
         $middleware->append(\App\Http\Middleware\BrandbookOnly::class);
+
+        // The recommendation cookie holds a random code and nothing else, and the
+        // script that adds it to WhatsApp links has to read it.
+        $middleware->encryptCookies(except: ['mc_ref']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

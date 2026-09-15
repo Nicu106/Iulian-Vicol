@@ -17,7 +17,8 @@ class Vehicle extends Model
         'description','features','video_url','cover_image','gallery_images','image_tags',
         'purchase_price','internal_notes','views_count','inquiries_count',
         'location','availability_schedule','meta_title','meta_description','tags',
-        'fuel_type','body_type','engine_capacity','images','seller_name','seller_phone','seller_email'
+        'fuel_type','body_type','engine_capacity','images','seller_name','seller_phone','seller_email',
+        'referred_by'
     ];
 
     protected $casts = [

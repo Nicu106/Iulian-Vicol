@@ -59,6 +59,39 @@
 @include('partials.foot')
 
 @yield('after')
+
+{{-- A recommendation code rides into WhatsApp.
+     /r/{code} leaves the code in the mc_ref cookie (App\Support\Referral).
+     Buyers here write on WhatsApp rather than fill in forms, so while the
+     cookie is there every WhatsApp link on the site carries the code in its
+     prefilled text and the owner sees it in the conversation. Links marked
+     data-no-ref are left alone: the person sharing their OWN link. Pages that
+     open WhatsApp from script read window.mcRefNote. --}}
+<script>
+(function () {
+  var m = document.cookie.match(/(?:^|;\s*)mc_ref=([A-Z0-9]{4,16})(?:;|$)/);
+  window.mcRefNote = m ? '\n\n(Código de recomendación: ' + m[1] + ')' : '';
+  if (!m) return;
+  var code = m[1];
+  function tag(a) {
+    if (a.hasAttribute('data-no-ref')) return;
+    try {
+      var u = new URL(a.href);
+      if (!/(^|\.)wa\.me$/.test(u.hostname) && !/(^|\.)whatsapp\.com$/.test(u.hostname)) return;
+      var t = u.searchParams.get('text') || '';
+      if (t.indexOf(code) !== -1) return;
+      u.searchParams.set('text', (t || 'Hola') + window.mcRefNote);
+      a.href = u.toString();
+    } catch (e) {}
+  }
+  document.querySelectorAll('a[href*="wa.me"], a[href*="whatsapp.com"]').forEach(tag);
+  // Links whose href is set by script after load are tagged at the moment they are pressed.
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href*="wa.me"], a[href*="whatsapp.com"]');
+    if (a) tag(a);
+  }, true);
+})();
+</script>
 @stack('js')
 </body>
 </html>

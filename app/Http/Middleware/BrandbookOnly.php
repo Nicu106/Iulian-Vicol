@@ -30,6 +30,8 @@ class BrandbookOnly
         'coche/*',       // one car, reached from the catalogue
         'inicio',        // the home page, in design
         'contacto',      // contact, in design
+        'recomienda',    // ask for a recommendation link — GET the page, POST its form
+        'r/*',           // a recommendation link
         'img',        // the /img/{w} resize service — vehicle and customer photos
         'img/*',
         'up',         // the health check

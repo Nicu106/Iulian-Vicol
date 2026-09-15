@@ -54,6 +54,8 @@ foreach ($s as $sc) {
   file_put_contents('${OUT}/' . $sc['name'] . '.html', view('layouts.ad')->render());
   if ($sc['items'] !== null) {
     file_put_contents('${OUT}/' . $sc['name'] . '-more.html', view('admin.more')->render());
+  } else {
+    file_put_contents('${OUT}/real-count.txt', (string) count(App\\Support\\AdminNav::items()));
   }
   App\\Support\\AdminNav::fake(null);
 }
@@ -62,6 +64,7 @@ echo "rendered\\n";
 writeFileSync(`${OUT}/render.php`, php);
 writeFileSync(`${OUT}/scenarios.json`, JSON.stringify(SCENARIOS));
 execFileSync('php', [`${OUT}/render.php`, `${OUT}/scenarios.json`], { cwd: ROOT });
+const REAL_N = Number(readFileSync(`${OUT}/real-count.txt`, 'utf8'));
 for (const f of readdirSync(OUT).filter(f => f.endsWith('.html'))) {
   const h = readFileSync(`${OUT}/${f}`, 'utf8').split('http://localhost/').join(`https://${HOST}/`);
   writeFileSync(`${OUT}/${f}`, h);
@@ -72,7 +75,7 @@ const b = await p.launch({ executablePath: exe, args: ['--no-sandbox', '--ignore
   `--host-resolver-rules=MAP ${HOST} 127.0.0.1`] });
 
 for (const sc of SCENARIOS) {
-  const n = sc.items ? sc.items.length : 5;
+  const n = sc.items ? sc.items.length : REAL_N;
   const overflow = n > 5 ? n - 4 : 0;
   console.log(`\n— ${sc.name}: ${n} sections`);
 
@@ -113,9 +116,9 @@ for (const sc of SCENARIOS) {
       is(/\/admin\/mas$/.test(m.moreHref || ''), '390: "Más" is a real link to /admin/mas', m.moreHref);
       is(m.sheetHidden === true, '390: the sheet is hidden until asked for');
 
-      const onIdx = sc.items.findIndex(i => i.match === sc.current);
+      const onIdx = sc.items ? sc.items.findIndex(i => i.match === sc.current) : -1;
       if (onIdx >= 4) is(m.tabs.at(-1).on, '390: "Más" is marked when the current page is behind it');
-      else is(m.tabs[onIdx]?.on && !m.tabs.at(-1).on, '390: the current tab is marked, "Más" is not');
+      else if (onIdx >= 0) is(m.tabs[onIdx]?.on && !m.tabs.at(-1).on, '390: the current tab is marked, "Más" is not');
 
       await pg.click('.ad-nav__more a');
       await new Promise(r => setTimeout(r, 450));
@@ -172,7 +175,7 @@ for (const sc of SCENARIOS) {
   }
 
   // the page "Más" falls back to
-  if (overflow) {
+  if (overflow && sc.items) {
     const pg = await b.newPage();
     await pg.setViewport({ width: 390, height: 844 });
     await pg.goto(`file://${OUT}/${sc.name}-more.html`, { waitUntil: 'networkidle0' });

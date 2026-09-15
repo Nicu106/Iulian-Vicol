@@ -287,6 +287,22 @@ unavailable. Give long names a short `'tab' => '…'` (≤ 9 chars fits 78px).
 The admin is behind auth: audit it by rendering views to disk with PHP and
 passing a `file://` URL to `audit.mjs` (it accepts full URLs).
 
+## 7b. Recommendations (referral) — no accounts
+
+Rules in one place: `App\Support\Referral` (read its docblock first).
+A person gets `/r/{CODE}` — made by the owner in `/admin/recomendaciones`
+(normally after a sale) or asked for on `/recomienda` with their OWN name and
+phone only. Never put personal data in a URL; never ask for the friend's data.
+Opening a link sets the `mc_ref` cookie (90 days, not encrypted, not HttpOnly —
+excluded in `bootstrap/app.php`); the FIRST link opened wins. A script in
+`layouts/site.blade.php` adds the code to every WhatsApp link (`data-no-ref`
+opts a link out; `window.mcRefNote` for WhatsApp opened from script, as on
+/contacto). A reward is created by `ReferralObserver` when a car is saved as sold
+with `referred_by` set — one per car, never for the person's own purchase — and
+the owner approves / marks it paid. What the reward IS is undecided: set
+`REFERRAL_REWARD` in .env; while null, no page promises anything.
+`tools/audit/suites/referral.mjs` covers all of it and cleans up after itself.
+
 ## 8. How to work here
 
 - Do the direction + audit first for anything new (contract §1). Then build the whole

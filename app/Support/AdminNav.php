@@ -59,6 +59,8 @@ final class AdminNav
             ['route' => 'admin.contacts.index',     'label' => 'Mensajes',  'match' => 'admin.contacts.*', 'count' => Inbox::counts()['real'] ?: null],
             ['route' => 'admin.testimonials.index', 'label' => 'Opiniones', 'match' => 'admin.testimonials.*'],
             ['route' => 'admin.sell-cars.index',    'label' => 'Ventas',    'match' => 'admin.sell-cars.*'],
+            ['route' => 'admin.referrals.index',    'label' => 'Recomendaciones', 'tab' => 'Referidos', 'match' => 'admin.referrals.*',
+             'count' => \App\Models\ReferralReward::whereIn('status', \App\Models\ReferralReward::OPEN)->count() ?: null],
         ];
 
         $current = self::current();

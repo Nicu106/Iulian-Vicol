@@ -58,6 +58,24 @@ class AppServiceProvider extends ServiceProvider
         // not when the first visitor asks for them. See App\Observers\VehicleObserver.
         \App\Models\Vehicle::observe(\App\Observers\VehicleObserver::class);
 
+        // Rewards follow the car: see App\Support\Referral::syncReward().
+        \App\Models\Vehicle::observe(\App\Observers\ReferralObserver::class);
+
+        // A person asks for their recommendation link once. Five an hour covers a
+        // family on one connection; past twenty a day it is a script.
+        \Illuminate\Support\Facades\RateLimiter::for('referral', function (\Illuminate\Http\Request $request) {
+            // Loopback is the box itself running tools/audit/suites/referral.mjs, which
+            // posts five times a run. nginx hands PHP-FPM the visitor's own address, so
+            // no one outside ever arrives as 127.0.0.1.
+            if ($request->ip() === '127.0.0.1') {
+                return \Illuminate\Cache\RateLimiting\Limit::none();
+            }
+            return [
+                \Illuminate\Cache\RateLimiting\Limit::perHour(5)->by($request->ip()),
+                \Illuminate\Cache\RateLimiting\Limit::perDay(20)->by($request->ip()),
+            ];
+        });
+
         // Force PHP settings for file uploads - ABSOLUTELY NO LIMITS
         if (function_exists('ini_set')) {
             // These settings cannot be changed at runtime, but we can try

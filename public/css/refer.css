@@ -1,0 +1,39 @@
+/* ============================================================================
+   RECOMIENDA — /recomienda
+   ---------------------------------------------------------------------------
+   Borrows the opening and the fields from contact.css and sell.css, so the
+   pages that ask a visitor to write are one voice. Only the link box is new.
+   ========================================================================= */
+.rf-body{ max-width:34rem; }
+.rf-form .mc-field{ margin-bottom:var(--s-5); }
+
+.rf-mine .ct-h2{ margin:0 0 var(--s-3); }
+.rf-note{ margin:0 0 var(--s-4); max-width:46ch; font-size:var(--t-small); line-height:1.55; color:var(--mc-ink-2); }
+.rf-note:empty{ display:none; }
+.rf-link{
+  margin:0 0 var(--s-4); padding:var(--s-3) var(--s-4);
+  background:var(--mc-surface); border:1px solid var(--mc-rule);
+  font-size:var(--t-ui); font-weight:600; line-height:1.4; color:var(--mc-ink);
+  overflow-wrap:anywhere; user-select:all;
+}
+/* The same headline size as /vende would put four words on four lines at 390;
+   this one is a question, and reads as one when it stays in two or three. */
+@media (max-width:559.98px){ .rf-h{ font-size:var(--t-h1); } }
+
+.rf-go{ display:flex; flex-wrap:wrap; gap:var(--s-3); margin:var(--s-2) 0 var(--s-3); }
+.rf-go .mc-btn{ min-height:var(--mc-tap-pref); }
+
+/* The quiet one beside the loud one: same height, the page's own ground. */
+.rf-copy{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-height:var(--mc-tap-pref); padding-inline:var(--s-5);
+  background:var(--mc-surface); color:var(--mc-ink);
+  border:1px solid var(--mc-rule); border-radius:var(--mc-r-card);
+  font:inherit; font-size:var(--t-ui); font-weight:600; cursor:pointer;
+}
+.rf-copy:hover{ background:var(--mc-band); }
+.rf-copy:focus-visible{ outline:3px solid var(--mc-focus); outline-offset:2px; }
+
+@media (max-width:559.98px){
+  .rf-go > *{ flex:1 1 100%; }
+}
