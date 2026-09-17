@@ -71,7 +71,8 @@ for (const [route, title, current] of ROUTES) {
      `${m.heads}/${m.mains}/${m.foots}`);
   is(m.headerFirst && m.mainIndex > 0 && m.footIndex > m.mainIndex,
      `${route} orders them header → main → footer`);
-  is(m.nav === 5, `${route} carries the five nav links`, `${m.nav}`);
+  // four since 2026-09-17: "Quién soy" pointed at the brandbook, now signed-in only
+  is(m.nav === 4, `${route} carries the four nav links`, `${m.nav}`);
   is(BASE.every(c => m.css.includes(c)), `${route} loads the four shared stylesheets`,
      m.css.join(' '));
   is(m.viewport.includes('interactive-widget') && m.robots.includes('noindex'),

@@ -61,6 +61,8 @@ final class AdminNav
             ['route' => 'admin.sell-cars.index',    'label' => 'Ventas',    'match' => 'admin.sell-cars.*'],
             ['route' => 'admin.referrals.index',    'label' => 'Recomendaciones', 'tab' => 'Referidos', 'match' => 'admin.referrals.*',
              'count' => \App\Models\ReferralReward::whereIn('status', \App\Models\ReferralReward::OPEN)->count() ?: null],
+            // The design system. Not public any more: only the signed-in reach it, from here.
+            ['route' => 'brandbook',                'label' => 'Brandbook', 'match' => 'brandbook'],
         ];
 
         $current = self::current();

@@ -334,3 +334,11 @@ policy to mention it before this goes to the real domain.
 - The admin will keep adding reviews and photos. Build systems that adapt to any input,
   not arrangements tuned to today's 24. If it needs a human to look at each photo, it's wrong.
 - Report honestly: what was verified, with numbers; what wasn't; what the client must decide.
+- **Keep `docs/JURNAL-LUCRU.md` current.** At the end of every block of work: add the day's
+  row (re-run `python3 tools/usage/report.py --since 2026-09-01` for hours, prompts and
+  tokens), tick what was done in §2, and move anything new the client must decide or that
+  is still open into §3. Written in Romanian without Spanish (UI labels translated in
+  brackets) — the client is a developer who does not read Spanish.
+- **`/brandbook` is signed-in only** (route middleware `auth`, reached from the panel's
+  "Brandbook" item). Never link it from a public page. To audit it, render it through
+  tinker like the admin views; an anonymous puppeteer run gets the login redirect.

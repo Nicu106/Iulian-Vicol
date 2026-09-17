@@ -45,7 +45,9 @@ Route::get('/vehicles/{slug}', [App\Http\Controllers\VehicleController::class, '
 Route::post('/inquiries', [App\Http\Controllers\InquiryController::class, 'store'])->name('inquiries.store');
 
 // Pagina mașini salvate (doar frontend, fără backend)
-Route::get('/brandbook', [App\Http\Controllers\BrandbookController::class, 'index'])->name('brandbook');
+// The design system is internal: signed-in only, reached from the panel's menu.
+// A guest is sent to the login and brought back here after it.
+Route::get('/brandbook', [App\Http\Controllers\BrandbookController::class, 'index'])->middleware('auth')->name('brandbook');
 Route::get('/catalogo', [App\Http\Controllers\BrandCatalogController::class, 'index'])->name('catalogo');
 Route::get('/coche/{slug}', [App\Http\Controllers\CarPageController::class, 'show'])->name('coche');
 Route::get('/inicio', [App\Http\Controllers\HomePageController::class, 'index'])->name('inicio');

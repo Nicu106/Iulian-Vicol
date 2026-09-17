@@ -17,14 +17,15 @@ const is   = (c, t, d) => (c ? ok : fail)(t, d);
 const b = await p.launch({ executablePath: exe,
   args: ['--no-sandbox', '--ignore-certificate-errors', `--host-resolver-rules=MAP ${HOST} 127.0.0.1`] });
 
-const LINKS = ['Inicio', 'Coches', 'Quién soy', 'Contacto', 'Vende tu coche'];
+// "Quién soy" went to the brandbook, which is signed-in only since 2026-09-17.
+const LINKS = ['Inicio', 'Coches', 'Contacto', 'Vende tu coche'];
 
 for (const route of ['/inicio', '/catalogo', '/contacto', '/vende']) {
   const pg = await b.newPage();
   await pg.setViewport({ width: 1440, height: 900 });
   await pg.goto(`https://${HOST}${route}`, { waitUntil: 'domcontentloaded' });
   const names = await pg.evaluate(() => [...document.querySelectorAll('.mc-nav__i')].map(a => a.textContent.trim()));
-  is(JSON.stringify(names) === JSON.stringify(LINKS), `${route} carries all five links`, names.join(' · '));
+  is(JSON.stringify(names) === JSON.stringify(LINKS), `${route} carries all four links`, names.join(' · '));
   const cur = await pg.evaluate(() => document.querySelector('.mc-nav__i.is-current')?.textContent.trim() || '(none)');
   is(cur !== '(none)', `and marks where you are`, cur);
   await pg.close();

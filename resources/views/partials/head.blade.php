@@ -5,7 +5,6 @@
     <nav class="mc-nav">
       <a class="mc-nav__i {{ ($current ?? '') === 'inicio' ? 'is-current' : '' }}" href="/inicio">Inicio</a>
       <a class="mc-nav__i {{ ($current ?? '') === 'catalogo' ? 'is-current' : '' }}" href="/catalogo">Coches</a>
-      <a class="mc-nav__i {{ ($current ?? '') === 'brandbook' ? 'is-current' : '' }}" href="/brandbook">Quién soy</a>
       <a class="mc-nav__i {{ ($current ?? '') === 'contacto' ? 'is-current' : '' }}" href="/contacto">Contacto</a>
       <a class="mc-nav__i {{ ($current ?? '') === 'vender' ? 'is-current' : '' }}" href="/vende">Vende tu coche</a>
     </nav>

@@ -9,7 +9,7 @@ R="--resolve v2design.ivmotorclass.com:443:127.0.0.1"
 RP="--resolve ivmotorclass.com:443:127.0.0.1"
 # The page these checks probe. While BRANDBOOK_ONLY is on, "/" is a holding
 # page that loads one stylesheet, so probing it would report false failures.
-PAGE=$(grep -q '^BRANDBOOK_ONLY=true' .env 2>/dev/null && echo /brandbook || echo /)
+PAGE=$(grep -q '^BRANDBOOK_ONLY=true' .env 2>/dev/null && echo /inicio || echo /)
 FAIL=0
 ok(){ printf "  \033[32m✓\033[0m %s\n" "$1"; }
 no(){ printf "  \033[31m✗\033[0m %s\n" "$1"; FAIL=1; }
@@ -59,21 +59,24 @@ readlink "$HERE/public/storage" | grep -q motorclass-v2 \
 
 echo "── Bloqueo del entorno (BRANDBOOK_ONLY) ──"
 if grep -q '^BRANDBOOK_ONLY=true' .env 2>/dev/null; then
-  c=$(curl -s -o /dev/null -w "%{http_code}" -m 10 "$V2/brandbook" $R)
-  [ "$c" = "200" ] && ok "/brandbook accesible" || no "/brandbook devuelve $c"
+  # the brandbook is signed-in only: a guest must be sent to the login
+  c=$(curl -s -o /dev/null -w "%{http_code} %{redirect_url}" -m 10 "$V2/brandbook" $R)
+  [[ "$c" == 302*"/login" ]] && ok "/brandbook sólo con sesión (invitado → login)" || no "/brandbook sin sesión devuelve '$c'"
   leaked=0
-  for p in / /catalog /admin /login /register /sell-car; do
-    t=$(curl -s -m 10 "$V2$p" $R | grep -c "sólo está el brandbook")
+  # Only what is still held. /admin, /login and /sell-car (301 → /vende) are open on
+  # purpose, as are the finished pages in BrandbookOnly::ALLOW.
+  for p in / /catalog /register; do
+    t=$(curl -s -m 10 "$V2$p" $R | grep -c "todavía se está construyendo")
     [ "$t" -eq 0 ] && { no "$p NO está bloqueada"; leaked=1; }
   done
-  [ "$leaked" -eq 0 ] && ok "resto de rutas bloqueadas (6 comprobadas)"
-  # the brandbook renders real photographs through /img, so that route must survive
-  src=$(curl -s -m 10 "$V2/brandbook" $R | grep -oE 'src="[^"]*/img/[^"]*"' | head -1 | sed 's/src="//;s/"//')
+  [ "$leaked" -eq 0 ] && ok "rutas sin terminar bloqueadas (3 comprobadas)"
+  # the pages render real photographs through /img, so that route must survive
+  src=$(curl -s -m 10 "$V2/catalogo" $R | grep -oE '/img/[0-9]+\?[^" ,]*' | head -1 | sed 's/&amp;/\&/g')
   if [ -n "$src" ]; then
-    i=$(curl -s -o /dev/null -w "%{http_code}" -m 10 "$src" $R)
+    i=$(curl -s -o /dev/null -w "%{http_code}" -m 10 "$V2$src" $R)
     [ "$i" = "200" ] && ok "servicio de imágenes sigue activo" || no "/img devuelve $i"
   else
-    no "el brandbook no referencia ninguna imagen vía /img"
+    no "/catalogo no referencia ninguna imagen vía /img"
   fi
 else
   ok "bloqueo desactivado (el sitio completo está servido)"
