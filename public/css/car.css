@@ -456,3 +456,104 @@
   font-size:var(--t-label); font-weight:700; letter-spacing:.02em; line-height:1.4;
   box-shadow:0 0 0 1px rgba(255,255,255,.16);
 }
+
+/* ============================================================================
+   THE WALL — the marque's colour behind the top of the page
+   The client: "pe fundal să avem culoarea ce reprezintă brandul ... de exemplu
+   la BMW ... albastru ... animația de culori ce este și pe catalog, doar că
+   pentru o singură culoare ... cum se poate face contrast".
+
+   The same stroke as a catalogue row (catalog.css, THE SEQUENCE): the colour
+   is clipped from the left and crosses the width in --m-sweep with a 2px nib,
+   the marque's mark sits in it at 7% white, and the words arrive once the
+   colour has landed.
+
+   Contrast, by placement rather than by effects:
+   - Only white goes on the colour. All five marques are 5.46:1 or better
+     against white; the year, the one dimmed word, is .84 white (4.6:1 on the
+     weakest, Porsche, and it is large text). Small text on it is full white.
+   - Nothing that has a colour of its own is ever on it. The wall ends part-way
+     down the photograph on a phone, where the price is further down; on a
+     desktop it ends in the gap between the price and the spec rows, and the
+     price turns white only there.
+   - The photograph is in front of the colour, so its light hairline is the
+     edge between the two.
+   - The focus ring on the colour is white; the blue one would vanish on BMW.
+   - A sold car's wall is the grey of its page, as the rest of it is.
+   ========================================================================= */
+.car--wall{ overflow-x:clip; }   /* the wall is 100vw; the scrollbar is not the page's */
+
+.car{ --wall-lip:calc((100vw - 2 * var(--mc-gutter-m)) * 2 / 3 * .42); }
+@media (min-width:768px){ .car{ --wall-lip:calc((100vw - 2 * var(--mc-gutter-d)) * 2 / 3 * .42); } }
+@media (min-width:1000px){ .car{ --wall-lip:7.5rem; } }
+
+.car-top{ position:relative; z-index:0; display:flow-root; }
+.car-grid{ position:relative; z-index:1; }
+
+.car-wall{
+  --brand-now:var(--brand, var(--mc-ink));
+  position:absolute; z-index:-1; overflow:hidden;
+  top:calc(-1 * var(--s-6));                 /* up to the header: .car's padding-top */
+  bottom:calc(-1 * var(--wall-lip));
+  left:calc(50% - 50vw); right:calc(50% - 50vw);
+  background:var(--brand-now);
+}
+.car--sold .car-wall{ --brand-now:var(--mc-ink-2); }
+
+.car-wall__mark{
+  position:absolute; top:50%; translate:0 -50%;
+  right:max(-6rem, calc(50vw - var(--mc-container) / 2 - 6rem));
+  width:min(30rem, 70vw); aspect-ratio:1;
+  background:rgba(255,255,255,.07);
+  -webkit-mask:var(--logo) center/contain no-repeat;
+          mask:var(--logo) center/contain no-repeat;
+}
+
+.car-wall::after{
+  content:""; position:absolute; top:0; bottom:0; right:0; width:2px;
+  background:#FFFFFF; opacity:0;
+}
+
+.car-top .car-back,
+.car-top .car-h{ color:#FFFFFF; }
+.car-top .car-h span{ color:rgba(255,255,255,.84); }
+.car-top .car-back{ text-decoration-color:rgba(255,255,255,.6); }
+.car-top .car-back:hover{ text-decoration-color:#FFFFFF; }
+.car-top :focus-visible{ outline-color:#FFFFFF; }
+
+@media (min-width:1000px){
+  /* The price is the one thing in the side column on the wall. Its block is
+     sized so the wall's edge falls in the middle of the gap under it. */
+  .car--wall .car-price{ min-block-size:calc(var(--wall-lip) - var(--s-5) / 2); align-content:start; }
+  .car--wall .car-price .mc-price,
+  .car--wall .car-price .mc-km{ color:#FFFFFF; }
+  /* full white: small text over the 7% mark, where Porsche at .84 fell under 4.5:1 */
+  .car--wall .car-price__was{ color:#FFFFFF; }
+  .car--wall .car-price__was b{ color:#FFFFFF; }
+}
+
+/* ---- the stroke ---------------------------------------------------------
+   CSS, not script: it is the first thing on the page, so there is nothing to
+   wait for, and without JavaScript it still plays. The finished state is the
+   base state; the keyframes only describe the way there. */
+@keyframes car-wall-sweep{ from{ clip-path:inset(0 100% 0 0); } to{ clip-path:inset(0 0 0 0); } }
+@keyframes car-wall-nib{ 0%,85%{ opacity:.55; } 100%{ opacity:0; } }
+@keyframes car-wall-words{ from{ opacity:0; transform:translateX(-16px); } to{ opacity:1; transform:none; } }
+
+.car-wall{ animation:car-wall-sweep var(--m-sweep) var(--e-inout) both; }
+.car-wall::after{ animation:car-wall-nib var(--m-sweep) linear both; }
+.car-top .car-back,
+.car-top .car-h{ animation:car-wall-words var(--m-move) var(--e-out) both; }
+.car-top .car-back{ animation-delay:var(--m-sweep); }
+.car-top .car-h{ animation-delay:calc(var(--m-sweep) + 70ms); }
+.car-top .car-gone{ color:rgba(255,255,255,.92); border-left-color:rgba(255,255,255,.6); }
+.car-top .car-gone{ position:relative; animation:car-wall-words var(--m-move) var(--e-out) calc(var(--m-sweep) + 140ms) both; }
+@media (min-width:1000px){
+  .car--wall .car-price{ animation:car-wall-words var(--m-move) var(--e-out) calc(var(--m-sweep) + 140ms) both; }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .car-wall,.car-wall::after,
+  .car-top .car-back,.car-top .car-h,.car-top .car-gone,
+  .car--wall .car-price{ animation:none; }
+}

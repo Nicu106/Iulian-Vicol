@@ -57,6 +57,9 @@ class CarPageController extends Controller
 
         return view('pages.coche', [
             'car'    => $car,
+            // The marque's colour for the wall at the top; null for a brand he does
+            // not specialise in, which gets the site's own ink instead.
+            'marque' => \App\Support\Marques::for($car->brand),
             'photos' => $photos,
             'groups' => self::GROUPS,
             'counts' => $counts,

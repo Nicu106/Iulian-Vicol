@@ -4,7 +4,7 @@
 @section('current', '')
 {{-- A car that is gone dresses the whole document, header and footer
      included — see the SOLD block in car.css. --}}
-@section('body', ($car->status ?? '') === 'sold' ? 'car--sold' : '')
+@section('body', trim((($car->status ?? '') === 'sold' ? 'car--sold ' : '') . 'car--wall'))
 
 @push('css')
 <link rel="stylesheet" href="{{ asset('css/car.css') }}">
@@ -15,18 +15,37 @@
 @section('content')
 <main class="cat-wrap car">
 
-  <a class="car-back mc-link" href="/catalogo">← Todos los coches</a>
+  {{-- The wall. The marque's own colour — the one its row carries in the
+       catalogue — painted behind the top of the page with the same stroke, so a
+       click from the blue BMW row lands on a blue BMW page. It runs edge to edge
+       and stops part-way down the photograph: the car stands in front of its
+       colour instead of being framed by it. Everything placed on it is white;
+       everything with a colour of its own (the spec rows, the buttons, the red
+       price on a phone) sits below its edge. See car.css, THE WALL. --}}
+  <div class="car-top">
+    <div class="car-wall" aria-hidden="true"
+         style="{{ $marque ? '--brand:'.$marque['colour'].';--logo:url('.asset('img/marques/'.$marque['key'].'.svg').')' : '' }}">
+      @if($marque)<span class="car-wall__mark"></span>@endif
+    </div>
 
-  <h1 class="car-h">
-    {{ $car->brand }} {{ $car->model }} <span>{{ $car->year }}</span>
-  </h1>
+    {{-- Back to this marque's row, not to the top of the catalogue: that row is
+         where the reader came from, and the catalogue centres it on arrival. --}}
+    <a class="car-back mc-link" href="/catalogo{{ $marque ? '#marque-'.$marque['key'] : '' }}">← Todos los coches</a>
 
-  @if($gone)
-    {{-- The state, in the reading order, for everyone. The fixed tab below is
-         aria-hidden precisely so this is not announced twice. --}}
-    <p class="car-gone">Vendido. Esta ficha se queda como registro: las fotos son
-      las que se hicieron entonces, sin retocar.</p>
-  @endif
+    <h1 class="car-h">
+      {{ $car->brand }} {{ $car->model }} <span>{{ $car->year }}</span>
+    </h1>
+
+    @if($gone)
+      {{-- The state, in the reading order, for everyone. The fixed tab below is
+           aria-hidden precisely so this is not announced twice. Inside the top so
+           the wall ends below it, not over it: a panel with its own ground, on the
+           grey of a sold car's wall. --}}
+      <p class="car-gone">Vendido. Esta ficha se queda como registro: las fotos son
+        las que se hicieron entonces, sin retocar.</p>
+    @endif
+  </div>
+
 
   @php
     // How many blocks end up in the left column. The sidebar spans exactly that

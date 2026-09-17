@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Vehicle;
+use App\Support\Marques;
 
 /**
  * The catalogue, organised by marque rather than by filter.
@@ -14,22 +15,8 @@ use App\Models\Vehicle;
  */
 class BrandCatalogController extends Controller
 {
-    /**
-     * Least to most exclusive. This order is the page's argument, so it is declared
-     * here rather than derived — the market's ranking is not in the database.
-     *
-     * Colours are the marques' own, checked against white text:
-     * VW 16.13:1 · Audi 6.56:1 · BMW 5.94:1 · Mercedes 17.22:1 · Porsche 5.46:1.
-     * Mercedes' petrol blue (#00ADEF) measures 2.55:1 and is unusable, so the row
-     * carries their corporate black instead.
-     */
-    private const MARQUES = [
-        ['key' => 'volkswagen', 'name' => 'Volkswagen',    'colour' => '#022254', 'match' => ['volkswagen', 'vw']],
-        ['key' => 'audi',       'name' => 'Audi',          'colour' => '#930016', 'match' => ['audi']],
-        ['key' => 'bmw',        'name' => 'BMW',           'colour' => '#004086', 'match' => ['bmw']],
-        ['key' => 'mercedes',   'name' => 'Mercedes-Benz', 'colour' => '#01172E', 'match' => ['mercedes', 'mercedes-benz', 'mercedes benz']],
-        ['key' => 'porsche',    'name' => 'Porsche',       'colour' => '#C50007', 'match' => ['porsche']],
-    ];
+    /** Least to most exclusive; the list and its colours live in App\Support\Marques. */
+    private const MARQUES = Marques::ALL;
 
     /**
      * Layout examples, for a marque he has never had. Freely licensed photographs, and

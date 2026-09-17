@@ -1912,7 +1912,10 @@
       'car'         => ['the page', 'air above and below; everything else is the grid'],
       'car--sold'   => ['the sold theme', 'one token block on the page root and nothing else: every accent is remapped to ink, so no component knows it happened. \u{201C}Tema gri total\u{201D} means the header and the footer too — the footer\u{2019}s green button on an otherwise grey archive is exactly the leftover the client notices. --mc-ok and --mc-warn are literals rather than aliases, so they are listed too; that is the whole point of doing it with tokens'],
       'car-grid'    => ['the page', 'the sidebar spans every row of the other column. In row 1 it sized that row instead, and the description started ~790px below the thumbnails — the hole the client photographed'],
-      'car-back'    => ['back to the catalogue', 'small, above the name'],
+      'car--wall'   => ['the marque wall switch', 'on <body>, because the wall is 100vw and the page has to clip the scrollbar\u{2019}s share of it (overflow-x: clip, which scrolls nothing and breaks no sticky). From 1000 up it also turns the price white, the one thing in the side column that stands on the colour'],
+      'car-top'     => ['the name block', 'back link, name and, for a sold car, the sold sentence. Its own stacking context with the wall at z -1 inside it; the grid after it sits at z 1, so the photograph and the side column are always in front of the colour'],
+      'car-wall'    => ['the marque\u{2019}s colour', 'the catalogue row\u{2019}s colour and stroke for one marque (App\\Support\\Marques is the one list): clipped from the left over --m-sweep with a 2px nib, the mark at 7% white, the words arriving after it lands. Edge to edge, ending part-way down the photograph on a phone and in the gap under the price on a desk. Only white on it; nothing with a colour of its own crosses its edge. Grey on a sold car, the site\u{2019}s ink for a marque outside the five. CSS keyframes, so it plays without script and not at all with reduced motion'],
+      'car-back'    => ['back to the catalogue', 'small, above the name, white on the wall. Goes to the marque\u{2019}s own row, which the catalogue centres on arrival'],
       'car-h'       => ['the car’s name', 'the h1 step, -.022em'],
       'car-stage'   => ['the photograph', '3:2, which is what the camera gave. A squarer crop cuts the nose or the tail off exactly when the buyer is judging the shape'],
       'car-thumbs'  => ['the strip', 'scrolled, never wrapped: 58 thumbnails in a grid is a wall to read, a strip is one to flick through. Edge to edge on a phone so the last is half-visible and the strip says it continues'],
@@ -1930,7 +1933,7 @@
       'car-tech'    => ['the long spec list', 'two columns of pairs, which reads faster than one long ladder and does not become a wall like a table would'],
       'car-tags'    => ['the equipment', 'chips, wrapped'],
       'car-with'    => ['what comes with it', 'a heading and its list'],
-      'car-gone'    => ['the sold sentence', 'above the fold, 52ch, so a buyer is told before they read the price'],
+      'car-gone'    => ['the sold sentence', 'above the fold, 52ch, so a buyer is told before they read the price. Inside .car-top, so the wall ends below it; .92 white on the grey'],
       'car-empty'   => ['nothing to show', 'the same tone as a note, never an error'],
 
       /* ---- Vende tu coche ---- */
