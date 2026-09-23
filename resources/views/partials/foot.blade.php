@@ -8,6 +8,7 @@
        It draws itself the first time it is reached (public/js/map-draw.js);
        without script it is simply there. The words sit over the sea, bottom
        right, which is the one calm region the drawing has. --}}
+  @if(trim($__env->yieldContent('foot-map')) !== 'off')
   <section class="mc-foot__place" aria-labelledby="f-place">
     <div class="mc-foot__band" data-map-draw data-src="/img/map/malaga-band.svg">
       <img class="mc-foot__img" src="/img/map/malaga-band.svg" width="2400" height="800" alt="" loading="lazy" decoding="async">
@@ -23,6 +24,7 @@
       </div>
     </div>
   </section>
+  @endif
 
   <div class="mc-foot__in cat-wrap">
 

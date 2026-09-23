@@ -68,7 +68,7 @@ const b = await p.launch({
       const e = document.querySelector(sel);
       return e ? Math.round(e.getBoundingClientRect().left) : null;
     };
-    return { open: edge('.ct-open__h'), ways: edge('.ct-ways .ct-way__k'),
+    return { open: edge('.ct-open__h'), ways: edge('.ct-band--wa .ct-band__k'),
              where: edge('.ct-where__say .ct-h2'), far: edge('.ct-far .ct-h2') };
   });
   const xs = Object.values(spine).filter(v => v !== null);
@@ -129,7 +129,7 @@ const b = await p.launch({
       await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
       const hold = document.querySelector('.ct-open__hold').getBoundingClientRect();
       const pic  = document.querySelector('.ct-open__pic').getBoundingClientRect();
-      const map  = document.querySelector('.ct-where__canvas').getBoundingClientRect();
+      const map  = document.querySelector('.ct-bands').getBoundingClientRect();   // what follows the opening
       out.push({ y, underPhoto: Math.round(pic.bottom - hold.bottom),
                  picToMap: Math.round(map.top - pic.bottom) });
     }
@@ -161,42 +161,38 @@ const b = await p.launch({
   await pg.goto(URLP, { waitUntil: 'networkidle0' });
   await new Promise(r => setTimeout(r, 600));
 
-  // 2026-09-23: the ways come before the photograph. With the photograph first
-  // (3:4, 520px) the first way to reach him started at y 913 on an 844 screen.
-  const order = await pg.evaluate(() => {
-    const t = (s) => Math.round(document.querySelector(s).getBoundingClientRect().top);
-    return { say: t('.ct-open__say'), ways: t('.ct-open__ways-wrap'), pic: t('.ct-open__pic') };
-  });
-  is(order.say < order.ways && order.ways < order.pic,
-     'phone reads statement, then the ways, then the photograph', JSON.stringify(order));
-
-  // The page's reason to exist is one tap from arrival: both buttons wholly on
-  // the first screen, thumb-sized, and in its lower half.
-  const go = await pg.evaluate(() => [...document.querySelectorAll('.ct-way__go .mc-btn')].map(e => {
-    const r = e.getBoundingClientRect(); return { top: Math.round(r.top), bottom: Math.round(r.bottom), h: Math.round(r.height) };
+  // The three ways are full-bleed bands, and on a phone they ARE the first
+  // screen: each one a whole-width target, wholly visible without a scroll.
+  const bands = await pg.evaluate(() => [...document.querySelectorAll('.ct-band__a')].map(a => {
+    const r = a.getBoundingClientRect();
+    return { top: Math.round(r.top), bottom: Math.round(r.bottom), w: Math.round(r.width), h: Math.round(r.height), href: a.getAttribute('href').slice(0, 7) };
   }));
-  is(go.length === 2 && go.every(g => g.bottom <= 844 && g.h >= 52),
-     'WhatsApp and Llamar are on the first screen, 52px tall', JSON.stringify(go));
-  is(go.every(g => g.top >= 844 / 2 - 60), 'and within reach of the thumb', `top ${go[0]?.top}`);
+  is(bands.length === 3 && bands.map(b => b.href).join() === 'https:/,tel:+34,mailto:',
+     'three bands: WhatsApp, phone, e-mail, in that order', bands.map(b => b.href).join(' '));
+  is(bands.every(b => b.bottom <= 844 && b.w === 390 && b.h >= 88),
+     'all three wholly on the first screen, full width, thumb-sized', JSON.stringify(bands.map(b => [b.top, b.bottom])));
 
-  const once = await pg.evaluate(() => (document.querySelector('.ct-open').textContent.match(/614 753 187/g) || []).length);
+  const once = await pg.evaluate(() => (document.querySelector('.ct-bands').textContent.match(/614 753 187/g) || []).length);
   is(once === 1, 'the number is printed once, not once per app', `${once}`);
 
-  // The dock repeats those two buttons, so it waits until they have scrolled off.
+  // The dock repeats WhatsApp and the phone, so it waits until the bands have scrolled off.
   const dock = async () => pg.evaluate(() => getComputedStyle(document.querySelector('.cat-dock')).visibility);
   const d0 = await dock();
-  await pg.evaluate(() => window.scrollTo(0, 1400)); await new Promise(r => setTimeout(r, 700));
+  await pg.evaluate(() => window.scrollTo(0, 1600)); await new Promise(r => setTimeout(r, 700));
   const d1 = await dock();
   await pg.evaluate(() => window.scrollTo(0, 0)); await new Promise(r => setTimeout(r, 700));
   const d2 = await dock();
   is(d0 === 'hidden' && d1 === 'visible' && d2 === 'hidden',
-     'the dock waits while the page\'s own buttons are showing', `${d0} → ${d1} → ${d2}`);
+     'the dock waits while the bands are showing', `${d0} → ${d1} → ${d2}`);
 
-  const shape = await pg.evaluate(() => {
-    const r = document.querySelector('.ct-open__hold').getBoundingClientRect();
-    return r.width / r.height;
-  });
-  is(Math.abs(shape - 4 / 3) < 0.01, 'the photograph closes the act at 4:3', shape.toFixed(3));
+  // The bands sweep in like the catalogue's rows, and are never left unpainted.
+  await new Promise(r => setTimeout(r, 1800));
+  const live = await pg.evaluate(() => [...document.querySelectorAll('.ct-band')].every(b => b.classList.contains('is-live')
+    && getComputedStyle(b.querySelector('.ct-band__fill')).clipPath.replace(/\s/g, '') !== 'inset(0px100%0px0px)'));
+  is(live, 'every band has swept in and is painted');
+
+  // One map on this page: the footer's band would be the same place twice.
+  is(!(await pg.$('.mc-foot__place')), 'the footer map is switched off here');
 
   await pg.close();
 }

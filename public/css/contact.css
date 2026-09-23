@@ -469,3 +469,111 @@ body.ct-dock-wait .cat-dock{ transform:translateY(100%); visibility:hidden;
   font-size:var(--t-ui); font-weight:600;
 }
 .ct-where__shield:focus-visible{ outline:3px solid var(--mc-focus); outline-offset:-6px; }
+
+
+/* ==========================================================================
+   THE WAYS — full-bleed bands, the catalogue's row turned to this page
+   Colour clipped in from one side over --m-sweep with a 2px nib (the rows'
+   own timings, from catalog.css), alternating sides; the words follow once
+   the colour has landed. Only white on the colours: WhatsApp 5.40:1, blue
+   5.90:1, navy 13.57:1 for full white; the notes at .9 stay above 4.5.
+   ======================================================================== */
+.ct-bands{ list-style:none; margin:0; padding:0; }
+.ct-band{ position:relative; overflow:hidden; }
+.ct-band--wa  { --band:var(--mc-wa);   --band-hi:var(--mc-wa-dark); --band-mark:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Cpath d=%27M13.6 2.33A7.94 7.94 0 0 0 8 0a7.9 7.9 0 0 0-6.85 11.9L0 16l4.2-1.1A7.9 7.9 0 0 0 8 15.85 7.92 7.92 0 0 0 13.6 2.33ZM8 14.5a6.6 6.6 0 0 1-3.35-.92l-.24-.14-2.49.65.66-2.43-.16-.25A6.57 6.57 0 1 1 8 14.5Zm3.6-4.92c-.2-.1-1.17-.58-1.35-.64s-.31-.1-.44.1-.51.64-.63.78-.23.15-.43.05a5.4 5.4 0 0 1-1.59-.98 6 6 0 0 1-1.1-1.37c-.11-.2 0-.3.09-.4s.2-.23.3-.35a1.34 1.34 0 0 0 .2-.33.36.36 0 0 0 0-.35c0-.1-.44-1.07-.6-1.46s-.32-.33-.44-.34h-.38a.72.72 0 0 0-.52.25 2.2 2.2 0 0 0-.69 1.64 3.83 3.83 0 0 0 .8 2.03 8.75 8.75 0 0 0 3.35 2.96 11 11 0 0 0 1.12.41 2.68 2.68 0 0 0 1.23.08 2.02 2.02 0 0 0 1.32-.93 1.63 1.63 0 0 0 .11-.93c-.05-.09-.18-.14-.38-.24Z%27/%3E%3C/svg%3E"); }
+.ct-band--tel { --band:var(--mc-blue); --band-hi:var(--mc-blue-dark); --band-mark:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Cpath d=%27M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z%27/%3E%3C/svg%3E"); }
+.ct-band--mail{ --band:var(--mc-navy); --band-hi:var(--mc-deep); --band-mark:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Cpath fill-rule=%27evenodd%27 d=%27M12 2a10 10 0 1 0 5.3 18.5l-.9-1.7A8 8 0 1 1 20 12v1.2a1.8 1.8 0 0 1-3.6 0V7h-2v.9A5 5 0 1 0 15 16a3.8 3.8 0 0 0 7-2.8V12A10 10 0 0 0 12 2zm0 7a3 3 0 1 1 0 6 3 3 0 0 1 0-6z%27/%3E%3C/svg%3E"); }
+
+.ct-band__a{ position:relative; display:block; color:#FFFFFF; text-decoration:none; }
+.ct-band__fill{ position:absolute; inset:0; background:var(--band); transition:background var(--m-state) var(--e-out); }
+.ct-band__fill::after{ content:""; position:absolute; top:0; bottom:0; right:0; width:2px; background:#FFFFFF; opacity:0; }
+.ct-band--rtl .ct-band__fill::after{ right:auto; left:0; }
+.ct-band__a:hover .ct-band__fill{ background:var(--band-hi); }
+
+/* the app's mark where a marque's badge sits in its row: huge, 7% white, off the edge */
+.ct-band__mark{
+  position:absolute; top:50%; right:-3rem; width:clamp(11rem, 26vw, 22rem); aspect-ratio:1; translate:0 -50%;
+  background:rgba(255,255,255,.08);
+  -webkit-mask:var(--band-mark) center/contain no-repeat; mask:var(--band-mark) center/contain no-repeat;
+  transition:translate var(--m-move) var(--e-out), background var(--m-state) var(--e-out);
+}
+.ct-band--rtl .ct-band__mark{ right:auto; left:-3rem; }
+.ct-band__a:hover .ct-band__mark{ translate:-12px -50%; background:rgba(255,255,255,.12); }
+.ct-band--rtl .ct-band__a:hover .ct-band__mark{ translate:12px -50%; }
+
+.ct-band__in{
+  position:relative; display:grid; align-items:baseline;
+  grid-template-columns:minmax(0,1fr); gap:var(--s-2);
+  padding-block:var(--s-6);
+}
+@media (min-width:900px){
+  .ct-band__in{ grid-template-columns:9rem minmax(0,1fr) auto; column-gap:var(--s-7); padding-block:var(--s-7); }
+  .ct-band__k{ grid-row:1 / span 2; }
+  .ct-band__n{ grid-column:2; }
+  .ct-band__go{ grid-column:3; grid-row:1 / span 2; align-self:center; }
+  .ct-band--rtl .ct-band__in{ grid-template-columns:auto minmax(0,1fr) 9rem; }
+  .ct-band--rtl .ct-band__k{ grid-column:3; text-align:right; }
+  .ct-band--rtl .ct-band__v, .ct-band--rtl .ct-band__n{ grid-column:2; text-align:right; justify-self:end; }
+  .ct-band--rtl .ct-band__go{ grid-column:1; }
+}
+.ct-band__k{ font-size:var(--t-small); font-weight:600; letter-spacing:.02em; color:rgba(255,255,255,.9); }
+.ct-band__v{
+  font-size:var(--t-h1); font-weight:700; letter-spacing:-.03em; line-height:1.02;
+  text-decoration:underline; text-decoration-thickness:1px; text-decoration-color:rgba(255,255,255,.35);
+  text-underline-offset:.14em; transition:text-decoration-color var(--m-quick) var(--e-out);
+}
+.ct-band__v--mail{ font-size:var(--t-h2); overflow-wrap:anywhere; }
+.ct-band__a:hover .ct-band__v{ text-decoration-color:#FFFFFF; text-decoration-thickness:2px; }
+.ct-band__n{ max-width:52ch; font-size:var(--t-small); line-height:1.5; color:rgba(255,255,255,.92); }
+.ct-band__go{
+  display:inline-flex; align-items:center; min-height:var(--mc-tap-pref); padding:0 var(--s-5);
+  border:1px solid rgba(255,255,255,.7); border-radius:var(--mc-r);
+  font-size:var(--t-ui); font-weight:600; white-space:nowrap;
+  transition:background var(--m-quick) var(--e-out), color var(--m-quick) var(--e-out);
+}
+.ct-band__a:hover .ct-band__go{ background:#FFFFFF; color:var(--band); }
+.ct-band__a:focus-visible{ outline:3px solid #FFFFFF; outline-offset:-6px; }
+
+/* phone: the three bands are the first screen — compact, the whole band the target */
+@media (max-width:899.98px){
+  .ct-band__in{ padding-block:var(--s-5); grid-template-columns:minmax(0,1fr) auto; column-gap:var(--s-4); }
+  .ct-band__k{ grid-column:1; }
+  .ct-band__v{ grid-column:1; font-size:var(--t-h2); }
+  .ct-band__v--mail{ font-size:var(--t-km); }
+  .ct-band__n{ grid-column:1; }
+  .ct-band__go{ display:none; }   /* the band is the button; a second button inside it is noise */
+  .ct-band__a::after{
+    content:""; position:absolute; right:var(--mc-gutter-m); top:50%; width:22px; height:22px; translate:0 -50%;
+    border-top:2px solid #FFFFFF; border-right:2px solid #FFFFFF; rotate:45deg; scale:.6; opacity:.9;
+  }
+  .ct-band__in{ padding-right:calc(var(--mc-gutter-m) + 2.5rem); }
+  .ct-band__mark{ width:9rem; right:-1.5rem; }
+  .ct-band--rtl .ct-band__mark{ left:auto; right:-1.5rem; }
+}
+
+/* ---- the stroke ------------------------------------------------------- */
+.bands-armed .ct-band__fill{ clip-path:inset(0 100% 0 0); }
+.bands-armed .ct-band--rtl .ct-band__fill{ clip-path:inset(0 0 0 100%); }
+.bands-armed .ct-band__in, .bands-armed .ct-band__mark{ opacity:0; }
+.bands-armed .ct-band__in{ translate:-16px 0; }
+.bands-armed .ct-band--rtl .ct-band__in{ translate:16px 0; }
+.bands-armed .ct-band.is-live .ct-band__fill{ clip-path:inset(0); transition:clip-path var(--m-sweep) var(--e-inout), background var(--m-state) var(--e-out); }
+.bands-armed .ct-band.is-live .ct-band__fill::after{ animation:ct-nib var(--m-sweep) linear both; }
+@keyframes ct-nib{ 0%,85%{ opacity:.55; } 100%{ opacity:0; } }
+.bands-armed .ct-band.is-live .ct-band__in{ opacity:1; translate:0 0;
+  transition:opacity var(--m-move) var(--e-out) var(--m-sweep), translate var(--m-move) var(--e-out) var(--m-sweep); }
+.bands-armed .ct-band.is-live .ct-band__mark{ opacity:1; transition:opacity var(--m-reveal) var(--e-out) calc(var(--m-sweep) - 100ms), translate var(--m-move) var(--e-out), background var(--m-state) var(--e-out); }
+@media (prefers-reduced-motion:reduce){
+  .bands-armed .ct-band__fill{ clip-path:none !important; }
+  .bands-armed .ct-band__in, .bands-armed .ct-band__mark{ opacity:1; translate:none; }
+}
+
+/* the opening is only the statement now: its column carries a line, not the ways */
+.ct-open__lede{ margin:var(--s-6) 0 0; max-width:34ch; font-size:var(--t-km); line-height:1.3; color:var(--mc-ink-2); }
+/* On a phone the three bands follow the statement directly: the photograph
+   would push the first of them to y 724. It belongs to the desk's two columns. */
+@media (max-width:899.98px){
+  .ct-open__pic{ display:none; }
+  .ct-open__ways-wrap{ padding-block:0 var(--s-6); }
+  .ct-open__lede{ margin-top:var(--s-3); font-size:var(--t-prose); }
+}

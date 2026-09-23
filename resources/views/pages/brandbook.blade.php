@@ -1907,6 +1907,8 @@
       'ct-f'        => ['one field', 'label, optional hint in the lighter ink, then the control'],
       'ct-note'     => ['the note under it', 'small, 52ch, the second ink'],
       'ct-pin'      => ['the point on the map', 'a brand-blue drop with a white ring, drawn in CSS at 50% / 50% because the rendered map (App\\Support\\StaticMap) is centred on the point. Its tip is the place'],
+      'ct-bands'    => ['the three ways', 'the catalogue\u{2019}s row device given to contact: a list of full-bleed bands, WhatsApp, phone, e-mail, in the order buyers use them. On a phone the three are the first screen'],
+      'ct-band'     => ['one way', 'ONE link the width of the screen, in the channel\u{2019}s colour (--mc-wa, --mc-blue, --mc-navy; only white on them), the app\u{2019}s mark at 8% white off the edge like a marque\u{2019}s badge. Swept in from alternating sides over --m-sweep with the 2px nib, words after the colour lands; on a phone a chevron instead of the inner button'],
       'ct-place'    => ['a place name on the map', 'ours, not the map\u{2019}s: the drawing carries no labels, so the names are HTML in the site\u{2019}s typeface, placed by the same projection that drew the map (StaticMap::pos) and haloed in the land colour. Málaga beside the pin, and the airport, because buyers fly in'],
       'ct-dock-wait'=> ['the dock, waiting', 'on <body> while the page\u{2019}s own WhatsApp and Llamar buttons are on screen: the dock slides out and leaves the tab order, and comes back once they scroll away. Two copies of the same two buttons in one view is noise'],
       'ct-rise'     => ['the arrival', '16px on --m-reveal and --e-out, 60ms apart, once. Armed by script, so with JavaScript off nothing is ever left invisible'],

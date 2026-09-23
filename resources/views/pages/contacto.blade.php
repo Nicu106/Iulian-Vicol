@@ -2,6 +2,8 @@
 
 @section('title', 'Contacto — IV MOTORCLASS')
 @section('current', 'contacto')
+{{-- this page has its own map; the footer's band would be the same place twice --}}
+@section('foot-map', 'off')
 
 @push('css')
 <link rel="stylesheet" href="{{ asset('css/contact.css') }}">
@@ -38,30 +40,8 @@
     </div>
 
     <div class="ct-open__ways-wrap">
-      {{-- One number, said once. WhatsApp and the phone are the same line, and
-           printing it twice at 52px was the page repeating itself. The two things
-           you can DO with it are buttons under it: on a phone they sit in the
-           lower half of the first screen, where a thumb already is, so the page's
-           whole purpose is one tap from arrival without scrolling. --}}
-      <ul class="ct-ways" id="ct-ways">
-        <li class="ct-rise ct-way ct-way--main">
-          <span class="ct-way__k">WhatsApp y teléfono</span>
-          <a class="ct-way__v" href="tel:+{{ $phoneRaw }}">{{ $phone }}</a>
-          <span class="ct-way__n">Lo leo en minutos. Te mando vídeo del coche, incluido lo que no está perfecto.
-            Si estoy con un cliente y no lo cojo, insiste o escríbeme.</span>
-          <span class="ct-way__go">
-            <a class="mc-btn mc-btn--cta" href="https://wa.me/{{ $phoneRaw }}"><span><span class="ct-way__long">Escribir por </span>WhatsApp</span></a>
-            <a class="mc-btn mc-btn--ghost" href="tel:+{{ $phoneRaw }}">Llamar</a>
-          </span>
-        </li>
-        <li class="ct-rise">
-          <a class="ct-way" href="mailto:{{ $email }}">
-            <span class="ct-way__k">Email</span>
-            <span class="ct-way__v ct-way__v--mail">{{ $email }}</span>
-            <span class="ct-way__n">Para documentación y facturas.</span>
-          </a>
-        </li>
-      </ul>
+      <p class="ct-open__lede ct-rise">Tres formas de llegar a mí, y las tres las contesto yo.
+        Lo normal es en minutos.</p>
     </div>
 
     <div class="ct-open__pic">
@@ -81,6 +61,54 @@
       </div>
     </div>
   </section>
+
+  {{-- ==================================================================
+       THE WAYS — the catalogue's device, turned to this page's job.
+       On /catalogo each marque is a full-bleed row of its own colour that
+       sweeps in with a nib; here each way to reach him is: WhatsApp green,
+       the site's blue for the phone, navy for e-mail. Each band is ONE link,
+       the whole width of the screen — on a phone the three are the first
+       screen, three thumb-sized targets that cannot be missed. The app's own
+       mark sits in the band at 7% white, where a marque's badge sits in its row.
+       ================================================================== --}}
+  <ul class="ct-bands" id="ct-ways">
+    <li class="ct-band ct-band--wa">
+      <a class="ct-band__a" href="https://wa.me/{{ $phoneRaw }}">
+        <span class="ct-band__fill" aria-hidden="true"></span>
+        <span class="ct-band__mark" aria-hidden="true"></span>
+        <span class="ct-band__in cat-wrap">
+          <span class="ct-band__k">WhatsApp</span>
+          <span class="ct-band__v">Escríbeme</span>
+          <span class="ct-band__n">Lo leo en minutos. Te mando vídeo del coche, incluido lo que no está perfecto.</span>
+          <span class="ct-band__go">Abrir WhatsApp</span>
+        </span>
+      </a>
+    </li>
+    <li class="ct-band ct-band--tel ct-band--rtl">
+      <a class="ct-band__a" href="tel:+{{ $phoneRaw }}">
+        <span class="ct-band__fill" aria-hidden="true"></span>
+        <span class="ct-band__mark" aria-hidden="true"></span>
+        <span class="ct-band__in cat-wrap">
+          <span class="ct-band__k">Teléfono</span>
+          <span class="ct-band__v">{{ $phone }}</span>
+          <span class="ct-band__n">Si estoy con un cliente y no lo cojo, insiste o escríbeme.</span>
+          <span class="ct-band__go">Llamar</span>
+        </span>
+      </a>
+    </li>
+    <li class="ct-band ct-band--mail">
+      <a class="ct-band__a" href="mailto:{{ $email }}">
+        <span class="ct-band__fill" aria-hidden="true"></span>
+        <span class="ct-band__mark" aria-hidden="true"></span>
+        <span class="ct-band__in cat-wrap">
+          <span class="ct-band__k">Email</span>
+          <span class="ct-band__v ct-band__v--mail">{{ $email }}</span>
+          <span class="ct-band__n">Para documentación y facturas.</span>
+          <span class="ct-band__go">Escribir un correo</span>
+        </span>
+      </a>
+    </li>
+  </ul>
 
   {{-- ---- where and when, one answer -------------------------------- --}}
   <section class="ct-where ct-grid" aria-labelledby="where-h">
@@ -166,7 +194,7 @@
     <ol class="ct-trips">
       @foreach($from as $f)
         <li class="ct-rise">
-          <span class="ct-trip__km">{{ number_format($f['km'],0,',','.') }}<i>km</i></span>
+          <span class="ct-trip__km"><span data-km="{{ $f['km'] }}">{{ number_format($f['km'],0,',','.') }}</span><i>km</i></span>
           <span class="ct-trip__who">{{ $f['who'] }}, desde {{ $f['city'] }}</span>
           <span class="ct-trip__said">{{ $f['said'] }}</span>
         </li>
@@ -220,6 +248,53 @@
     rise.forEach(function (el) { io.observe(el); });
   }
 
+  /* ---- the bands sweep in, one after another, like the catalogue's rows ----
+     is-live starts each band's stroke; those already on screen at load follow
+     each other 260ms apart, the rest wait until they are reached. */
+  var bands = document.querySelectorAll('.ct-band');
+  if (bands.length) {
+    document.documentElement.classList.add('bands-armed');
+    var liveBand = function (b, d) { window.setTimeout(function () { b.classList.add('is-live'); }, d); };
+    if (!('IntersectionObserver' in window) || still.matches) {
+      bands.forEach(function (b) { b.classList.add('is-live'); });
+    } else {
+      var k = 0;
+      var bo = new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          bo.unobserve(e.target); liveBand(e.target, (k++) * 260);
+        });
+      }, { threshold: 0.25 });
+      bands.forEach(function (b) { bo.observe(b); });
+      window.setTimeout(function () { bands.forEach(function (b) { b.classList.add('is-live'); }); }, 5000);
+    }
+  }
+
+  /* ---- the distances count up to themselves, once --------------------------
+     720, 630, 130 km arrive as a trip odometer would: fast, then settling. The
+     final number is in the markup; without script or with reduced motion it is
+     simply there. */
+  var kms = document.querySelectorAll('.ct-trip__km [data-km]');
+  if (kms.length && 'IntersectionObserver' in window && !still.matches) {
+    var fmt = function (n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); };
+    var ko = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        ko.unobserve(e.target);
+        var el = e.target, to = +el.getAttribute('data-km'), t0 = null, dur = 1400;
+        var step = function (t) {
+          if (t0 === null) t0 = t;
+          var p = Math.min(1, (t - t0) / dur), q = 1 - Math.pow(1 - p, 3);
+          el.textContent = fmt(Math.round(to * q));
+          if (p < 1) requestAnimationFrame(step);
+        };
+        el.textContent = '0';
+        requestAnimationFrame(step);
+      });
+    }, { threshold: 0.6 });
+    kms.forEach(function (el) { ko.observe(el); });
+  }
+
   /* ---- the live map, built on request ---------------------------------
      Nothing from Google exists in the page until this runs. The picture stays
      underneath while the frame loads, so there is never an empty box. */
@@ -240,16 +315,16 @@
     });
   }
 
-  /* ---- the dock waits while the page's own buttons are on screen --------
-     On a phone the first screen already carries "Escribir por WhatsApp" and
-     "Llamar"; the dock repeating them underneath was the same two buttons twice
-     in one view. It arrives once they have scrolled away, and leaves again if
+  /* ---- the dock waits while the bands are on screen --------------------
+     On a phone the first screen already IS WhatsApp and the phone, three
+     screen-wide targets; the dock repeating them underneath was the same
+     things twice in one view. It arrives once they have scrolled away, and leaves again if
      the reader comes back up to them. */
   var ways = document.getElementById('ct-ways');
   if (ways && 'IntersectionObserver' in window) {
     new IntersectionObserver(function (es) {
       document.body.classList.toggle('ct-dock-wait', es[0].isIntersecting);
-    }, { threshold: 0 }).observe(ways.querySelector('.ct-way__go') || ways);
+    }, { threshold: 0 }).observe(ways);
   }
 
   /* ---- the form --------------------------------------------------------
