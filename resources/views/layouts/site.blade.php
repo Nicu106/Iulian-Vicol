@@ -103,6 +103,9 @@
   }, true);
 })();
 </script>
+{{-- The maps draw themselves (footer band, /contacto). Deferred; does nothing
+     until a map is near the screen. --}}
+<script src="{{ asset('js/map-draw.js') }}" defer></script>
 @stack('js')
 </body>
 </html>

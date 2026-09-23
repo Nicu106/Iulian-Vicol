@@ -41,7 +41,9 @@ final class StaticMap
     public const OUT = [
         'malaga-wide'  => [2000, 875, 13, 'light'],
         'malaga-phone' => [800, 600, 12, 'light'],
-        'malaga-foot'  => [640, 400, 12, 'dark'],
+        // the footer's band: full bleed, cropped from the sides by the box
+        // (slice), which keeps the centre — the pin — where it is at any width
+        'malaga-band'  => [2400, 800, 13, 'dark'],
     ];
 
     /**
@@ -104,21 +106,24 @@ final class StaticMap
         $pad = 400;
         $sea = $coast ? array_merge($coast, [[end($coast)[0], $h + $pad], [$coast[0][0], $h + $pad]]) : [];
 
-        $out = [];
-        $out[] = sprintf('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" preserveAspectRatio="xMidYMid slice">', $w, $h);
-        $out[] = sprintf('<rect width="%d" height="%d" fill="%s"/>', $w, $h, $st['land']);
-        if ($sea) $out[] = sprintf('<path d="%s Z" fill="%s"/>', self::d(self::simplify($sea, 0.5)), $st['sea']);
-        foreach ($rings as $r) {
-            if ($inView($r)) $out[] = sprintf('<path d="%s Z" fill="%s"/>', self::d(self::simplify($r, 0.5)), $st['land']);
-        }
-
-        $lines = function (array $ways, string $colour, float $width) use ($inView) {
-            $d = [];
-            foreach ($ways as $pts) {
-                if ($inView($pts)) $d[] = self::d(self::simplify($pts, 0.9));
+        // One <g> per kind carries the colour and width, so the file needs no
+        // <style> (an inline SVG's style would leak into the page) and still
+        // draws correctly as a plain <img>. Every line is its own path with
+        // pathLength=1, which is what lets public/js/map-draw.js draw them in.
+        // $draw: one path per line (drawn in, stroke by stroke), or all of them in
+        // one path (faded in). The minor roads are 3,500 fragments; drawing each
+        // would be 3,500 animations for texture nobody follows with the eye.
+        $group = function (string $cls, array $ways, string $colour, float $width, float $eps, bool $draw = true) use ($inView) {
+            $ways = array_values(array_filter($ways, $inView));
+            if ($draw) $ways = self::chain($ways);   // a road drawn as one stroke, not as its 40 OSM pieces
+            $paths = '';
+            if ($draw) {
+                foreach ($ways as $pts) $paths .= '<path pathLength="1" d="' . self::d(self::simplify($pts, $eps)) . '"/>';
+            } elseif ($ways) {
+                $paths = '<path d="' . implode(' ', array_map(fn ($pts) => self::d(self::simplify($pts, $eps)), $ways)) . '"/>';
             }
-            return $d ? sprintf('<path d="%s" fill="none" stroke="%s" stroke-width="%s" stroke-linecap="round" stroke-linejoin="round"/>',
-                implode(' ', $d), $colour, $width) : '';
+            return $paths ? sprintf('<g class="%s" fill="none" stroke="%s" stroke-width="%s" stroke-linecap="round" stroke-linejoin="round">%s</g>',
+                $cls, $colour, $width, $paths) : '';
         };
 
         $rivers = [];
@@ -128,10 +133,20 @@ final class StaticMap
             if (($t['waterway'] ?? null) === 'river') $rivers[] = array_map($p, $e['geometry']);
             if (isset($t['highway'], self::ROAD_CLASS[$t['highway']])) $roads[self::ROAD_CLASS[$t['highway']]][] = array_map($p, $e['geometry']);
         }
-        $out[] = $lines($rivers, $st['river'], 1.6);
+
+        $out = [];
+        $out[] = sprintf('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" preserveAspectRatio="xMidYMid slice">', $w, $h);
+        $out[] = sprintf('<rect class="mp-land" width="%d" height="%d" fill="%s"/>', $w, $h, $st['land']);
+        $isles = '';
+        foreach ($rings as $r) {
+            if ($inView($r)) $isles .= '<path d="' . self::d(self::simplify($r, 0.5)) . ' Z"/>';
+        }
+        if ($sea) $out[] = sprintf('<g class="mp-sea"><path fill="%s" d="%s Z"/>%s</g>', $st['sea'],
+            self::d(self::simplify($sea, 0.5)), $isles ? sprintf('<g fill="%s">%s</g>', $st['land'], $isles) : '');
+        $out[] = $group('mp-river', $rivers, $st['river'], 1.6, 0.9);
         // smallest first, so the motorways are drawn over what they cross
-        for ($i = 2; $i >= 0; $i--) $out[] = $lines($roads[$i], $st['roads'][$i][0], $st['roads'][$i][1]);
-        if ($coast) $out[] = $lines([$coast, ...$rings], $st['coast'], 1.2);
+        for ($i = 2; $i >= 0; $i--) $out[] = $group('mp-r' . $i, $roads[$i], $st['roads'][$i][0], $st['roads'][$i][1], 0.9, $i === 0);
+        if ($coast) $out[] = $group('mp-coast', [$coast, ...array_filter($rings, $inView)], $st['coast'], 1.2, 0.5);
         $out[] = '</svg>';
 
         return implode("\n", array_filter($out));

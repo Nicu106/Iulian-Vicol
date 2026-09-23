@@ -191,38 +191,89 @@
   .mc-foot__legal-sep{ display:none; }
 }
 
-/* ---- where: a small map under the contact lines ---------------------------
-   Our own line drawing in the footer's navy (StaticMap 'dark'). No frame: its
-   edges fade into the footer, so the coast and the roads look drawn on the
-   ground of the footer itself rather than pasted into a box on it. */
-.mc-foot__col li.mc-foot__where{ grid-column:1 / -1; display:grid; gap:var(--s-2); }
-.mc-foot__col a.mc-foot__map{
-  position:relative; display:block; width:100%; max-width:22rem; aspect-ratio:16/10;
-  margin:var(--s-1) 0 0; overflow:clip; min-height:0; text-decoration:none;
-  -webkit-mask:radial-gradient(ellipse 72% 70% at 50% 50%, #000 55%, transparent 100%);
-          mask:radial-gradient(ellipse 72% 70% at 50% 50%, #000 55%, transparent 100%);
+/* ==========================================================================
+   WHERE — the footer opens on a band of the map
+   ======================================================================== */
+.mc-foot__place{ position:relative; }
+.mc-foot__band{
+  position:relative; height:clamp(17rem, 30vw, 27rem); overflow:clip;
+  /* faded into the navy on all four sides: ground, not a picture */
+  -webkit-mask:linear-gradient(180deg, transparent 0, #000 22%, #000 72%, transparent 100%),
+               linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+  -webkit-mask-composite:source-in;
+          mask:linear-gradient(180deg, transparent 0, #000 22%, #000 72%, transparent 100%),
+               linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+          mask-composite:intersect;
 }
-.mc-foot__map img{ display:block; width:100%; height:100%; object-fit:cover;
-  transition:scale var(--m-move) var(--e-out); }
-.mc-foot__map:hover img{ scale:1.05; }
+.mc-foot__img, .mc-foot__band .mp-svg{ position:absolute; inset:0; width:100%; height:100%; display:block; object-fit:cover; }
 
-/* The point: a white dot with a ring that breathes out three times when it
-   first appears, then rests — "here", said once, not a beacon on every page. */
+/* The point: a white dot, a ring that breathes out three times, and the name. */
 .mc-foot__pin{
-  position:absolute; left:50%; top:50%; width:10px; height:10px; translate:-50% -50%;
-  border-radius:50%; background:#FFFFFF; box-shadow:0 0 0 3px rgba(255,255,255,.18);
+  position:absolute; left:50%; top:50%; z-index:1; width:12px; height:12px; translate:-50% -50%;
+  border-radius:50%; background:#FFFFFF; box-shadow:0 0 0 4px rgba(255,255,255,.16), 0 0 24px 6px rgba(120,160,230,.35);
 }
 .mc-foot__pin::after{
-  content:""; position:absolute; inset:-3px; border-radius:50%;
-  border:1px solid rgba(255,255,255,.7); opacity:0;
+  content:""; position:absolute; inset:-4px; border-radius:50%;
+  border:1px solid rgba(255,255,255,.75); opacity:0;
   animation:mc-foot-ping 2.4s var(--e-out) .4s 3;
 }
-@keyframes mc-foot-ping{ 0%{ opacity:.8; scale:1; } 100%{ opacity:0; scale:3.2; } }
+@keyframes mc-foot-ping{ 0%{ opacity:.8; scale:1; } 100%{ opacity:0; scale:3.4; } }
 .mc-foot__pin b{
-  position:absolute; left:calc(100% + 8px); top:50%; translate:0 -115%;
-  font-size:var(--t-label); font-weight:600; letter-spacing:.02em; color:#FFFFFF; white-space:nowrap;
-  text-shadow:0 0 4px #0A1731, 0 0 8px #0A1731;
+  position:absolute; left:calc(100% + 10px); top:50%; translate:0 -120%;
+  font-size:var(--t-small); font-weight:700; letter-spacing:.02em; color:#FFFFFF; white-space:nowrap;
+  text-shadow:0 0 4px #0A1731, 0 0 10px #0A1731;
 }
-.mc-foot__col .mc-foot__osm{ font-size:11px; line-height:1.4; color:rgba(255,255,255,.55); }
-@media (max-width:759.98px){ .mc-foot__col a.mc-foot__map{ max-width:none; } }
-@media (prefers-reduced-motion:reduce){ .mc-foot__map img{ transition:none; } .mc-foot__pin::after{ animation:none; } }
+
+/* The words, over the sea (bottom right) on a desk; under the band on a phone. */
+.mc-foot__say-where{ position:relative; z-index:2; display:flex; justify-content:flex-end; }
+.mc-foot__say-where > div{ display:grid; justify-items:start; gap:var(--s-1); max-width:22rem; }
+@media (min-width:760px){
+  /* low enough to be all sea: the coast east of the city runs at ~58% of the band */
+  .mc-foot__say-where{ position:absolute; left:0; right:0; bottom:clamp(1rem, 2.4vw, 2rem); }
+}
+@media (max-width:759.98px){
+  .mc-foot__band{ height:16rem; }
+  .mc-foot__say-where{ justify-content:flex-start; margin-top:calc(-1 * var(--s-5)); }
+}
+.mc-foot__place-h{ margin:0; max-width:14ch; font-size:var(--t-h3); font-size:clamp(1.375rem, 1rem + 1vw, 1.875rem); font-weight:700; letter-spacing:-.02em; line-height:1.05; color:#FFFFFF; }
+.mc-foot__say-where p{ margin:0; font-size:var(--t-small); line-height:1.5; color:rgba(255,255,255,.82); }
+.mc-foot__maps{
+  display:inline-flex; align-items:center; min-height:44px;
+  font-size:var(--t-small); font-weight:600; color:#FFFFFF;
+  text-decoration:underline; text-decoration-color:rgba(255,255,255,.45); text-underline-offset:3px;
+}
+.mc-foot__maps:hover{ text-decoration-color:#FFFFFF; }
+.mc-foot__maps:focus-visible{ outline:3px solid #FFFFFF; outline-offset:3px; }
+.mc-foot__osm{ font-size:11px; line-height:1.4; color:rgba(255,255,255,.55); }
+/* the columns start closer: the band already gave the footer its air */
+.mc-foot__place + .mc-foot__in{ padding-top:var(--s-7); }
+
+/* ==========================================================================
+   THE DRAWING — shared by the footer band and /contacto (map-draw.js)
+   is-armed: inlined, undrawn. is-drawn: a third of it on screen.
+   Coast 0-1.6s · rivers and motorways from .3s, 70ms apart · sea .4-1.6s ·
+   minor roads 1.0-2.0s · the point and the names at 1.7s.
+   ======================================================================== */
+.is-armed .mp-coast path, .is-armed .mp-river path, .is-armed .mp-r0 path{
+  stroke-dasharray:1 2; stroke-dashoffset:1;
+}
+.is-armed .mp-sea, .is-armed .mp-r1, .is-armed .mp-r2{ opacity:0; }
+.is-armed .mc-foot__pin, .is-armed .ct-pin, .is-armed .ct-place{ opacity:0; }
+.is-armed .mc-foot__pin{ scale:.3; }
+.is-armed .mc-foot__pin::after{ animation:none; }
+
+.is-drawn .mp-coast path{ stroke-dashoffset:0; transition:stroke-dashoffset 1.6s var(--e-inout); }
+.is-drawn .mp-river path,
+.is-drawn .mp-r0 path{ stroke-dashoffset:0;
+  transition:stroke-dashoffset 1.3s var(--e-inout) calc(.3s + var(--i, 0) * 70ms); }
+.is-drawn .mp-sea{ opacity:1; transition:opacity 1.2s var(--e-out) .4s; }
+.is-drawn .mp-r1{ opacity:1; transition:opacity 1s var(--e-out) 1s; }
+.is-drawn .mp-r2{ opacity:1; transition:opacity 1s var(--e-out) 1.2s; }
+.is-drawn .mc-foot__pin{ opacity:1; scale:1; transition:opacity .3s var(--e-out) 1.7s, scale .5s cubic-bezier(.34,1.56,.64,1) 1.7s; }
+.is-drawn .mc-foot__pin::after{ animation:mc-foot-ping 2.4s var(--e-out) 2s 3; }
+.is-drawn .ct-pin, .is-drawn .ct-place{ opacity:1; transition:opacity .4s var(--e-out) 1.7s; }
+.is-drawn .ct-place--air{ transition-delay:1.9s; }
+@media (prefers-reduced-motion:reduce){ .mc-foot__pin::after{ animation:none; } }
+/* a halo of the sea's own colour: where a road near the coast passes behind a
+   letter, the letter wins */
+.mc-foot__say-where h2, .mc-foot__say-where p{ text-shadow:0 0 8px #040B1F, 0 0 18px #040B1F; }

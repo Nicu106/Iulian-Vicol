@@ -92,7 +92,9 @@ for (const route of [carHref, '/catalogo', '/inicio', '/contacto']) {
   // The image the page is judged on must not be lazy: a lazily-loaded LCP is the
   // classic own goal, and it is invisible unless you look for it.
   const hero = await pg.evaluate(() => {
-    const i = [...document.images].sort((a, b) => {
+    // Only what the first screen shows can be the LCP. The footer's map band is
+    // wider than a car's photograph and is rightly lazy: it is never above the fold.
+    const i = [...document.images].filter(x => x.getBoundingClientRect().top < innerHeight).sort((a, b) => {
       const A = a.getBoundingClientRect(), B = b.getBoundingClientRect();
       return (B.width * B.height) - (A.width * A.height);
     })[0];

@@ -89,7 +89,8 @@
          lazy vector drawing (~30 KB compressed) in the site's own
          palette, and not a single request to Google — no scripts, no fonts, no
          cookies. See App\Support\StaticMap; `php artisan map:render` redraws it. --}}
-    <div class="ct-where__canvas" id="ct-map">
+    <div class="ct-where__canvas" id="ct-map" data-map-draw
+         data-src="/img/map/malaga-phone.svg" data-src-wide="/img/map/malaga-wide.svg" data-media="(min-width:760px)">
       <picture>
         <source media="(min-width:760px)" srcset="/img/map/malaga-wide.svg" width="2000" height="875">
         <img class="ct-where__img" src="/img/map/malaga-phone.svg" width="800" height="600"
