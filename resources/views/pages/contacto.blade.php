@@ -86,18 +86,27 @@
   <section class="ct-where ct-grid" aria-labelledby="where-h">
     {{-- The map, as a picture of the map. The live Google embed is built only
          when "Activar el mapa" is pressed (script below): until then this is one
-         lazy image of 35 KB on a phone and ~100 KB on a desk, in the site's own
+         lazy vector drawing (~30 KB compressed) in the site's own
          palette, and not a single request to Google — no scripts, no fonts, no
          cookies. See App\Support\StaticMap; `php artisan map:render` redraws it. --}}
     <div class="ct-where__canvas" id="ct-map">
       <picture>
-        <source media="(min-width:760px)" srcset="/img/map/malaga-wide.webp" width="2000" height="875">
-        <img class="ct-where__img" src="/img/map/malaga-phone.webp" width="800" height="600"
+        <source media="(min-width:760px)" srcset="/img/map/malaga-wide.svg" width="2000" height="875">
+        <img class="ct-where__img" src="/img/map/malaga-phone.svg" width="800" height="600"
              alt="Mapa de Málaga" loading="lazy" decoding="async">
       </picture>
+      {{-- Names are ours, over the drawing, in the site's typeface. Placed from
+           the same projection that drew the map (StaticMap::pos), per ratio. --}}
+      @php
+        [$ax, $ay] = \App\Support\StaticMap::pos('malaga-phone', ...\App\Support\StaticMap::AIRPORT);
+        [$wx, $wy] = \App\Support\StaticMap::pos('malaga-wide', ...\App\Support\StaticMap::AIRPORT);
+      @endphp
       <span class="ct-pin" aria-hidden="true"></span>
+      <span class="ct-place ct-place--city" aria-hidden="true">Málaga</span>
+      <span class="ct-place ct-place--air" aria-hidden="true"
+            style="--x:{{ $ax }}%;--y:{{ $ay }}%;--wx:{{ $wx }}%;--wy:{{ $wy }}%">Aeropuerto</span>
       <button class="ct-where__shield" id="map-on" type="button"><span>Activar el mapa</span></button>
-      <small class="ct-where__osm">© OpenStreetMap</small>
+      <small class="ct-where__osm">Mapa © OpenStreetMap</small>
     </div>
     <div class="ct-where__say">
       <h2 class="ct-h2 ct-rise" id="where-h">Málaga</h2>

@@ -192,25 +192,37 @@
 }
 
 /* ---- where: a small map under the contact lines ---------------------------
-   The footer's own navy (StaticMap 'dark'), so it sits in the column as a
-   surface of the footer and not as a light hole punched in it. */
-.mc-foot__col li.mc-foot__where{ grid-column:1 / -1; }
+   Our own line drawing in the footer's navy (StaticMap 'dark'). No frame: its
+   edges fade into the footer, so the coast and the roads look drawn on the
+   ground of the footer itself rather than pasted into a box on it. */
+.mc-foot__col li.mc-foot__where{ grid-column:1 / -1; display:grid; gap:var(--s-2); }
 .mc-foot__col a.mc-foot__map{
-  position:relative; display:block; width:100%; max-width:20rem; aspect-ratio:16/10;
-  margin:var(--s-2) 0 var(--s-2); overflow:clip; min-height:0;
-  border:1px solid rgba(255,255,255,.14); text-decoration:none;
+  position:relative; display:block; width:100%; max-width:22rem; aspect-ratio:16/10;
+  margin:var(--s-1) 0 0; overflow:clip; min-height:0; text-decoration:none;
+  -webkit-mask:radial-gradient(ellipse 72% 70% at 50% 50%, #000 55%, transparent 100%);
+          mask:radial-gradient(ellipse 72% 70% at 50% 50%, #000 55%, transparent 100%);
 }
 .mc-foot__map img{ display:block; width:100%; height:100%; object-fit:cover;
   transition:scale var(--m-move) var(--e-out); }
-.mc-foot__map:hover img{ scale:1.04; }
+.mc-foot__map:hover img{ scale:1.05; }
+
+/* The point: a white dot with a ring that breathes out three times when it
+   first appears, then rests — "here", said once, not a beacon on every page. */
 .mc-foot__pin{
-  position:absolute; left:50%; top:50%; width:12px; height:12px; translate:-50% -50%;
-  border-radius:50%; background:#FFFFFF;
-  box-shadow:0 0 0 4px rgba(255,255,255,.22), 0 0 0 9px rgba(255,255,255,.08);
+  position:absolute; left:50%; top:50%; width:10px; height:10px; translate:-50% -50%;
+  border-radius:50%; background:#FFFFFF; box-shadow:0 0 0 3px rgba(255,255,255,.18);
 }
-.mc-foot__col .mc-foot__osm{
-  position:absolute; right:var(--s-1); bottom:var(--s-1); padding:0 var(--s-1);
-  font-size:10px; line-height:1.4; color:rgba(255,255,255,.72); background:rgba(4,11,31,.6);
+.mc-foot__pin::after{
+  content:""; position:absolute; inset:-3px; border-radius:50%;
+  border:1px solid rgba(255,255,255,.7); opacity:0;
+  animation:mc-foot-ping 2.4s var(--e-out) .4s 3;
 }
-@media (prefers-reduced-motion:reduce){ .mc-foot__map img{ transition:none; } }
+@keyframes mc-foot-ping{ 0%{ opacity:.8; scale:1; } 100%{ opacity:0; scale:3.2; } }
+.mc-foot__pin b{
+  position:absolute; left:calc(100% + 8px); top:50%; translate:0 -115%;
+  font-size:var(--t-label); font-weight:600; letter-spacing:.02em; color:#FFFFFF; white-space:nowrap;
+  text-shadow:0 0 4px #0A1731, 0 0 8px #0A1731;
+}
+.mc-foot__col .mc-foot__osm{ font-size:11px; line-height:1.4; color:rgba(255,255,255,.55); }
 @media (max-width:759.98px){ .mc-foot__col a.mc-foot__map{ max-width:none; } }
+@media (prefers-reduced-motion:reduce){ .mc-foot__map img{ transition:none; } .mc-foot__pin::after{ animation:none; } }

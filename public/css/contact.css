@@ -423,9 +423,23 @@ body.ct-dock-wait .cat-dock{ transform:translateY(100%); visibility:hidden;
 .ct-pin{ translate:-50% calc(-100% - 4px); }
 .ct-pin::after{ content:""; position:absolute; inset:7px; border-radius:50%; background:#FFFFFF; }
 
+/* The names. Ink on the pale drawing, with a halo of the land colour so a road
+   running under a letter does not cut it. */
+.ct-place{
+  position:absolute; pointer-events:none; white-space:nowrap;
+  font-size:var(--t-small); font-weight:600; color:var(--mc-ink);
+  text-shadow:0 0 3px #EEF1F6, 0 0 3px #EEF1F6, 0 0 6px #EEF1F6;
+}
+.ct-place--city{ left:50%; top:50%; translate:22px -130%; font-size:var(--t-ui); font-weight:700; }
+.ct-place--air{ left:var(--x); top:var(--y); translate:10px -50%; font-weight:500; color:var(--mc-ink-2); }
+.ct-place--air::before{
+  content:""; position:absolute; left:-14px; top:50%; width:8px; height:8px; translate:0 -50%;
+  border-radius:50%; background:var(--mc-ink-2); box-shadow:0 0 0 2px #EEF1F6;
+}
+@media (min-width:760px){ .ct-place--air{ left:var(--wx); top:var(--wy); } }
+
 .ct-where__osm{
-  position:absolute; left:var(--s-2); bottom:var(--s-2);
-  padding:1px var(--s-2); background:rgba(255,255,255,.85);
+  position:absolute; left:var(--s-3); bottom:var(--s-2);
   font-size:var(--t-label); color:var(--mc-ink-2);
 }
 

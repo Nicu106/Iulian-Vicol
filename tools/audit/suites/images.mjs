@@ -29,7 +29,7 @@ const nav = await browser.newPage();
 await nav.setViewport({ width: 1440, height: 900 });
 await nav.goto(`${B}/catalogo`, { waitUntil: 'networkidle0' });
 const carHref = await nav.evaluate(() =>
-  document.querySelector('.mc-card:not(.mc-card--demo) a.mc-card__link')?.getAttribute('href'));
+  document.querySelector('.mc-card:not(.mc-card--soon) a.mc-card__link')?.getAttribute('href'));
 await nav.close();
 
 for (const route of [carHref, '/catalogo', '/inicio', '/contacto']) {

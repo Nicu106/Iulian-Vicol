@@ -1,15 +1,15 @@
-{{-- One car card. $car may be a Vehicle or an example array; $kind is
-     'available' | 'sold' | 'demo'. --}}
+{{-- One car card. $car is a Vehicle; $kind is 'available' | 'sold'. A marque
+     with nothing to show uses partials/card-soon instead. --}}
 @php
   $g = fn($k) => is_array($car) ? ($car[$k] ?? null) : ($car->$k ?? null);
   // The path, not a built URL: <x-img> needs the source to derive a srcset from.
-  $imgPath = $kind === 'demo' ? '/storage/'.ltrim((string) $g('img'), '/') : $car->primary_image;
-  // 'demo' is an invented example and has no page. Everything real does, sold
-  // included: the photographs are the record of what he has actually delivered.
-  $href = in_array($kind, ['available', 'sold'], true) ? '/coche/'.$g('slug') : null;
-  $alt = $kind === 'demo' ? 'Ejemplo de ficha — Porsche '.$g('model') : trim($g('brand').' '.$g('model').' '.$g('year'));
+  $imgPath = $car->primary_image;
+  // Every card has a page, sold included: the photographs are the record of what
+  // he has actually delivered.
+  $href = '/coche/'.$g('slug');
+  $alt = trim($g('brand').' '.$g('model').' '.$g('year'));
 @endphp
-<article class="mc-card {{ $kind === 'sold' ? 'mc-card--sold' : '' }} {{ $kind === 'demo' ? 'mc-card--demo' : '' }}">
+<article class="mc-card {{ $kind === 'sold' ? 'mc-card--sold' : '' }}">
   @if($href)<a class="mc-card__link" href="{{ $href }}">@else<div class="mc-card__link">@endif
     <div class="mc-frame mc-frame--card">
       {{-- Measured across the column ladder: 228px at 320, 279 at 390, 302 at
@@ -19,7 +19,6 @@
              sizes="(min-width:900px) 210px, (min-width:560px) 40vw, 72vw"
              :max="720" :fallback="480" />
       @if($kind === 'sold')<span class="mc-badge mc-badge--sold">Entregado</span>@endif
-      @if($kind === 'demo')<span class="mc-badge mc-badge--demo">Ejemplo</span>@endif
     </div>
     <div class="mc-card__body">
       <h3 class="mc-card__title">{{ $g('model') }}</h3>

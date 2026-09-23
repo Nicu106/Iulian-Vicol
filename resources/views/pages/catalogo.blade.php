@@ -63,11 +63,11 @@
               @elseif($row['sold'])
                 <span class="nw"><b>{{ $row['sold'] }}</b> entregados</span> · <span class="nw">ninguno ahora</span>
               @else
-                Bajo pedido · ejemplo de ficha
+                Próximamente · te lo busco bajo pedido
               @endif
             </span>
 
-            @if($row['n'] || $row['delivered']->count() || $row['demo'])
+            @if($row['total'])
               {{-- Opens the marque to the full screen. Without JavaScript it is not
                    rendered at all, because there would be nothing for it to do. --}}
               <button class="cat-row__all" type="button" hidden
@@ -77,7 +77,7 @@
             @endif
           </div>
 
-          @if($row['n'] || $row['delivered']->count() || $row['demo'])
+          @if($row['total'] || $row['soon'])
             {{-- A rail's content scent is weak: nothing on screen says the row
                  continues past the edge. Shown once per visit, on the first rail
                  that has anything hidden, and only where the rail exists at all.
@@ -85,22 +85,17 @@
                  never appears on a rail that fits. --}}
             <div class="cat-row__rail">
             <div class="cat-row__cars" id="cars-{{ $row['key'] }}"
-                 style="--n:{{ $row['cars']->count() + $row['delivered']->count() + count($row['demo']) }}">
+                 style="--n:{{ $row['total'] ?: $row['soon'] }}">
               @foreach($row['cars'] as $car)
                 @include('partials.card', ['car' => $car, 'kind' => 'available'])
               @endforeach
               @foreach($row['delivered'] as $car)
                 @include('partials.card', ['car' => $car, 'kind' => 'sold'])
               @endforeach
-              @foreach($row['demo'] as $d)
-                @include('partials.card', ['car' => $d, 'kind' => 'demo'])
-              @endforeach
+              @for($i = 0; $i < $row['soon']; $i++)
+                @include('partials.card-soon', ['marque' => $row, 'i' => $i])
+              @endfor
             </div>
-            </div>
-          @else
-            <div class="cat-row__none">
-              <p>Todavía no he tenido ninguno aquí. Si buscas uno concreto, dímelo y lo busco.</p>
-              <a class="mc-btn mc-btn--cta" href="https://wa.me/34614753187">Avísame</a>
             </div>
           @endif
         </div>
@@ -108,10 +103,6 @@
         @if(!$row['n'] && $row['delivered']->count())
           <p class="cat-row__note"><span>Ninguno disponible ahora mismo. Estos ya los entregué.
             <a class="mc-link" href="https://wa.me/34614753187">Avísame cuando entre uno</a>.</span></p>
-        @elseif($row['demo'])
-          <p class="cat-row__note"><span><b>Estas dos fichas son un ejemplo de maquetación</b>, no
-            coches en venta: todavía no he tenido ningún Porsche. Fotografías de Unsplash.
-            <a class="mc-link" href="https://wa.me/34614753187">Si buscas uno, dímelo</a>.</span></p>
         @endif
       </section>
     @endforeach

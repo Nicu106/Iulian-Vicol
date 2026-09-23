@@ -19,16 +19,13 @@ class BrandCatalogController extends Controller
     private const MARQUES = Marques::ALL;
 
     /**
-     * Layout examples, for a marque he has never had. Freely licensed photographs, and
-     * every card carrying a visible "Ejemplo" badge — the page must never show a car it
-     * does not have as though it were stock.
+     * A marque with no car at all — never had one, nothing in stock — shows this
+     * many "Próximamente" cards: a full band at the widest ladder step, trimmed in
+     * CSS to what each width shows. There used to be two invented Porsches here
+     * (Unsplash photographs, marked "Ejemplo"); removed on 2026-09-23 because the
+     * page must not show cars that do not exist, marked or not.
      */
-    private const DEMO = [
-        'porsche' => [
-            ['model' => '911 GT3', 'year' => 2019, 'price' => 139000, 'km' => 41000, 'fuel' => 'Gasolina', 'gear' => 'PDK', 'power' => 510, 'engine' => '4.0', 'body_type' => 'Coupé', 'drivetrain' => 'RWD', 'img' => 'demo/porsche-911-gt3.jpg'],
-            ['model' => 'Panamera Turbo', 'year' => 2018, 'price' => 84500, 'km' => 96000, 'fuel' => 'Gasolina', 'gear' => 'PDK', 'power' => 550, 'engine' => '4.0', 'body_type' => 'Berlina', 'drivetrain' => 'AWD', 'img' => 'demo/porsche-panamera.jpg'],
-        ],
-    ];
+    private const SOON = 4;
 
     public function index()
     {
@@ -49,15 +46,15 @@ class BrandCatalogController extends Controller
             // page look emptier than the business is: he has had 41. The delivered ones
             // are his own photographs and carry a visible "Entregado" badge, so the row
             // is a record of the marque rather than a shelf with two things on it.
-            //   Where he has never had one at all — Porsche — a marked example stands in,
-            //   never presented as stock; see the brandbook on stock photography.
+            //   Where he has never had one at all, the row is "Próximamente" cards:
+            //   empty places, not invented cars.
             $delivered = $soldCount->filter($is)->values();
 
             $rows[] = $m + [
                 'cars'      => $cars,
                 'delivered' => $delivered,
-                'demo'      => $cars->count() || $delivered->count() ? [] : (self::DEMO[$m['key']] ?? []),
-                'total'     => $cars->count() + $delivered->count() + count($cars->count() || $delivered->count() ? [] : (self::DEMO[$m['key']] ?? [])),
+                'soon'      => $cars->count() || $delivered->count() ? 0 : self::SOON,
+                'total'     => $cars->count() + $delivered->count(),
                 'n'         => $cars->count(),
                 'sold'      => $sold,
                 'from'      => $cars->count() ? (int) $cars->min('price') : null,

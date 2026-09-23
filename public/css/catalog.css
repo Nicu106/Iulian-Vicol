@@ -224,9 +224,37 @@
 }
 
 /* ---- an example card, never mistakable for stock ---------- */
-.mc-badge--demo{ background:var(--mc-accent); color:#FFFFFF; }
-.mc-card--demo{ border-style:dashed; border-color:var(--mc-accent); }
-.mc-card--demo .mc-frame img{ filter:saturate(.9); }
+/* ---- "Próximamente": an empty place in a marque's row ----------------------
+   Reversed out of the row's colour rather than a white card: a white card with
+   no photograph is a broken card, a ghost of one on the colour is a place kept.
+   A dashed edge says "not filled yet" the way a parking bay does. Only white on
+   the colour — the weakest marque, Porsche, is 5.4:1 for .92 white over the 8%
+   ground. */
+.mc-card--soon{ background:rgba(255,255,255,.08); border:1px dashed rgba(255,255,255,.55); box-shadow:none; }
+.mc-card--soon .mc-card__link{ color:#FFFFFF; }
+.mc-soon__frame{ position:relative; background:rgba(255,255,255,.06); display:grid; place-items:center; }
+.mc-soon__mark{
+  width:44%; aspect-ratio:1; background:rgba(255,255,255,.22);
+  -webkit-mask:var(--logo) center/contain no-repeat; mask:var(--logo) center/contain no-repeat;
+  transition:background var(--m-quick) var(--e-out);
+}
+.mc-card--soon .mc-card__title{ color:#FFFFFF; }
+.cat-row .mc-card--soon .mc-card__sub{ color:rgba(255,255,255,.92); font-size:var(--t-small); line-height:1.45;
+  display:block; -webkit-line-clamp:unset; overflow:visible; }   /* a sentence, whole: never clamped */
+.mc-soon__go{
+  margin-top:auto; padding-top:var(--s-3);
+  font-size:var(--t-small); font-weight:600; color:#FFFFFF;
+  text-decoration:underline; text-decoration-color:rgba(255,255,255,.6); text-underline-offset:3px;
+}
+.mc-card--soon:hover{ border-style:solid; border-color:#FFFFFF; }
+.mc-card--soon:hover .mc-soon__mark{ background:rgba(255,255,255,.4); }
+.mc-card--soon:hover .mc-soon__go{ text-decoration-color:#FFFFFF; }
+.mc-card--soon .mc-card__link:focus-visible{ outline:3px solid #FFFFFF; outline-offset:3px; }
+/* As many empty places as the band shows at that width, and no more: four from
+   1200, three from 900, two on a phone rail — four empty cards to swipe through
+   is a long way to say "nothing yet". */
+@media (max-width:1199.98px){ .mc-card--soon:nth-child(n+4){ display:none; } }
+@media (max-width:899.98px){ .mc-card--soon:nth-child(n+3){ display:none; } }
 
 
 /* ---- the header below the desk ----------------------------------------------

@@ -189,7 +189,7 @@ else {
   await pg.setViewport({ width: 1440, height: 900 });
   await pg.goto(`${B}/catalogo`, { waitUntil: 'networkidle0' });
   const href = await pg.evaluate(() =>
-    [...document.querySelectorAll('.mc-card:not(.mc-card--sold):not(.mc-card--demo) a.mc-card__link')][0]?.getAttribute('href'));
+    [...document.querySelectorAll('.mc-card:not(.mc-card--sold):not(.mc-card--soon) a.mc-card__link')][0]?.getAttribute('href'));
   if (!href) { fail('no available car to compare against'); }
   else {
     await pg.goto(B + href, { waitUntil: 'networkidle0' });
