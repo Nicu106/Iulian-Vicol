@@ -38,20 +38,21 @@
     </div>
 
     <div class="ct-open__ways-wrap">
-      <ul class="ct-ways">
-        <li class="ct-rise">
-          <a class="ct-way" href="https://wa.me/{{ $phoneRaw }}">
-            <span class="ct-way__k">WhatsApp</span>
-            <span class="ct-way__v">{{ $phone }}</span>
-            <span class="ct-way__n">Lo leo en minutos. Te mando vídeo del coche, incluido lo que no está perfecto.</span>
-          </a>
-        </li>
-        <li class="ct-rise">
-          <a class="ct-way" href="tel:+{{ $phoneRaw }}">
-            <span class="ct-way__k">Teléfono</span>
-            <span class="ct-way__v">{{ $phone }}</span>
-            <span class="ct-way__n">Si estoy con un cliente, insiste o escríbeme.</span>
-          </a>
+      {{-- One number, said once. WhatsApp and the phone are the same line, and
+           printing it twice at 52px was the page repeating itself. The two things
+           you can DO with it are buttons under it: on a phone they sit in the
+           lower half of the first screen, where a thumb already is, so the page's
+           whole purpose is one tap from arrival without scrolling. --}}
+      <ul class="ct-ways" id="ct-ways">
+        <li class="ct-rise ct-way ct-way--main">
+          <span class="ct-way__k">WhatsApp y teléfono</span>
+          <a class="ct-way__v" href="tel:+{{ $phoneRaw }}">{{ $phone }}</a>
+          <span class="ct-way__n">Lo leo en minutos. Te mando vídeo del coche, incluido lo que no está perfecto.
+            Si estoy con un cliente y no lo cojo, insiste o escríbeme.</span>
+          <span class="ct-way__go">
+            <a class="mc-btn mc-btn--cta" href="https://wa.me/{{ $phoneRaw }}"><span><span class="ct-way__long">Escribir por </span>WhatsApp</span></a>
+            <a class="mc-btn mc-btn--ghost" href="tel:+{{ $phoneRaw }}">Llamar</a>
+          </span>
         </li>
         <li class="ct-rise">
           <a class="ct-way" href="mailto:{{ $email }}">
@@ -83,12 +84,12 @@
 
   {{-- ---- where and when, one answer -------------------------------- --}}
   <section class="ct-where ct-grid" aria-labelledby="where-h">
-    <div class="ct-where__canvas">
-      <iframe class="ct-where__f" title="Mapa de Málaga, España"
-              src="https://maps.google.com/maps?q={{ urlencode('Málaga, España') }}&z=11&hl=es&output=embed"
-              loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
-      <button class="ct-where__shield" id="map-on" type="button"><span>Activar el mapa</span></button>
-    </div>
+    {{-- There was a Google Maps embed here: a 630px band of the whole of Málaga
+         at zoom 11, with no pin, because there is no shop to pin. It told the
+         reader nothing the word "Málaga" does not, cost a third-party load and
+         Google's cookies (which the consent notice would have to cover), and on
+         a phone it was 293px that swallowed a scroll until "Activar el mapa" was
+         pressed. The link below opens the real map in the app that is good at it. --}}
     <div class="ct-where__say">
       <h2 class="ct-h2 ct-rise" id="where-h">Málaga</h2>
       <p class="ct-say ct-rise">No hay tienda a la que presentarse. Quedamos donde
@@ -112,11 +113,11 @@
       <form class="ct-form ct-rise" id="ct-form">
         <label class="ct-f">
           <span>Tu nombre</span>
-          <input class="mc-input" type="text" id="f-name" name="name" autocomplete="name" required>
+          <input class="mc-input" type="text" id="f-name" name="name" autocomplete="name" autocapitalize="words" enterkeyhint="next" required>
         </label>
         <label class="ct-f">
           <span>Tu teléfono <em>(opcional)</em></span>
-          <input class="mc-input" type="tel" id="f-tel" name="phone" autocomplete="tel" inputmode="tel">
+          <input class="mc-input" type="tel" id="f-tel" name="phone" autocomplete="tel" inputmode="tel" enterkeyhint="next">
         </label>
         <label class="ct-f ct-f--wide">
           <span>Qué necesitas</span>
@@ -200,13 +201,16 @@
     rise.forEach(function (el) { io.observe(el); });
   }
 
-  /* ---- the map is handed over on request -------------------------------- */
-  var shield = document.getElementById('map-on');
-  if (shield) {
-    shield.addEventListener('click', function () {
-      shield.closest('.ct-where__canvas').classList.add('is-on');
-      shield.remove();
-    });
+  /* ---- the dock waits while the page's own buttons are on screen --------
+     On a phone the first screen already carries "Escribir por WhatsApp" and
+     "Llamar"; the dock repeating them underneath was the same two buttons twice
+     in one view. It arrives once they have scrolled away, and leaves again if
+     the reader comes back up to them. */
+  var ways = document.getElementById('ct-ways');
+  if (ways && 'IntersectionObserver' in window) {
+    new IntersectionObserver(function (es) {
+      document.body.classList.toggle('ct-dock-wait', es[0].isIntersecting);
+    }, { threshold: 0 }).observe(ways.querySelector('.ct-way__go') || ways);
   }
 
   /* ---- the form --------------------------------------------------------

@@ -68,7 +68,7 @@ a new session starts:
 
        cd /var/www/motorclass-v2
        node tools/audit/audit.mjs contrast /inicio     # failing: 0   (occluded: 48 = the review back faces; fine)
-       node tools/audit/audit.mjs contrast /contacto   # failing: 2   — exactly p.ct-hero__kicker and p.ct-lead (see below)
+       node tools/audit/audit.mjs contrast /contacto   # failing: 0   (since 2026-09-23; the old hero lines are gone)
        node tools/audit/audit.mjs overflow /inicio     # overflow: 0 at 390/768/1400; escaping: ["button.hm-fb__halt"] is expected
        node tools/audit/audit.mjs targets  /inicio     # small: only "Detener el movimiento" 16x6 (keyboard-only control)
        node tools/audit/audit.mjs ladder   /inicio     # {} {} {} {}

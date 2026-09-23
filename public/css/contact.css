@@ -172,7 +172,24 @@
 .ct-way:hover .ct-way__v{
   color:var(--mc-blue); text-decoration-color:currentColor; text-decoration-thickness:2px;
 }
-.ct-way:focus-visible{ outline:3px solid var(--mc-focus); outline-offset:6px; border-radius:2px; }
+.ct-way:focus-visible,
+a.ct-way__v:focus-visible{ outline:3px solid var(--mc-focus); outline-offset:6px; border-radius:2px; }
+a.ct-way__v:hover{ color:var(--mc-blue); text-decoration-color:currentColor; text-decoration-thickness:2px; }
+/* The main way is not one link: the number (a tel: link) and two buttons.
+   Hovering its buttons must not light the number up as though it were pressed. */
+li.ct-way:hover .ct-way__v:not(:hover){ color:var(--mc-ink); text-decoration-color:var(--mc-rule); text-decoration-thickness:1px; }
+.ct-way__go{ display:flex; flex-wrap:wrap; gap:var(--s-3); margin-top:var(--s-5); }
+@media (max-width:899.98px){
+  /* Thumb-sized, and the one people use most is the wider one. 52px: the
+     preferred 48 plus a step, because this is the page's reason to exist. */
+  .ct-way__go{ display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1fr); }
+  .ct-way__go .mc-btn{ min-height:calc(var(--mc-tap-pref) + var(--s-1)); justify-content:center; }
+  /* "Escribir por WhatsApp" broke onto two lines in 2/3 of 358px. The button
+     already wears the WhatsApp mark and the green; the word alone says it. */
+  .ct-way__long{ display:none; }
+  /* 22 characters at 28px broke "gmail.c|om" at 320. At 22px it fits 288. */
+  .ct-way__v.ct-way__v--mail{ font-size:var(--t-km); }   /* two classes: the phone block's .ct-way__v comes later */
+}
 
 /* ---- the phone: one column, photograph first --------------------------- */
 /* ---- the phone: statement, photograph, ways ----------------------------
@@ -189,14 +206,23 @@
   /* DOM order is say, ways, picture — the order a screen reader should hear.
      Visually the picture belongs between the statement and the ways, which is
      what these three lines do and the only thing they do. */
-  .ct-open__say{ order:1; }
-  .ct-open__pic{ order:2; }
-  .ct-open__ways-wrap{ order:3; }
-  .ct-open__hold{ position:static; aspect-ratio:3 / 4; }
-  .ct-open__img{ object-position:50% 50%; }   /* nothing is cropped, so nothing is chosen */
-  .ct-open__say{ padding-inline:var(--mc-gutter-m); padding-block:var(--s-7) var(--s-7); }
-  .ct-open__ways-wrap{ padding-inline:var(--mc-gutter-m); padding-block:0 var(--s-8); }
-  .ct-ways{ margin-top:var(--s-7); }
+  /* 2026-09-23: say, ways, photograph — the DOM order, so nothing is reordered.
+     The photograph led the ways, and at 3:4 it was 520px: the first way to reach
+     him started at y 913 on an 844 screen. A contact page whose first screen
+     cannot contact anyone is a poster. Now the two buttons land at ~y 560, in the
+     lower half where the thumb is, and the photograph closes the act instead of
+     opening it. */
+  .ct-open__hold{ position:static; aspect-ratio:4 / 3; }
+  /* 4:3 out of a 3:4 file keeps 56% of its height. The 12x16 map puts the tail
+     light and the wheel in rows 7-13; 72% frames rows 5-14 and gives up the
+     ceiling, which carries nothing. */
+  .ct-open__img{ object-position:50% 72%; }
+  .ct-open__say{ padding-inline:var(--mc-gutter-m); padding-block:var(--s-6) 0; }
+  .ct-open__ways-wrap{ padding-inline:var(--mc-gutter-m); padding-block:0 var(--s-7); }
+  .ct-open__kick{ margin-bottom:var(--s-3); font-size:var(--t-small); }
+  .ct-ways{ margin-top:var(--s-5); gap:var(--s-6); }
+  .ct-way__v{ font-size:var(--t-h2); }
+  .ct-way__n{ font-size:var(--t-small); margin-top:var(--s-2); }
 }
 @media (min-width:760px) and (max-width:899.98px){
   .ct-open__say,
@@ -230,49 +256,7 @@
    look like it had simply run out. The map begins on the photograph's last
    line instead: dark field, then light field, one edge, on purpose. */
 .ct-where{ padding-block:0; }
-.ct-where__canvas{
-  grid-column:full-start / full-end;
-  position:relative; width:100%; aspect-ratio:16/7;
-  overflow:clip; background:var(--mc-band);
-}
-@media (max-width:759.98px){ .ct-where__canvas{ aspect-ratio:4/3; } }
-.ct-where__f{
-  /* Pulled up so Google's own place card — a white widget with its own buttons,
-     top left of every embed — is clipped away above the frame. The height grows
-     by the same amount so the bottom edge does not move and the Google
-     attribution stays visible, as the terms require. */
-  position:absolute; left:0; right:0; top:-84px; height:calc(100% + 84px);
-  width:100%; border:0;
-  /* No filter. There was a grayscale(1) here with a paragraph explaining that
-     Google's colours fight the page, and it never did anything: rendered with
-     grayscale(1), with saturate(.9) and with none, the pixels inside this frame
-     are byte-for-byte the same — 10.6% mean saturation, 25% of pixels over 0.10,
-     in all three. A CSS filter on the parent does not reach this cross-origin
-     frame's own compositing. The rule was written, read back from the computed
-     style, believed, and documented; only sampling the painted pixels showed it
-     had no effect. The map has always been in colour, and Google's palette is
-     simply pale.
-     Left off rather than left in: a rule that cannot be shown to do anything is
-     a comment pretending to be code. */
-}
-/* An embed is live from the frame it loads: a scroll that starts over the map
-   is eaten by the map. The shield hands it over on purpose. */
-.ct-where__shield{
-  position:absolute; inset:0; width:100%; height:100%;
-  /* Top right: bottom left is Google's attribution, bottom right its fullscreen
-     control, and a control of ours on either reads as a collision. */
-  display:flex; align-items:flex-start; justify-content:flex-end;
-  padding:var(--s-5); border:0; background:transparent; cursor:pointer;
-  font:inherit; color:var(--mc-ink);
-}
-.ct-where__shield span{
-  display:inline-flex; align-items:center; min-height:var(--mc-tap-pref);
-  padding:0 var(--s-5); border-radius:var(--mc-r);
-  background:var(--mc-surface); box-shadow:var(--mc-shadow-2);
-  font-size:var(--t-ui); font-weight:600;
-}
-.ct-where__shield:focus-visible{ outline:3px solid var(--mc-focus); outline-offset:-6px; }
-/* Under the map, the caption and the form share one row: 5 | 7, the mirror of
+/* The caption and the form share one row: 5 | 7, the mirror of
    the opening's 7 | 5, so the page's two split sections answer each other.
    Below 900 both take the whole main track and stack — the same breakpoint the
    opening uses to stack its own two columns. This also fixes something that had
@@ -363,6 +347,16 @@
   display:block; margin-top:var(--s-3); max-width:34ch;
   font-size:var(--t-caption); font-style:italic; line-height:1.5; color:var(--mc-ink);
 }
+@media (max-width:759.98px){
+  /* The number on the left, who and what they said beside it: three trips in
+     one screen instead of three screens of 52px numerals stacked. */
+  .ct-trips{ gap:var(--s-5); margin-top:var(--s-6); }
+  .ct-trips > li{ display:grid; grid-template-columns:6.5rem minmax(0,1fr); column-gap:var(--s-4);
+    padding-top:var(--s-5); border-top:1px solid rgba(255,255,255,.14); }
+  .ct-trip__km{ grid-row:1 / span 2; font-size:var(--t-h2); }
+  .ct-trip__who{ margin-top:0; }
+  .ct-trip__said{ margin-top:var(--s-2); }
+}
 .ct-note{ margin:var(--s-8) 0 0; max-width:52ch; font-size:var(--t-small); line-height:1.6; color:var(--mc-ink-2); }
 
 /* ==========================================================================
@@ -376,6 +370,19 @@
 .ct-f > span em{ font-style:normal; color:var(--mc-ink-3); }
 .ct-form__go{ grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:var(--s-3); margin-top:var(--s-2); }
 .ct-form .ct-note{ grid-column:1 / -1; margin-top:0; }
+@media (max-width:759.98px){
+  .ct-form{ gap:var(--s-4); }
+  .ct-form__go{ display:grid; }
+  .ct-form__go .mc-btn{ min-height:calc(var(--mc-tap-pref) + var(--s-1)); justify-content:center; }
+}
+
+/* ---- the dock, while the page's own buttons are showing -----------------
+   Out of the way, and out of the accessibility tree and tab order with it
+   (visibility), then back once they scroll off. See the script in contacto. */
+.cat-dock{ transition:transform var(--m-move) var(--e-out), visibility 0s linear 0s; }
+body.ct-dock-wait .cat-dock{ transform:translateY(100%); visibility:hidden;
+  transition:transform var(--m-move) var(--e-out), visibility 0s linear var(--m-move); }
+@media (prefers-reduced-motion:reduce){ .cat-dock, body.ct-dock-wait .cat-dock{ transition:none; } }
 
 /* ---- arrival ------------------------------------------------------------
    16px on the system's --m-reveal and --e-out, 60ms apart, once. Armed by

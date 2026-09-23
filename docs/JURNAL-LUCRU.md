@@ -30,7 +30,10 @@ Timpul tău de gândire și de verificare între prompturi, peste 15 minute, **n
 | 14.09 | 1,5 | 5 | Navigația adminului (bară laterală / bară jos), rețelele sociale reale |
 | 15.09 | 1,4 | 8 | Logo Instagram, sistemul de recomandări, urmărirea link-urilor |
 | 17.09 | 0,8 | 6 | Documentul de strategie, culoarea mărcii pe pagina mașinii, raportul de ore, brandbook doar cu login |
+| 23.09 | — | 1 | Contact refăcut pentru telefon: butoanele în primul ecran, harta Google scoasă, pagina cu 18% mai scurtă |
 | **Total** | **35,3 h** | **127** | **12 zile** |
+
+(Rândul din 23.09 se completează cu orele la următoarea rulare a `tools/usage/report.py`.)
 
 **Consum de tokeni** (sesiunea principală plus sub-agenți, din 1 septembrie)
 - Generați (output): 3.561.888
@@ -58,6 +61,7 @@ Timpul tău de gândire și de verificare între prompturi, peste 15 minute, **n
 - [x] `/catalogo`: rânduri pe mărci, cu culoarea mărcii care traversează rândul
 - [x] `/coche/...`: fotografii grupate, garanție și mentenanță, mașinile vândute în gri
 - [x] **17.09:** culoarea mărcii ca fundal în partea de sus, cu animația din catalog
+- [x] **23.09:** `/contacto` pe telefon: WhatsApp și Llamar în primul ecran, numărul o singură dată, fără harta Google, bara de jos ascunsă cât se văd butoanele
 - [x] `/contacto` (contact), `/vende` (vinde-ți mașina, securizat), `/recomienda` (recomandă un prieten)
 - [x] Header și footer unice
 - [x] **17.09:** scos „Quién soy” (Cine sunt), care ducea la brandbook

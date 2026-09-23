@@ -129,9 +129,8 @@ const b = await p.launch({
       await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
       const hold = document.querySelector('.ct-open__hold').getBoundingClientRect();
       const pic  = document.querySelector('.ct-open__pic').getBoundingClientRect();
-      const map  = document.querySelector('.ct-where__canvas').getBoundingClientRect();
-      out.push({ y, underPhoto: Math.round(pic.bottom - hold.bottom),
-                 picToMap: Math.round(map.top - pic.bottom) });
+      // the map band under the photograph was removed on 2026-09-23
+      out.push({ y, underPhoto: Math.round(pic.bottom - hold.bottom), picToMap: 0 });
     }
     window.scrollTo(0, 0);
     return out;
@@ -161,33 +160,42 @@ const b = await p.launch({
   await pg.goto(URLP, { waitUntil: 'networkidle0' });
   await new Promise(r => setTimeout(r, 600));
 
-  // At 3:4 the photograph is 520 of an 844px screen; leading with it put the
-  // second line of the opening statement behind the fixed dock.
+  // 2026-09-23: the ways come before the photograph. With the photograph first
+  // (3:4, 520px) the first way to reach him started at y 913 on an 844 screen.
   const order = await pg.evaluate(() => {
     const t = (s) => Math.round(document.querySelector(s).getBoundingClientRect().top);
-    return { say: t('.ct-open__say'), pic: t('.ct-open__pic'), ways: t('.ct-open__ways-wrap') };
+    return { say: t('.ct-open__say'), ways: t('.ct-open__ways-wrap'), pic: t('.ct-open__pic') };
   });
-  is(order.say < order.pic && order.pic < order.ways,
-     'phone reads statement, then photograph, then the ways', JSON.stringify(order));
+  is(order.say < order.ways && order.ways < order.pic,
+     'phone reads statement, then the ways, then the photograph', JSON.stringify(order));
 
-  const clear = await pg.evaluate(() => {
-    const h = document.querySelector('.ct-open__h').getBoundingClientRect();
-    const dock = document.querySelector('.cat-dock');
-    const d = dock ? dock.getBoundingClientRect().top : window.innerHeight;
-    return { hBottom: Math.round(h.bottom), dockTop: Math.round(d) };
-  });
-  is(clear.hBottom <= clear.dockTop,
-     'and the opening statement clears the dock', `${clear.hBottom} vs ${clear.dockTop}`);
+  // The page's reason to exist is one tap from arrival: both buttons wholly on
+  // the first screen, thumb-sized, and in its lower half.
+  const go = await pg.evaluate(() => [...document.querySelectorAll('.ct-way__go .mc-btn')].map(e => {
+    const r = e.getBoundingClientRect(); return { top: Math.round(r.top), bottom: Math.round(r.bottom), h: Math.round(r.height) };
+  }));
+  is(go.length === 2 && go.every(g => g.bottom <= 844 && g.h >= 52),
+     'WhatsApp and Llamar are on the first screen, 52px tall', JSON.stringify(go));
+  is(go.every(g => g.top >= 844 / 2 - 60), 'and within reach of the thumb', `top ${go[0]?.top}`);
 
-  // On a phone the full width IS the photograph's width, so nothing comes off it.
+  const once = await pg.evaluate(() => (document.querySelector('.ct-open').textContent.match(/614 753 187/g) || []).length);
+  is(once === 1, 'the number is printed once, not once per app', `${once}`);
+
+  // The dock repeats those two buttons, so it waits until they have scrolled off.
+  const dock = async () => pg.evaluate(() => getComputedStyle(document.querySelector('.cat-dock')).visibility);
+  const d0 = await dock();
+  await pg.evaluate(() => window.scrollTo(0, 1400)); await new Promise(r => setTimeout(r, 700));
+  const d1 = await dock();
+  await pg.evaluate(() => window.scrollTo(0, 0)); await new Promise(r => setTimeout(r, 700));
+  const d2 = await dock();
+  is(d0 === 'hidden' && d1 === 'visible' && d2 === 'hidden',
+     'the dock waits while the page\'s own buttons are showing', `${d0} → ${d1} → ${d2}`);
+
   const shape = await pg.evaluate(() => {
-    const i = document.getElementById('hero-img');
-    const r = i.getBoundingClientRect();
-    return { box: r.width / r.height, file: i.naturalWidth / i.naturalHeight };
+    const r = document.querySelector('.ct-open__hold').getBoundingClientRect();
+    return r.width / r.height;
   });
-  is(Math.abs(shape.box - shape.file) < 0.01,
-     'and the photograph is shown at its own ratio, uncropped',
-     `${shape.box.toFixed(3)} vs ${shape.file.toFixed(3)}`);
+  is(Math.abs(shape - 4 / 3) < 0.01, 'the photograph closes the act at 4:3', shape.toFixed(3));
 
   await pg.close();
 }
