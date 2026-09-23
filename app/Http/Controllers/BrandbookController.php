@@ -103,6 +103,7 @@ class BrandbookController extends Controller
             'WhatsApp' => [
                 ['--mc-wa',      'The channel colour. WhatsApp\'s hue at the lightness that clears 4.5:1 with a white label — the brand #25D366 measures 1.98:1.'],
                 ['--mc-wa-dark', 'Hover, and the label colour when the button sits on navy.'],
+                ['--mc-wa-deep', 'A field, never a button: the WhatsApp band on /contacto. WhatsApp\'s own dark teal, deep like the marque rows and 74° from the blue beside it, so the seam does not vibrate. '.$this->ratio($t['--mc-wa-deep'] ?? '#075E54', '#FFFFFF').':1 white.'],
                 ['--mc-wa-tint', 'Sent-message confirmation ground.'],
             ],
             'Ink' => [
