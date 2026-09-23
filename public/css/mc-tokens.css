@@ -78,6 +78,11 @@
      that clears 4.5:1 with a white 16px label. */
   --mc-wa:        #017B37;  /* 5.40:1 white label; 4.99 vs bg, 4.59 vs band */
   --mc-wa-dark:   #006E30;  /* hover; label colour when the CTA sits on navy (6.42 on white) */
+  --mc-wa-deep:   #075E54;  /* WhatsApp's own dark teal (their brand palette). A FIELD,
+                               not a button: the /contacto band. 7.67:1 white. Deep
+                               like the marque rows (OKLCH L .43), and 74° from the
+                               blue beside it instead of 112°, so the seam between
+                               them does not vibrate. Buttons keep --mc-wa. */
   --mc-wa-tint:   #E3F7EF;  /* confirmation ground. 4.87:1 with --mc-wa text */
   --mc-ok:        #017B37;  /* = --mc-wa. Confirmation only, never "disponible" */
   --mc-ok-tint:   var(--mc-wa-tint);
