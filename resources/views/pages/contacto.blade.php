@@ -84,12 +84,21 @@
 
   {{-- ---- where and when, one answer -------------------------------- --}}
   <section class="ct-where ct-grid" aria-labelledby="where-h">
-    {{-- There was a Google Maps embed here: a 630px band of the whole of Málaga
-         at zoom 11, with no pin, because there is no shop to pin. It told the
-         reader nothing the word "Málaga" does not, cost a third-party load and
-         Google's cookies (which the consent notice would have to cover), and on
-         a phone it was 293px that swallowed a scroll until "Activar el mapa" was
-         pressed. The link below opens the real map in the app that is good at it. --}}
+    {{-- The map, as a picture of the map. The live Google embed is built only
+         when "Activar el mapa" is pressed (script below): until then this is one
+         lazy image of 35 KB on a phone and ~100 KB on a desk, in the site's own
+         palette, and not a single request to Google — no scripts, no fonts, no
+         cookies. See App\Support\StaticMap; `php artisan map:render` redraws it. --}}
+    <div class="ct-where__canvas" id="ct-map">
+      <picture>
+        <source media="(min-width:760px)" srcset="/img/map/malaga-wide.webp" width="2000" height="875">
+        <img class="ct-where__img" src="/img/map/malaga-phone.webp" width="800" height="600"
+             alt="Mapa de Málaga" loading="lazy" decoding="async">
+      </picture>
+      <span class="ct-pin" aria-hidden="true"></span>
+      <button class="ct-where__shield" id="map-on" type="button"><span>Activar el mapa</span></button>
+      <small class="ct-where__osm">© OpenStreetMap</small>
+    </div>
     <div class="ct-where__say">
       <h2 class="ct-h2 ct-rise" id="where-h">Málaga</h2>
       <p class="ct-say ct-rise">No hay tienda a la que presentarse. Quedamos donde
@@ -199,6 +208,26 @@
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
     rise.forEach(function (el) { io.observe(el); });
+  }
+
+  /* ---- the live map, built on request ---------------------------------
+     Nothing from Google exists in the page until this runs. The picture stays
+     underneath while the frame loads, so there is never an empty box. */
+  var shield = document.getElementById('map-on');
+  if (shield) {
+    shield.addEventListener('click', function () {
+      var box = document.getElementById('ct-map');
+      var f = document.createElement('iframe');
+      f.className = 'ct-where__f';
+      f.title = 'Mapa de Málaga, España';
+      f.referrerPolicy = 'no-referrer-when-downgrade';
+      f.allowFullscreen = true;
+      f.src = 'https://maps.google.com/maps?q=' + encodeURIComponent('Málaga, España') + '&z=12&hl=es&output=embed';
+      f.addEventListener('load', function () { box.classList.add('is-live'); });
+      box.appendChild(f);
+      shield.remove();
+      f.focus();
+    });
   }
 
   /* ---- the dock waits while the page's own buttons are on screen --------

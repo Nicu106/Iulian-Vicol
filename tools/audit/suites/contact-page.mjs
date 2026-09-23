@@ -129,8 +129,9 @@ const b = await p.launch({
       await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
       const hold = document.querySelector('.ct-open__hold').getBoundingClientRect();
       const pic  = document.querySelector('.ct-open__pic').getBoundingClientRect();
-      // the map band under the photograph was removed on 2026-09-23
-      out.push({ y, underPhoto: Math.round(pic.bottom - hold.bottom), picToMap: 0 });
+      const map  = document.querySelector('.ct-where__canvas').getBoundingClientRect();
+      out.push({ y, underPhoto: Math.round(pic.bottom - hold.bottom),
+                 picToMap: Math.round(map.top - pic.bottom) });
     }
     window.scrollTo(0, 0);
     return out;
@@ -197,6 +198,27 @@ const b = await p.launch({
   });
   is(Math.abs(shape - 4 / 3) < 0.01, 'the photograph closes the act at 4:3', shape.toFixed(3));
 
+  await pg.close();
+}
+
+/* -------------------------------------------------------------- the map */
+{
+  // A picture of the map until it is asked for: not one request to Google Maps
+  // (the site font from fonts.googleapis is a separate matter and allowed).
+  const pg = await b.newPage();
+  const reqs = [];
+  pg.on('request', r => reqs.push(r.url()));
+  await pg.setViewport({ width: 1440, height: 900 });
+  await pg.goto(URLP, { waitUntil: 'networkidle0' });
+  await pg.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 300) { scrollTo(0, y); await new Promise(r => setTimeout(r, 60)); } });
+  await new Promise(r => setTimeout(r, 500));
+  const maps = u => /maps\.google|google\.com\/maps|maps\.gstatic|maps\.googleapis/.test(u);
+  const before = reqs.filter(maps).length;
+  const img = reqs.filter(u => /\/img\/map\//.test(u)).length;
+  is(before === 0 && img >= 1, 'the map is our picture until asked for: no Google Maps request', `google ${before}, map images ${img}`);
+  await pg.click('#map-on');
+  await pg.waitForSelector('#ct-map iframe', { timeout: 5000 }).catch(() => {});
+  is(!!(await pg.$('#ct-map iframe')), 'and "Activar el mapa" builds the live one');
   await pg.close();
 }
 

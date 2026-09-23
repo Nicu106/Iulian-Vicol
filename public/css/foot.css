@@ -190,3 +190,27 @@
   .mc-foot__legal > span:first-child{ grid-column:1 / -1; }
   .mc-foot__legal-sep{ display:none; }
 }
+
+/* ---- where: a small map under the contact lines ---------------------------
+   The footer's own navy (StaticMap 'dark'), so it sits in the column as a
+   surface of the footer and not as a light hole punched in it. */
+.mc-foot__col li.mc-foot__where{ grid-column:1 / -1; }
+.mc-foot__col a.mc-foot__map{
+  position:relative; display:block; width:100%; max-width:20rem; aspect-ratio:16/10;
+  margin:var(--s-2) 0 var(--s-2); overflow:clip; min-height:0;
+  border:1px solid rgba(255,255,255,.14); text-decoration:none;
+}
+.mc-foot__map img{ display:block; width:100%; height:100%; object-fit:cover;
+  transition:scale var(--m-move) var(--e-out); }
+.mc-foot__map:hover img{ scale:1.04; }
+.mc-foot__pin{
+  position:absolute; left:50%; top:50%; width:12px; height:12px; translate:-50% -50%;
+  border-radius:50%; background:#FFFFFF;
+  box-shadow:0 0 0 4px rgba(255,255,255,.22), 0 0 0 9px rgba(255,255,255,.08);
+}
+.mc-foot__col .mc-foot__osm{
+  position:absolute; right:var(--s-1); bottom:var(--s-1); padding:0 var(--s-1);
+  font-size:10px; line-height:1.4; color:rgba(255,255,255,.72); background:rgba(4,11,31,.6);
+}
+@media (prefers-reduced-motion:reduce){ .mc-foot__map img{ transition:none; } }
+@media (max-width:759.98px){ .mc-foot__col a.mc-foot__map{ max-width:none; } }

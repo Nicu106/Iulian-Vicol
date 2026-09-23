@@ -396,3 +396,62 @@ body.ct-dock-wait .cat-dock{ transform:translateY(100%); visibility:hidden;
 @media (prefers-reduced-motion:reduce){
   .rise-armed .ct-rise{ opacity:1; transform:none; transition:none; }
 }
+
+/* ==========================================================================
+   THE MAP — a picture of it, and the live one on request
+   Full bleed between the opening and the caption, as it was. 16:7 on a desk,
+   4:3 on a phone. The pin is drawn here, not in the image: the point is the
+   image's centre, and a CSS pin stays sharp at any density.
+   ======================================================================== */
+.ct-where__canvas{
+  grid-column:full-start / full-end;
+  position:relative; width:100%; aspect-ratio:16/7;
+  overflow:clip; background:var(--mc-band);
+}
+@media (max-width:759.98px){ .ct-where__canvas{ aspect-ratio:4/3; } }
+.ct-where__img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 50%; }
+
+/* A drop: its tip is the point, its body stands above it. Brand blue, a white
+   ring so it reads on the pale roads, and one shadow to lift it off the map. */
+.ct-pin{
+  position:absolute; left:50%; top:50%; width:30px; height:30px;
+  translate:-50% -100%;
+  background:var(--mc-blue); border:3px solid #FFFFFF;
+  border-radius:50% 50% 50% 0; rotate:-45deg; transform-origin:50% 50%;
+  box-shadow:0 6px 14px rgba(var(--mc-scrim),.28);
+}
+.ct-pin{ translate:-50% calc(-100% - 4px); }
+.ct-pin::after{ content:""; position:absolute; inset:7px; border-radius:50%; background:#FFFFFF; }
+
+.ct-where__osm{
+  position:absolute; left:var(--s-2); bottom:var(--s-2);
+  padding:1px var(--s-2); background:rgba(255,255,255,.85);
+  font-size:var(--t-label); color:var(--mc-ink-2);
+}
+
+.ct-where__f{
+  /* Pulled up so Google's own place card — a white widget top left of every
+     embed — is clipped away above the frame; the height grows by the same so the
+     bottom edge and Google's attribution stay where the terms want them. */
+  position:absolute; left:0; right:0; top:-84px; height:calc(100% + 84px);
+  width:100%; border:0; opacity:0; transition:opacity var(--m-state) var(--e-out);
+}
+.ct-where__canvas.is-live .ct-where__f{ opacity:1; }
+
+/* An embed is live from the frame it loads: a scroll that starts over it is
+   eaten by it. So it is built only when asked for. Top right: bottom left is the
+   attribution, bottom right Google's fullscreen control once it is live. */
+.ct-where__shield{
+  position:absolute; inset:0; width:100%; height:100%;
+  display:flex; align-items:flex-start; justify-content:flex-end;
+  padding:var(--s-5); border:0; background:transparent; cursor:pointer;
+  font:inherit; color:var(--mc-ink);
+}
+@media (max-width:759.98px){ .ct-where__shield{ padding:var(--s-3); } }
+.ct-where__shield span{
+  display:inline-flex; align-items:center; min-height:var(--mc-tap-pref);
+  padding:0 var(--s-5); border-radius:var(--mc-r);
+  background:var(--mc-surface); box-shadow:var(--mc-shadow-2);
+  font-size:var(--t-ui); font-weight:600;
+}
+.ct-where__shield:focus-visible{ outline:3px solid var(--mc-focus); outline-offset:-6px; }

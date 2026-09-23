@@ -27,7 +27,19 @@
         <li><a href="tel:+34614753187">+34 614 753 187</a></li>
         <li><a href="https://wa.me/34614753187">WhatsApp</a></li>
         <li><a href="mailto:jvmotorclass@gmail.com">jvmotorclass@gmail.com</a></li>
-        <li><span>Málaga, España</span></li>
+        {{-- Where, as a map rather than as two words. A picture of it (13 KB,
+             lazy, drawn in the footer's own navy — App\Support\StaticMap) that
+             opens the real map; no Google request on any page until it is pressed. --}}
+        <li class="mc-foot__where">
+          <a class="mc-foot__map" href="https://www.google.com/maps/search/?api=1&amp;query={{ urlencode('Málaga, España') }}"
+             target="_blank" rel="noopener">
+            <img src="/img/map/malaga-foot.webp" width="640" height="400" alt="" loading="lazy" decoding="async">
+            <span class="mc-foot__pin" aria-hidden="true"></span>
+            <small class="mc-foot__osm">© OpenStreetMap</small>
+          </a>
+          <a href="https://www.google.com/maps/search/?api=1&amp;query={{ urlencode('Málaga, España') }}"
+             target="_blank" rel="noopener">Málaga, España · Ver en el mapa</a>
+        </li>
       </ul>
     </div>
 

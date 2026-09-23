@@ -12,3 +12,8 @@ Artisan::command('inspire', function () {
 Artisan::command('referrals:prune', function () {
     $this->info(\App\Support\Journey::prune() . ' referred visitors not seen for ' . \App\Support\Referral::days() . ' days deleted.');
 })->purpose('Delete recommendation journeys older than the link lifetime');
+
+// The map image on /contacto and in the footer. See App\Support\StaticMap.
+Artisan::command('map:render', function () {
+    \App\Support\StaticMap::renderAll(fn ($l) => $this->info($l));
+})->purpose('Render the static Málaga map images from OpenStreetMap tiles');

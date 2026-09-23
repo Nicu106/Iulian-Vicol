@@ -30,7 +30,7 @@ Timpul tău de gândire și de verificare între prompturi, peste 15 minute, **n
 | 14.09 | 1,5 | 5 | Navigația adminului (bară laterală / bară jos), rețelele sociale reale |
 | 15.09 | 1,4 | 8 | Logo Instagram, sistemul de recomandări, urmărirea link-urilor |
 | 17.09 | 0,8 | 6 | Documentul de strategie, culoarea mărcii pe pagina mașinii, raportul de ore, brandbook doar cu login |
-| 23.09 | — | 1 | Contact refăcut pentru telefon: butoanele în primul ecran, harta Google scoasă, pagina cu 18% mai scurtă |
+| 23.09 | — | 2 | Contact refăcut pentru telefon (butoanele în primul ecran); harta refăcută ca imagine proprie rapidă, Google doar la cerere; harta în subsol |
 | **Total** | **35,3 h** | **127** | **12 zile** |
 
 (Rândul din 23.09 se completează cu orele la următoarea rulare a `tools/usage/report.py`.)
@@ -61,7 +61,8 @@ Timpul tău de gândire și de verificare între prompturi, peste 15 minute, **n
 - [x] `/catalogo`: rânduri pe mărci, cu culoarea mărcii care traversează rândul
 - [x] `/coche/...`: fotografii grupate, garanție și mentenanță, mașinile vândute în gri
 - [x] **17.09:** culoarea mărcii ca fundal în partea de sus, cu animația din catalog
-- [x] **23.09:** `/contacto` pe telefon: WhatsApp și Llamar în primul ecran, numărul o singură dată, fără harta Google, bara de jos ascunsă cât se văd butoanele
+- [x] **23.09:** `/contacto` pe telefon: WhatsApp și Llamar în primul ecran, numărul o singură dată, bara de jos ascunsă cât se văd butoanele
+- [x] **23.09:** harta: imagine proprie (35 KB pe telefon), harta Google interactivă doar la „Activar el mapa”; hartă mică în subsol, pe toate paginile
 - [x] `/contacto` (contact), `/vende` (vinde-ți mașina, securizat), `/recomienda` (recomandă un prieten)
 - [x] Header și footer unice
 - [x] **17.09:** scos „Quién soy” (Cine sunt), care ducea la brandbook
@@ -103,4 +104,5 @@ Detaliile sunt în `docs/STRATEGIE-SI-SCHIMBARI.md` §4. Pe scurt:
 - [ ] `/` să arate noua pagină principală; paginile vechi redirecționate (301) sau șterse
 - [ ] `sitemap.xml`, `robots.txt`, domeniul, certificatul, mutarea datelor, backup
 - [ ] Timer zilnic pentru `referrals:prune`
+- [ ] Fontul DM Sans vine de la Google Fonts: de găzduit pe site (mai rapid și fără cerere către Google, relevant pentru GDPR)
 - [ ] Pagina „Quién soy” (Cine sunt): o facem ca pagină reală sau rămâne scoasă din meniu?
