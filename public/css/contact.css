@@ -577,3 +577,18 @@ body.ct-dock-wait .cat-dock{ transform:translateY(100%); visibility:hidden;
   .ct-open__ways-wrap{ padding-block:0 var(--s-6); }
   .ct-open__lede{ margin-top:var(--s-3); font-size:var(--t-prose); }
 }
+
+/* ---- phone pass, 2026-09-23 ------------------------------------------------ */
+@media (max-width:768px), (max-height:520px) and (orientation:landscape){
+  /* The page ends on the navy band and the footer carries its own clearance for
+     the dock (foot.css); main's clearance on top of it was a 90px strip of page
+     ground between two dark fields. /inicio does the same. */
+  body:has(.cat-dock) main.ct{ padding-bottom:0; }
+}
+@media (max-width:759.98px){
+  /* "Abrir en Google Maps" ended a section with ~150px of nothing before the form */
+  .ct-where__say{ padding-block:var(--s-6) 0; }
+  .ct-write{ padding-block:var(--s-6) var(--s-7); margin-top:var(--s-4); border-top:1px solid var(--mc-hairline); }
+  .ct-where__say .ct-h2{ font-size:var(--t-h3); }        /* the map above has just said "Málaga" */
+  .ct-far .ct-note{ margin-top:var(--s-6); }
+}

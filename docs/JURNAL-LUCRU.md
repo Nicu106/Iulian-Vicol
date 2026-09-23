@@ -30,7 +30,7 @@ Timpul tău de gândire și de verificare între prompturi, peste 15 minute, **n
 | 14.09 | 1,5 | 5 | Navigația adminului (bară laterală / bară jos), rețelele sociale reale |
 | 15.09 | 1,4 | 8 | Logo Instagram, sistemul de recomandări, urmărirea link-urilor |
 | 17.09 | 0,8 | 6 | Documentul de strategie, culoarea mărcii pe pagina mașinii, raportul de ore, brandbook doar cu login |
-| 23.09 | — | 4 | Contact refăcut pentru telefon; hărți vectoriale proprii (contact + subsol), Google doar la cerere; catalog: exemplele Porsche șterse, cartonașe „Próximamente”; subsol cu hartă care se desenează; contact cu benzi colorate ca în catalog |
+| 23.09 | — | 4 | Contact refăcut pentru telefon; hărți vectoriale proprii (contact + subsol), Google doar la cerere; catalog: exemplele Porsche șterse, cartonașe „Próximamente”; subsol cu hartă care se desenează; contact cu benzi colorate ca în catalog; analiză completă 8 pagini × 10 lățimi |
 | **Total** | **35,3 h** | **127** | **12 zile** |
 
 (Rândul din 23.09 se completează cu orele la următoarea rulare a `tools/usage/report.py`.)

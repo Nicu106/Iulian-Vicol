@@ -121,7 +121,9 @@
 :is(.cat-row,.home-rail) .mc-card__body{ gap:var(--s-2); }
 :is(.cat-row,.home-rail) .mc-card__sub{
   margin:0; font-size:var(--t-label); line-height:1.35; color:var(--mc-ink-3);
-  display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;
+  /* No clamp: "2.0TDI · Furgoneta · FWD" was cut to an ellipsis at 900px, and no
+     text on this site is cut. It wraps; the price row stays aligned because it is
+     pushed to the card's foot (margin-top:auto) in a row of equal-height cards. */
 }
 :is(.cat-row,.home-rail) .mc-chips{ gap:var(--s-1); margin-top:var(--s-1); }
 :is(.cat-row,.home-rail) .mc-chip{
