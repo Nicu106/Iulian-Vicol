@@ -1,0 +1,10 @@
+[Unit]
+Description=v2design: limpieza diaria de recomendaciones antiguas
+
+[Timer]
+OnCalendar=*-*-* 04:10:00
+RandomizedDelaySec=15min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

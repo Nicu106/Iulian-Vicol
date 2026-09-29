@@ -314,8 +314,8 @@ never "te escribió". Bots and link previews (WhatsApp's fetcher above all) are
 never counted — `Journey::isBot`, and the suite must keep a real phone UA.
 The owner reads it at `/admin/recomendaciones/{referrer}`; the car form's
 "Vino de parte de" puts links whose people viewed that car first. Rows are pruned
-90 days after last seen (`referrals:prune`, also run 1-in-50 on link opens — no
-scheduler here). Legal: recording journeys needs the cookie notice / privacy
+90 days after last seen (`referrals:prune`: daily by `motorclass-v2-prune.timer`
+(units in docs/systemd) and 1-in-50 on link opens). Legal: recording journeys needs the cookie notice / privacy
 policy to mention it before this goes to the real domain.
 `tools/audit/suites/referral.mjs` covers all of it and cleans up after itself.
 
@@ -339,6 +339,8 @@ policy to mention it before this goes to the real domain.
   tokens), tick what was done in §2, and move anything new the client must decide or that
   is still open into §3. Written in Romanian without Spanish (UI labels translated in
   brackets) — the client is a developer who does not read Spanish.
+- **Fonts are self-hosted** (`public/css/fonts.css`, `public/fonts/dm-sans`). Never add a
+  Google Fonts link back: it was removed for GDPR and first-paint speed.
 - **`/brandbook` is signed-in only** (route middleware `auth`, reached from the panel's
   "Brandbook" item). Never link it from a public page. To audit it, render it through
   tinker like the admin views; an anonymous puppeteer run gets the login redirect.

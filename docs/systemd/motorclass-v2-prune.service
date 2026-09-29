@@ -1,0 +1,15 @@
+[Unit]
+Description=v2design: borra los recorridos de recomendaciones de mas de 90 dias
+
+[Service]
+Type=oneshot
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/motorclass-v2
+# Lo que se promete en el panel: una persona anonima se borra 90 dias despues de
+# su ultima visita. Tambien corre 1 de cada 50 aperturas de enlace, pero sin
+# visitas no correria nunca; esto lo garantiza.
+ExecStart=/usr/bin/php artisan referrals:prune
+Nice=15
+StandardOutput=journal
+StandardError=journal

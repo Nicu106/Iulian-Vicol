@@ -70,14 +70,12 @@ if grep -q '^BRANDBOOK_ONLY=true' .env 2>/dev/null; then
     [ "$t" -eq 0 ] && { no "$p NO está bloqueada"; leaked=1; }
   done
   [ "$leaked" -eq 0 ] && ok "rutas sin terminar bloqueadas (3 comprobadas)"
-  # the pages render real photographs through /img, so that route must survive
-  src=$(curl -s -m 10 "$V2/catalogo" $R | grep -oE '/img/[0-9]+\?[^" ,]*' | head -1 | sed 's/&amp;/\&/g')
-  if [ -n "$src" ]; then
-    i=$(curl -s -o /dev/null -w "%{http_code}" -m 10 "$V2$src" $R)
-    [ "$i" = "200" ] && ok "servicio de imágenes sigue activo" || no "/img devuelve $i"
-  else
-    no "/catalogo no referencia ninguna imagen vía /img"
-  fi
+  # The /img resizer must survive the lockdown. Asked directly for a width of a
+  # file that is always there (the catalogue banner): a page may link only
+  # already-built files from /storage/cache, so scraping a page for an /img URL
+  # found nothing once every derivative existed, and failed a healthy service.
+  i=$(curl -s -o /dev/null -w "%{http_code}" -m 20 "$V2/img/320?p=%2Fimg%2Fbanner%2Fpanamera.jpg" $R)
+  [[ "$i" == "200" || "$i" == "302" ]] && ok "servicio de imágenes sigue activo ($i)" || no "/img devuelve $i"
 else
   ok "bloqueo desactivado (el sitio completo está servido)"
 fi

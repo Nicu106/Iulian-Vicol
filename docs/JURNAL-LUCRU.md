@@ -5,7 +5,7 @@ de lucru (regula e în `CLAUDE.md` §8).
 
 - **Planul complet și deciziile:** `docs/STRATEGIE-SI-SCHIMBARI.md`
 - **Orele și tokenii se recalculează** cu `python3 tools/usage/report.py --since 2026-09-01`
-- **Ultima actualizare:** 17 septembrie 2026
+- **Ultima actualizare:** 30 septembrie 2026
 
 ---
 
@@ -29,14 +29,14 @@ Timpul tău de gândire și de verificare între prompturi, peste 15 minute, **n
 | 10.09 | 1,4 | 5 | Adminul refăcut pe noul design, totul tradus, fluxul „Vinde-ți mașina” reparat |
 | 14.09 | 1,5 | 5 | Navigația adminului (bară laterală / bară jos), rețelele sociale reale |
 | 15.09 | 1,4 | 8 | Logo Instagram, sistemul de recomandări, urmărirea link-urilor |
-| 17.09 | 0,8 | 6 | Documentul de strategie, culoarea mărcii pe pagina mașinii, raportul de ore, brandbook doar cu login |
-| 23.09 | — | 4 | Contact refăcut pentru telefon; hărți vectoriale proprii (contact + subsol), Google doar la cerere; catalog: exemplele Porsche șterse, cartonașe „Próximamente”; subsol cu hartă care se desenează; contact cu benzi colorate ca în catalog; analiză completă 8 pagini × 10 lățimi |
-| **Total** | **35,3 h** | **127** | **12 zile** |
+| 17.09 | 0,9 | 6 | Documentul de strategie, culoarea mărcii pe pagina mașinii, raportul de ore, brandbook doar cu login |
+| 23.09 | 1,7 | 6 | Contact refăcut pentru telefon; hărți vectoriale proprii (contact + subsol), Google doar la cerere; catalog: exemplele Porsche șterse, cartonașe „Próximamente”; subsol cu hartă care se desenează; contact cu benzi colorate ca în catalog; analiză completă 8 pagini × 10 lățimi |
+| 30.09 | 0,1 | 1 | Font găzduit pe site (fără Google), timer zilnic pentru curățarea recomandărilor, verificarea zilnică reparată |
+| **Total** | **37,1 h** | **134** | **14 zile** |
 
-(Rândul din 23.09 se completează cu orele la următoarea rulare a `tools/usage/report.py`.)
 
 **Consum de tokeni** (sesiunea principală plus sub-agenți, din 1 septembrie)
-- Generați (output): 3.561.888
+- Generați (output): 3.717.906 (recalculat 30.09)
 - Citiți din cache: 1.440.860.859 (contextul conversației, recitit la fiecare pas)
 - Scriși în cache: 42.982.070
 - Input necache: 96.353
@@ -69,6 +69,7 @@ Timpul tău de gândire și de verificare între prompturi, peste 15 minute, **n
 - [x] Header și footer unice
 - [x] **17.09:** scos „Quién soy” (Cine sunt), care ducea la brandbook
 - [x] Imagini optimizate automat, fără pași manuali
+- [x] **30.09:** fontul DM Sans găzduit pe site: 0 cereri către Google pe orice pagină (GDPR, pagină mai rapidă)
 - [x] Rețelele sociale cu conturile și logo-urile reale
 
 ### Adminul
@@ -83,6 +84,12 @@ Timpul tău de gândire și de verificare între prompturi, peste 15 minute, **n
 - [x] `docs/STRATEGIE-SI-SCHIMBARI.md` (planul)
 - [x] acest jurnal
 - [x] `tools/usage/report.py` (raportul de ore)
+
+### Server (merg și fără sesiune deschisă — systemd, pornesc la boot)
+- [x] `motorclass-v2-queue.service`: coada (imaginile la încărcarea pozelor), repornește singură
+- [x] `motorclass-v2-images.timer`: la fiecare oră, construiește imaginile lipsă
+- [x] `motorclass-v2-check.timer`: zilnic, verifică izolarea față de producție (reparat 30.09)
+- [x] **30.09:** `motorclass-v2-prune.timer`: zilnic la 04:10, șterge datele de recomandări mai vechi de 90 de zile
 
 ---
 
@@ -105,6 +112,4 @@ Detaliile sunt în `docs/STRATEGIE-SI-SCHIMBARI.md` §4. Pe scurt:
 - [ ] Termenii programului de recomandare pe `/recomienda`
 - [ ] `/` să arate noua pagină principală; paginile vechi redirecționate (301) sau șterse
 - [ ] `sitemap.xml`, `robots.txt`, domeniul, certificatul, mutarea datelor, backup
-- [ ] Timer zilnic pentru `referrals:prune`
-- [ ] Fontul DM Sans vine de la Google Fonts: de găzduit pe site (mai rapid și fără cerere către Google, relevant pentru GDPR)
 - [ ] Pagina „Quién soy” (Cine sunt): o facem ca pagină reală sau rămâne scoasă din meniu?
