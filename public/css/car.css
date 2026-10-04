@@ -557,3 +557,39 @@
   .car-top .car-back,.car-top .car-h,.car-top .car-gone,
   .car--wall .car-price{ animation:none; }
 }
+
+/* ============================================================================
+   THE PHONE GALLERY (2026-10-05) — a strip you swipe, dots like Instagram's,
+   no arrows. The strip is built by the script; without it the stage is the
+   single photograph it always was.
+   ========================================================================= */
+@media (max-width:768px){
+  .car-stage__nav{ display:none; }
+  .car-stage.is-track .car-stage__img{ display:none; }
+  .car-track{ position:absolute; inset:0; display:flex; overflow-x:auto; overflow-y:hidden;
+    scroll-snap-type:x mandatory; overscroll-behavior-x:contain; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+  .car-track::-webkit-scrollbar{ display:none; }
+  .car-track__img{ flex:0 0 100%; width:100%; height:100%; object-fit:cover; display:block;
+    scroll-snap-align:center; scroll-snap-stop:always; }
+  .car-stage.is-track .car-stage__count{ z-index:1; pointer-events:none; }
+
+  .car-dots{ display:flex; justify-content:center; align-items:center; gap:6px; height:22px; margin-top:var(--s-2); }
+  .car-dots i{ width:7px; height:7px; border-radius:50%; background:var(--mc-rule);
+    transition:background var(--m-quick) var(--e-out), transform var(--m-quick) var(--e-out); }
+  .car-dots i.on{ background:var(--mc-blue); }
+  .car-dots i.sm{ transform:scale(.6); }
+  .car--sold .car-dots i.on{ background:var(--mc-ink); }
+
+  .car-view.is-track:not([hidden]){ display:block; padding:0; }
+  .car-view.is-track .car-view__fig, .car-view.is-track .car-view__nav{ display:none; }
+  .car-view__track{ position:absolute; inset:0; display:flex; overflow-x:auto; overflow-y:hidden;
+    scroll-snap-type:x mandatory; overscroll-behavior:contain; scrollbar-width:none; }
+  .car-view__track::-webkit-scrollbar{ display:none; }
+  .car-view__slide{ flex:0 0 100%; width:100%; height:100%; object-fit:contain; scroll-snap-align:center; scroll-snap-stop:always; }
+  .car-view.is-track .car-view__x{ z-index:2; top:calc(var(--s-4) + env(safe-area-inset-top, 0px)); }
+  .car-dots--view{ position:absolute; left:0; right:0; z-index:2; bottom:calc(var(--s-8) + env(safe-area-inset-bottom, 0px)); margin:0; }
+  .car-dots--view i{ background:rgba(255,255,255,.4); }
+  .car-dots--view i.on{ background:#FFFFFF; }
+  .car-view.is-track .car-view__count{ z-index:2; }
+}
+@media (min-width:769px){ .car-dots{ display:none; } }

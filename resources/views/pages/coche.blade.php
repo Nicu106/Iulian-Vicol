@@ -445,11 +445,12 @@
     else if (e.key === 'ArrowLeft')  { e.preventDefault(); step(-1); }
   });
 
+  var PHONE = window.matchMedia('(max-width: 768px)');
   // a swipe across the full-screen photograph, which is how a phone expects to move
   var x0 = null;
   view.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
   view.addEventListener('touchend', function (e) {
-    if (x0 === null) return;
+    if (x0 === null || PHONE.matches) return;    // on a phone the viewer is a swipeable strip (below)
     var dx = e.changedTouches[0].clientX - x0;
     x0 = null;
     if (Math.abs(dx) > 45) step(dx < 0 ? 1 : -1);
@@ -486,6 +487,88 @@
       thumbs.hidden = !n;
     });
   }
+
+  /* ---- the phone: a strip you swipe, and dots ---------------------------
+     2026-10-05. The client: the arrows go on a phone (on the page AND full
+     screen), dots like Instagram's show there is more, and — the bug — "the
+     number in the corner changes but the photograph does not". That was the
+     swap: the counter moved at once while the new file waited on decode(),
+     which iOS Safari can hold for seconds or drop. Here the photographs ARE the
+     strip; the browser scrolls it natively, and the number and the dots are
+     read off what is on screen, so they cannot disagree with the picture. */
+  if (!PHONE.matches) return;
+  var cap = stageFig.querySelector('.car-stage__count');
+  var track = document.createElement('div'); track.className = 'car-track';
+  stageFig.insertBefore(track, cap); stageFig.classList.add('is-track');
+  var dots = document.createElement('div'); dots.className = 'car-dots'; dots.setAttribute('aria-hidden', 'true');
+  stageFig.parentNode.insertBefore(dots, stageFig.nextSibling);
+  var list = [], cur = 0;
+
+  function drawDots(box, n, i) {
+    // up to 7 visible; the far ones shrink, as Instagram's do, so 59 photographs stay a short row
+    var html = '', from = Math.max(0, Math.min(i - 3, n - 7)), to = Math.min(n, from + 7);
+    for (var k = from; k < to; k++) {
+      var d = Math.abs(k - i), edge = (k === from && from > 0) || (k === to - 1 && to < n);
+      html += '<i class="' + (k === i ? 'on' : '') + (edge ? ' sm' : d >= 3 ? ' sm' : '') + '"></i>';
+    }
+    box.innerHTML = n > 1 ? html : '';
+  }
+  function setIdx(i) {
+    cur = i; var a = list[i]; if (!a) return;
+    cap.innerHTML = '<b id="stage-n">' + (i + 1) + '</b> / ' + list.length;
+    drawDots(dots, list.length, i);
+    var was = thumbs.querySelector('.car-thumb.is-on'); if (was) was.classList.remove('is-on');
+    a.classList.add('is-on');
+    thumbs.scrollTo({ left: a.offsetLeft - (thumbs.clientWidth - a.clientWidth) / 2, behavior: 'smooth' });
+  }
+  function slide(a, i, big) {
+    var im = new Image(); im.className = big ? 'car-view__slide' : 'car-track__img';
+    im.alt = a.getAttribute('aria-label') || ''; im.decoding = 'async'; im.loading = i < 2 ? 'eager' : 'lazy';
+    var set = a.getAttribute('data-set'); if (set) { im.srcset = set; im.sizes = '100vw'; }
+    im.src = big ? a.getAttribute('href') : (a.getAttribute('data-stage') || a.getAttribute('href'));
+    return im;
+  }
+  function build() {
+    // a group with no photographs keeps the strip it had: the page says why underneath
+    if (!shown().length && list.length) return;
+    list = shown(); track.innerHTML = '';
+    list.forEach(function (a, i) { track.appendChild(slide(a, i, false)); });
+    track.scrollLeft = 0; setIdx(0);
+  }
+  var raf = 0;
+  track.addEventListener('scroll', function () {
+    if (raf) return; raf = requestAnimationFrame(function () { raf = 0;
+      var i = Math.round(track.scrollLeft / track.clientWidth); if (i !== cur && list[i]) setIdx(i); });
+  }, { passive: true });
+  // a thumbnail scrolls the strip to its photograph
+  thumbs.addEventListener('click', function (e) {
+    var a = e.target.closest('.car-thumb'); if (!a) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    var i = list.indexOf(a); if (i >= 0) track.scrollTo({ left: i * track.clientWidth, behavior: 'smooth' });
+  }, true);
+  if (tabs) tabs.addEventListener('click', function () { setTimeout(build, 0); });
+
+  // full screen: the same strip, larger, on black, with its own dots; no arrows
+  var vtrack = document.createElement('div'); vtrack.className = 'car-view__track';
+  var vdots = document.createElement('div'); vdots.className = 'car-dots car-dots--view'; vdots.setAttribute('aria-hidden', 'true');
+  view.appendChild(vtrack); view.appendChild(vdots); view.classList.add('is-track');
+  var vcur = 0, vraf = 0;
+  function vset(i) { vcur = i; vCnt.textContent = (i + 1) + ' / ' + list.length; drawDots(vdots, list.length, i); }
+  vtrack.addEventListener('scroll', function () {
+    if (vraf) return; vraf = requestAnimationFrame(function () { vraf = 0;
+      var i = Math.round(vtrack.scrollLeft / vtrack.clientWidth); if (i !== vcur && list[i]) vset(i); });
+  }, { passive: true });
+  function vopen() {
+    lastFocus = document.activeElement;
+    vtrack.innerHTML = ''; list.forEach(function (a, i) { var im = slide(a, i, true); im.loading = Math.abs(i - cur) < 2 ? 'eager' : 'lazy'; vtrack.appendChild(im); });
+    view.hidden = false; document.body.style.overflow = 'hidden';
+    vtrack.scrollLeft = cur * vtrack.clientWidth; vset(cur);
+    document.getElementById('view-x').focus();
+  }
+  track.addEventListener('click', vopen);
+  // closing brings the page strip to the photograph you stopped on
+  document.getElementById('view-x').addEventListener('click', function () { track.scrollLeft = vcur * track.clientWidth; setIdx(vcur); });
+  build();
 })();
 </script>
 @endpush
