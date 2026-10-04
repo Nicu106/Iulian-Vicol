@@ -37,7 +37,7 @@
     <h1>Esta página todavía se está construyendo</h1>
     <p>Este servidor es la copia de diseño, no la web pública. Sólo están abiertas
        las páginas ya terminadas.</p>
-    <p><a class="btn" href="/inicio">Ver la web nueva</a></p>
+    <p><a class="btn" href="/">Ver la web nueva</a></p>
     <p class="r">¿Buscabas la web?
        <a href="https://ivmotorclass.com" style="color:var(--mc-blue-light)">ivmotorclass.com</a></p>
   </div>

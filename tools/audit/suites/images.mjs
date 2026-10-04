@@ -17,7 +17,7 @@ const is   = (c, t, d) => (c ? ok : fail)(t, d);
 // Budgets are the measured figure with headroom, not aspirations. /coche was
 // 7.17 MB before this work; /inicio carries a 25-photograph carousel and is the
 // one page where the bytes are the design.
-const BUDGET = { '/coche': 0.60, '/catalogo': 0.75, '/inicio': 1.40, '/contacto': 0.35 };
+const BUDGET = { '/coche': 0.60, '/catalogo': 0.75, '/': 1.40, '/contacto': 0.35 };
 
 const browser = await p.launch({
   executablePath: exe,
@@ -32,7 +32,7 @@ const carHref = await nav.evaluate(() =>
   document.querySelector('.mc-card:not(.mc-card--soon) a.mc-card__link')?.getAttribute('href'));
 await nav.close();
 
-for (const route of [carHref, '/catalogo', '/inicio', '/contacto']) {
+for (const route of [carHref, '/catalogo', '/', '/contacto']) {
   const key = route.startsWith('/coche') ? '/coche' : route;
   const pg = await browser.newPage();
   await pg.setViewport({ width: 390, height: 844, deviceScaleFactor: 2, isMobile: true, hasTouch: true });

@@ -53,7 +53,7 @@
     <div class="ad-rail__head">
       <a class="ad-mark" href="{{ route('admin.home') }}"><b>IV MOTORCLASS</b> <span>Panel</span></a>
       <div class="ad-rail__end">
-        <a class="ad-out" href="{{ route('inicio') }}">Ver la web</a>
+        <a class="ad-out" href="{{ route('home') }}">Ver la web</a>
         <form action="{{ route('logout') }}" method="POST">
           @csrf
           <button class="ad-out" type="submit">Salir</button>

@@ -1,2 +1,7 @@
 User-agent: *
-Disallow: /
+Disallow: /admin
+Disallow: /login
+Disallow: /brandbook
+Disallow: /r/
+
+Sitemap: https://ivmotorclass.com/sitemap.xml

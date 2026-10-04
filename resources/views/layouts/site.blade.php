@@ -34,7 +34,7 @@
      scrolling the page under it, which is what a page with forms wants. It was
      on three pages of five before this. --}}
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="index, follow">
 <title>@yield('title')</title>
 
 <link rel="preload" href="/fonts/dm-sans/dm-sans-latin-normal.woff2" as="font" type="font/woff2" crossorigin>

@@ -19,7 +19,7 @@ class ReferralController extends Controller
      */
     public function visit(Request $request, string $code)
     {
-        $to = redirect()->route('inicio');
+        $to = redirect()->route('home');
 
         // WhatsApp's preview fetcher and other bots: not a person opening the
         // link. Not counted, and no cookie.

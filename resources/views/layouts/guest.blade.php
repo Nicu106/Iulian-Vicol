@@ -26,7 +26,7 @@
 
 <main class="ad-gate">
   <div class="ad-gate__in">
-    <a class="ad-gate__mark" href="{{ route('inicio') }}">
+    <a class="ad-gate__mark" href="{{ route('home') }}">
       <b>IV MOTORCLASS</b>
       <span>Acceso administrador</span>
     </a>

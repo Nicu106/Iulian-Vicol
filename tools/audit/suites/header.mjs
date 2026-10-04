@@ -20,7 +20,7 @@ const b = await p.launch({ executablePath: exe,
 // "Quién soy" went to the brandbook, which is signed-in only since 2026-09-17.
 const LINKS = ['Inicio', 'Coches', 'Contacto', 'Vende tu coche'];
 
-for (const route of ['/inicio', '/catalogo', '/contacto', '/vende']) {
+for (const route of ['/', '/catalogo', '/contacto', '/vende']) {
   const pg = await b.newPage();
   await pg.setViewport({ width: 1440, height: 900 });
   await pg.goto(`https://${HOST}${route}`, { waitUntil: 'domcontentloaded' });

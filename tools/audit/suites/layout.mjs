@@ -33,7 +33,7 @@ const browser = await p.launch({ executablePath: exe,
   args: ['--no-sandbox', '--ignore-certificate-errors', `--host-resolver-rules=MAP ${HOST} 127.0.0.1`] });
 
 const ROUTES = [
-  ['/inicio',   'IV MOTORCLASS — Coches alemanes premium en Málaga', 'Inicio'],
+  ['/',   'IV MOTORCLASS — Coches alemanes premium en Málaga', 'Inicio'],
   ['/catalogo', 'Catálogo — IV MOTORCLASS',                          'Coches'],
   ['/contacto', 'Contacto — IV MOTORCLASS',                          'Contacto'],
   ['/vende',    'Vende tu coche — IV MOTORCLASS',                    'Vende tu coche'],

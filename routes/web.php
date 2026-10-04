@@ -5,10 +5,14 @@ use App\Http\Controllers\Admin\VehicleController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
-Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::view('/despre', 'pages.about')->name('about');
-Route::view('/contact', 'pages.contact')->name('contact');
-Route::get('/catalog', [App\Http\Controllers\CatalogController::class, 'index'])->name('catalog');
+// 2026-10-05: v2 is ivmotorclass.com. The home page is the new one at "/"; every address
+// the old site used answers with a 301 to its new page, so links and search results keep
+// working. The route names stay because older code still builds URLs from them.
+Route::get('/', [App\Http\Controllers\HomePageController::class, 'index'])->name('home');
+Route::redirect('/inicio', '/', 301)->name('inicio');
+Route::redirect('/despre', '/contacto', 301)->name('about');
+Route::redirect('/contact', '/contacto', 301)->name('contact');
+Route::redirect('/catalog', '/catalogo', 301)->name('catalog');
 Route::post('/contact/send', [App\Http\Controllers\ContactController::class, 'store'])->name('contact.send');
 
 // Lightweight image resize with caching (local files only)
@@ -41,7 +45,7 @@ Route::post('/vende', [App\Http\Controllers\SellCarController::class, 'store'])
     ->name('sell-car.store');
 
 // Detaliu vehicul (din baza de date)
-Route::get('/vehicles/{slug}', [App\Http\Controllers\VehicleController::class, 'show'])->name('vehicle.show');
+Route::get('/vehicles/{slug}', fn (string $slug) => redirect('/coche/' . $slug, 301))->name('vehicle.show');
 Route::post('/inquiries', [App\Http\Controllers\InquiryController::class, 'store'])->name('inquiries.store');
 
 // Pagina mașini salvate (doar frontend, fără backend)
@@ -50,7 +54,6 @@ Route::post('/inquiries', [App\Http\Controllers\InquiryController::class, 'store
 Route::get('/brandbook', [App\Http\Controllers\BrandbookController::class, 'index'])->middleware('auth')->name('brandbook');
 Route::get('/catalogo', [App\Http\Controllers\BrandCatalogController::class, 'index'])->name('catalogo');
 Route::get('/coche/{slug}', [App\Http\Controllers\CarPageController::class, 'show'])->name('coche');
-Route::get('/inicio', [App\Http\Controllers\HomePageController::class, 'index'])->name('inicio');
 Route::get('/contacto', [App\Http\Controllers\ContactPageController::class, 'index'])->name('contacto');
 
 // Recommendations without accounts — App\Support\Referral has the rules.
@@ -62,7 +65,7 @@ Route::get('/recomienda', [App\Http\Controllers\ReferralController::class, 'show
 Route::post('/recomienda', [App\Http\Controllers\ReferralController::class, 'store'])
     ->middleware('throttle:referral')->name('refer.store');
 
-Route::view('/saved-vehicles', 'pages.saved-vehicles')->name('saved-vehicles');
+Route::redirect('/saved-vehicles', '/catalogo', 301)->name('saved-vehicles');
 
 Route::get('/dashboard', function () {
     return redirect()->route('admin.home');
@@ -142,3 +145,14 @@ require __DIR__.'/auth.php';
 // They read as harmless because BrandbookOnly was serving a holding page over
 // them. Probed with the lockdown switched off, which is what launch does, all
 // three GETs answered 200 with the real content. Removed 2026-09-08.
+
+// The sitemap, from the database, so a car added in the panel is in it the same minute.
+Route::get('/sitemap.xml', function () {
+    $urls = collect(['/', '/catalogo', '/contacto', '/vende', '/recomienda'])
+        ->map(fn ($p) => ['loc' => url($p), 'lastmod' => null]);
+    \App\Models\Vehicle::whereIn('status', ['available', 'sold'])->orderByDesc('updated_at')->get(['slug', 'updated_at'])
+        ->each(fn ($v) => $urls->push(['loc' => url('/coche/' . $v->slug), 'lastmod' => optional($v->updated_at)->toAtomString()]));
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+    foreach ($urls as $u) $xml .= '<url><loc>' . e($u['loc']) . '</loc>' . ($u['lastmod'] ? '<lastmod>' . $u['lastmod'] . '</lastmod>' : '') . '</url>';
+    return response($xml . '</urlset>', 200, ['Content-Type' => 'application/xml']);
+})->name('sitemap');
