@@ -102,7 +102,7 @@
         <span class="ct-band__mark" aria-hidden="true"></span>
         <span class="ct-band__in cat-wrap">
           <span class="ct-band__k">Email</span>
-          <span class="ct-band__v ct-band__v--mail">{{ $email }}</span>
+          <span class="ct-band__v ct-band__v--mail">{!! str_replace('@', '<wbr>@', e($email)) !!}</span>
           <span class="ct-band__n">Para documentación y facturas.</span>
           <span class="ct-band__go">Escribir un correo</span>
         </span>

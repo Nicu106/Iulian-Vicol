@@ -339,7 +339,7 @@ li.ct-way:hover .ct-way__v:not(:hover){ color:var(--mc-ink); text-decoration-col
   font-variant-numeric:tabular-nums;
 }
 .ct-trip__km i{
-  font-style:normal; font-size:.36em; font-weight:600;
+  font-style:normal; font-size:max(var(--t-label), .36em); font-weight:600;
   letter-spacing:0; color:var(--mc-ink-2); margin-left:.22em;
 }
 .ct-trip__who{ display:block; margin-top:var(--s-3); font-size:var(--t-small); color:var(--mc-ink-2); }

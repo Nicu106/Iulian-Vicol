@@ -135,7 +135,7 @@ let codeA = null, codeB = null;
   const jar = await pg.cookies();
   const c = jar.find(k => k.name === 'mc_ref');
   const days = c ? (c.expires * 1000 - Date.now()) / 864e5 : 0;
-  is(/\/inicio$/.test(url), 'opening a link lands on the home page', url);
+  is(/ivmotorclass\.com\/$/.test(url), 'opening a link lands on the home page', url);
   is(c && c.value === codeA, 'and remembers the code (typed in lower case, stored as the code)', c?.value);
   is(c && !c.httpOnly && c.sameSite === 'Lax', 'in a readable, SameSite=Lax cookie');
   is(days > 89 && days <= 90.01, 'for 90 days', days.toFixed(2));
@@ -199,7 +199,7 @@ let codeA = null, codeB = null;
   const r1 = await pg.goto(`${B}/r/NOPE9999`, { waitUntil: 'networkidle0' });
   const r2 = await pg.goto(`${B}/r/%3Cx%3E`, { waitUntil: 'networkidle0' });
   const jar = await pg.cookies();
-  is(/\/inicio$/.test(pg.url()) && r1.status() === 200 && r2.status() < 500 && !jar.some(k => k.name === 'mc_ref'),
+  is(/ivmotorclass\.com\/$/.test(pg.url()) && r1.status() === 200 && r2.status() < 500 && !jar.some(k => k.name === 'mc_ref'),
      'an unknown or malformed code lands on the home page and remembers nothing');
   await ctx.close();
 }

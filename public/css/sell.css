@@ -221,3 +221,13 @@
 .sl-alert__h{ margin:0; font-size:var(--t-value); font-weight:700; color:var(--mc-ink); }
 .sl-alert__l{ margin:var(--s-2) 0 0; padding-left:var(--s-5); font-size:var(--t-small); line-height:1.6; color:var(--mc-ink); }
 .sl-alert:focus-visible{ outline:3px solid var(--mc-focus); outline-offset:3px; }
+
+/* ---- phone pass, 2026-10-05 ---------------------------------------------- */
+/* the chosen marque says so: a white tick in a disc, top right, besides the ring */
+.sl-marque::after{ content:""; position:absolute; top:var(--s-3); right:var(--s-3); width:26px; height:26px; border-radius:50%;
+  background:#FFFFFF url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%23111C2E' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/16px no-repeat;
+  opacity:0; transform:scale(.6); transition:opacity var(--m-quick) var(--e-out), transform var(--m-quick) var(--e-out); }
+.sl-marque:has(.sl-marque__in:checked)::after{ opacity:1; transform:none; }
+.sl-marque--other::after{ background-color:var(--mc-ink); background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%23FFFFFF' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+/* on a phone every form's send button is the same: full width */
+@media (max-width:759.98px){ .sl-send__btn{ justify-self:stretch; width:100%; justify-content:center; } }

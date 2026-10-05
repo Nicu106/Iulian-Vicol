@@ -75,7 +75,7 @@ for (const [route, title, current] of ROUTES) {
   is(m.nav === 4, `${route} carries the four nav links`, `${m.nav}`);
   is(BASE.every(c => m.css.includes(c)), `${route} loads the four shared stylesheets`,
      m.css.join(' '));
-  is(m.viewport.includes('interactive-widget') && m.robots.includes('noindex'),
+  is(m.viewport.includes('interactive-widget') && m.robots.includes('index, follow')   // public since the launch, 2026-10-05,
      `${route} inherits the shared viewport and robots meta`);
   if (title) is(m.title === title, `${route} keeps its own title`, m.title);
   if (current) is(m.current === current, `${route} marks its nav item`, m.current || '(none)');

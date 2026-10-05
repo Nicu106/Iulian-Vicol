@@ -593,3 +593,17 @@
   .car-view.is-track .car-view__count{ z-index:2; }
 }
 @media (min-width:769px){ .car-dots{ display:none; } }
+
+/* ---- phone pass, 2026-10-05 (two audits at 390/360/320) ------------------- */
+/* WhatsApp + Llamar as one balanced row: the second button sat 4px lower and
+   the pair used 268 of 358px; on a sold car the two stacked touching. */
+.car-act{ display:flex; flex-wrap:wrap; gap:var(--s-2); }
+.car-act .mc-btn{ flex:1 1 auto; justify-content:center; min-height:var(--mc-tap-pref); }
+/* a car that is gone does not sell its warranty, its maintenance or a discount */
+.car--sold .car-with, .car--sold .car-price__was{ display:none; }
+.car-back{ display:inline-flex; align-items:center; min-height:var(--mc-tap); }
+.car-text__p{ white-space:pre-line; }
+.car-text__p.is-folded{ display:-webkit-box; -webkit-line-clamp:8; -webkit-box-orient:vertical; overflow:hidden; }
+.car-more{ display:inline-flex; align-items:center; min-height:var(--mc-tap); margin-top:var(--s-2);
+  background:none; border:0; padding:0; font:600 var(--t-ui)/1 var(--f-ui); color:var(--mc-blue); cursor:pointer; }
+@media (max-width:768px){ .car-sec{ margin-top:var(--s-7); } .car-grid{ row-gap:var(--s-7); } .car-with{ margin-top:var(--s-5); } }

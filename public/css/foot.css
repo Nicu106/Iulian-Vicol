@@ -23,7 +23,7 @@
   .mc-foot__in{ grid-template-columns:1.6fr 1fr 1fr 1fr; gap:var(--s-6); }
 }
 
-.mc-foot__logo{
+.mc-foot__logo{ min-height:44px; align-items:center; display:inline-flex !important;
   display:inline-block; margin-bottom:var(--s-4);
   font-size:var(--t-h3); font-weight:700; letter-spacing:-.010em;
   color:#FFFFFF; text-decoration:none;
@@ -229,9 +229,11 @@
 .mc-foot__say-where > div{ display:grid; justify-items:start; gap:var(--s-1); max-width:26rem; }
 /* Always under the band. Over the sea it collided with the coast at 1000px
    and only cleared it by chance at 1440: where the coast falls depends on the
-   band's height, so no placement over the drawing holds at every width. */
-}
+   band's height, so no placement over the drawing holds at every width.
+   (A stray "}" here swallowed the next rule until 2026-10-05: the phone got the
+   desk's right alignment, x 147 instead of the gutter.) */
 .mc-foot__say-where{ justify-content:flex-start; margin-top:calc(-1 * var(--s-5)); }
+@media (min-width:760px){ .mc-foot__say-where{ justify-content:flex-end; } }
 @media (max-width:759.98px){ .mc-foot__band{ height:16rem; } }
 .mc-foot__place-h{ margin:0; max-width:14ch; font-size:var(--t-h3); font-size:clamp(1.375rem, 1rem + 1vw, 1.875rem); font-weight:700; letter-spacing:-.02em; line-height:1.05; color:#FFFFFF; }
 .mc-foot__say-where p{ margin:0; font-size:var(--t-small); line-height:1.5; color:rgba(255,255,255,.82); }
@@ -242,7 +244,7 @@
 }
 .mc-foot__maps:hover{ text-decoration-color:#FFFFFF; }
 .mc-foot__maps:focus-visible{ outline:3px solid #FFFFFF; outline-offset:3px; }
-.mc-foot__osm{ font-size:11px; line-height:1.4; color:rgba(255,255,255,.55); }
+.mc-foot__osm{ font-size:var(--t-label); line-height:1.4; color:rgba(255,255,255,.55); }
 /* the columns start closer: the band already gave the footer its air */
 .mc-foot__place + .mc-foot__in{ padding-top:var(--s-7); }
 

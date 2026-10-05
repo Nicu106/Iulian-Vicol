@@ -141,27 +141,30 @@ await new Promise(r => setTimeout(r, 700));
   is(swap.skip || swap.hasSet, 'and the stage keeps a srcset after the swap, not a bare src');
 }
 
-/* --- the full-screen viewer's arrows ------------------------------------
-   They are absolutely positioned children of a grid container. With a definite
-   grid-column they are laid out against their GRID AREA, not the container's
-   padding box — and on the phone's one-column template, column 3 is an implicit
-   line, so `right:22%` resolved against a zero-width strip. The next button sat
-   3px from the screen edge while prev sat at 95px. */
-for (const [w, h] of [[390, 844], [430, 932], [360, 780], [844, 390], [1440, 900]]) {
+/* --- the full-screen viewer ---------------------------------------------
+   Phones (≤768px, since 2026-10-05): no arrows — a swipe strip with dots; the
+   counter follows the photograph on screen. Larger screens keep the arrows,
+   symmetric and level. */
+for (const [w, h] of [[390, 844], [360, 780], [1440, 900]]) {
   await pg.setViewport({ width: w, height: h, isMobile: w < 560, hasTouch: w < 560 });
-  await new Promise(r => setTimeout(r, 300));
+  await pg.reload({ waitUntil: 'networkidle0' });
   const a = await pg.evaluate(async () => {
-    const v = document.getElementById('view');
-    if (v.hidden) { document.getElementById('stage').click(); await new Promise(r => setTimeout(r, 600)); }
-    const R = s => document.querySelector(s).getBoundingClientRect();
-    const p = R('.car-view__nav--prev'), n = R('.car-view__nav--next');
-    return { left: Math.round(p.left), right: Math.round(innerWidth - n.right),
-             sameRow: Math.round(p.top) === Math.round(n.top),
-             gap: Math.round(n.left - p.right) };
+    const t = document.querySelector('.car-track');
+    (t || document.getElementById('stage')).click(); await new Promise(r => setTimeout(r, 700));
+    const vis = s => [...document.querySelectorAll(s)].filter(e => getComputedStyle(e).display !== 'none' && e.getBoundingClientRect().width > 0).length;
+    const out = { arrows: vis('.car-view__nav'), track: !!document.querySelector('.car-view__track'), dots: vis('.car-dots--view i') };
+    if (out.track) { const vt = document.querySelector('.car-view__track'); vt.scrollLeft = vt.clientWidth * 2; await new Promise(r => setTimeout(r, 400));
+      out.count = document.getElementById('view-count').textContent.trim(); }
+    else { const R = s => document.querySelector(s).getBoundingClientRect(); const p = R('.car-view__nav--prev'), n = R('.car-view__nav--next');
+      out.sameRow = Math.round(p.top) === Math.round(n.top); out.gap = Math.round(n.left - p.right); }
+    document.getElementById('view-x').click(); return out;
   });
-  is(a.left === a.right, `the viewer arrows are symmetric at ${w}x${h}`,
-     `left ${a.left}, right ${a.right}`);
-  is(a.sameRow && a.gap > 0, `and level, without overlapping, at ${w}x${h}`, `gap ${a.gap}px`);
+  if (w <= 768) {
+    is(a.arrows === 0 && a.track && a.dots > 1, `phone ${w}: full screen is a swipe strip with dots, no arrows`, JSON.stringify(a));
+    is(/^3 \//.test(a.count || ''), `and its counter follows the photograph on screen`, a.count);
+  } else {
+    is(a.arrows === 2 && a.sameRow && a.gap > 0, `desk ${w}: the viewer keeps two level arrows`, JSON.stringify(a));
+  }
 }
 
 is(errs.length === 0, 'no script errors', errs.slice(0, 2).join(' | '));

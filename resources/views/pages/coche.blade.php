@@ -1,6 +1,6 @@
 @extends('layouts.site')
 
-@section('title', $car->brand.' '.$car->model.' '.$car->year.' — IV MOTORCLASS')
+@section('title', (\App\Support\Marques::for($car->brand)['name'] ?? $car->brand).' '.$car->model.' '.$car->year.' — IV MOTORCLASS')
 @section('current', '')
 {{-- A car that is gone dresses the whole document, header and footer
      included — see the SOLD block in car.css. --}}
@@ -33,7 +33,7 @@
     <a class="car-back mc-link" href="/catalogo{{ $marque ? '#marque-'.$marque['key'] : '' }}">← Todos los coches</a>
 
     <h1 class="car-h">
-      {{ $car->brand }} {{ $car->model }} <span>{{ $car->year }}</span>
+      {{ $brand }} {{ $car->model }} <span>{{ $car->year }}</span>
     </h1>
 
     @if($gone)
@@ -213,7 +213,10 @@
   @if($car->description)
       <section class="car-sec car-text">
         <h2 class="car-h2">Lo que hay que saber</h2>
-        <p>{{ \Illuminate\Support\Str::of($car->description)->stripTags()->limit(700) }}</p>
+        {{-- The whole description, never cut: long ones fold after a few lines with
+             "Leer más" (script below; without it the text is simply all there). --}}
+        <p class="car-text__p" id="car-desc">{{ \Illuminate\Support\Str::of($car->description)->stripTags() }}</p>
+        <button class="car-more mc-link" type="button" id="car-more" hidden>Leer más</button>
       </section>
     @endif
 
@@ -487,6 +490,16 @@
       thumbs.hidden = !n;
     });
   }
+
+  /* ---- the description folds when it is long ---------------------------- */
+  (function () {
+    var d = document.getElementById('car-desc'), b = document.getElementById('car-more'); if (!d || !b) return;
+    d.classList.add('is-folded');
+    if (d.scrollHeight <= d.clientHeight + 4) { d.classList.remove('is-folded'); return; }
+    b.hidden = false;
+    b.addEventListener('click', function () { var open = d.classList.toggle('is-folded') === false;
+      b.textContent = open ? 'Leer menos' : 'Leer más'; b.setAttribute('aria-expanded', open ? 'true' : 'false'); });
+  })();
 
   /* ---- the phone: a strip you swipe, and dots ---------------------------
      2026-10-05. The client: the arrows go on a phone (on the page AND full

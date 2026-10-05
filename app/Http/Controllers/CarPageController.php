@@ -60,6 +60,8 @@ class CarPageController extends Controller
             // The marque's colour for the wall at the top; null for a brand he does
             // not specialise in, which gets the site's own ink instead.
             'marque' => \App\Support\Marques::for($car->brand),
+            // the marque's own spelling ("BMW", "Mercedes-Benz"), whatever the data says ("Bmw")
+            'brand'  => \App\Support\Marques::for($car->brand)['name'] ?? \Illuminate\Support\Str::title((string) $car->brand),
             'photos' => $photos,
             'groups' => self::GROUPS,
             'counts' => $counts,
@@ -75,14 +77,13 @@ class CarPageController extends Controller
 
             // The long list, further down: everything else that is known.
             'tech'   => array_filter([
-                'Marca'                  => $car->brand,
+                'Marca'                  => \App\Support\Marques::for($car->brand)['name'] ?? $car->brand,
                 'Modelo'                 => $car->model,
                 'Motor'                  => $car->engine ?: $car->engine_capacity,
                 'Carrocería'             => $car->body_type,
                 'Tracción'               => $car->drivetrain,
                 'Color'                  => $car->color,
                 'Etiqueta medioambiental'=> $car->vin,   // the DGT label lives in this column
-                'Ubicación'              => $car->location,
             ]),
 
             // Price. Only what is true: what it costs, and what it cost before if that
@@ -97,7 +98,7 @@ class CarPageController extends Controller
                                 ? (int) $car->original_price - (int) $car->price : null,
             ],
 
-            'tags'   => is_array($car->tags) ? $car->tags : [],
+            'tags'   => [],   // SEO keywords, not for buyers (they read as raw text on the page)
             'euros'  => fn ($n) => number_format((int) $n, 0, ',', '.') . ' €',
         ]);
     }
