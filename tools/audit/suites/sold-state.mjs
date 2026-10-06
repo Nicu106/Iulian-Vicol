@@ -5,7 +5,7 @@
 import p from 'puppeteer';
 import { readdirSync } from 'fs';
 
-const HOST = process.env.AUDIT_HOST || 'v2design.ivmotorclass.com';
+const HOST = process.env.AUDIT_HOST || 'ivmotorclass.com';
 const B    = `https://${HOST}`;
 const dir  = `${process.env.HOME}/.cache/puppeteer/chrome`;
 const exe  = `${dir}/${readdirSync(dir).filter(d => d.startsWith('linux-')).sort().pop()}/chrome-linux64/chrome`;

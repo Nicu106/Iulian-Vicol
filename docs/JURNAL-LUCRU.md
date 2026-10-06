@@ -32,6 +32,7 @@ Timpul tău de gândire și de verificare între prompturi, peste 15 minute, **n
 | 17.09 | 0,9 | 6 | Documentul de strategie, culoarea mărcii pe pagina mașinii, raportul de ore, brandbook doar cu login |
 | 23.09 | 1,7 | 6 | Contact refăcut pentru telefon; hărți vectoriale proprii (contact + subsol), Google doar la cerere; catalog: exemplele Porsche șterse, cartonașe „Próximamente”; subsol cu hartă care se desenează; contact cu benzi colorate ca în catalog; analiză completă 8 pagini × 10 lățimi |
 | 30.09 | 0,1 | 1 | Font găzduit pe site (fără Google), timer zilnic pentru curățarea recomandărilor, verificarea zilnică reparată |
+| 05–06.10 | — | — | **LANSARE**: v2 = ivmotorclass.com; date reale mutate; galerie telefon (glisare, puncte); 2 agenți de audit telefon + reparații; formularul /vende reparat (nginx); pagina nu mai alunecă lateral |
 | **Total** | **37,1 h** | **134** | **14 zile** |
 
 
@@ -107,9 +108,8 @@ Detaliile sunt în `docs/STRATEGIE-SI-SCHIMBARI.md` §4. Pe scurt:
 - [ ] Mesaje WhatsApp automate (WhatsApp Cloud API): da sau nu
 - [ ] Monitorizarea orelor de acum înainte: raportul din script, hook care scrie un CSV sau OpenTelemetry
 
-### Înainte de lansare
+### După lansare (site-ul e live din 06.10)
 - [ ] Politica de confidențialitate (link-ul din subsol e acum `#`) și anunțul de cookie-uri
 - [ ] Termenii programului de recomandare pe `/recomienda`
-- [ ] `/` să arate noua pagină principală; paginile vechi redirecționate (301) sau șterse
-- [ ] `sitemap.xml`, `robots.txt`, domeniul, certificatul, mutarea datelor, backup
+- [ ] certificat pentru `www.ivmotorclass.com` (acum doar domeniul fără www)
 - [ ] Pagina „Quién soy” (Cine sunt): o facem ca pagină reală sau rămâne scoasă din meniu?

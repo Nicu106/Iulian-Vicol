@@ -6,7 +6,7 @@ import p from 'puppeteer';
 import { readdirSync, writeFileSync, unlinkSync } from 'fs';
 import { execSync } from 'child_process';
 
-const HOST = process.env.AUDIT_HOST || 'v2design.ivmotorclass.com';
+const HOST = process.env.AUDIT_HOST || 'ivmotorclass.com';
 const B    = `https://${HOST}`;
 const ROOT = '/var/www/motorclass-v2';
 const dir  = `${process.env.HOME}/.cache/puppeteer/chrome`;

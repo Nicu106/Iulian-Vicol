@@ -5,10 +5,10 @@ import { mkdirSync } from 'fs';
 const OUT = process.argv[2] || new URL('../out', import.meta.url).pathname; mkdirSync(OUT, { recursive: true });
 const dir=`${process.env.HOME}/.cache/puppeteer/chrome`;
 const ex=`${dir}/${readdirSync(dir).filter(d=>d.startsWith('linux-')).sort().pop()}/chrome-linux64/chrome`;
-const b=await p.launch({executablePath:ex,args:['--no-sandbox','--ignore-certificate-errors','--host-resolver-rules=MAP v2design.ivmotorclass.com 127.0.0.1']});
+const b=await p.launch({executablePath:ex,args:['--no-sandbox','--ignore-certificate-errors','--host-resolver-rules=MAP ivmotorclass.com 127.0.0.1']});
 for (const w of [1920,1440,1200,1024]) {
   const pg=await b.newPage(); await pg.setViewport({width:w,height:900});
-  await pg.goto('https://v2design.ivmotorclass.com/inicio',{waitUntil:'networkidle2'});
+  await pg.goto('https://ivmotorclass.com/',{waitUntil:'networkidle2'});
   await new Promise(r=>setTimeout(r,1500));
   console.log(w, await pg.evaluate(()=>{
     const cells=[...document.querySelectorAll('.fb')];

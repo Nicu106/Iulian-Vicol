@@ -12,7 +12,7 @@ import p from 'puppeteer';
 import { readdirSync, writeFileSync, readFileSync, mkdirSync } from 'fs';
 import { execFileSync } from 'child_process';
 
-const HOST = process.env.AUDIT_HOST || 'v2design.ivmotorclass.com';
+const HOST = process.env.AUDIT_HOST || 'ivmotorclass.com';
 const ROOT = '/var/www/motorclass-v2';
 const OUT  = `${ROOT}/tools/audit/out/admin-nav`;
 mkdirSync(OUT, { recursive: true });

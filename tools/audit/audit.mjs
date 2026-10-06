@@ -24,7 +24,7 @@ import { fileURLToPath } from 'url';
 const [, , check = 'contrast', route = '/'] = process.argv;
 const wArg = process.argv.indexOf('--w');
 const WIDTHS = wArg > -1 ? process.argv[wArg + 1].split(',').map(Number) : [390, 768, 1400];
-const HOST = process.env.AUDIT_HOST || 'v2design.ivmotorclass.com';
+const HOST = process.env.AUDIT_HOST || 'ivmotorclass.com';
 // A full URL is taken as-is. The admin sits behind auth and cannot be fetched
 // over HTTP by this tool, so its pages are rendered to disk and audited as
 // file:// — same checks, same false-positive guards, no second implementation.

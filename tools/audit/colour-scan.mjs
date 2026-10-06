@@ -4,7 +4,7 @@
 // feeling into a number: mean saturation, and the share of pixels above 15% and
 // 35% saturation, per 100px band of the full page.
 import p from 'puppeteer'; import { readdirSync } from 'fs';
-const HOST = process.env.AUDIT_HOST || 'v2design.ivmotorclass.com';
+const HOST = process.env.AUDIT_HOST || 'ivmotorclass.com';
 const URL = `https://${HOST}${(process.argv[2] || '/contacto').replace(/^(?!\/)/, '/')}`;
 const dir=`${process.env.HOME}/.cache/puppeteer/chrome`;
 const ex=`${dir}/${readdirSync(dir).filter(d=>d.startsWith('linux-')).sort().pop()}/chrome-linux64/chrome`;

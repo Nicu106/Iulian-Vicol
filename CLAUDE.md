@@ -1,4 +1,4 @@
-# IV MOTORCLASS — v2 design environment. Read this before touching anything.
+# IV MOTORCLASS — the live site (v2). Read this before touching anything.
 
 You are continuing a long design engagement for a Spanish used-car dealer
 (ivmotorclass.com, Málaga, five German marques, one owner who answers WhatsApp
@@ -6,20 +6,27 @@ himself). The client writes in Romanian, judges by screenshots in Chrome and
 Safari and on a phone, and has a precise, demanding taste: premium, unique,
 never generic, never "cheap". The standard already reached is high. Match it.
 
-## 0. Two environments. One rule.
+## 0. THIS IS PRODUCTION since 2026-10-06
 
-    /var/www/motorclass       PRODUCTION  (ivmotorclass.com)      — NEVER modify. Read only.
-    /var/www/motorclass-v2    THIS REPO   (v2design.ivmotorclass.com) — all work happens here.
+    /var/www/motorclass-v2    PRODUCTION  https://ivmotorclass.com  — this repo.
+    /var/www/motorclass       the OLD site, kept untouched as the ROLLBACK (HEAD 643a3b9).
+                              Never modify it. deploy/rollback.sh points nginx back at it.
 
-Separate PHP-FPM pool, separate SQLite DB, separate git. Production has had zero
-commits from this engagement and it must stay that way. If you find yourself
-editing under /var/www/motorclass, stop. Verify at the end of every session:
-`git -C /var/www/motorclass log --oneline -1` must still be `643a3b9` (this repo's HEAD is
-something else — the path matters).
+The launch was deploy/cutover.sh (backup in /root/launch-backup-*). nginx:
+sites-available/ivmotorclass (this app) and motorclass-v2-redirect
+(v2design.ivmotorclass.com → 301 ivmotorclass.com). There is no design copy any
+more: every change you make is live the moment the file is saved. So:
+- test on a phone width before saving anything visible; keep changes small; commit;
+- the database is the dealer's real data (cars, messages, reviews). Back it up
+  (cp database/database.sqlite /root/...) before any migration or bulk change;
+- suites that WRITE (referral, sell-car, sell-car-security) create rows on the
+  live site and remove them; run them only when needed and check counts after;
+- .env: APP_ENV=production, APP_DEBUG=false, BRANDBOOK_ONLY=false.
 
-Reach the dev site from this box with
-`curl --insecure --resolve v2design.ivmotorclass.com:443:127.0.0.1 https://v2design.ivmotorclass.com/...`
-and in puppeteer with `--host-resolver-rules=MAP v2design.ivmotorclass.com 127.0.0.1`.
+Audit scripts default to ivmotorclass.com and resolve it to 127.0.0.1
+(`curl --resolve ivmotorclass.com:443:127.0.0.1 https://ivmotorclass.com/...`,
+puppeteer `--host-resolver-rules=MAP ivmotorclass.com 127.0.0.1`).
+Push to GitHub: `git push origin main:v2-design`.
 
 ## 1. The client's design contract is law
 

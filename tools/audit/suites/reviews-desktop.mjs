@@ -5,8 +5,8 @@ import { mkdirSync } from 'fs';
 const OUT = process.argv[2] || new URL('../out', import.meta.url).pathname; mkdirSync(OUT, { recursive: true });
 const dir=`${process.env.HOME}/.cache/puppeteer/chrome`;
 const ex=`${dir}/${readdirSync(dir).filter(d=>d.startsWith('linux-')).sort().pop()}/chrome-linux64/chrome`;
-const b=await p.launch({executablePath:ex,args:['--no-sandbox','--ignore-certificate-errors','--host-resolver-rules=MAP v2design.ivmotorclass.com 127.0.0.1']});
-const PAGE='https://v2design.ivmotorclass.com/inicio';
+const b=await p.launch({executablePath:ex,args:['--no-sandbox','--ignore-certificate-errors','--host-resolver-rules=MAP ivmotorclass.com 127.0.0.1']});
+const PAGE='https://ivmotorclass.com/';
 const out=[];
 const ok=(name,cond,detail='')=>out.push(`${cond?'✓':'✗'} ${name}${detail?'  — '+detail:''}`);
 
