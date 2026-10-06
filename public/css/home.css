@@ -581,3 +581,5 @@ html:not(.js) .hm-fb__step{ display:none; }
 .hm-soc__p + .hm-soc__p{ margin-top:var(--s-3); }
 .hm-search__ask{ display:flex; align-items:center; justify-content:center; min-height:44px; margin-top:var(--s-2); font-weight:600; }
 .hm-search__ask[hidden]{ display:none; }
+.hm-how__more{ margin:var(--s-5) 0 0; }
+.hm-how__more .mc-link{ display:inline-flex; align-items:center; min-height:44px; font-weight:600; }

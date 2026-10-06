@@ -18,14 +18,14 @@ const b = await p.launch({ executablePath: exe,
   args: ['--no-sandbox', '--ignore-certificate-errors', `--host-resolver-rules=MAP ${HOST} 127.0.0.1`] });
 
 // "Quién soy" went to the brandbook, which is signed-in only since 2026-09-17.
-const LINKS = ['Inicio', 'Coches', 'Contacto', 'Vende tu coche'];
+const LINKS = ['Inicio', 'Coches', 'Por qué nosotros', 'Contacto', 'Vende tu coche'];   // + /por-que-nosotros, 2026-10-07 (desk only from 901px)
 
 for (const route of ['/', '/catalogo', '/contacto', '/vende']) {
   const pg = await b.newPage();
   await pg.setViewport({ width: 1440, height: 900 });
   await pg.goto(`https://${HOST}${route}`, { waitUntil: 'domcontentloaded' });
   const names = await pg.evaluate(() => [...document.querySelectorAll('.mc-nav__i')].map(a => a.textContent.trim()));
-  is(JSON.stringify(names) === JSON.stringify(LINKS), `${route} carries all four links`, names.join(' · '));
+  is(JSON.stringify(names) === JSON.stringify(LINKS), `${route} carries all its links`, names.join(' · '));
   const cur = await pg.evaluate(() => document.querySelector('.mc-nav__i.is-current')?.textContent.trim() || '(none)');
   is(cur !== '(none)', `and marks where you are`, cur);
   await pg.close();
@@ -39,7 +39,7 @@ for (const [w, want] of [[320, 100], [360, 100], [390, 100], [430, 100], [600, 1
   await new Promise(r => setTimeout(r, 250));
   const m = await pg.evaluate(() => {
     const h = Math.round(document.querySelector('.mc-head').getBoundingClientRect().height);
-    const items = [...document.querySelectorAll('.mc-nav__i')];
+    const items = [...document.querySelectorAll('.mc-nav__i')].filter(a => a.offsetParent);   // the desk-only link is display:none on a phone
     const rows = new Set(items.map(i => Math.round(i.getBoundingClientRect().top))).size;
     const nav = document.querySelector('.mc-nav');
     const last = items[items.length - 1];

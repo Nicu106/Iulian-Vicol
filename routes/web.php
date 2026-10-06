@@ -59,6 +59,7 @@ Route::get('/brandbook', [App\Http\Controllers\BrandbookController::class, 'inde
 Route::get('/catalogo', [App\Http\Controllers\BrandCatalogController::class, 'index'])->name('catalogo');
 Route::get('/coche/{slug}', [App\Http\Controllers\CarPageController::class, 'show'])->name('coche');
 Route::get('/contacto', [App\Http\Controllers\ContactPageController::class, 'index'])->name('contacto');
+Route::get('/por-que-nosotros', [App\Http\Controllers\WhyUsController::class, 'index'])->name('why');
 
 // Recommendations without accounts — App\Support\Referral has the rules.
 // What the page script reports as a WhatsApp or e-mail press leaves the site.
@@ -153,7 +154,7 @@ require __DIR__.'/auth.php';
 
 // The sitemap, from the database, so a car added in the panel is in it the same minute.
 Route::get('/sitemap.xml', function () {
-    $urls = collect(['/', '/catalogo', '/contacto', '/vende', '/recomienda'])
+    $urls = collect(['/', '/catalogo', '/por-que-nosotros', '/contacto', '/vende', '/recomienda'])
         ->map(fn ($p) => ['loc' => url($p), 'lastmod' => null]);
     \App\Models\Vehicle::whereIn('status', ['available', 'sold'])->orderByDesc('updated_at')->get(['slug', 'updated_at'])
         ->each(fn ($v) => $urls->push(['loc' => url('/coche/' . $v->slug), 'lastmod' => optional($v->updated_at)->toAtomString()]));

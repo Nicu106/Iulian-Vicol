@@ -36,6 +36,7 @@ Timpul tău de gândire și de verificare între prompturi, peste 15 minute, **n
 | 06.10 | — | — | Feedback client (capturi): carusel automat la „Disponibles ahora”, textele noi (catalog, recenzii, rețele, pașii 01–03), garanție 36 luni, banda din catalog pe toată lățimea pe ecrane late; adminul verificat pagină cu pagină + salvări; 3 rute de admin reparate |
 | 06.10 (2) | — | — | Audit UX cu 3 agenți (pagini publice, mașină, formulare + admin) și reparațiile: căutarea filtrează, Back închide galeria, previzualizare WhatsApp, „Alte mașini”, Compartir, 404/419/429/500 în spaniolă, pozele din /vende micșorate, previzualizări blocate de CSP reparate (public + admin), XSS în admin închis, recenzii ascunse, echipament păstrat la salvare |
 | 06.10 (3) | — | — | Viteza pozelor (măsurat, fără pierdere de calitate): telefon 4G slab, pagina principală 6,8 s → 3,4 s (1,34 MB → 0,40 MB); prima poză a mașinii 2,2 s → 1,4 s; poza următoare instant; galerie retina până la 2000 px; contur estompat; toate mărimile generate la încărcare |
+| 07.10 | — | — | Pagina nouă /por-que-nosotros (6 motive, cifre din baza de date, recenzii reale, poză reală de predare); link în meniu (de la 901px), subsol și pagina principală; diagnostic www (DNS spre Hostinger, certificat expirat) |
 | **Total** | **37,1 h** | **134** | **14 zile** |
 
 
@@ -114,5 +115,5 @@ Detaliile sunt în `docs/STRATEGIE-SI-SCHIMBARI.md` §4. Pe scurt:
 ### După lansare (site-ul e live din 06.10)
 - [ ] Politica de confidențialitate și Termenii (link-urile din subsol sunt `#`): obligatorii (RGPD/LSSI), am nevoie de datele firmei
 - [ ] Termenii programului de recomandare pe `/recomienda`
-- [ ] certificat pentru `www.ivmotorclass.com` (acum doar domeniul fără www)
+- [ ] `www`: în Hostinger DNS, CNAME www → A 213.199.39.241 (și CDN oprit), apoi `certbot --nginx -d ivmotorclass.com -d www.ivmotorclass.com --expand`
 - [ ] Pagina „Quién soy” (Cine sunt): o facem ca pagină reală sau rămâne scoasă din meniu?

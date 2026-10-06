@@ -731,3 +731,7 @@ body.is-locked{ position:fixed; left:0; right:0; overflow:hidden; }
 .cat-filter__t span{ color:var(--mc-ink-2); }
 .cat-filter__x{ display:inline-flex; align-items:center; min-height:44px; font-weight:600; }
 .cat-filter__wa{ flex:1 1 100%; justify-content:center; max-width:24rem; }
+
+/* "Por qué nosotros": in the header from tablet up; on a phone it lives in the footer and the home page */
+@media (max-width:900px){ .mc-nav__i--desk{ display:none; } }
+.mc-nav__i--desk{ white-space:nowrap; }

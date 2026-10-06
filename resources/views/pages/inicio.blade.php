@@ -339,6 +339,7 @@
         </div>
       </li>
     </ol>
+    <p class="hm-how__more"><a class="mc-link" href="/por-que-nosotros">¿Por qué comprar aquí? Seis razones →</a></p>
   </section>
 
   {{-- ============ questions ============ --}}
