@@ -693,3 +693,14 @@
   .mc-head .mc-nav__i{ padding-inline:var(--s-1); min-width:0; }
 }
 @media (max-width:374.98px){ .mc-head .mc-nav__i{ padding-inline:2px; font-size:15px; } }
+
+/* ---- the page never moves sideways (2026-10-06) ------------------------------
+   The client: swiping a photograph left or right moved the whole page. Nothing on
+   any page is wider than the screen (measured on 7 pages at 390/360/320); what
+   moved it was the gesture: on iOS a swipe that reaches the end of a strip
+   chains to the document, which bounces sideways. The document cannot scroll or
+   bounce horizontally; strips keep their own swipe (overscroll contained there).
+   Public pages have no position:sticky, so clipping the root is safe. */
+html, body{ overflow-x:hidden; overscroll-behavior-x:none; }
+@supports (overflow-x:clip){ html, body{ overflow-x:clip; } }
+body.is-locked{ position:fixed; left:0; right:0; overflow:hidden; }

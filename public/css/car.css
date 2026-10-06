@@ -607,3 +607,6 @@
 .car-more{ display:inline-flex; align-items:center; min-height:var(--mc-tap); margin-top:var(--s-2);
   background:none; border:0; padding:0; font:600 var(--t-ui)/1 var(--f-ui); color:var(--mc-blue); cursor:pointer; }
 @media (max-width:768px){ .car-sec{ margin-top:var(--s-7); } .car-grid{ row-gap:var(--s-7); } .car-with{ margin-top:var(--s-5); } }
+/* full screen: sideways swipes and pinch-zoom only; a vertical drag does not reach the page behind */
+.car-view{ touch-action:pan-x pinch-zoom; overscroll-behavior:contain; }
+.car-track{ touch-action:pan-x pan-y pinch-zoom; }

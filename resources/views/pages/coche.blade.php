@@ -417,16 +417,21 @@
     vImg.alt = a.getAttribute('aria-label') || '';
     vCnt.textContent = (i + 1) + ' / ' + list.length;
   }
+  // iOS ignores overflow:hidden on <body> for touch: the page behind the viewer still
+  // moved under a swipe. Pin the body where it is, and put the scroll back on close.
+  var lockY = 0;
+  function lock() { lockY = window.pageYOffset; document.body.style.top = -lockY + 'px'; document.body.classList.add('is-locked'); }
+  function unlock() { document.body.classList.remove('is-locked'); document.body.style.top = ''; window.scrollTo(0, lockY); }
   function open() {
     lastFocus = document.activeElement;
     paint();
     view.hidden = false;
-    document.body.style.overflow = 'hidden';     // the page must not scroll behind it
+    lock();                                      // the page must not move behind it
     document.getElementById('view-x').focus();
   }
   function close() {
     view.hidden = true;
-    document.body.style.overflow = '';
+    unlock();
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
 
@@ -574,7 +579,7 @@
   function vopen() {
     lastFocus = document.activeElement;
     vtrack.innerHTML = ''; list.forEach(function (a, i) { var im = slide(a, i, true); im.loading = Math.abs(i - cur) < 2 ? 'eager' : 'lazy'; vtrack.appendChild(im); });
-    view.hidden = false; document.body.style.overflow = 'hidden';
+    view.hidden = false; lock();
     vtrack.scrollLeft = cur * vtrack.clientWidth; vset(cur);
     document.getElementById('view-x').focus();
   }
