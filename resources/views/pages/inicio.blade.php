@@ -322,9 +322,12 @@
       <li class="hm-how__step">
         <span class="hm-how__n" aria-hidden="true">04</span>
         <div class="hm-how__t">
-          <h3>Te lo llevas</h3>
-          <p>Papeles, transferencia y entrega. Si no puedes venir a por él, te lo llevo.</p>
-          <a class="mc-link" href="https://wa.me/34614753187">Preguntar por uno</a>
+          <h3>Las llaves son tuyas. Mi teléfono sigue disponible.</h3>
+          <p>Con la documentación preparada, en solo 30 minutos puedes llevártelo transferido a tu
+            nombre y con el seguro en vigor. Yo me encargo de los trámites y de entregártelo. Y si
+            después tienes una duda o surge algún problema, puedes seguir llamándome: mi atención
+            continúa después de la compra.</p>
+          <a class="mc-link" href="https://wa.me/34614753187">Hablemos de tu próximo coche</a>
         </div>
       </li>
     </ol>
