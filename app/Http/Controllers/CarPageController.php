@@ -28,7 +28,7 @@ class CarPageController extends Controller
         // Not `pending`: a submission from /vende is a Vehicle row until he approves
         // it, and this page must not show a stranger's unreviewed car at a guessable
         // URL. Anything he has not approved does not exist here.
-        $car = Vehicle::where('slug', $slug)->where('status', '!=', 'pending')->firstOrFail();
+        $car = Vehicle::where('slug', $slug)->whereIn('status', ['available', 'reserved', 'sold'])->firstOrFail();   // not pending, rejected or draft
 
         $all = array_values(array_filter(array_merge(
             [$car->cover_image],
@@ -99,6 +99,17 @@ class CarPageController extends Controller
             ],
 
             'tags'   => [],   // SEO keywords, not for buyers (they read as raw text on the page)
+
+            // The end of the page is not a dead end: what else is here now. Same
+            // marque first, then the nearest in price. Only cars for sale.
+            'others' => Vehicle::where('status', 'available')->where('id', '!=', $car->id)->get()
+                ->sortBy(fn ($v) => [
+                    ((\App\Support\Marques::for($v->brand)['key'] ?? $v->brand) === (\App\Support\Marques::for($car->brand)['key'] ?? $car->brand)) ? 0 : 1,
+                    abs((int) $v->price - (int) $car->price),
+                ])->take(6)->values(),
+            'chips'  => BrandCatalogController::chips(),
+            'sub'    => BrandCatalogController::sub(),
+            'km'     => fn ($n) => number_format((int) $n, 0, ',', '.') . ' km',
             'euros'  => fn ($n) => number_format((int) $n, 0, ',', '.') . ' €',
         ]);
     }

@@ -1,6 +1,7 @@
 @extends('layouts.site')
 
 @section('title', 'Recomienda a un amigo — IV MOTORCLASS')
+@section('description', '¿Conoces a alguien que busca coche? Crea tu enlace personal en un minuto y compártelo por WhatsApp.')
 @section('current', 'recomienda')
 
 @push('css')
@@ -52,8 +53,8 @@
 
           {{-- The trap and the clock, as on /vende. --}}
           <div class="sl-hp" aria-hidden="true">
-            <label for="apellido_2">No rellenes esto</label>
-            <input type="text" id="apellido_2" name="apellido_2" tabindex="-1" autocomplete="off" value="">
+            <label for="hp_note">No rellenes esto</label>
+            <input type="text" id="hp_note" name="hp_note" tabindex="-1" autocomplete="off" value="">
           </div>
           <input type="hidden" name="t" value="{{ $stamp }}">
 

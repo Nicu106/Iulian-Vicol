@@ -13,7 +13,8 @@ Route::redirect('/inicio', '/', 301)->name('inicio');
 Route::redirect('/despre', '/contacto', 301)->name('about');
 Route::redirect('/contact', '/contacto', 301)->name('contact');
 Route::redirect('/catalog', '/catalogo', 301)->name('catalog');
-Route::post('/contact/send', [App\Http\Controllers\ContactController::class, 'store'])->name('contact.send');
+// old site's form, kept for any cached page; rate-limited like the others
+Route::post('/contact/send', [App\Http\Controllers\ContactController::class, 'store'])->middleware('throttle:5,60')->name('contact.send');
 
 // Lightweight image resize with caching (local files only)
 // No session, no cookies, no CSRF token: this route answers with an image and
@@ -22,6 +23,9 @@ Route::post('/contact/send', [App\Http\Controllers\ContactController::class, 'st
 // request. It only runs when a derivative is missing (built ones are served by
 // nginx straight off disk), and that is exactly the request that is already
 // paying 1.4-1.8 s of GD.
+// the link-preview picture for a car (WhatsApp, Facebook…)
+Route::get('/og/{slug}', [App\Http\Controllers\ShareImageController::class, 'show'])
+    ->where('slug', '[A-Za-z0-9-]+')->name('og.car');
 Route::get('/img/{w}', [App\Http\Controllers\ImageController::class, 'resize'])
     ->withoutMiddleware([
         \Illuminate\Session\Middleware\StartSession::class,
@@ -46,7 +50,7 @@ Route::post('/vende', [App\Http\Controllers\SellCarController::class, 'store'])
 
 // Detaliu vehicul (din baza de date)
 Route::get('/vehicles/{slug}', fn (string $slug) => redirect('/coche/' . $slug, 301))->name('vehicle.show');
-Route::post('/inquiries', [App\Http\Controllers\InquiryController::class, 'store'])->name('inquiries.store');
+Route::post('/inquiries', [App\Http\Controllers\InquiryController::class, 'store'])->middleware('throttle:5,60')->name('inquiries.store');
 
 // Pagina mașini salvate (doar frontend, fără backend)
 // The design system is internal: signed-in only, reached from the panel's menu.

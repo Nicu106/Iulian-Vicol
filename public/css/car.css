@@ -610,3 +610,45 @@
 /* full screen: sideways swipes and pinch-zoom only; a vertical drag does not reach the page behind */
 .car-view{ touch-action:pan-x pinch-zoom; overscroll-behavior:contain; }
 .car-track{ touch-action:pan-x pan-y pinch-zoom; }
+
+/* ---- share, under the two buttons ---------------------------------------- */
+.car-share{
+  display:flex; align-items:center; justify-content:center; gap:.5rem; width:100%;
+  min-height:var(--mc-tap-pref, 48px); margin-top:var(--s-2); padding:0 1rem;
+  border:0; border-radius:var(--r-2, 10px); background:transparent; cursor:pointer;
+  font:inherit; font-weight:600; color:var(--mc-ink); text-decoration:underline;
+  text-decoration-thickness:1px; text-underline-offset:.25em;
+}
+.car-share:hover{ text-decoration-thickness:2px; }
+.car-share:focus-visible{ outline:2px solid var(--mc-blue); outline-offset:2px; }
+.car--sold .car-share{ display:none; }
+
+/* ---- other cars, at the end ---------------------------------------------- */
+.car-others__head{ display:flex; align-items:baseline; justify-content:space-between; gap:var(--s-3); flex-wrap:wrap; }
+.car-others__head .mc-link{ display:inline-flex; align-items:center; min-height:44px; }
+.car-others__rail{
+  display:flex; gap:var(--s-4); overflow-x:auto; scroll-snap-type:x mandatory;
+  overscroll-behavior-x:contain; scrollbar-width:none; padding:var(--s-2) 0 var(--s-3);
+  margin-top:var(--s-3);
+}
+.car-others__rail::-webkit-scrollbar{ display:none; }
+.car-others__rail > *{ flex:0 0 15.5rem; scroll-snap-align:start; }
+@media (max-width:768px){
+  .car-others__rail{ margin-inline:calc(var(--mc-gutter-m) * -1); padding-inline:var(--mc-gutter-m); scroll-padding-inline:var(--mc-gutter-m); }
+  .car-others__rail > *{ flex:0 0 72vw; max-width:19rem; }
+}
+
+/* [hidden] must win over the display these set (a dead "Leer más" showed on short texts) */
+.car-more[hidden], .car-share[hidden]{ display:none; }
+
+/* a sold car: the figure is what it sold for, said so */
+.car-price__sold{ display:block; width:100%; font-size:var(--t-label); font-weight:600; color:var(--mc-ink-3); }
+
+/* Imperfecciones with none: only the message, no stray photograph or counter */
+.car-stage.is-empty .car-track, .car-stage.is-empty .car-stage__count,
+.is-track.is-empty .car-track, .is-track.is-empty .car-stage__count{ display:none; }
+
+/* narrow phones: specifications stack, so "Mercedes-Benz" is never cut in half */
+@media (max-width:400px){
+  .car-tech__row{ grid-template-columns:1fr; row-gap:2px; }
+}

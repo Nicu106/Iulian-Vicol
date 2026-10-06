@@ -30,7 +30,7 @@
         <div class="hm-search__tabs" role="tablist">
           <span class="hm-search__tab is-on" role="tab" aria-selected="true">Comprar</span>
           <a class="hm-search__tab hm-search__tab--link"
-             href="https://wa.me/34614753187?text={{ urlencode('Hola, quiero vender mi coche.') }}">Vende tu coche →</a>
+             href="/vende">Vende tu coche →</a>
         </div>
         <h2 class="hm-search__h">Encuentra tu próximo coche</h2>
 
@@ -68,8 +68,9 @@
         </label>
 
         <button class="mc-btn mc-btn--primary hm-search__go" type="submit" id="s-go">
-          Buscar <b id="s-n">{{ $total }}</b> <span id="s-word">coches</span>
+          <span id="s-lead">Buscar</span> <b id="s-n">{{ $total }}</b> <span id="s-word">coches</span>
         </button>
+        <a class="mc-link hm-search__ask" id="s-ask" hidden href="https://wa.me/34614753187">No lo tengo ahora: te lo busco por WhatsApp</a>
       </form>
     </div>
   </section>
@@ -296,7 +297,7 @@
           <p>Soy el director de IV Motorclass y quien te acompañará durante toda la compra.
             Escríbeme por WhatsApp y cuéntame qué coche te interesa. Hablaremos de lo que buscas
             y resolveré tus dudas, sin pasarte de una persona a otra.</p>
-          <a class="mc-link" href="https://wa.me/34614753187">Hablemos por WhatsApp</a>
+          <a class="mc-link" href="https://wa.me/34614753187?text=Hola%2C+me+interesa+un+coche.+%C2%BFHablamos%3F">Hablemos por WhatsApp</a>
         </div>
       </li>
       <li class="hm-how__step">
@@ -327,7 +328,7 @@
             nombre y con el seguro en vigor. Yo me encargo de los trámites y de entregártelo. Y si
             después tienes una duda o surge algún problema, puedes seguir llamándome: mi atención
             continúa después de la compra.</p>
-          <a class="mc-link" href="https://wa.me/34614753187">Hablemos de tu próximo coche</a>
+          <a class="mc-link" href="https://wa.me/34614753187?text=Hola%2C+quiero+hablar+de+mi+pr%C3%B3ximo+coche.">Hablemos de tu próximo coche</a>
         </div>
       </li>
     </ol>
@@ -338,7 +339,7 @@
     <h2 class="hm-h2" id="h-faq">Preguntas frecuentes</h2>
     <details class="hm-q"><summary>¿Ofrecen garantía para vehículos?</summary><p>Sí, ofrecemos garantía extendida hasta 36 meses, dependiendo del modelo.</p></details>
     <details class="hm-q"><summary>¿Puedo comprar en leasing o con financiación?</summary><p>Sí, colaboramos con socios financieros para ofertas rápidas y ventajosas.</p></details>
-    <details class="hm-q"><summary>¿Puedo programar una prueba de manejo?</summary><p>Por supuesto. Escríbeme por WhatsApp o llámame y la programamos.</p></details>
+    <details class="hm-q"><summary>¿Puedo hacer una prueba de conducción?</summary><p>Por supuesto. Escríbeme por WhatsApp o llámame y la programamos.</p></details>
   </section>
 
   {{-- ============ the ask ============ --}}
@@ -362,7 +363,7 @@
   <div class="mc-bar">
     <span class="cat-dock__t">¿Buscas algo concreto?<b>Te lo busco yo</b></span>
     <span class="mc-bar__act">
-      <a class="mc-btn mc-btn--cta" href="https://wa.me/34614753187">WhatsApp</a>
+      <a class="mc-btn mc-btn--cta" href="https://wa.me/34614753187?text=Hola%2C+busco+algo+concreto%3A+">WhatsApp</a>
       <a class="mc-btn mc-btn--ghost" href="tel:+34614753187" aria-label="Llamar">Tel</a>
     </span>
   </div>
@@ -400,7 +401,7 @@
   ['mouseenter', 'touchstart', 'focusin'].forEach(function (e) { rail.addEventListener(e, function () { held = true; }, { passive: true }); });
   rail.addEventListener('mouseleave', function () { held = false; });
   rail.addEventListener('focusout', function () { held = false; });
-  rail.addEventListener('touchend', function () { setTimeout(function () { held = false; }, 2500); }, { passive: true });
+  // a hand that touched it has taken over: it stays where they left it (WCAG 2.2.2)
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }, { threshold: .3 }).observe(rail);
   } else { visible = true; }
@@ -838,7 +839,16 @@
     // "Buscar 0 coches" is a dead end dressed as a button; say what is true instead
     var go = document.getElementById('s-go');
     go.disabled = k === 0;
-    if (k === 0) { n.textContent = ''; word.textContent = 'Ningún coche así — cambia algo'; }
+    document.getElementById('s-lead').hidden = k === 0;
+    if (k === 0) { n.textContent = ''; word.textContent = 'Ningún coche así'; }
+    // nothing fits: the man who finds cars is one message away
+    var ask = document.getElementById('s-ask');
+    if (ask) {
+      ask.hidden = k !== 0;
+      var mo = modelo.value, mx = max.value, mk = marca.options[marca.selectedIndex];
+      var want = [mk && marca.value ? mk.textContent.replace(/\s*\(.*\)\s*$/, '') : '', mo, mx ? 'hasta ' + Number(mx).toLocaleString('es-ES') + (document.querySelector('input[name=pago]:checked') && document.querySelector('input[name=pago]:checked').value === 'mes' ? ' €/mes' : ' €') : ''].filter(Boolean).join(' ');
+      ask.href = 'https://wa.me/34614753187?text=' + encodeURIComponent('Hola, busco ' + (want || 'un coche') + '. ¿Me lo buscas?');
+    }
   }
   marca.addEventListener('change', function () { fillModels(); count(); });
   modelo.addEventListener('change', count);

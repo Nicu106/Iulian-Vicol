@@ -157,6 +157,7 @@ else {
        d.back ? `"${d.back.text}" → ${d.back.href}, --cta:${d.back.cta}` : '(missing)');
   }
   await pg.setViewport({ width: 1440, height: 900 });
+  await pg.reload({ waitUntil: 'networkidle2' });   // a phone page turned desk-wide rebuilds (coche.blade.php)
 
   // "In coltul imaginii" — of the image, not of the overlay. The viewer centres
   // the photograph, so a mark pinned to the overlay would float in the black

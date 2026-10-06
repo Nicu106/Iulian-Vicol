@@ -26,7 +26,7 @@ class TestimonialController extends Controller
             'author_name' => 'required|string|max:255',
             'author_location' => 'nullable|string|max:255',
             'quote' => 'required|string|max:1000',
-            'image' => 'nullable|image|max:4096',
+            'image' => 'nullable|image|max:12288',
             'order_index' => 'nullable|integer|min:0|max:255',
             'is_active' => 'nullable|boolean',
         ]);
@@ -43,7 +43,7 @@ class TestimonialController extends Controller
             'quote' => $data['quote'],
             'image_path' => $imagePath,
             'order_index' => $data['order_index'] ?? 0,
-            'is_active' => (bool)($data['is_active'] ?? true),
+            'is_active' => $request->boolean('is_active'),   // an unticked box sends nothing
         ]);
 
         return redirect()->route('admin.testimonials.index')->with('status', 'Testimonio creado.');
@@ -60,7 +60,7 @@ class TestimonialController extends Controller
             'author_name' => 'required|string|max:255',
             'author_location' => 'nullable|string|max:255',
             'quote' => 'required|string|max:1000',
-            'image' => 'nullable|image|max:4096',
+            'image' => 'nullable|image|max:12288',
             'order_index' => 'nullable|integer|min:0|max:255',
             'is_active' => 'nullable|boolean',
         ]);
@@ -74,7 +74,7 @@ class TestimonialController extends Controller
         $testimonial->author_location = $data['author_location'] ?? null;
         $testimonial->quote = $data['quote'];
         $testimonial->order_index = $data['order_index'] ?? 0;
-        $testimonial->is_active = (bool)($data['is_active'] ?? true);
+        $testimonial->is_active = $request->boolean('is_active');
         $testimonial->save();
 
         return redirect()->route('admin.testimonials.index')->with('status', 'Testimonio actualizado.');

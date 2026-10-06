@@ -8,6 +8,6 @@
       <a class="mc-nav__i {{ ($current ?? '') === 'contacto' ? 'is-current' : '' }}" href="/contacto">Contacto</a>
       <a class="mc-nav__i {{ ($current ?? '') === 'vender' ? 'is-current' : '' }}" href="/vende">Vende tu coche</a>
     </nav>
-    <a class="mc-btn mc-btn--cta" href="https://wa.me/34614753187">WhatsApp</a>
+    <a class="mc-btn mc-btn--cta" href="https://wa.me/34614753187?text=Hola%2C+vengo+de+la+web+y+busco+un+coche.">WhatsApp</a>
   </div>
 </header>

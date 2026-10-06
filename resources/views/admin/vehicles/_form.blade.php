@@ -319,7 +319,7 @@
 @if($isEdit)
   {{-- Deleting a car is not a button that sits beside "Guardar". --}}
   <form class="ad-danger" action="{{ route('admin.vehicles.destroy', $v['slug']) }}" method="POST"
-        onsubmit="return confirm('Se borra {{ trim(($v['brand'] ?? '') . ' ' . ($v['model'] ?? '')) }} y todas sus fotos. ¿Seguro?')">
+        onsubmit="return confirm(@js('Se borra '.trim(($v['brand'] ?? '') . ' ' . ($v['model'] ?? '')).' y todas sus fotos. ¿Seguro?'))">
     @csrf
     @method('DELETE')
     <button class="ad-btn ad-btn--bad ad-btn--s" type="submit">Borrar este coche</button>
@@ -350,14 +350,37 @@
         ? files.length + (files.length === 1 ? ' foto elegida' : ' fotos elegidas') + ' — se suben al guardar'
         : 'Puedes seleccionar todas a la vez';
 
+      /* Thumbnails without blob: URLs — the site's security policy blocks them,
+         which left these squares empty. One file at a time: forty full-size
+         photographs decoded at once is what makes a phone stall. */
+      var queue = [];
+      var next = function () {
+        var job = queue.shift(); if (!job) { return; }
+        var f = job[0], img = job[1];
+        var paint = function (pic) {
+          var w = pic.naturalWidth || pic.width, h = pic.naturalHeight || pic.height, k = Math.min(1, 240 / Math.max(w, h));
+          var c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
+          c.getContext('2d').drawImage(pic, 0, 0, c.width, c.height);
+          img.src = c.toDataURL('image/jpeg', 0.75); if (pic.close) { pic.close(); }
+        };
+        var done = function () { setTimeout(next, 0); };
+        if (window.createImageBitmap) {
+          createImageBitmap(f, { imageOrientation: 'from-image' }).catch(function () { return createImageBitmap(f); })
+            .then(paint).then(done, done);
+        } else {
+          var r = new FileReader();
+          r.onload = function () { var i = new Image(); i.onload = function () { paint(i); done(); }; i.onerror = done; i.src = r.result; };
+          r.onerror = done; r.readAsDataURL(f);
+        }
+      };
+
       files.forEach(function (file, i) {
         var li  = document.createElement('li');
         li.className = 'ad-shot';
         var img = document.createElement('img');
         img.className = 'ad-shot__i';
         img.alt = file.name;
-        img.src = URL.createObjectURL(file);
-        img.onload = function () { URL.revokeObjectURL(img.src); };
+        queue.push([file, img]);
         var n = document.createElement('span');
         n.className = 'ad-shot__n';
         n.textContent = i + 1;
@@ -365,6 +388,7 @@
         li.appendChild(n);
         list.appendChild(li);
       });
+      next();
     });
   }
 

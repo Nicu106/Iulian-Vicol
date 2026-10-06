@@ -97,7 +97,8 @@
 
 <section class="ad-sec">
   <div class="ad-go" style="border-top:0;padding-top:0">
-    <form action="{{ route('admin.sell-cars.approve', $vehicle) }}" method="POST">
+    <form action="{{ route('admin.sell-cars.approve', $vehicle) }}" method="POST"
+          onsubmit="return confirm(@js('Se publica en el catálogo a '.number_format((int) $vehicle->price, 0, ',', '.').' €. ¿Seguro?'))">
       @csrf
       <button class="ad-btn" type="submit">Aceptar y publicarlo</button>
     </form>

@@ -2,6 +2,15 @@
 
 @section('title', (\App\Support\Marques::for($car->brand)['name'] ?? $car->brand).' '.$car->model.' '.$car->year.' — IV MOTORCLASS')
 @section('current', '')
+{{-- the link preview: price and the facts that decide a viewing, and the cover photo --}}
+@section('description', trim(implode(' · ', array_filter([
+    ($car->status ?? '') === 'sold' ? 'Vendido' : ($car->price ? number_format((int) $car->price, 0, ',', '.') . ' €' : null),
+    $car->mileage ? number_format($car->mileage, 0, ',', '.') . ' km' : null,
+    $car->fuel ?: $car->fuel_type,
+    $car->transmission,
+    'Málaga',
+]))) . (($car->status ?? '') === 'sold' ? '. Ya vendido: pregúntame por uno parecido.' : '. Fotos reales, garantía incluida. Escríbeme por WhatsApp.'))
+@section('og_image', route('og.car', $car->slug) . '?v=' . (@filemtime(\App\Http\Controllers\ShareImageController::fsPath($car->cover_image) ?? '') ?: '1'))
 {{-- A car that is gone dresses the whole document, header and footer
      included — see the SOLD block in car.css. --}}
 @section('body', trim((($car->status ?? '') === 'sold' ? 'car--sold ' : '') . 'car--wall'))
@@ -52,7 +61,7 @@
     // many rows, so it stops dictating the height of row 1 — which is what left a
     // ~790px hole under the thumbnails while the panels ran on beside it.
     $mainRows = 1
-      + ($car->description ? 1 : 0)
+      + (mb_strlen(trim(strip_tags((string) $car->description))) >= 40 ? 1 : 0)
       + ((is_array($car->features) && count($car->features)) ? 1 : 0);
   @endphp
   <div class="car-grid" style="--main-rows:{{ $mainRows }}">
@@ -80,14 +89,21 @@
            order they get asked: what does it look like, what is it like inside,
            and what is wrong with it. Written by the script — without JavaScript
            there is nothing to filter, so an inert row of buttons would be a lie. --}}
+      {{-- Only once he has sorted some photographs: a row of "Exterior 0 ·
+           Interior 0" filters nothing. Then a group with none is left out — except
+           Imperfecciones, whose empty state says so honestly. --}}
+      @php $sorted = $counts['exterior'] + $counts['interior'] + $counts['flaw'] > 0; @endphp
+      @if($sorted)
       <div class="car-tabs" role="tablist" aria-label="Tipo de fotografía" hidden>
         <button class="car-tab is-on" type="button" role="tab" aria-selected="true"
                 data-group="all">Todas <span>{{ $counts['all'] }}</span></button>
         @foreach($groups as $key => $label)
+          @continue($counts[$key] === 0 && $key !== 'flaw')
           <button class="car-tab" type="button" role="tab" aria-selected="false"
                   data-group="{{ $key }}">{{ $label }} <span>{{ $counts[$key] }}</span></button>
         @endforeach
       </div>
+      @endif
 
       {{-- Small, and scrolled. 58 photographs will not fit any other way, and a
            grid of 58 thumbnails is a wall, not a gallery. --}}
@@ -125,6 +141,7 @@
     {{-- ---------------- the facts ---------------- --}}
     <aside class="car-side">
       <div class="car-price">
+        @if($gone)<span class="car-price__sold">Vendido por</span>@endif
         <span class="mc-price">{{ $euros($price['now']) }}</span>
         @if($car->mileage)<span class="mc-km">{{ number_format($car->mileage, 0, ',', '.') }} km</span>@endif
         @if($price['before'])
@@ -142,10 +159,18 @@
              lie about itself. What is actually useful is the question the
              visitor really has. --}}
         <a class="mc-btn mc-btn--cta" href="https://wa.me/34614753187?text={{ urlencode($gone
-            ? 'Hola, he visto el '.$car->brand.' '.$car->model.' '.$car->year.' que ya vendiste. ¿Tienes algo parecido?'
-            : 'Hola, me interesa el '.$car->brand.' '.$car->model.' '.$car->year) }}">{{ $gone ? '¿Tienes algo parecido?' : 'WhatsApp' }}</a>
+            ? 'Hola, he visto el '.$brand.' '.$car->model.' '.$car->year.' que ya vendiste. ¿Tienes algo parecido?'
+            : 'Hola, me interesa el '.$brand.' '.$car->model.' '.$car->year.' — '.url()->current()) }}">{{ $gone ? '¿Tienes algo parecido?' : 'WhatsApp' }}</a>
         <a class="mc-btn mc-btn--ghost" href="tel:+34614753187">Llamar</a>
       </div>
+      {{-- Most cars are decided by two people. The phone's own share sheet
+           (WhatsApp, Messages…); where there is none, the link is copied. Shown
+           by the script, so without one there is no dead button. --}}
+      <button class="car-share" type="button" id="car-share" hidden
+              data-title="{{ $brand }} {{ $car->model }} {{ $car->year }}">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>
+        <span>Compartir este coche</span>
+      </button>
 
       {{-- Everything that comes with the car sits in this column, under the price
            and the buttons — the client: "trebuiau toate sa fie sub pret pe
@@ -210,7 +235,7 @@
          Before this they sat below the grid, and the left column ended at the
          thumbnails while the right ran on for another 950px — the hole the client
          photographed. --}}
-  @if($car->description)
+  @if(mb_strlen(trim(strip_tags((string) $car->description))) >= 40)
       <section class="car-sec car-text">
         <h2 class="car-h2">Lo que hay que saber</h2>
         {{-- The whole description, never cut: long ones fold after a few lines with
@@ -242,6 +267,21 @@
           <div class="car-tech__row"><dt>{{ $k }}</dt><dd>{{ $v }}</dd></div>
         @endforeach
       </dl>
+    </section>
+  @endif
+
+  {{-- Not a dead end: what else is here now, same marque first. --}}
+  @if($others->count())
+    <section class="car-sec car-others" aria-labelledby="h-others">
+      <div class="car-others__head">
+        <h2 class="car-h2" id="h-others">{{ $gone ? 'Disponibles ahora' : 'Otros coches que tengo ahora' }}</h2>
+        <a class="mc-link" href="/catalogo">Ver el catálogo →</a>
+      </div>
+      <div class="car-others__rail">
+        @foreach($others as $o)
+          @include('partials.card', ['car' => $o, 'kind' => 'available'])
+        @endforeach
+      </div>
     </section>
   @endif
 
@@ -293,9 +333,7 @@
     <span class="mc-bar__act">
       {{-- The same question the side CTA asks, so the two do not disagree about
            what this page is for. --}}
-      <a class="mc-btn mc-btn--cta" href="https://wa.me/34614753187{{ $gone
-         ? '?text='.urlencode('Hola, he visto el '.$car->brand.' '.$car->model.' '.$car->year.' que ya vendiste. ¿Tienes algo parecido?')
-         : '' }}">WhatsApp</a>
+      <a class="mc-btn mc-btn--cta" href="https://wa.me/34614753187?text={{ urlencode('Hola, me interesa el '.$brand.' '.$car->model.' '.$car->year.' — '.url()->current()) }}">WhatsApp</a>
       <a class="mc-btn mc-btn--ghost" href="tel:+34614753187" aria-label="Llamar">Tel</a>
     </span>
     @endif
@@ -304,6 +342,26 @@
 @endsection
 
 @push('js')
+<script>
+(function () {
+  var b = document.getElementById('car-share');
+  if (!b) return;
+  var url = location.origin + location.pathname, title = b.getAttribute('data-title');
+  var label = b.querySelector('span'), was = label.textContent;
+  if (!navigator.share && !(navigator.clipboard && window.isSecureContext)) return;
+  b.hidden = false;
+  b.addEventListener('click', function () {
+    if (navigator.share) {
+      navigator.share({ title: title, text: title + ' — IV MOTORCLASS', url: url }).catch(function () {});
+      return;
+    }
+    navigator.clipboard.writeText(url).then(function () {
+      label.textContent = 'Enlace copiado';
+      setTimeout(function () { label.textContent = was; }, 2200);
+    });
+  });
+})();
+</script>
 <script>
 (function () {
   document.documentElement.className += ' js';
@@ -422,22 +480,32 @@
   var lockY = 0;
   function lock() { lockY = window.pageYOffset; document.body.style.top = -lockY + 'px'; document.body.classList.add('is-locked'); }
   function unlock() { document.body.classList.remove('is-locked'); document.body.style.top = ''; window.scrollTo(0, lockY); }
+  /* The phone's Back closes the viewer instead of leaving the page: opening it
+     adds a history entry; Back (popstate) closes it; closing by × or Esc takes
+     that entry away again so the history stays as it was. */
+  var pushed = false, onClose = null;
+  function pushView() { try { history.pushState({ mcView: 1 }, ''); pushed = true; } catch (e) { pushed = false; } }
   function open() {
     lastFocus = document.activeElement;
     paint();
     view.hidden = false;
     lock();                                      // the page must not move behind it
+    pushView();
     document.getElementById('view-x').focus();
   }
-  function close() {
+  function close(fromBack) {
+    if (view.hidden) return;
     view.hidden = true;
     unlock();
+    if (onClose) onClose();
     if (lastFocus && lastFocus.focus) lastFocus.focus();
+    if (pushed) { pushed = false; if (fromBack !== true) history.back(); }
   }
+  window.addEventListener('popstate', function () { if (!view.hidden) close(true); });
 
   stage.addEventListener('click', open);
   stage.style.cursor = 'zoom-in';
-  document.getElementById('view-x').addEventListener('click', close);
+  document.getElementById('view-x').addEventListener('click', function () { close(); });
   document.getElementById('view-prev').addEventListener('click', function () { step(-1); });
   document.getElementById('view-next').addEventListener('click', function () { step(1); });
   // the backdrop closes, the photograph and the buttons do not
@@ -501,9 +569,10 @@
     var d = document.getElementById('car-desc'), b = document.getElementById('car-more'); if (!d || !b) return;
     d.classList.add('is-folded');
     if (d.scrollHeight <= d.clientHeight + 4) { d.classList.remove('is-folded'); return; }
-    b.hidden = false;
+    b.hidden = false; b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-controls', 'car-desc');
     b.addEventListener('click', function () { var open = d.classList.toggle('is-folded') === false;
-      b.textContent = open ? 'Leer menos' : 'Leer más'; b.setAttribute('aria-expanded', open ? 'true' : 'false'); });
+      b.textContent = open ? 'Leer menos' : 'Leer más'; b.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (!open && d.getBoundingClientRect().top < 0) d.scrollIntoView({ block: 'start' }); });
   })();
 
   /* ---- the phone: a strip you swipe, and dots ---------------------------
@@ -514,6 +583,8 @@
      which iOS Safari can hold for seconds or drop. Here the photographs ARE the
      strip; the browser scrolls it natively, and the number and the dots are
      read off what is on screen, so they cannot disagree with the picture. */
+  // a phone turned to landscape (or a window resized) across 768px: one gallery or the other, not both
+  if (PHONE.addEventListener && matchMedia('(pointer: coarse)').matches) PHONE.addEventListener('change', function () { location.reload(); });
   if (!PHONE.matches) return;
   var cap = stageFig.querySelector('.car-stage__count');
   var track = document.createElement('div'); track.className = 'car-track';
@@ -534,6 +605,7 @@
   function setIdx(i) {
     cur = i; var a = list[i]; if (!a) return;
     cap.innerHTML = '<b id="stage-n">' + (i + 1) + '</b> / ' + list.length;
+    stageN = document.getElementById('stage-n');
     drawDots(dots, list.length, i);
     var was = thumbs.querySelector('.car-thumb.is-on'); if (was) was.classList.remove('is-on');
     a.classList.add('is-on');
@@ -548,7 +620,10 @@
   }
   function build() {
     // a group with no photographs keeps the strip it had: the page says why underneath
-    if (!shown().length && list.length) return;
+    // Imperfecciones with none: no photograph pretending to be one, only the message
+    var none = !shown().length;
+    stageFig.classList.toggle('is-empty', none); dots.hidden = none;
+    if (none) return;
     list = shown(); track.innerHTML = '';
     list.forEach(function (a, i) { track.appendChild(slide(a, i, false)); });
     track.scrollLeft = 0; setIdx(0);
@@ -579,13 +654,13 @@
   function vopen() {
     lastFocus = document.activeElement;
     vtrack.innerHTML = ''; list.forEach(function (a, i) { var im = slide(a, i, true); im.loading = Math.abs(i - cur) < 2 ? 'eager' : 'lazy'; vtrack.appendChild(im); });
-    view.hidden = false; lock();
+    view.hidden = false; lock(); pushView();
     vtrack.scrollLeft = cur * vtrack.clientWidth; vset(cur);
     document.getElementById('view-x').focus();
   }
   track.addEventListener('click', vopen);
-  // closing brings the page strip to the photograph you stopped on
-  document.getElementById('view-x').addEventListener('click', function () { track.scrollLeft = vcur * track.clientWidth; setIdx(vcur); });
+  // closing — ×, Esc or Back — brings the page strip to the photograph you stopped on
+  onClose = function () { if (!list.length) return; track.scrollLeft = vcur * track.clientWidth; setIdx(vcur); };
   build();
 })();
 </script>

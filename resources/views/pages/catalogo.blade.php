@@ -1,6 +1,7 @@
 @extends('layouts.site')
 
 @section('title', 'Catálogo — IV MOTORCLASS')
+@section('description', 'Tu próximo capricho, bien elegido: Volkswagen, Audi, BMW, Mercedes-Benz y Porsche en Málaga, seleccionados y revisados. Precio, kilómetros y fotos reales de cada coche.')
 @section('current', 'catalogo')
 
 @section('content')
@@ -102,7 +103,7 @@
 
         @if(!$row['n'] && $row['delivered']->count())
           <p class="cat-row__note"><span>Ninguno disponible ahora mismo. Estos ya los entregué.
-            <a class="mc-link" href="https://wa.me/34614753187">Avísame cuando entre uno</a>.</span></p>
+            <a class="mc-link cat-row__ask" href="https://wa.me/34614753187?text={{ urlencode('Hola, avísame cuando entre un '.$row['name'].', por favor.') }}">Avísame cuando entre uno</a>.</span></p>
         @endif
       </section>
     @endforeach
@@ -119,7 +120,7 @@
   <div class="mc-bar">
     <span class="cat-dock__t">¿Buscas algo concreto?<b>Te lo busco yo</b></span>
     <span class="mc-bar__act">
-      <a class="mc-btn mc-btn--cta" href="https://wa.me/34614753187">WhatsApp</a>
+      <a class="mc-btn mc-btn--cta" href="https://wa.me/34614753187?text=Hola%2C+busco+algo+concreto%3A+">WhatsApp</a>
       <a class="mc-btn mc-btn--ghost" href="tel:+34614753187" aria-label="Llamar">Tel</a>
     </span>
   </div>
@@ -332,6 +333,16 @@
     land(); requestAnimationFrame(land); window.setTimeout(land, 250);
   })();
 
+  /* ---- /catalogo#entregados (footer): the first delivered car -------------- */
+  (function () {
+    if (location.hash !== '#entregados') return;
+    var first = document.querySelector('.mc-card--sold');
+    if (!first) return;
+    var row = first.closest('.cat-row') || first;
+    var go = function () { row.scrollIntoView({ block: 'start', behavior: 'auto' }); };
+    go(); window.setTimeout(go, 250);
+  })();
+
   /* ---- arriving from the home page's search ------------------------------
      ?marca opens that marque to the full screen; ?modelo and ?max hide the cards
      that do not fit. Nothing is removed from the page — a car hidden here is one
@@ -340,22 +351,47 @@
     var q = new URLSearchParams(location.search);
     var marca = q.get('marca'), modelo = q.get('modelo'), max = parseInt(q.get('max'), 10), pago = q.get('pago');
     if (!marca && !modelo && !max) return;
-    var MONTHS = 48;
-    var hid = 0;
+    var MONTHS = {{ \App\Http\Controllers\HomePageController::MONTHS }};
+    /* The same rule the home page counted with, so "Buscar 2 coches" lands on two:
+       only cars for sale; a delivered car or a "Próximamente" card is not a result.
+       A marque row left with nothing is folded away, and a bar says what is
+       filtered and takes it off. */
+    var shown = 0;
     rows.forEach(function (row) {
+      var key = (row.getAttribute('aria-labelledby') || '').replace('marque-', '');
+      var left = 0;
       row.querySelectorAll('.mc-card').forEach(function (card) {
+        var sold = card.classList.contains('mc-card--sold') || card.classList.contains('mc-card--soon');
         var t = (card.querySelector('.mc-card__title') || {}).textContent || '';
         var p = parseInt(((card.querySelector('.mc-price') || {}).textContent || '').replace(/\D/g, ''), 10);
         var v = pago === 'mes' ? Math.round(p / MONTHS) : p;
-        var out = (modelo && t.trim() !== modelo) || (max && v > max);
-        if (out) { card.hidden = true; hid++; }
+        var out = sold || (marca && key !== marca) || (modelo && t.trim() !== modelo) || (max && v > max);
+        if (out) { card.hidden = true; } else { left++; }
       });
+      if (!left) { row.hidden = true; }
+      shown += left;
+      var all = row.querySelector('.cat-row__all'); if (all) { all.hidden = true; }
+      var note = row.querySelector('.cat-row__note'); if (note) { note.hidden = true; }
     });
-    if (marca) {
-      var row = document.querySelector('.cat-row[aria-labelledby="marque-' + marca + '"]');
-      var btn = row && row.querySelector('.cat-row__all');
-      if (btn) window.setTimeout(function () { btn.click(); }, 700);
+    var hero = document.querySelector('.cat-hero');
+    var bar = document.createElement('div'); bar.className = 'cat-filter cat-wrap'; bar.setAttribute('role', 'status');
+    var bits = [];
+    var mName = marca && document.getElementById('marque-' + marca);
+    if (mName) { bits.push(mName.textContent.trim()); } else if (marca) { bits.push(marca); }
+    if (modelo) { bits.push(modelo); }
+    if (max) { bits.push('hasta ' + max.toLocaleString('es-ES') + (pago === 'mes' ? ' €/mes' : ' €')); }
+    var label = document.createElement('p'); label.className = 'cat-filter__t';
+    label.innerHTML = '<b></b> <span></span>';
+    label.querySelector('b').textContent = shown + (shown === 1 ? ' coche' : ' coches');
+    label.querySelector('span').textContent = bits.length ? '· ' + bits.join(' · ') : '';
+    var clear = document.createElement('a'); clear.className = 'cat-filter__x mc-link'; clear.href = '/catalogo'; clear.textContent = 'Quitar filtros';
+    bar.appendChild(label); bar.appendChild(clear);
+    if (!shown) {
+      var wa = document.createElement('a'); wa.className = 'mc-btn mc-btn--cta cat-filter__wa';
+      wa.href = 'https://wa.me/34614753187?text=' + encodeURIComponent('Hola, busco ' + (bits.join(', ') || 'un coche') + '. ¿Me ayudas?');
+      wa.textContent = 'Te lo busco: escríbeme'; bar.appendChild(wa);
     }
+    if (hero) { hero.parentNode.insertBefore(bar, hero.nextSibling); }
   })();
 
   document.addEventListener('keydown', function (e) {

@@ -87,14 +87,14 @@ class SellCarController extends Controller
                the constants now, so the two cannot drift apart again. */
             'fuel_type' => 'required|string|in:' . implode(',', \App\Http\Controllers\SellCarController::FUEL),
             'transmission' => 'required|string|in:' . implode(',', \App\Http\Controllers\SellCarController::GEAR),
-            'body_type' => 'required|string|max:50',
-            'color' => 'required|string|max:50',
-            'engine_capacity' => 'required|integer|min:0',
-            'power' => 'required|integer|min:0',
-            'description' => 'required|string|max:2000',
+            'body_type' => 'nullable|string|max:50',
+            'color' => 'nullable|string|max:50',
+            'engine_capacity' => 'nullable|integer|min:0',
+            'power' => 'nullable|integer|min:0',
+            'description' => 'nullable|string|max:2000',
             'seller_name' => 'required|string|max:255',
-            'seller_phone' => 'required|string|max:20',
-            'seller_email' => 'required|email|max:255',
+            'seller_phone' => 'required|string|max:30',   // the public form allows 30
+            'seller_email' => 'nullable|email|max:255',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB max per image
         ]);
 
@@ -161,6 +161,11 @@ class SellCarController extends Controller
         /* 'is_featured' was neither a column nor fillable, so mass-assignment
            protection dropped it silently on every approval. The column is
            'featured'. */
+        // A car with no price would go into the catalogue at "0 €".
+        if ((int) $vehicle->price <= 0) {
+            return redirect()->route('admin.sell-cars.edit', $vehicle)
+                            ->withErrors(['price' => 'Ponle precio antes de publicarlo.']);
+        }
         $vehicle->update([
             'status'   => 'available',
             'featured' => false,

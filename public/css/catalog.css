@@ -718,3 +718,16 @@ body.is-locked{ position:fixed; left:0; right:0; overflow:hidden; }
 /* "Encuentra el tuyo": lands below the sticky header, glides there */
 #cat-first{ scroll-margin-top:4.5rem; }
 @media (prefers-reduced-motion: no-preference){ html:has(#cat-first){ scroll-behavior:smooth; } }
+
+/* "Avísame cuando entre uno": an inline link, but a finger-sized one */
+.cat-row__ask{ display:inline-block; padding-block:.8rem; margin-block:-.8rem; }
+
+/* [hidden] wins over the card and row layouts (the home search hid cards that stayed visible) */
+.mc-card[hidden], .cat-row[hidden], .cat-row__note[hidden]{ display:none !important; }
+
+/* what the home search filtered, and the way out */
+.cat-filter{ display:flex; flex-wrap:wrap; align-items:center; gap:var(--s-2) var(--s-4); padding-block:var(--s-4); }
+.cat-filter__t{ margin:0; font-size:var(--t-body); color:var(--mc-ink); }
+.cat-filter__t span{ color:var(--mc-ink-2); }
+.cat-filter__x{ display:inline-flex; align-items:center; min-height:44px; font-weight:600; }
+.cat-filter__wa{ flex:1 1 100%; justify-content:center; max-width:24rem; }

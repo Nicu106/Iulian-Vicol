@@ -17,7 +17,7 @@
 @include('admin.testimonials._form', ['testimonial' => $testimonial, 'action' => route('admin.testimonials.update', $testimonial)])
 
 <form class="ad-danger" action="{{ route('admin.testimonials.destroy', $testimonial) }}" method="POST"
-      onsubmit="return confirm('¿Borrar la opinión de {{ $testimonial->author_name }}?')">
+      onsubmit="return confirm(@js('¿Borrar la opinión de '.$testimonial->author_name.'?'))">
   @csrf
   @method('DELETE')
   <button class="ad-btn ad-btn--bad ad-btn--s" type="submit">Borrar esta opinión</button>

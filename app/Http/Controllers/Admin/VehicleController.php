@@ -353,7 +353,9 @@ class VehicleController extends BaseController
             try { $this->warmResizeCache($coverUrl); } catch (\Throwable $e) { /* ignore */ }
         }
 
-        $features = array_filter(array_map('trim', explode(',', $validated['features'] ?? '')));
+        // "uno por línea" in the form; older entries were comma-separated
+        $featIn = (string) ($validated['features'] ?? '');
+        $features = array_values(array_filter(array_map('trim', preg_split(str_contains($featIn, "\n") ? '/\r\n|\r|\n/' : '/,/', $featIn))));
         $badges = array_filter(array_map('trim', explode(',', $validated['badges'] ?? '')));
         $tags = array_filter(array_map('trim', explode(',', $validated['tags'] ?? '')));
 
@@ -570,6 +572,10 @@ class VehicleController extends BaseController
                 $vehicleData['gallery_images'] = array_values(array_filter($current, function ($url) use ($toRemove) {
                     return !in_array($url, $toRemove, true);
                 }));
+                // the cover went with them: the next photo becomes the cover, never a dead file
+                if (in_array($vehicleData['cover_image'] ?? null, $toRemove, true)) {
+                    $vehicleData['cover_image'] = $vehicleData['gallery_images'][0] ?? null;
+                }
                 // Optionally remove files from storage if they are ours
                 foreach ($toRemove as $url) {
                     $path = str_replace('/storage/', '', parse_url($url, PHP_URL_PATH));
@@ -580,7 +586,9 @@ class VehicleController extends BaseController
             }
         }
 
-        $features = array_filter(array_map('trim', explode(',', $validated['features'] ?? '')));
+        // "uno por línea" in the form; older entries were comma-separated
+        $featIn = (string) ($validated['features'] ?? '');
+        $features = array_values(array_filter(array_map('trim', preg_split(str_contains($featIn, "\n") ? '/\r\n|\r|\n/' : '/,/', $featIn))));
         $badges = array_filter(array_map('trim', explode(',', $validated['badges'] ?? '')));
         $tags = array_filter(array_map('trim', explode(',', $validated['tags'] ?? '')));
         
@@ -624,6 +632,19 @@ class VehicleController extends BaseController
             'updated_at' => now()->toISOString(),
         ]);
 
+        // Fields this form does not carry are kept as they are, not wiped: saving
+        // a car used to clear featured, badges, tags and the SEO texts.
+        foreach (['featured', 'priority', 'badges', 'tags', 'meta_title', 'meta_description', 'video_url',
+                  'location', 'internal_notes', 'offer_expires_at', 'offer_type', 'offer_description',
+                  'original_price', 'offer_price', 'drivetrain', 'condition', 'referred_by', 'status',
+                  'features', 'description', 'vin', 'color', 'engine', 'power', 'fuel', 'transmission',
+                  'mileage', 'body_type'] as $k) {
+            if (!$request->has($k)) {
+                unset($updatedData[$k]);
+                if ($k === 'offer_price') { unset($updatedData['has_offer']); }
+            }
+        }
+
         if ($isDbVehicle) {
             $vehicle->update($updatedData);
         } else {
@@ -649,7 +670,12 @@ class VehicleController extends BaseController
     public function destroy(string $slug)
     {
         try {
-            Vehicle::query()->where('slug', $slug)->delete();
+            // through the model, so its observers run (referral rewards, caches)
+            Vehicle::where('slug', $slug)->first()?->delete();
+            // the photographs live here, not in public/uploads — the confirm promises they go too
+            if ($slug !== '' && !str_contains($slug, '/') && !str_contains($slug, '.')) {
+                Storage::disk('public')->deleteDirectory('vehicles/' . $slug);
+            }
         } catch (\Throwable $e) {
             $items = $this->readStore();
             $items = array_values(array_filter($items, fn($v) => ($v['slug'] ?? '') !== $slug));

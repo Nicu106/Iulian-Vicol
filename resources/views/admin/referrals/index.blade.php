@@ -108,7 +108,7 @@
                  href="https://wa.me/{{ $p->phone }}?text={{ rawurlencode(Referral::messageFor($p)) }}">Enviarle su enlace</a>
               <button class="ad-btn ad-btn--q ad-btn--s" type="button" data-copy="{{ $p->link }}">Copiar enlace</button>
               <form action="{{ route('admin.referrals.destroy', $p) }}" method="POST"
-                    onsubmit="return confirm('¿Borrar el enlace de {{ $p->name }}?')">@csrf @method('DELETE')
+                    onsubmit="return confirm(@js('¿Borrar el enlace de '.$p->name.'?'))">@csrf @method('DELETE')
                 <button class="ad-btn ad-btn--bad ad-btn--s" type="submit">Borrar</button>
               </form>
             </div>

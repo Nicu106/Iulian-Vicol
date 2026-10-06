@@ -61,7 +61,7 @@ class SellCarController extends Controller
             'marques' => self::MARQUES,
             'fuels'   => self::FUEL,
             'gears'   => self::GEAR,
-            'years'   => range((int) date('Y'), 2005),
+            'years'   => range((int) date('Y'), 1990),   // the server accepts from 1990; older Porsches and Mercedes are sold too
             'sent'    => $request->boolean('enviado'),
             'maxPhotos' => self::MAX_PHOTOS,
             // Encrypted, so the clock in SellCarRequest cannot be back-dated.

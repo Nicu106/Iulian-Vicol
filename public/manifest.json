@@ -1,35 +1,30 @@
 {
-  "name": "MOTORCLASS - Concesionario de Coches Premium",
-  "short_name": "MOTORCLASS",
-  "description": "Concesionario de coches premium en Málaga, España. Vehículos de calidad, financiación rápida, garantía extendida.",
+  "name": "IV MOTORCLASS",
+  "short_name": "IV MOTORCLASS",
+  "description": "Coches alemanes premium en Málaga.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#dc3545",
-  "orientation": "portrait-primary",
+  "background_color": "#FFFFFF",
+  "theme_color": "#111C2E",
+  "lang": "es",
+  "dir": "ltr",
   "icons": [
     {
-      "src": "/images/icon-192x192.png",
+      "src": "/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/images/icon-512x512.png",
+      "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
-    }
-  ],
-  "categories": ["automotive", "business", "shopping"],
-  "lang": "es",
-  "dir": "ltr",
-  "scope": "/",
-  "id": "motorclass-app",
-  "screenshots": [
+    },
     {
-      "src": "/images/screenshot1.png",
-      "sizes": "1280x720",
+      "src": "/icons/maskable-512.png",
+      "sizes": "512x512",
       "type": "image/png",
-      "form_factor": "wide"
+      "purpose": "maskable"
     }
   ]
 }

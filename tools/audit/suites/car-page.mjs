@@ -45,7 +45,7 @@ const col = await pg.evaluate(() => {
 });
 is(col.there && col.inColumn,
    'everything that comes with the car sits in the right-hand column');
-is(col.order.join(' ') === 'car-price mc-specs car-act car-with',
+is(col.order.join(' ') === 'car-price mc-specs car-act car-share car-with',   // + "Compartir", 2026-10-06
    'under the price, the facts and the buttons, in that order', col.order.join(' → '));
 is(col.specsCopies === 1, 'the six facts are rendered exactly once', `${col.specsCopies} copies`);
 is(col.panels === 2 && col.steps.join(',') === '3,2',

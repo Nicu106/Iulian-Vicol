@@ -31,7 +31,7 @@
     <div class="mc-foot__lead">
       <a class="mc-foot__logo" href="/catalogo">IV&nbsp;MOTORCLASS</a>
       <p class="mc-foot__say">Coches alemanes premium en Málaga. Cinco marcas, y sólo esas.</p>
-      <a class="mc-btn mc-btn--cta" href="https://wa.me/34614753187">Reservar cita</a>
+      <a class="mc-btn mc-btn--cta" href="https://wa.me/34614753187?text=Hola%2C+quiero+quedar+para+ver+un+coche.">Reservar cita</a>
     </div>
 
     <nav class="mc-foot__col" aria-labelledby="f-nav">
@@ -49,7 +49,7 @@
       <h2 class="mc-foot__h">Contacto</h2>
       <ul>
         <li><a href="tel:+34614753187">+34 614 753 187</a></li>
-        <li><a href="https://wa.me/34614753187">WhatsApp</a></li>
+        <li><a href="https://wa.me/34614753187?text=Hola%2C+vengo+de+la+web+y+busco+un+coche.">WhatsApp</a></li>
         <li><a href="mailto:jvmotorclass@gmail.com">jvmotorclass@gmail.com</a></li>
         <li><a href="https://www.google.com/maps/search/?api=1&amp;query={{ urlencode('Málaga, España') }}"
                target="_blank" rel="noopener">Málaga, España</a></li>

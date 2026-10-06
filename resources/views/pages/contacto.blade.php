@@ -1,6 +1,7 @@
 @extends('layouts.site')
 
 @section('title', 'Contacto — IV MOTORCLASS')
+@section('description', 'Escríbeme por WhatsApp, llámame o mándame un email. Contesto yo, normalmente en minutos. Málaga, con cita, donde esté el coche.')
 @section('current', 'contacto')
 {{-- this page has its own map; the footer's band would be the same place twice --}}
 @section('foot-map', 'off')
@@ -343,6 +344,15 @@
     var name = form.querySelector('#f-name').value.trim();
     var tel  = form.querySelector('#f-tel').value.trim();
     var msg  = form.querySelector('#f-msg').value.trim();
+    // spaces only pass "required": ask for the real thing, on the field itself
+    var empty = !name ? '#f-name' : (!msg ? '#f-msg' : null);
+    if (empty) {
+      var f = form.querySelector(empty);
+      f.setCustomValidity(empty === '#f-name' ? 'Dime tu nombre.' : 'Cuéntame qué necesitas.');
+      f.reportValidity();
+      f.addEventListener('input', function clear() { f.setCustomValidity(''); f.removeEventListener('input', clear); });
+      return;
+    }
     var body = 'Hola' + (name ? ', soy ' + name : '') + '. ' + msg + (tel ? '\n\nMi teléfono: ' + tel : '');
     if (window.mcRefTrack) { window.mcRefTrack(via === 'mail' ? 'email' : 'whatsapp'); }
     if (via === 'mail') {

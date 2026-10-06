@@ -231,3 +231,4 @@
 .sl-marque--other::after{ background-color:var(--mc-ink); background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%23FFFFFF' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
 /* on a phone every form's send button is the same: full width */
 @media (max-width:759.98px){ .sl-send__btn{ justify-self:stretch; width:100%; justify-content:center; } }
+.sl-alert__note{ margin:var(--s-2) 0 0; font-size:var(--t-small); color:var(--mc-ink-2); }

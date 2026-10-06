@@ -34,6 +34,7 @@ Timpul tău de gândire și de verificare între prompturi, peste 15 minute, **n
 | 30.09 | 0,1 | 1 | Font găzduit pe site (fără Google), timer zilnic pentru curățarea recomandărilor, verificarea zilnică reparată |
 | 05–06.10 | — | — | **LANSARE**: v2 = ivmotorclass.com; date reale mutate; galerie telefon (glisare, puncte); 2 agenți de audit telefon + reparații; formularul /vende reparat (nginx); pagina nu mai alunecă lateral |
 | 06.10 | — | — | Feedback client (capturi): carusel automat la „Disponibles ahora”, textele noi (catalog, recenzii, rețele, pașii 01–03), garanție 36 luni, banda din catalog pe toată lățimea pe ecrane late; adminul verificat pagină cu pagină + salvări; 3 rute de admin reparate |
+| 06.10 (2) | — | — | Audit UX cu 3 agenți (pagini publice, mașină, formulare + admin) și reparațiile: căutarea filtrează, Back închide galeria, previzualizare WhatsApp, „Alte mașini”, Compartir, 404/419/429/500 în spaniolă, pozele din /vende micșorate, previzualizări blocate de CSP reparate (public + admin), XSS în admin închis, recenzii ascunse, echipament păstrat la salvare |
 | **Total** | **37,1 h** | **134** | **14 zile** |
 
 
@@ -110,7 +111,7 @@ Detaliile sunt în `docs/STRATEGIE-SI-SCHIMBARI.md` §4. Pe scurt:
 - [ ] Monitorizarea orelor de acum înainte: raportul din script, hook care scrie un CSV sau OpenTelemetry
 
 ### După lansare (site-ul e live din 06.10)
-- [ ] Politica de confidențialitate (link-ul din subsol e acum `#`) și anunțul de cookie-uri
+- [ ] Politica de confidențialitate și Termenii (link-urile din subsol sunt `#`): obligatorii (RGPD/LSSI), am nevoie de datele firmei
 - [ ] Termenii programului de recomandare pe `/recomienda`
 - [ ] certificat pentru `www.ivmotorclass.com` (acum doar domeniul fără www)
 - [ ] Pagina „Quién soy” (Cine sunt): o facem ca pagină reală sau rămâne scoasă din meniu?

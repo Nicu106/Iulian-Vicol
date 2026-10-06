@@ -277,3 +277,6 @@
 /* a halo of the sea's own colour: where a road near the coast passes behind a
    letter, the letter wins */
 .mc-foot__say-where h2, .mc-foot__say-where p{ text-shadow:0 0 8px #040B1F, 0 0 18px #040B1F; }
+
+/* focus on navy: a white ring, not the ink one that disappears */
+.mc-foot :focus-visible{ outline-color:#FFFFFF; }

@@ -35,6 +35,18 @@ class SellCarRequest extends FormRequest
         return true;
     }
 
+    /** "120.000 km", "14 500 €": written the way people write them, read as numbers. */
+    protected function prepareForValidation(): void
+    {
+        foreach (['mileage', 'price'] as $k) {
+            $v = $this->input($k);
+            if (is_string($v) && $v !== '') {
+                $v = explode(',', $v)[0];                       // no cents
+                $this->merge([$k => preg_replace('/[^0-9]/', '', $v)]);
+            }
+        }
+    }
+
     public function rules(): array
     {
         $marques = array_merge(array_column(SellCarController::MARQUES, 'key'), ['otra']);
@@ -83,7 +95,7 @@ class SellCarRequest extends FormRequest
             // ---- the trap -------------------------------------------------
             // A field no person can see or tab to. Anything in it filled the
             // form by reading the HTML, which is what a bot does.
-            if (filled($this->input('apellido_2'))) {
+            if (filled($this->input('hp_note'))) {
                 $v->errors()->add('brand', 'No he podido enviar el formulario. Recarga la página e inténtalo otra vez.');
                 $this->flag('honeypot');
                 return;

@@ -34,8 +34,32 @@
      scrolling the page under it, which is what a page with forms wants. It was
      on three pages of five before this. --}}
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-<meta name="robots" content="index, follow">
+<meta name="robots" content="@yield('robots', 'index, follow')">
 <title>@yield('title')</title>
+@php
+  // What a shared link shows (WhatsApp, Facebook, Google). A page may set
+  // @section('description') and @section('og_image'); the rest is derived.
+  $metaDesc  = trim($__env->yieldContent('description')) ?: 'Coches alemanes premium en Málaga: Volkswagen, Audi, BMW, Mercedes-Benz y Porsche. Seleccionados, revisados y con garantía. Escríbeme por WhatsApp.';
+  $metaImage = trim($__env->yieldContent('og_image')) ?: url('/img/og-default.jpg');
+  $metaUrl   = url()->current();
+@endphp
+<meta name="description" content="{{ $metaDesc }}">
+@unless(trim($__env->yieldContent('robots')))<link rel="canonical" href="{{ $metaUrl }}">@endunless
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="IV MOTORCLASS">
+<meta property="og:locale" content="es_ES">
+<meta property="og:title" content="@yield('title')">
+<meta property="og:description" content="{{ $metaDesc }}">
+<meta property="og:url" content="{{ $metaUrl }}">
+<meta property="og:image" content="{{ $metaImage }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#111C2E">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/icons/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
 
 <link rel="preload" href="/fonts/dm-sans/dm-sans-latin-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="{{ asset('css/fonts.css') }}">

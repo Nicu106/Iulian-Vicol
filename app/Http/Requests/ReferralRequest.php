@@ -43,7 +43,7 @@ class ReferralRequest extends FormRequest
         $v->after(function (Validator $v) {
             $again = 'No he podido crear el enlace. Recarga la página e inténtalo otra vez.';
 
-            if (filled($this->input('apellido_2'))) {
+            if (filled($this->input('hp_note'))) {
                 $v->errors()->add('name', $again);
                 return;
             }
