@@ -153,7 +153,11 @@
 /* the rail of what is available: the catalogue's own card, scrolled */
 .home-rail{ margin-inline:calc(var(--mc-gutter-d) * -1); padding-inline:var(--mc-gutter-d); }
 .home-rail__in{ display:flex; gap:var(--s-4); overflow-x:auto; scroll-snap-type:x proximity;
-  padding-bottom:var(--s-3); scrollbar-width:thin; }
+  padding-bottom:var(--s-3); overscroll-behavior-x:contain;
+  /* a carousel that moves by itself (inicio script): no scrollbar under it — the
+     client: "în loc de bara de jos, să fie carusel automat" */
+  scrollbar-width:none; }
+.home-rail__in::-webkit-scrollbar{ display:none; }
 .home-rail__in > *{ flex:0 0 15.5rem; scroll-snap-align:start; }
 @media (max-width:768px){
   .home-rail{ margin-inline:calc(var(--mc-gutter-m) * -1); padding-inline:var(--mc-gutter-m); }
@@ -568,3 +572,10 @@ html:not(.js) .hm-fb__step{ display:none; }
    on the row, and it only happens under a pointer. */
 .hm-soc__link:hover .hm-soc__go{ opacity:1; translate:2px -2px; }
 @media (prefers-reduced-motion:reduce){ .hm-soc__link:hover .hm-soc__go{ translate:none; } }
+
+/* the social band's own call, on black: white, underlined, not the blue link */
+.hm-soc__cta{ display:inline-flex; align-items:center; min-height:44px; color:#FFFFFF; font-weight:600;
+  text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:.25em; }
+.hm-soc__cta:hover{ text-decoration-thickness:2px; }
+.hm-soc__cta:focus-visible{ outline:2px solid #FFFFFF; outline-offset:3px; }
+.hm-soc__p + .hm-soc__p{ margin-top:var(--s-3); }

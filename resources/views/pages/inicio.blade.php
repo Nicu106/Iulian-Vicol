@@ -128,9 +128,9 @@
   @if($reviewCount > 0)
   <section class="hm-fb" id="reviews" aria-labelledby="h-fb">
     <div class="cat-wrap hm-fb__head">
-      <h2 class="hm-h2" id="h-fb">{{ $reviewCount }} personas se hicieron la foto</h2>
-      <p class="hm-sec__p">Con el coche que se llevaron. Ninguna foto de archivo,
-        y ningún texto recortado: lo que escribieron está aquí entero.</p>
+      <h2 class="hm-h2" id="h-fb">La confianza se gana. Ellos te cuentan cómo.</h2>
+      <p class="hm-sec__p">Conoce a quienes ya han comprado su coche en IV Motorclass. Estas son
+        sus fotos el día de la entrega y sus opiniones sobre la experiencia.</p>
     </div>
 
     {{-- The one control there is. It is not visible until a keyboard reaches it,
@@ -216,9 +216,14 @@
       <div class="hm-soc__say">
         <p class="hm-soc__kick">Fuera de esta web</p>
         <h2 class="hm-h2 hm-soc__h" id="h-soc">Los coches se ven mejor en movimiento.</h2>
-        <p class="hm-soc__p">Subo cada uno en vídeo: por fuera, por dentro, el
-          cuentakilómetros y lo que no está perfecto. Es lo mismo que le mando por
-          WhatsApp a quien pregunta, sólo que antes de que pregunte.</p>
+        <p class="hm-soc__p">Los coches están en Málaga. Las miradas llegan de todas partes.</p>
+        <p class="hm-soc__p">Nuestros vídeos nos conectan con personas de muchos lugares que comparten
+          nuestra pasión por los coches. Muchos nos descubren en redes y nos escriben para encontrar
+          su próximo vehículo.</p>
+        <p class="hm-soc__p">Explora nuestros reels, conoce detalles y curiosidades, descubre nuestras
+          últimas entregas. El coche que te interesa puede estar también en nuestros vídeos.</p>
+        <p class="hm-soc__p"><a class="hm-soc__cta" href="{{ $social['tiktok']['url'] ?? 'https://www.tiktok.com/@_ivmotorclass' }}"
+          target="_blank" rel="noopener">Descubrir IV Motorclass en redes</a></p>
       </div>
 
       <div class="hm-soc__num">
@@ -287,28 +292,31 @@
       <li class="hm-how__step">
         <span class="hm-how__n" aria-hidden="true">01</span>
         <div class="hm-how__t">
-          <h3>Escribes</h3>
-          <p>Al WhatsApp que hay en toda la web. Contesto yo, y normalmente en minutos.
-            No hay nadie más al otro lado.</p>
-          <a class="mc-link" href="/contacto">Ver cómo contactar</a>
+          <h3>Tu primer mensaje lo recibo yo</h3>
+          <p>Soy el director de IV Motorclass y quien te acompañará durante toda la compra.
+            Escríbeme por WhatsApp y cuéntame qué coche te interesa. Hablaremos de lo que buscas
+            y resolveré tus dudas, sin pasarte de una persona a otra.</p>
+          <a class="mc-link" href="https://wa.me/34614753187">Hablemos por WhatsApp</a>
         </div>
       </li>
       <li class="hm-how__step">
         <span class="hm-how__n" aria-hidden="true">02</span>
         <div class="hm-how__t">
-          <h3>Te mando vídeo</h3>
-          <p>Del coche entero, y de lo que no está perfecto también. Prefiero que lo
-            veas en el móvil antes de coger el coche para venir.</p>
-          <a class="mc-link" href="/catalogo">Ver los coches</a>
+          <h3>Te lo enseño antes de que vengas</h3>
+          <p>Te preparo un vídeo del coche y me detengo en los detalles que quieras comprobar.
+            Verás el exterior, el interior, el equipamiento y también sus posibles desperfectos.
+            Si vas a desplazarte para verlo, quiero que sepas de antemano qué te vas a encontrar.</p>
+          <a class="mc-link" href="/catalogo">Elige el coche que quieres conocer</a>
         </div>
       </li>
       <li class="hm-how__step">
         <span class="hm-how__n" aria-hidden="true">03</span>
         <div class="hm-how__t">
-          <h3>Lo ves. O no lo ves</h3>
-          <p>Quedamos en Málaga, en el punto exacto donde esté el coche. O no vienes:
-            hay quien ha conducido 720 km para verlo y quien no se movió de casa.</p>
-          <a class="mc-link" href="/contacto#far">Lo que hicieron ellos</a>
+          <h3>Lo pruebas y decides con calma</h3>
+          <p>Quedamos en Málaga, vemos el coche juntos y salimos a probarlo. Tendrás tiempo para
+            preguntar y decidir, sin presiones. Si compras a distancia, me encargo de enseñártelo
+            y resolver tus dudas personalmente antes de que tomes la decisión.</p>
+          <a class="mc-link" href="#reviews">Así lo vivieron otros clientes</a>
         </div>
       </li>
       <li class="hm-how__step">
@@ -325,7 +333,7 @@
   {{-- ============ questions ============ --}}
   <section class="hm-sec hm-faq cat-wrap" aria-labelledby="h-faq">
     <h2 class="hm-h2" id="h-faq">Preguntas frecuentes</h2>
-    <details class="hm-q"><summary>¿Ofrecen garantía para vehículos?</summary><p>Sí, ofrecemos garantía extendida hasta 24 meses, dependiendo del modelo.</p></details>
+    <details class="hm-q"><summary>¿Ofrecen garantía para vehículos?</summary><p>Sí, ofrecemos garantía extendida hasta 36 meses, dependiendo del modelo.</p></details>
     <details class="hm-q"><summary>¿Puedo comprar en leasing o con financiación?</summary><p>Sí, colaboramos con socios financieros para ofertas rápidas y ventajosas.</p></details>
     <details class="hm-q"><summary>¿Puedo programar una prueba de manejo?</summary><p>Por supuesto. Escríbeme por WhatsApp o llámame y la programamos.</p></details>
   </section>
@@ -357,6 +365,46 @@
   </div>
 </div>
 @endsection
+
+@push('js')
+<script>
+/* "Disponibles ahora" moves by itself: one card every 3.5 s, for ever. The cards
+   are followed by aria-hidden, unfocusable copies so the loop has no visible jump:
+   once the first set has scrolled away, the strip is moved back by exactly one set
+   width, which shows the same picture. It waits while a hand is on it (hover,
+   touch, focus), while it is off screen, and does not move at all for
+   prefers-reduced-motion. A swipe still works: the strip is a normal scroller. */
+(function () {
+  var rail = document.querySelector('.home-rail__in');
+  if (!rail || rail.children.length < 2) return;
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var originals = Array.prototype.slice.call(rail.children);
+  originals.forEach(function (c) {
+    var k = c.cloneNode(true); k.setAttribute('aria-hidden', 'true'); k.setAttribute('data-clone', '');
+    k.querySelectorAll('a, button').forEach(function (a) { a.setAttribute('tabindex', '-1'); });
+    rail.appendChild(k);
+  });
+  function setWidth() { return rail.children[originals.length].offsetLeft - rail.children[0].offsetLeft; }
+  function step() { var a = rail.children[0], b = rail.children[1]; return b.offsetLeft - a.offsetLeft; }
+  var held = false, visible = false, timer = null;
+  function wrap() { var w = setWidth(); if (rail.scrollLeft >= w - 2) rail.scrollLeft -= w; }
+  function tick() {
+    if (held || !visible || document.hidden) return;
+    wrap();
+    rail.scrollBy({ left: step(), behavior: 'smooth' });
+  }
+  rail.addEventListener('scroll', function () { clearTimeout(rail._t); rail._t = setTimeout(wrap, 150); }, { passive: true });
+  ['mouseenter', 'touchstart', 'focusin'].forEach(function (e) { rail.addEventListener(e, function () { held = true; }, { passive: true }); });
+  rail.addEventListener('mouseleave', function () { held = false; });
+  rail.addEventListener('focusout', function () { held = false; });
+  rail.addEventListener('touchend', function () { setTimeout(function () { held = false; }, 2500); }, { passive: true });
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }, { threshold: .3 }).observe(rail);
+  } else { visible = true; }
+  timer = setInterval(tick, 3500);
+})();
+</script>
+@endpush
 
 @push('js')
 <script>

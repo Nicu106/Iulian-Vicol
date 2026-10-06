@@ -33,6 +33,7 @@ Timpul tău de gândire și de verificare între prompturi, peste 15 minute, **n
 | 23.09 | 1,7 | 6 | Contact refăcut pentru telefon; hărți vectoriale proprii (contact + subsol), Google doar la cerere; catalog: exemplele Porsche șterse, cartonașe „Próximamente”; subsol cu hartă care se desenează; contact cu benzi colorate ca în catalog; analiză completă 8 pagini × 10 lățimi |
 | 30.09 | 0,1 | 1 | Font găzduit pe site (fără Google), timer zilnic pentru curățarea recomandărilor, verificarea zilnică reparată |
 | 05–06.10 | — | — | **LANSARE**: v2 = ivmotorclass.com; date reale mutate; galerie telefon (glisare, puncte); 2 agenți de audit telefon + reparații; formularul /vende reparat (nginx); pagina nu mai alunecă lateral |
+| 06.10 | — | — | Feedback client (capturi): carusel automat la „Disponibles ahora”, textele noi (catalog, recenzii, rețele, pașii 01–03), garanție 36 luni, banda din catalog pe toată lățimea pe ecrane late; adminul verificat pagină cu pagină + salvări; 3 rute de admin reparate |
 | **Total** | **37,1 h** | **134** | **14 zile** |
 
 

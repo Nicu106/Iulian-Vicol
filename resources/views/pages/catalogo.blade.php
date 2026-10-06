@@ -21,16 +21,16 @@
            sizes="100vw" :max="2000" :fallback="1080" :priority="true" />
     <div class="cat-hero__in cat-wrap">
       <span class="cat-hero__eyebrow">Málaga · {{ $sold }} coches entregados</span>
-      <h1 class="cat-hero__h"><span>{{ $words[$total] ?? $total }} coches.</span>
-        <span>Cinco marcas alemanas.</span></h1>
-      <p class="cat-hero__p">Sólo trabajo con estas cinco. Los he comprado y conducido yo,
-         y si preguntas por uno te contesto yo.</p>
+      <h1 class="cat-hero__h">Tu próximo capricho, bien elegido.</h1>
+      <p class="cat-hero__p">Modelos y acabados que llaman la atención. Seleccionados, revisados
+         y preparados por nuestro equipo para que disfrutes de algo especial.</p>
+      <a class="cat-hero__go" href="#cat-first">Encuentra el tuyo <span aria-hidden="true">↓</span></a>
       <span class="cat-hero__credit">Foto de archivo · Unsplash</span>
     </div>
   </header>
 
   @foreach($rows as $i => $row)
-      <section class="cat-row {{ $i % 2 ? 'cat-row--rtl' : '' }}"
+      <section @if($i === 0) id="cat-first" @endif class="cat-row {{ $i % 2 ? 'cat-row--rtl' : '' }}"
                style="--brand:{{ $row['colour'] }}"
                aria-labelledby="marque-{{ $row['key'] }}">
 

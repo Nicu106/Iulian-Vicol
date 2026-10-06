@@ -90,6 +90,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/contacts', [App\Http\Controllers\Admin\ContactMessageController::class, 'index'])->name('admin.contacts.index');
     Route::delete('/admin/contacts/{contact}', [App\Http\Controllers\Admin\ContactMessageController::class, 'destroy'])->name('admin.contacts.destroy');
     Route::get('/admin/vehicles/create', [VehicleController::class, 'create'])->name('admin.vehicles.create');
+    // fixed paths before /{slug}, or {slug} swallows them
+    Route::post('/admin/vehicles/bulk-action', [VehicleController::class, 'bulkAction'])->name('admin.vehicles.bulk-action');
+    Route::post('/admin/vehicles/bulk-pricing', [VehicleController::class, 'bulkPricingUpdate'])->name('admin.vehicles.bulk-pricing');
+    Route::get('/admin/vehicles/export-pricing', [VehicleController::class, 'exportPricingReport'])->name('admin.vehicles.export-pricing');
     Route::post('/admin/vehicles', [VehicleController::class, 'store'])->name('admin.vehicles.store');
     Route::get('/admin/vehicles/{slug}', [VehicleController::class, 'show'])->name('admin.vehicles.show');
     Route::get('/admin/vehicles/{slug}/edit', [VehicleController::class, 'edit'])->name('admin.vehicles.edit');
@@ -117,11 +121,8 @@ Route::middleware('auth')->group(function () {
     // Advanced admin actions
     Route::post('/admin/vehicles/{slug}/status', [VehicleController::class, 'setStatus'])->name('admin.vehicles.status');
     Route::post('/admin/vehicles/{slug}/toggle-featured', [VehicleController::class, 'toggleFeatured'])->name('admin.vehicles.toggle-featured');
-    Route::post('/admin/vehicles/bulk-action', [VehicleController::class, 'bulkAction'])->name('admin.vehicles.bulk-action');
     
     // Enhanced pricing and offers management
-    Route::post('/admin/vehicles/bulk-pricing', [VehicleController::class, 'bulkPricingUpdate'])->name('admin.vehicles.bulk-pricing');
-    Route::get('/admin/vehicles/export-pricing', [VehicleController::class, 'exportPricingReport'])->name('admin.vehicles.export-pricing');
     /* /admin/vehicles/pricing-analytics is gone. The route pointed at
        VehicleController@pricingAnalytics, which does not exist and never
        has, so opening it raised "Call to undefined method" — a 500, not a

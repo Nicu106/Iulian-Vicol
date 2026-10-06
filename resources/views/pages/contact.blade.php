@@ -204,7 +204,7 @@
               <div class="col-md-3">
                 <i class="bi bi-award text-success fs-1"></i>
                 <h6 class="mt-2">Garantía extendida</h6>
-                <p class="text-secondary small mb-0">Ofrecemos garantía de hasta 24 meses</p>
+                <p class="text-secondary small mb-0">Ofrecemos garantía de hasta 36 meses</p>
               </div>
               <div class="col-md-3">
                 <i class="bi bi-credit-card text-info fs-1"></i>
