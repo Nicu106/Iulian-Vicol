@@ -24,7 +24,8 @@ class WarmImages extends Command
     protected $signature = 'images:warm
         {--clicks : also the stage size for every gallery photograph, so pressing a thumbnail is instant}
         {--all : every gallery photograph at every width, not just the first screen}
-        {--force : rebuild derivatives that already exist}';
+        {--force : rebuild derivatives that already exist}
+        {--complete : every width any srcset on the site names, for every photograph (2000 for cars for sale)}';
 
     protected $description = 'Pre-build resized images so nobody waits for GD on a cold page';
 
@@ -57,6 +58,19 @@ class WarmImages extends Command
             $this->add($jobs, '/storage/testimonials/' . basename($f), self::FACE);
         }
 
+        if ($this->option('complete')) {
+            foreach (glob(storage_path('app/public/testimonials/*')) as $f) {
+                $this->add($jobs, '/storage/testimonials/' . basename($f), Img::ladder('/storage/testimonials/' . basename($f), 1080));
+            }
+            foreach (Vehicle::whereIn('status', ['available', 'sold'])->get() as $v) {
+                $gallery = is_array($v->gallery_images) ? $v->gallery_images : [];
+                foreach (array_values(array_filter(array_merge([$v->cover_image], $gallery))) as $p) {
+                    $this->add($jobs, $p, Img::ladder($p, $v->status === 'available' ? 2000 : 1600));
+                }
+            }
+            // only what is missing: Img::url answers with the cached file once it exists
+            $jobs = array_values(array_filter($jobs, fn ($j) => !str_starts_with((string) Img::url($j[0], $j[1]), '/storage/cache/')));
+        } else
         foreach (Vehicle::whereIn('status', ['available', 'sold'])->get() as $v) {
             $gallery = is_array($v->gallery_images) ? $v->gallery_images : [];
             $all = array_values(array_filter(array_merge([$v->cover_image], $gallery)));

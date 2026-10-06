@@ -128,6 +128,56 @@ final class Img
         return implode(', ', $out);
     }
 
+    /**
+     * A placeholder: the photograph at 24px as an inline data: URI (~300-500 B),
+     * shown behind the real image until it arrives, so a slow connection sees the
+     * car's colours instead of an empty frame. Made from the 320 derivative (a
+     * small decode), never from the original; stored next to the derivatives.
+     * No 320 yet → null, and the frame is simply plain until the warm job runs.
+     */
+    public static function lqip(?string $path): ?string
+    {
+        $path = self::clean($path);
+        $small = $path ? self::cachedUrl($path, 320) : null;
+        if ($small === null) {
+            return null;
+        }
+        $key = 'lqip|' . $small;
+        if (array_key_exists($key, self::$memo)) {
+            return self::$memo[$key];
+        }
+        $src = storage_path('app/public/cache/' . basename($small));
+        $out = storage_path('app/public/cache/lqip_' . pathinfo($small, PATHINFO_FILENAME) . '.txt');
+        if (is_file($out)) {
+            return self::$memo[$key] = (string) file_get_contents($out);
+        }
+        try {
+            $im = @imagecreatefromwebp($src) ?: @imagecreatefromjpeg($src);
+            if (!$im) {
+                return self::$memo[$key] = null;
+            }
+            $w = imagesx($im); $h = imagesy($im);
+            $tw = 24; $th = max(1, (int) round($h * $tw / max(1, $w)));
+            $t = imagecreatetruecolor($tw, $th);
+            imagecopyresampled($t, $im, 0, 0, 0, 0, $tw, $th, $w, $h);
+            ob_start(); imagewebp($t, null, 40); $bin = ob_get_clean();
+            imagedestroy($im); imagedestroy($t);
+            $uri = 'data:image/webp;base64,' . base64_encode($bin);
+            @file_put_contents($out, $uri);
+            return self::$memo[$key] = $uri;
+        } catch (\Throwable $e) {
+            return self::$memo[$key] = null;
+        }
+    }
+
+    /** The widths srcset() would name for this file, as numbers — what the warm
+     *  jobs build so that every candidate a browser can pick already exists. */
+    public static function ladder(?string $path, int $max = 2000): array
+    {
+        preg_match_all('/ (\d+)w(?:,|$)/', self::srcset($path, $max), $m);
+        return array_map('intval', $m[1]);
+    }
+
     /** In-request memo. A car page renders 42 thumbnails and each one would
      *  otherwise cost a getimagesize() plus an exif_read_data() — 84 file reads
      *  to render one page, before a single byte of image is served. */

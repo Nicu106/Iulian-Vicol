@@ -35,6 +35,7 @@ Timpul tău de gândire și de verificare între prompturi, peste 15 minute, **n
 | 05–06.10 | — | — | **LANSARE**: v2 = ivmotorclass.com; date reale mutate; galerie telefon (glisare, puncte); 2 agenți de audit telefon + reparații; formularul /vende reparat (nginx); pagina nu mai alunecă lateral |
 | 06.10 | — | — | Feedback client (capturi): carusel automat la „Disponibles ahora”, textele noi (catalog, recenzii, rețele, pașii 01–03), garanție 36 luni, banda din catalog pe toată lățimea pe ecrane late; adminul verificat pagină cu pagină + salvări; 3 rute de admin reparate |
 | 06.10 (2) | — | — | Audit UX cu 3 agenți (pagini publice, mașină, formulare + admin) și reparațiile: căutarea filtrează, Back închide galeria, previzualizare WhatsApp, „Alte mașini”, Compartir, 404/419/429/500 în spaniolă, pozele din /vende micșorate, previzualizări blocate de CSP reparate (public + admin), XSS în admin închis, recenzii ascunse, echipament păstrat la salvare |
+| 06.10 (3) | — | — | Viteza pozelor (măsurat, fără pierdere de calitate): telefon 4G slab, pagina principală 6,8 s → 3,4 s (1,34 MB → 0,40 MB); prima poză a mașinii 2,2 s → 1,4 s; poza următoare instant; galerie retina până la 2000 px; contur estompat; toate mărimile generate la încărcare |
 | **Total** | **37,1 h** | **134** | **14 zile** |
 
 

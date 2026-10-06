@@ -162,11 +162,18 @@
                        The card width varies per photograph — the no-crop system
                        sets it from the file's own ratio — so 360 is the widest of
                        them, not a guess. --}}
+                  {{-- 2026-10-06, measured: 8 of these were eager — ~950 KB starting
+                       with the hero, 2,457px below it, which put the phone's first
+                       picture at 6.8 s on slow 4G. Lazy: the browser fetches them as
+                       the section approaches. 1080w added so a 3x phone gets
+                       pixels for its 272px slot. --}}
                   <img src="{{ $src(480) }}"
-                       srcset="{{ $src(320) }} 320w, {{ $src(480) }} 480w, {{ $src(720) }} 720w"
+                       srcset="{{ $src(320) }} 320w, {{ $src(480) }} 480w, {{ $src(720) }} 720w, {{ $src(1080) }} 1080w"
                        sizes="(min-width:1000px) 360px, 80vw"
                        alt="{{ $pass ? '' : $t->name . ', con su coche' }}"
-                       loading="{{ !$pass && $loop->index < 8 ? 'eager' : 'lazy' }}" decoding="async">
+                       @php $lq = \App\Support\Img::lqip($t->img); @endphp
+                       @if($lq) style="background:url('{{ $lq }}') center/cover no-repeat" @endif
+                       loading="lazy" fetchpriority="low" decoding="async">
                 </div>
                 <div class="fb__face fb__face--back">
                   <blockquote class="fb__q">{{ $t->quote }}</blockquote>

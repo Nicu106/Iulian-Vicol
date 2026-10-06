@@ -37,7 +37,8 @@ class WarmVehicleImages implements ShouldQueue
     private const THUMB = [320];
     private const CLICK = [1080];
 
-    public function __construct(public array $paths)
+    /** $pairs: [path, width] still to build — set when a run hands the rest on. */
+    public function __construct(public array $paths, public array $pairs = [])
     {
     }
 
@@ -45,7 +46,7 @@ class WarmVehicleImages implements ShouldQueue
      *  at three widths is a few minutes and nothing is waiting on it. It exists so
      *  that if this job is ever run inside a request again it cannot hold one of
      *  six PHP-FPM processes indefinitely. */
-    private const BUDGET = 600.0;
+    private const BUDGET = 100.0;   // under the job's 120 s timeout; the rest goes to a fresh job
 
     public int $timeout = 120;
     public int $tries = 1;
@@ -53,7 +54,7 @@ class WarmVehicleImages implements ShouldQueue
     public function handle(): void
     {
         $paths = array_values(array_filter($this->paths));
-        if (!$paths) {
+        if (!$paths && !$this->pairs) {
             return;
         }
         $t0 = microtime(true);
@@ -76,13 +77,22 @@ class WarmVehicleImages implements ShouldQueue
                 $queue[] = [$p, $w];
             }
         }
+        /* 2026-10-06: then EVERY width a srcset on the site can name for these
+           photographs (strip, retina stage, full screen up to 2000), so no visitor
+           ever waits for GD — measured 0.24-1.8 s per photo when one did. */
+        foreach ($paths as $p) {
+            foreach (Img::ladder($p, 2000) as $w) {
+                $queue[] = [$p, $w];
+            }
+        }
+        if ($this->pairs) {
+            $queue = $this->pairs;      // a continuation: only what was left
+        }
 
-        foreach ($queue as [$path, $w]) {
+        foreach ($queue as $k => [$path, $w]) {
             if (microtime(true) - $t0 > self::BUDGET) {
-                \Log::info(sprintf(
-                    'WarmVehicleImages: budget reached after %d of %d — the rest build on demand',
-                    $done, count($queue)
-                ));
+                // hand the rest to a new job instead of dropping it
+                self::dispatch([], array_values(array_slice($queue, $k)));
                 return;
             }
             $this->build($path, $w);

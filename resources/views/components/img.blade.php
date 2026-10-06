@@ -22,6 +22,9 @@
     $set = Img::srcset($src, (int) $max);
     $dim = Img::size($src);
     $url = Img::url($src, (int) $fallback) ?? $src;
+    // a 24px blur of the photo behind it until it arrives (not for thumbnails:
+    // they are 320px files that land at once)
+    $lqip = (int) $max > 320 ? Img::lqip($src) : null;
 @endphp
 <img src="{{ $url }}"
      @if($set) srcset="{{ $set }}" sizes="{{ $sizes }}" @endif
@@ -29,4 +32,4 @@
      @if($dim) width="{{ $dim[0] }}" height="{{ $dim[1] }}" @endif
      @if($priority) fetchpriority="high" loading="eager"
      @else loading="lazy" decoding="async" @endif
-     {{ $attributes }}>
+     {{ $lqip ? $attributes->merge(['style' => "background:url('".$lqip."') center/cover no-repeat"]) : $attributes }}>

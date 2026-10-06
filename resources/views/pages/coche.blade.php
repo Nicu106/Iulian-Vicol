@@ -124,6 +124,8 @@
                   like. Each thumbnail carries the candidates for the slot it is
                   about to fill. --}}
              data-set="{{ \App\Support\Img::srcset($p['path'], 1600) }}"
+             {{-- full screen: up to 2000, so a retina laptop gets the pixels it shows --}}
+             data-vset="{{ \App\Support\Img::srcset($p['path'], 2000) }}"
              data-group="{{ $p['group'] ?? 'none' }}"
              data-n="{{ $p['n'] }}"
              aria-label="Foto {{ $p['n'] }}{{ $p['group'] ? ' · '.($groups[$p['group']] ?? '') : '' }}">
@@ -406,12 +408,38 @@
     if (next.decode) { next.decode().then(show, show); } else { next.onload = show; next.onerror = show; }
   }
 
+  /* Neighbours fetched before they are asked for: the next and previous
+     photograph, at the size their slot will pick, at idle time. A press or a
+     swipe then finds the file already here (measured: 270-1000 ms per press on
+     4G before, 3.4 s on slow 4G in the viewer). Bytes are spent only while
+     someone is actually looking through the photographs. */
+  var warmed = {};
+  var idle = window.requestIdleCallback || function (f) { return setTimeout(f, 200); };
+  function warm(a, big) {
+    if (!a) return;
+    var set = a.getAttribute(big ? 'data-vset' : 'data-set') || '';
+    var key = (big ? 'v' : 's') + (a.getAttribute('data-n') || '');
+    if (warmed[key]) return; warmed[key] = 1;
+    idle(function () {
+      var im = new Image(); im.decoding = 'async';
+      if (set) { im.srcset = set; im.sizes = big ? '100vw' : (stage.sizes || '100vw'); }
+      im.src = big ? a.getAttribute('href') : (a.getAttribute('data-stage') || a.getAttribute('href'));
+    });
+  }
+  function warmAround(big) {
+    var list = shown(), i = indexNow(), n = list.length;
+    if (n < 2) return;
+    warm(list[(i + 1) % n], big); warm(list[(i - 1 + n) % n], big);
+    if (n > 2) warm(list[(i + 2) % n], big);
+  }
+
   function pick(a) {
     var was = thumbs.querySelector('.car-thumb.is-on');
     if (was) was.classList.remove('is-on');
     a.classList.add('is-on');
     swapStage(a);
     stageN.textContent = a.getAttribute('data-n');
+    warmAround(false);
     // keep the chosen thumbnail in view without yanking the page
     if (a.scrollIntoView) a.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   }
@@ -466,11 +494,17 @@
     // Same reason as the stage: assigning to the visible element empties it for
     // the length of the download. Here the frame is black, so an empty one is a
     // black hole in the middle of the screen between two photographs.
-    var url = a.getAttribute('href');
+    var url = a.getAttribute('href'), vset = a.getAttribute('data-vset') || '';
     var token = ++viewToken;
     var next = new Image();
+    if (vset) { next.srcset = vset; next.sizes = '100vw'; }
     next.src = url;
-    var show = function () { if (token === viewToken) { vImg.src = url; } };
+    var show = function () {
+      if (token !== viewToken) { return; }
+      if (vset) { vImg.sizes = '100vw'; vImg.srcset = vset; } else { vImg.removeAttribute('srcset'); }
+      vImg.src = url;
+    };
+    warmAround(true);
     if (next.decode) { next.decode().then(show, show); } else { next.onload = show; next.onerror = show; }
     vImg.alt = a.getAttribute('aria-label') || '';
     vCnt.textContent = (i + 1) + ' / ' + list.length;
@@ -604,6 +638,8 @@
   }
   function setIdx(i) {
     cur = i; var a = list[i]; if (!a) return;
+    // the next two and the previous one load now, not when they slide in
+    for (var k = i - 1; k <= i + 2; k++) { var el = track.children[k]; if (el && el.loading !== 'eager') el.loading = 'eager'; }
     cap.innerHTML = '<b id="stage-n">' + (i + 1) + '</b> / ' + list.length;
     stageN = document.getElementById('stage-n');
     drawDots(dots, list.length, i);
@@ -614,7 +650,11 @@
   function slide(a, i, big) {
     var im = new Image(); im.className = big ? 'car-view__slide' : 'car-track__img';
     im.alt = a.getAttribute('aria-label') || ''; im.decoding = 'async'; im.loading = i < 2 ? 'eager' : 'lazy';
-    var set = a.getAttribute('data-set'); if (set) { im.srcset = set; im.sizes = '100vw'; }
+    // the strip is the stage's width, not the screen's: the same `sizes` picks the
+    // same file the stage already downloaded, so slide 0 costs nothing
+    var set = a.getAttribute(big ? 'data-vset' : 'data-set') || a.getAttribute('data-set');
+    if (set) { im.srcset = set; im.sizes = big ? '100vw' : (stage.getAttribute('sizes') || '100vw'); }
+    if (i === 0 && !big) { im.fetchPriority = 'high'; }
     im.src = big ? a.getAttribute('href') : (a.getAttribute('data-stage') || a.getAttribute('href'));
     return im;
   }
@@ -646,7 +686,8 @@
   var vdots = document.createElement('div'); vdots.className = 'car-dots car-dots--view'; vdots.setAttribute('aria-hidden', 'true');
   view.appendChild(vtrack); view.appendChild(vdots); view.classList.add('is-track');
   var vcur = 0, vraf = 0;
-  function vset(i) { vcur = i; vCnt.textContent = (i + 1) + ' / ' + list.length; drawDots(vdots, list.length, i); }
+  function vset(i) { vcur = i;
+    for (var k = i - 1; k <= i + 2; k++) { var el = vtrack.children[k]; if (el && el.loading !== 'eager') el.loading = 'eager'; } vCnt.textContent = (i + 1) + ' / ' + list.length; drawDots(vdots, list.length, i); }
   vtrack.addEventListener('scroll', function () {
     if (vraf) return; vraf = requestAnimationFrame(function () { vraf = 0;
       var i = Math.round(vtrack.scrollLeft / vtrack.clientWidth); if (i !== vcur && list[i]) vset(i); });

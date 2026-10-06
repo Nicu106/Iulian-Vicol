@@ -19,7 +19,9 @@
   <header class="cat-hero">
     {{-- Was the 253 KB JPEG served raw. Full-bleed: 100vw. --}}
     <x-img class="cat-hero__img" src="/img/banner/panamera.jpg" alt=""
-           sizes="100vw" :max="2000" :fallback="1080" :priority="true" />
+           {{-- on a phone the band is portrait and the photo is cropped from its
+                sides: it is drawn ~2.5x the screen's width, so ask for that --}}
+           sizes="(max-width:768px) 250vw, 100vw" :max="2000" :fallback="1080" :priority="true" />
     <div class="cat-hero__in cat-wrap">
       <span class="cat-hero__eyebrow">Málaga · {{ $sold }} coches entregados</span>
       <h1 class="cat-hero__h">Tu próximo capricho, bien elegido.</h1>
