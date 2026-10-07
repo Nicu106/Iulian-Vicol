@@ -3,22 +3,29 @@
    rest of the site (DM Sans, --mc-ink, --mc-navy, .mc-btn); what is new is the
    scale and the scroll. No labels, no numbering: few words, large.
 
-   Every scene is a tall section with a sticky stage of one screen. why.js gives
-   each section --p (0→1 through its length) and marks each line .is-on while
-   the scroll is inside its [data-in, data-out). Without .wy-on on <html> (no JS,
+   Every scene is a tall section with a sticky stage of one screen. why.js reads
+   one smoothed scroll position and from it draws each film's frame on the
+   canvas and sets, per line, opacity and lift (inline styles), the shade under
+   words on a film, the dip to white between scenes, every picture's scale and
+   --o (welcome opens): no CSS
+   transitions, so words and film move as one. Without .wy-on on <html> (no JS,
    or reduced motion) none of this applies: the scenes are an ordinary page.
    ========================================================================== */
 .wy{ background:var(--mc-surface); }
 
 /* ---- the motion version ---------------------------------------------------- */
-.wy-on .wy-film--a{ height:440vh; }
-.wy-on .wy-film--b{ height:460vh; }
-.wy-on .wy-still{ height:240vh; }
+.wy-on .wy-film{ height:400vh; }
+.wy-on .wy-still{ height:220vh; }
 .wy-on .wy-stage{ position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; }
 
 .wy-film .wy-stage{ background:#05080F; }
-.wy-video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;
-  filter:brightness(var(--dim, 1)); transition:filter .7s cubic-bezier(.2,.7,.1,1); }
+.wy-poster, .wy-poster img, .wy-canvas, .wy-shade, .wy-veil{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+.wy-poster img{ object-fit:cover; }
+/* under the words only: the bottom of the frame, where they sit (measured per beat) */
+.wy-shade{ opacity:0; pointer-events:none;
+  background:linear-gradient(to top, rgba(5,8,15,.64) 0%, rgba(5,8,15,.5) 30%, rgba(5,8,15,.26) 55%, rgba(5,8,15,0) 80%); }
+/* the dip: a film rises out of the page white and dissolves back into it */
+.wy-veil{ opacity:0; pointer-events:none; background:var(--mc-surface); }
 
 /* the words: all beats share one place, each arrives line by line */
 .wy-copy{ position:absolute; inset:0; display:grid; align-content:end; justify-items:start;
@@ -32,16 +39,6 @@
 .wy-beat--line{ font-size:clamp(2.2rem, 9vw, 6rem); line-height:1; letter-spacing:-.035em; font-weight:700; }
 .wy-beat--sub{ font-size:clamp(1.05rem, 4.2vw, 1.5rem); line-height:1.5; font-weight:500; max-width:34ch; letter-spacing:-.005em; }
 
-.wy-on .wy-beat .wy-l{
-  opacity:0; transform:translate3d(0, .5em, 0); clip-path:inset(0 0 100% 0);
-  transition:opacity .5s ease, transform 1s cubic-bezier(.16,.84,.2,1), clip-path 1s cubic-bezier(.16,.84,.2,1);
-}
-.wy-on .wy-beat.is-on .wy-l{ opacity:1; transform:none; clip-path:inset(-.25em -.2em -.25em -.2em); }
-.wy-on .wy-beat.is-on .wy-l:nth-child(2){ transition-delay:.12s; }
-.wy-on .wy-beat.is-past .wy-l{ opacity:0; transform:translate3d(0, -.35em, 0); clip-path:inset(0 0 0 0);
-  transition-duration:.45s; transition-delay:0s; }
-.wy-on .wy-beat--act{ opacity:0; transform:translateY(12px); transition:opacity .6s ease, transform .8s cubic-bezier(.16,.84,.2,1); }
-.wy-on .wy-beat--act.is-on{ opacity:1; transform:none; }
 
 /* ---- the stills -------------------------------------------------------------- */
 .wy-still .wy-stage{ background:var(--mc-surface); }
@@ -52,8 +49,7 @@
 .wy-still--portrait .wy-stage{ display:grid; grid-template-rows:auto minmax(0,1fr); }
 .wy-still--portrait .wy-copy{ position:relative; inset:auto; order:-1; align-content:start;
   padding:calc(var(--mc-head-h, 56px) + 1.5rem) var(--mc-gutter-m) 1.5rem; gap:1rem; }
-.wy-still--portrait .wy-photo > img{ object-position:58% 60%;
-  transform:scale(calc(1.16 - .16 * var(--p, 1))); transform-origin:58% 55%; }
+.wy-still--portrait .wy-photo > img{ object-position:58% 60%; transform-origin:58% 55%; }
 .wy-copy--ink .wy-beat{ color:var(--mc-ink); text-shadow:none; position:relative; }
 .wy-copy--ink .wy-beat--sub{ color:var(--mc-ink-2); }
 .wy-still--portrait .wy-beat{ grid-area:auto; }
@@ -63,7 +59,7 @@
 .wy-still--welcome .wy-photo{ position:absolute; inset:0;
   clip-path:inset(calc(22% * (1 - var(--o, 1))) calc(12% * (1 - var(--o, 1))) calc(30% * (1 - var(--o, 1))) calc(12% * (1 - var(--o, 1))));
 }
-.wy-still--welcome .wy-photo > img{ object-position:49% 55%; transform:scale(calc(1.08 - .08 * var(--o, 1))); }
+.wy-still--welcome .wy-photo > img{ object-position:49% 55%; }
 .wy-copy--wall{ align-content:start; justify-items:center; text-align:center;
   padding:calc(var(--mc-head-h, 56px) + 5vh) var(--mc-gutter-m) 0; gap:.9rem; }
 .wy-copy--wall .wy-beat{ grid-area:auto; color:var(--mc-ink); text-shadow:none; max-width:20ch; }
@@ -80,12 +76,13 @@
 
 /* ---- the plain version: no JS, or reduced motion ------------------------------ */
 html:not(.wy-on) .wy-film .wy-stage{ position:relative; }
-html:not(.wy-on) .wy-video{ position:relative; height:auto; aspect-ratio:9 / 16; max-height:80vh; }
+html:not(.wy-on) .wy-canvas, html:not(.wy-on) .wy-shade, html:not(.wy-on) .wy-veil{ display:none; }
+html:not(.wy-on) .wy-poster{ position:relative; height:auto; aspect-ratio:9 / 16; max-height:80vh; }
 html:not(.wy-on) .wy-copy{ position:relative; padding:var(--s-6) var(--mc-gutter-m); background:var(--mc-navy); gap:var(--s-4); }
 html:not(.wy-on) .wy-beat{ grid-area:auto; }
 html:not(.wy-on) .wy-still--welcome .wy-photo{ position:relative; aspect-ratio:4 / 3; }
 html:not(.wy-on) .wy-still--portrait .wy-photo{ aspect-ratio:4 / 3; }
-@media (min-aspect-ratio: 1/1){ html:not(.wy-on) .wy-video{ aspect-ratio:16 / 9; } }
+@media (min-aspect-ratio: 1/1){ html:not(.wy-on) .wy-poster{ aspect-ratio:16 / 9; } }
 
 /* ---- the record ---------------------------------------------------------------- */
 .wy-proof{ background:var(--mc-band); }
@@ -138,8 +135,6 @@ html:not(.wy-on) .wy-still--portrait .wy-photo{ aspect-ratio:4 / 3; }
   .wy-still--portrait .wy-beat--sub{ font-size:clamp(1.1rem, 1.4vw, 1.4rem); }
 }
 
-/* second pass: a wrapped line must not be clipped (inline + clip-path cut "sin pasarte de una") */
-.wy-on .wy-beat--sub .wy-l{ clip-path:none !important; }
 /* welcome: title on his white wall above, the promise on the pale asphalt below */
 .wy-copy--wall{ align-content:space-between; padding-bottom:calc(9vh + env(safe-area-inset-bottom)); }
 .wy-still--welcome .wy-photo > img{ object-position:49% 22%; }
@@ -171,3 +166,8 @@ html:not(.wy-on) .wy-copy--ink, html:not(.wy-on) .wy-copy--wall{ background:var(
 html:not(.wy-on) .wy-still--portrait .wy-stage{ display:block; }
 html:not(.wy-on) .wy-still--welcome .wy-photo{ position:relative; }
 html:not(.wy-on) .wy-still--welcome .wy-photo{ clip-path:none; }
+/* the film page moves words and shade every frame: each on its own layer, so a
+   change of opacity or lift is composited, never repainted (text-shadow included) */
+.wy-on .wy-beat:not(.wy-beat--sub):not(.wy-beat--act) .wy-l, .wy-on .wy-beat--sub, .wy-on .wy-beat--act, .wy-on .wy-shade{ will-change:transform, opacity; }
+/* the first stage starts under the header: its opening words sit that much higher (why.js sets --wy-lead) */
+.wy-on .wy-beat--open{ margin-bottom:var(--wy-lead, 0px); }

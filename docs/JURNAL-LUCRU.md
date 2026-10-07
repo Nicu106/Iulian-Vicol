@@ -38,6 +38,7 @@ Timpul tău de gândire și de verificare între prompturi, peste 15 minute, **n
 | 06.10 (3) | — | — | Viteza pozelor (măsurat, fără pierdere de calitate): telefon 4G slab, pagina principală 6,8 s → 3,4 s (1,34 MB → 0,40 MB); prima poză a mașinii 2,2 s → 1,4 s; poza următoare instant; galerie retina până la 2000 px; contur estompat; toate mărimile generate la încărcare |
 | 07.10 | — | — | Pagina nouă /por-que-nosotros (6 motive, cifre din baza de date, recenzii reale, poză reală de predare); link în meniu (de la 901px), subsol și pagina principală; diagnostic www (DNS spre Hostinger, certificat expirat) |
 | 07.10 (2) | — | — | /por-que-nosotros refăcută ca film derulat cu scroll: 2 videouri DJI (decupaj vertical pentru telefon, 24 fps, cadru-cheie la 0,5 s), portretul la apus, poza de bun venit care se deschide; fără etichete și numerotare; verificat 320/390/768/844×390/1440, cu și fără animații |
+| 07.10 (3) | — | — | /por-que-nosotros: filmele redate ca la Apple — secvențe de cadre WebP din originalele DJI (telefon 608×1080, desktop 1600×900), gradate cinematic, desenate pe canvas; mișcare netezită care se oprește lin pe un cadru întreg; deschidere din întuneric, tranziții prin alb între scene, o singură curbă pentru tot; text verificat ca contrast pe fiecare cadru la 390 și 1440 |
 | **Total** | **37,1 h** | **134** | **14 zile** |
 
 

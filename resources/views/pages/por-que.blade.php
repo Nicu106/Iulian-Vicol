@@ -11,8 +11,8 @@
 
 @push('head')
 {{-- the opening film's first frame, so the screen is never empty while it loads --}}
-<link rel="preload" as="image" href="/storage/why/a-phone.webp" media="(max-aspect-ratio: 1/1)" fetchpriority="high">
-<link rel="preload" as="image" href="/storage/why/a-desk.webp" media="(min-aspect-ratio: 1/1)" fetchpriority="high">
+<link rel="preload" as="image" href="/storage/why/seq/a/p/000.webp" media="(max-aspect-ratio: 1/1)" fetchpriority="high">
+<link rel="preload" as="image" href="/storage/why/seq/a/d/000.webp" media="(min-aspect-ratio: 1/1)" fetchpriority="high">
 @endpush
 
 @php
@@ -34,11 +34,21 @@
      4  WELCOME  arms open in front of the four cars. The photograph opens from
                  the centre to the whole screen: the keys are yours.
 
-     The scroll drives each film (currentTime follows the page). Files encoded
-     for it: 24 fps, a keyframe every half second, no B-frames. Phones get their
-     own upright crop (540×960): one car at a time, full screen.
-     Without JavaScript, or with reduced motion: a normal page — still frames,
-     the words beneath them (why.css, html:not(.wy-on)).
+     The scroll plays each film like a video — Apple's technique, not video
+     seeking (2026-10-07, third pass): every film is a sequence of stills cut
+     from his original footage (/storage/why/seq/<a|b>/<p|d>/NNN.webp: phones
+     an upright 608×1080 crop, wider screens 1600×900; 120 and 144 frames),
+     graded once at extraction (gentle S-curve, warm mids, a little vibrance,
+     light sharpening — baked in, no filter on the picture) and drawn on a <canvas>.
+     One smoothed scroll position moves everything, on one curve: the frame,
+     each line (scrubbed: rises 0.32em and sharpens from a 6px blur), the
+     shade under the words (only where they sit), every picture settling from
+     106% to 100%. When the finger stops the film glides to rest on a whole
+     frame. The opening fades up from night, then the first words land, then
+     the film may move. Films rise out of the page white and dissolve back into
+     it, so no scene ever cuts. Details in public/js/why.js.
+     Without JavaScript, or with reduced motion: a normal page — the first
+     frames as still pictures, the words beneath them (html:not(.wy-on)).
      ========================================================================== --}}
 
 @section('content')
@@ -47,18 +57,22 @@
   {{-- ---- 1 · film A ------------------------------------------------------- --}}
   <section class="wy-film wy-film--a" data-scene="film" aria-label="Seleccionados, revisados y preparados">
     <div class="wy-stage">
-      <video class="wy-video" muted playsinline preload="metadata" aria-hidden="true"
-             data-phone="/storage/why/a-phone.mp4" data-desk="/storage/why/a-desk.mp4"
-             data-poster-phone="/storage/why/a-phone.webp" data-poster-desk="/storage/why/a-desk.webp"></video>
+      <picture class="wy-poster">
+        <source media="(min-aspect-ratio: 1/1)" srcset="/storage/why/seq/a/d/000.webp" width="1600" height="900">
+        <img src="/storage/why/seq/a/p/000.webp" alt="" width="608" height="1080" fetchpriority="high">
+      </picture>
+      <canvas class="wy-canvas" data-n="120" data-base="/storage/why/seq/a/" aria-hidden="true"></canvas>
+      <div class="wy-shade" aria-hidden="true"></div>
+      <div class="wy-veil" aria-hidden="true"></div>
       <div class="wy-copy">
-        <h1 class="wy-beat wy-beat--open" data-in="0" data-out=".2">
+        <h1 class="wy-beat wy-beat--open" data-in="-1" data-out=".18">
           <span class="wy-l">Un coche bien elegido.</span>
           <span class="wy-l">Y alguien que responde.</span>
         </h1>
-        <p class="wy-beat wy-beat--word" data-in=".24" data-out=".44"><span class="wy-l">Seleccionados.</span></p>
-        <p class="wy-beat wy-beat--word" data-in=".47" data-out=".66"><span class="wy-l">Revisados.</span></p>
-        <p class="wy-beat wy-beat--word" data-in=".69" data-out=".86"><span class="wy-l">Preparados.</span></p>
-        <p class="wy-beat wy-beat--line" data-in=".89" data-out="2">
+        <p class="wy-beat wy-beat--word" data-in=".21" data-out=".41"><span class="wy-l">Seleccionados.</span></p>
+        <p class="wy-beat wy-beat--word" data-in=".44" data-out=".63"><span class="wy-l">Revisados.</span></p>
+        <p class="wy-beat wy-beat--word" data-in=".66" data-out=".84"><span class="wy-l">Preparados.</span></p>
+        <p class="wy-beat wy-beat--line" data-in=".86" data-out="2">
           <span class="wy-l">Para que disfrutes</span>
           <span class="wy-l">de algo especial.</span>
         </p>
@@ -74,15 +88,15 @@
                sizes="(min-aspect-ratio: 1/1) 62vw, 100vw" :max="2000" :fallback="1080" />
       </div>
       <div class="wy-copy wy-copy--ink">
-        <h2 class="wy-beat wy-beat--line" id="wy-me" data-in=".1" data-out="2">
+        <h2 class="wy-beat wy-beat--line" id="wy-me" data-in=".04" data-out="2">
           <span class="wy-l">Soy el director</span>
           <span class="wy-l">de IV Motorclass.</span>
         </h2>
-        <p class="wy-beat wy-beat--sub" data-in=".3" data-out="2">
+        <p class="wy-beat wy-beat--sub" data-in=".2" data-out="2">
           <span class="wy-l">Te contesto yo y te acompaño durante toda la compra,</span>
           <span class="wy-l">sin pasarte de una persona a otra.</span>
         </p>
-        <p class="wy-beat wy-beat--act" data-in=".45" data-out="2">
+        <p class="wy-beat wy-beat--act" data-in=".34" data-out="2">
           <a class="mc-btn mc-btn--cta" href="{{ $wa('Hola, me interesa un coche. ¿Hablamos?') }}">Hablemos por WhatsApp</a>
         </p>
       </div>
@@ -92,18 +106,22 @@
   {{-- ---- 3 · film B ------------------------------------------------------- --}}
   <section class="wy-film wy-film--b" data-scene="film" aria-label="Te lo enseño antes de que vengas">
     <div class="wy-stage">
-      <video class="wy-video" muted playsinline preload="none" aria-hidden="true"
-             data-phone="/storage/why/b-phone.mp4" data-desk="/storage/why/b-desk.mp4"
-             data-poster-phone="/storage/why/b-phone.webp" data-poster-desk="/storage/why/b-desk.webp"></video>
+      <picture class="wy-poster">
+        <source media="(min-aspect-ratio: 1/1)" srcset="/storage/why/seq/b/d/000.webp" width="1600" height="900">
+        <img src="/storage/why/seq/b/p/000.webp" alt="" width="608" height="1080" loading="lazy">
+      </picture>
+      <canvas class="wy-canvas" data-n="144" data-base="/storage/why/seq/b/" aria-hidden="true"></canvas>
+      <div class="wy-shade" aria-hidden="true"></div>
+      <div class="wy-veil" aria-hidden="true"></div>
       <div class="wy-copy">
-        <h2 class="wy-beat wy-beat--line" data-in="-1" data-out=".24">
+        <h2 class="wy-beat wy-beat--line" data-in="-1" data-out=".22">
           <span class="wy-l">Te lo enseño</span>
           <span class="wy-l">antes de que vengas.</span>
         </h2>
-        <p class="wy-beat wy-beat--word" data-in=".28" data-out=".42"><span class="wy-l">El exterior.</span></p>
-        <p class="wy-beat wy-beat--word" data-in=".45" data-out=".58"><span class="wy-l">El interior.</span></p>
-        <p class="wy-beat wy-beat--word" data-in=".61" data-out=".74"><span class="wy-l">Y sus desperfectos.</span></p>
-        <p class="wy-beat wy-beat--line" data-in=".78" data-out="2">
+        <p class="wy-beat wy-beat--word" data-in=".25" data-out=".43"><span class="wy-l">El exterior.</span></p>
+        <p class="wy-beat wy-beat--word" data-in=".46" data-out=".63"><span class="wy-l">El interior.</span></p>
+        <p class="wy-beat wy-beat--word" data-in=".66" data-out=".83"><span class="wy-l">Y sus desperfectos.</span></p>
+        <p class="wy-beat wy-beat--line" data-in=".86" data-out="2">
           <span class="wy-l">Para que sepas</span>
           <span class="wy-l">qué te vas a encontrar.</span>
         </p>
@@ -115,15 +133,15 @@
   <section class="wy-still wy-still--welcome" data-scene="still" aria-labelledby="wy-keys">
     <div class="wy-stage">
       <div class="wy-photo">
-        <x-img src="/storage/why/welcome.jpg" alt="El director de IV Motorclass delante de cuatro coches preparados para entregar"
+        <x-img src="/storage/why/welcome-graded.jpg" alt="El director de IV Motorclass delante de cuatro coches preparados para entregar"
                sizes="100vw" :max="2000" :fallback="1080" />
       </div>
       <div class="wy-copy wy-copy--wall">
-        <h2 class="wy-beat wy-beat--line" id="wy-keys" data-in=".38" data-out="2">
+        <h2 class="wy-beat wy-beat--line" id="wy-keys" data-in=".3" data-out="2">
           <span class="wy-l">Las llaves son tuyas.</span>
           <span class="wy-l">Mi teléfono sigue disponible.</span>
         </h2>
-        <p class="wy-beat wy-beat--sub" data-in=".55" data-out="2">
+        <p class="wy-beat wy-beat--sub" data-in=".46" data-out="2">
           <span class="wy-l">En 30 minutos, a tu nombre y con el seguro en vigor.</span>
           <span class="wy-l">Y después de la compra, me sigues teniendo al teléfono.</span>
         </p>
