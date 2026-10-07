@@ -7,6 +7,7 @@
 
 @push('css')
 <link rel="stylesheet" href="{{ asset('css/why2.css') }}">
+<link rel="stylesheet" href="{{ asset('css/why-odo.css') }}">
 @endpush
 
 @push('head')
@@ -198,4 +199,5 @@
 
 @push('js')
 <script src="{{ asset('js/why.js') }}" defer></script>
+<script src="{{ asset('js/why-odo.js') }}" defer></script>
 @endpush

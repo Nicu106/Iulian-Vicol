@@ -1,0 +1,33 @@
+/* /por-que-nosotros — the record, as an odometer (why-odo.js builds the drums).
+   Each digit is a cell one figure tall; inside it a strip of figures rolls up
+   to the value. Only transform moves. The labels arrive once the number lands,
+   with the page's reveal. Without the script the plain numbers stay. */
+/* the label rule in why2.css (.wy-proof__l span) must not reach the drums */
+.wy-proof__l b span{ font-size:inherit; line-height:1; color:inherit; max-width:none; }
+.wy-odo{ display:inline-flex; align-items:flex-start; line-height:1; }
+.wy-odo__c{ position:relative; display:inline-block; height:1em; overflow:hidden;
+  /* the figure blurs into the edge of the window as it passes, like the
+     real counter behind its glass; still figures are never touched (the
+     glyph sits well inside the 10% bands) */
+  -webkit-mask-image:linear-gradient(transparent, #000 10%, #000 90%, transparent);
+          mask-image:linear-gradient(transparent, #000 10%, #000 90%, transparent); }
+.wy-odo__s{ display:block; }
+.wy-odo__s > i{ display:block; height:1em; font-style:normal; text-align:center; }
+.wy-odo__sep{ display:inline-block; }
+.wy-odo.is-rolling .wy-odo__s{ will-change:transform; }
+.wy-odo__sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+
+/* the label waits for its number */
+.wy-odo-on .wy-proof__l li > span{ opacity:0; transform:translateY(.5em);
+  transition:opacity var(--m-reveal, 420ms) var(--e-out, ease), transform var(--m-reveal, 420ms) var(--e-out, ease); }
+.wy-odo-on .wy-proof__l li.is-landed > span{ opacity:1; transform:none; }
+
+/* each drum is its own box, so the number's tight tracking (-.04em, why2.css)
+   is given back as a margin; the size keeps "600.000" inside its column from
+   320 px up (it overflowed by a few px before, drums or not) */
+.wy-odo__sep, .wy-odo__c{ margin-inline-end:-.04em; }
+.wy-odo__s{ letter-spacing:0; }
+.wy-odo__c{ display:flex; justify-content:center; }
+.wy-odo__s{ flex:none; }
+.wy-proof__l b{ font-size:clamp(2rem, 9.4vw, 4rem); font-variant-numeric:proportional-nums; }
+@media (min-width:900px){ .wy-proof__l b{ font-size:min(4rem, 4.2vw); } }
