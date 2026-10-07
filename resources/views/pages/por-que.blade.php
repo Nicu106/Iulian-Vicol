@@ -8,7 +8,6 @@
 @push('css')
 <link rel="stylesheet" href="{{ asset('css/why2.css') }}">
 <link rel="stylesheet" href="{{ asset('css/why-odo.css') }}">
-<link rel="stylesheet" href="{{ asset('css/why-say.css') }}">
 @endpush
 
 @push('head')
@@ -177,7 +176,7 @@
   @if($reviews->count())
   <section class="wy-say cat-wrap" aria-labelledby="wy-say-h">
     <h2 class="wy-say__h" id="wy-say-h">Lo cuentan ellos</h2>
-    <ul class="wy-say__l" data-pool='@json($pool ?? [])'>
+    <ul class="wy-say__l">
       @foreach($reviews->take(3) as $t)
         @php $d = \App\Support\Img::size($t->image_path); @endphp
         <li class="wy-q">
@@ -215,5 +214,4 @@
 {{-- if it cannot load, the plain page (the class set in <head> comes off) --}}
 <script src="{{ asset('js/why.js') }}" defer onerror="document.documentElement.classList.remove('wy-on')"></script>
 <script src="{{ asset('js/why-odo.js') }}" defer></script>
-<script src="{{ asset('js/why-say.js') }}" defer></script>
 @endpush
