@@ -101,8 +101,10 @@ html:not(.wy-on) .wy-still--portrait .wy-photo{ aspect-ratio:4 / 3; }
 .wy-say__h{ margin:0 0 var(--s-6); font-size:clamp(2.2rem, 8vw, 4.4rem); line-height:1; letter-spacing:-.035em; color:var(--mc-ink); }
 .wy-say__l{ list-style:none; margin:0; padding:0; display:grid; gap:var(--s-5); }
 .wy-q figure{ margin:0; height:100%; background:var(--mc-surface); border:1px solid var(--mc-hairline); }
-.wy-q__ph{ aspect-ratio:4 / 3; overflow:hidden; background:var(--mc-band); }
-.wy-q__ph img{ width:100%; height:100%; object-fit:cover; display:block; }
+/* a customer's photograph is never cropped: the box takes the file's own ratio
+   (--r, from the view; clamped .6–1.6, anything beyond is matted whole) */
+.wy-q__ph{ aspect-ratio:var(--r, .75); overflow:hidden; background:var(--mc-band); }
+.wy-q__ph img{ width:100%; height:100%; object-fit:contain; display:block; }
 .wy-q__t{ margin:0; padding:var(--s-4) var(--s-4) var(--s-2); font-size:var(--t-body); line-height:1.6; color:var(--mc-ink); }
 .wy-q__by{ padding:0 var(--s-4) var(--s-4); font-size:var(--t-body); font-weight:600; color:var(--mc-ink); }
 .wy-say__all{ display:inline-flex; align-items:center; min-height:44px; margin-top:var(--s-4); font-weight:600; }
@@ -173,3 +175,21 @@ html:not(.wy-on) .wy-still--welcome .wy-photo{ clip-path:none; }
 .wy-on .wy-beat:not(.wy-beat--sub):not(.wy-beat--act) .wy-l, .wy-on .wy-beat--sub, .wy-on .wy-beat--act, .wy-on .wy-shade{ will-change:transform, opacity; }
 /* the first stage starts under the header: its opening words sit that much higher (why.js sets --wy-lead) */
 .wy-on .wy-beat--open{ margin-bottom:var(--wy-lead, 0px); }
+
+/* ---- audit 2026-10-07 (6) ------------------------------------------------------
+   A film's lines share one cell; each now sits on the cell's floor. They used to
+   hang from its top, so every line was placed by the TALLEST one (the opening's
+   four lines plus its lead): film A's single words floated up to 41% of the
+   screen at 320x568, over the lit wall (worst pixel under "Para que disfrutes"
+   3.3:1), and moved with the viewport. On the floor they sit in the deep part
+   of the vignette, where the grade was made for them. */
+.wy-film .wy-beat{ align-self:end; }
+/* why.js owns the words' opacity; until its first frame they are not shown, so
+   the class set in <head> never paints every line of a film on top of the others */
+.wy-on .wy-beat:not(.wy-beat--sub):not(.wy-beat--act) .wy-l, .wy-on .wy-beat--sub, .wy-on .wy-beat--act{ opacity:0; }
+/* the opening starts from night (why.js lifts it once the first frame is there) */
+.wy-on .wy-film--a .wy-veil{ opacity:1; background-color:#05080F; }
+/* on a phone the cards pass one at a time: each as tall as its own photograph and
+   words, not stretched to the tallest (a 3:4 photo beside a .65 one left 140px of
+   empty card) */
+@media (max-width:899px){ .wy-say__l{ align-items:start; } }

@@ -11,6 +11,11 @@
 @endpush
 
 @push('head')
+{{-- the film layout is decided before the first paint, by the same test why.js
+     makes: deferred, why.js could arrive after the page had already painted the
+     plain version (stylesheets cached from another page, why.js not), and the
+     screen jumped from a poster over a navy block of words to the film --}}
+<script>(function(d){var m=window.matchMedia;if(!(m&&m('(prefers-reduced-motion: reduce)').matches)&&'IntersectionObserver' in window&&window.requestAnimationFrame)d.className+=' wy-on';})(document.documentElement)</script>
 {{-- the opening film's first frame, so the screen is never empty while it loads --}}
 <link rel="preload" as="image" href="/storage/why/film/a-p.webp" media="(max-aspect-ratio: 1/1)" fetchpriority="high">
 <link rel="preload" as="image" href="/storage/why/film/a-d.webp" media="(min-aspect-ratio: 1/1)" fetchpriority="high">
@@ -91,7 +96,7 @@
     <div class="wy-stage">
       <div class="wy-photo">
         <x-img src="/storage/why/portrait.jpg" alt="El director de IV Motorclass con dos Mercedes-Benz descapotables"
-               sizes="(min-aspect-ratio: 1/1) 62vw, 100vw" :max="2000" :fallback="1080" />
+               sizes="(min-aspect-ratio: 1/1) 134vh, 86vh" :max="2000" :fallback="1080" />
       </div>
       <div class="wy-copy wy-copy--ink">
         <h2 class="wy-beat wy-beat--line" id="wy-me" data-in=".04" data-out="2">
@@ -142,7 +147,7 @@
     <div class="wy-stage">
       <div class="wy-photo">
         <x-img src="/storage/why/welcome-graded.jpg" alt="El director de IV Motorclass delante de cuatro coches preparados para entregar"
-               sizes="100vw" :max="2000" :fallback="1080" />
+               sizes="(max-aspect-ratio: 4/3) 134vh, 100vw" :max="2000" :fallback="1080" />
       </div>
       <div class="wy-copy wy-copy--wall">
         <h2 class="wy-beat wy-beat--line" id="wy-keys" data-in=".3" data-out="2">
@@ -173,9 +178,10 @@
     <h2 class="wy-say__h" id="wy-say-h">Lo cuentan ellos</h2>
     <ul class="wy-say__l">
       @foreach($reviews->take(3) as $t)
+        @php $d = \App\Support\Img::size($t->image_path); @endphp
         <li class="wy-q">
           <figure>
-            <div class="wy-q__ph">
+            <div class="wy-q__ph" style="--r: {{ $d && $d[1] ? round(max(.6, min(1.6, $d[0] / $d[1])), 4) : .75 }}">
               <x-img :src="$t->image_path" :alt="$t->author_name.', el día de la entrega'"
                      sizes="(min-width:900px) 360px, 82vw" :max="1080" :fallback="720" />
             </div>
@@ -205,6 +211,7 @@
 @endsection
 
 @push('js')
-<script src="{{ asset('js/why.js') }}" defer></script>
+{{-- if it cannot load, the plain page (the class set in <head> comes off) --}}
+<script src="{{ asset('js/why.js') }}" defer onerror="document.documentElement.classList.remove('wy-on')"></script>
 <script src="{{ asset('js/why-odo.js') }}" defer></script>
 @endpush

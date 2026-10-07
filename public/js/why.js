@@ -30,7 +30,7 @@
   var root = document.documentElement;
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var scenes = Array.prototype.slice.call(document.querySelectorAll('[data-scene]'));
-  if (!scenes.length || reduce || !('IntersectionObserver' in window) || !window.requestAnimationFrame) return;
+  if (!scenes.length || reduce || !('IntersectionObserver' in window) || !window.requestAnimationFrame) { root.classList.remove('wy-on'); return; }
   root.classList.add('wy-on');
 
   var TAU = 0.11, LAG = 0.35;                  // the follow: s per stage; screens before it tightens
@@ -48,6 +48,19 @@
   var kind = function () { return upright.matches ? 'p' : 'd'; };
   var DIM = { p: [608, 1080], d: [1600, 900] };
   var now = performance.now(), t0 = now, intro = 0;
+  // the opening's clock starts when its first frame can be painted, not when this
+  // script runs: on a phone the script often ran before the first paint and the
+  // fade from night was over before anyone saw it (veil at 0.09 in the first
+  // painted frame). It waits at most 1.2 s for the poster; night is dark enough
+  // to land the words on if the picture is late.
+  var started = false, introStart = function () { if (started) return; started = true; t0 = performance.now(); kick(); };
+  (function () {
+    var im = document.querySelector('.wy-film .wy-poster img');
+    if (!im || (im.complete && im.naturalWidth)) return requestAnimationFrame(introStart);
+    im.addEventListener('load', function () { requestAnimationFrame(introStart); });
+    im.addEventListener('error', introStart);
+    setTimeout(introStart, 1200);
+  })();
   var introEnd = INTRO[1] + INTRO[2] + T_STAG;
   var vh = window.innerHeight;
 
@@ -99,6 +112,9 @@
     v.addEventListener('seeked', function () { if (st.pend) { var p = st.pend; st.pend = null; p(); } kick(); });
     v.addEventListener('loadeddata', kick);
     v.addEventListener('pause', function () { st.playing = false; kick(); });
+    // the browser may start it again by itself (a tab shown again): the loop must
+    // be watching, or it plays on through every chapter with the wrong words
+    v.addEventListener('play', function () { st.playing = true; kick(); });
     try { v.load(); } catch (e) {}
   }
   function startOf(st, k) { return k <= 0 ? 0 : st.ends[k - 1]; }
@@ -130,6 +146,7 @@
     var v = st.v;
     if (!v.paused) v.pause();
     st.playing = false;
+    if (thenPlay === false) st.stop = t;   // held here: nothing left to play to
     var had = snap(st);
     st.xf = tween(had ? 1 : 0);
     css(st, st.c, 'opacity', had ? '1' : '0');
@@ -155,7 +172,11 @@
     var v = st.v;
     if (!st.loaded || v.readyState < 1) return;
     var want = wanted(st, p, true);
-    if (st.playing && v.currentTime >= st.stop - 0.008) { v.pause(); st.playing = false; }
+    if (!v.paused && v.currentTime >= st.stop - 0.008) { v.pause(); st.playing = false; }
+    // stopped short of its chapter's end (paused while far away, or while the tab
+    // was hidden) and back on screen: play on to it, never hold a frame mid-move
+    if (want === st.cur && st.cur >= 0 && v.paused && !v.seeking && !st.pend && !document.hidden &&
+        v.currentTime < st.stop - 0.05 && Math.abs(x - st.top) < st.run + vh) { play(st, st.stop); return; }
     if (want === st.cur || v.seeking || st.pend) return;
     if (want > st.cur && v.currentTime >= startOf(st, want) - 0.5) {   // the next line: play on
       st.cur = want; play(st, st.ends[want]);
@@ -233,26 +254,35 @@
       if (st.v) steer(st, p);
       // which lines are on: a film's line is its chapter's; a still's by scroll
       var on = st.v ? st.cur : -1;
+      // all of a film's lines share one place: one that arrives while another is
+      // still leaving waits for it (two lines a third visible over each other read
+      // as a smudge — measured 250 ms of it on every chapter change)
+      var wait = 0;
+      if (st.v) st.beats.forEach(function (b, bi) {
+        if (bi !== on && !(bi === st.beats.length - 1 && on >= bi) && b.lines.some(function (l) { return +l.style.opacity > 0.05; })) wait = T_OUT * 0.65;
+      });
       st.beats.forEach(function (b, bi) {
         var show;
         if (st.v) show = bi === on || (bi === st.beats.length - 1 && on >= bi);
-        else show = p >= b.a;
+        else show = p >= b.a || b.el.contains(document.activeElement);
         if (st.v && bi === 0 && st.first && on < 0) show = intro >= INTRO[1];
         if (st.v && on < 0 && bi === 0 && !st.first) show = false;
         var gone = st.v ? (on > bi && bi !== st.beats.length - 1) : false;
         b.tin.forEach(function (tw, j) {
           aim(tw, show || gone ? 1 : 0, (show || gone) ? T_IN : T_OUT);
-          if (tw.to === 1 && tw.from === 0 && tw.at === now && j) tw.at = now + j * T_STAG * 1000;
+          if (tw.to === 1 && tw.from === 0 && tw.at === now) tw.at = now + (j * T_STAG + (show && st.v ? wait : 0)) * 1000;
         });
         aim(b.tout, gone ? 1 : 0, T_OUT);
+        // back to an earlier line: it waits for the later one to leave, too
+        if (st.v && b.tout.to === 0 && b.tout.from > 0.5 && b.tout.at === now) b.tout.at = now + wait * 1000;
       });
       var dipIn = st.first ? 0 : 1 - E((x - (st.top - vh)) / (DIP_IN * vh));
       var dipOut = E((x - (st.top + st.run)) / (DIP_OUT * vh));
-      var night = st.first ? 1 - E(intro / INTRO[0]) : 0;
+      var night = st.first && x < 0.3 * vh ? 1 - E(intro / INTRO[0]) : 0;
       var dip = Math.max(dipIn, dipOut);
       if (st.veil) {
         css(st, st.veil, 'opacity', Math.max(dip, night).toFixed(3));
-        css(st, st.veil, 'backgroundColor', night > dip ? '#05080F' : '');
+        css(st, st.veil, 'backgroundColor', night > dip ? '#05080F' : 'var(--mc-surface)');
       }
       var lit = 0;
       st.beats.forEach(function (b) {
@@ -261,7 +291,7 @@
         for (var j = 0; j < b.lines.length; j++) {
           var tw = b.tin[j], i = now < tw.at ? tw.from : val(tw);
           if (busy(tw) || now < tw.at) moving = true;
-          var op = i * (1 - o) * (1 - (st.v ? dip : 0));
+          var op = i * (1 - o) * (st.v ? 1 - E(dip / 0.5) : 1);
           setLine(b, j, op, i, o);
           vis = Math.max(vis, op);
         }
@@ -282,14 +312,14 @@
   function tick(t) {
     now = t;
     var dt = Math.min(0.05, Math.max(0, (t - last) / 1000)); last = t;
-    intro = (t - t0) / 1000;
+    intro = started ? (t - t0) / 1000 : 0;
     measure();
     var T = window.pageYOffset;
     y = follow(y, T, dt); x = follow(x, y, dt);
     var settled = Math.abs(T - x) < 0.25 && Math.abs(T - y) < 0.25;
     if (settled) x = y = T;
     render();
-    if (settled && !moving && t - lastScroll > 200 && intro > introEnd + 1) { running = false; return; }
+    if (settled && !moving && t - lastScroll > 200 && started && intro > introEnd + 1) { running = false; return; }
     requestAnimationFrame(tick);
   }
   function kick() {
@@ -297,15 +327,46 @@
     running = true; last = performance.now();
     requestAnimationFrame(tick);
   }
-  window.addEventListener('scroll', function () { lastScroll = performance.now(); kick(); }, { passive: true });
-  window.addEventListener('resize', function () { vh = window.innerHeight; kick(); });
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) films.forEach(function (st) { if (st.loaded && !st.v.paused) st.v.pause(); });
+    else kick();
+  });
+  // where in which scene the reader is, so a turned phone lands on the same line:
+  // the scroll keeps its pixels, but every scene is a multiple of the screen's
+  // height (turned on "Revisados", the page landed past the end of the film)
+  var anchor = null, lastW = window.innerWidth, turnedAt = -1e9;
+  function place() {
+    var sy = window.pageYOffset; anchor = null;
+    for (var i = 0; i < S.length; i++) {
+      var r = S[i].el.getBoundingClientRect();
+      if (r.top <= 0 && r.bottom > 0) { anchor = { el: S[i].el, p: -r.top / Math.max(1, r.height - window.innerHeight) }; break; }
+    }
+  }
+  window.addEventListener('scroll', function () {
+    lastScroll = performance.now();
+    if (lastScroll - turnedAt > 400 && window.innerWidth === lastW) place();
+    kick();
+  }, { passive: true });
+  window.addEventListener('resize', function () {
+    vh = window.innerHeight;
+    if (window.innerWidth !== lastW) {
+      lastW = window.innerWidth; turnedAt = performance.now();
+      var a = anchor;
+      if (a) requestAnimationFrame(function () {
+        var r = a.el.getBoundingClientRect();
+        window.scrollTo(0, Math.round(r.top + window.pageYOffset + a.p * Math.max(1, r.height - window.innerHeight)));
+        x = y = window.pageYOffset;
+      });
+    }
+    kick();
+  });
   // a phone that only lets a video start after a touch: try again on the first one
   window.addEventListener('touchstart', function retry() {
     window.removeEventListener('touchstart', retry);
     films.forEach(function (st) { if (st.loaded && st.cur >= 0 && st.v.paused && st.v.currentTime < st.stop - 0.01) play(st, st.stop); });
   }, { passive: true });
 
-  measure();
+  measure(); place();
   S.forEach(function (st) { var r = st.el.getBoundingClientRect(); st.near = r.bottom > -vh && r.top < 2.5 * vh; if (st.near && st.v) load(st); });
   kick();
 })();
