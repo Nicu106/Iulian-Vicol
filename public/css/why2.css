@@ -1,0 +1,173 @@
+/* =============================================================================
+   /por-que-nosotros — the film. Phone first. Same type, ink and buttons as the
+   rest of the site (DM Sans, --mc-ink, --mc-navy, .mc-btn); what is new is the
+   scale and the scroll. No labels, no numbering: few words, large.
+
+   Every scene is a tall section with a sticky stage of one screen. why.js gives
+   each section --p (0→1 through its length) and marks each line .is-on while
+   the scroll is inside its [data-in, data-out). Without .wy-on on <html> (no JS,
+   or reduced motion) none of this applies: the scenes are an ordinary page.
+   ========================================================================== */
+.wy{ background:var(--mc-surface); }
+
+/* ---- the motion version ---------------------------------------------------- */
+.wy-on .wy-film--a{ height:440vh; }
+.wy-on .wy-film--b{ height:460vh; }
+.wy-on .wy-still{ height:240vh; }
+.wy-on .wy-stage{ position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; }
+
+.wy-film .wy-stage{ background:#05080F; }
+.wy-video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;
+  filter:brightness(var(--dim, 1)); transition:filter .7s cubic-bezier(.2,.7,.1,1); }
+
+/* the words: all beats share one place, each arrives line by line */
+.wy-copy{ position:absolute; inset:0; display:grid; align-content:end; justify-items:start;
+  padding:0 var(--mc-gutter-m) calc(14vh + env(safe-area-inset-bottom)); pointer-events:none; }
+.wy-beat{ grid-area:1 / 1; margin:0; color:#FFFFFF; max-width:16ch;
+  text-shadow:0 2px 40px rgba(0,0,0,.35); }
+.wy-beat a{ pointer-events:auto; }
+.wy-l{ display:block; }
+.wy-beat--open{ font-size:clamp(2.5rem, 10.5vw, 7rem); line-height:.98; letter-spacing:-.04em; font-weight:700; }
+.wy-beat--word{ font-size:clamp(3rem, 15vw, 10.5rem); line-height:.95; letter-spacing:-.05em; font-weight:700; max-width:none; }
+.wy-beat--line{ font-size:clamp(2.2rem, 9vw, 6rem); line-height:1; letter-spacing:-.035em; font-weight:700; }
+.wy-beat--sub{ font-size:clamp(1.05rem, 4.2vw, 1.5rem); line-height:1.5; font-weight:500; max-width:34ch; letter-spacing:-.005em; }
+
+.wy-on .wy-beat .wy-l{
+  opacity:0; transform:translate3d(0, .5em, 0); clip-path:inset(0 0 100% 0);
+  transition:opacity .5s ease, transform 1s cubic-bezier(.16,.84,.2,1), clip-path 1s cubic-bezier(.16,.84,.2,1);
+}
+.wy-on .wy-beat.is-on .wy-l{ opacity:1; transform:none; clip-path:inset(-.25em -.2em -.25em -.2em); }
+.wy-on .wy-beat.is-on .wy-l:nth-child(2){ transition-delay:.12s; }
+.wy-on .wy-beat.is-past .wy-l{ opacity:0; transform:translate3d(0, -.35em, 0); clip-path:inset(0 0 0 0);
+  transition-duration:.45s; transition-delay:0s; }
+.wy-on .wy-beat--act{ opacity:0; transform:translateY(12px); transition:opacity .6s ease, transform .8s cubic-bezier(.16,.84,.2,1); }
+.wy-on .wy-beat--act.is-on{ opacity:1; transform:none; }
+
+/* ---- the stills -------------------------------------------------------------- */
+.wy-still .wy-stage{ background:var(--mc-surface); }
+.wy-photo{ position:relative; overflow:hidden; background:var(--mc-band); }
+.wy-photo > img{ display:block; width:100%; height:100%; object-fit:cover; }
+
+/* portrait: phone = words on white above, photograph below; desk = side by side */
+.wy-still--portrait .wy-stage{ display:grid; grid-template-rows:auto minmax(0,1fr); }
+.wy-still--portrait .wy-copy{ position:relative; inset:auto; order:-1; align-content:start;
+  padding:calc(var(--mc-head-h, 56px) + 1.5rem) var(--mc-gutter-m) 1.5rem; gap:1rem; }
+.wy-still--portrait .wy-photo > img{ object-position:58% 60%;
+  transform:scale(calc(1.16 - .16 * var(--p, 1))); transform-origin:58% 55%; }
+.wy-copy--ink .wy-beat{ color:var(--mc-ink); text-shadow:none; position:relative; }
+.wy-copy--ink .wy-beat--sub{ color:var(--mc-ink-2); }
+.wy-still--portrait .wy-beat{ grid-area:auto; }
+.wy-still--portrait .wy-beat--line{ font-size:clamp(2rem, 9vw, 4.6rem); }
+
+/* welcome: opens from the centre to the whole screen; words in ink on his white wall */
+.wy-still--welcome .wy-photo{ position:absolute; inset:0;
+  clip-path:inset(calc(22% * (1 - var(--o, 1))) calc(12% * (1 - var(--o, 1))) calc(30% * (1 - var(--o, 1))) calc(12% * (1 - var(--o, 1))));
+}
+.wy-still--welcome .wy-photo > img{ object-position:49% 55%; transform:scale(calc(1.08 - .08 * var(--o, 1))); }
+.wy-copy--wall{ align-content:start; justify-items:center; text-align:center;
+  padding:calc(var(--mc-head-h, 56px) + 5vh) var(--mc-gutter-m) 0; gap:.9rem; }
+.wy-copy--wall .wy-beat{ grid-area:auto; color:var(--mc-ink); text-shadow:none; max-width:20ch; }
+.wy-copy--wall .wy-beat--line{ font-size:clamp(1.9rem, 8.4vw, 4.4rem); }
+.wy-copy--wall .wy-beat--sub{ color:var(--mc-ink); max-width:36ch; font-weight:600; }
+
+@media (min-aspect-ratio: 1/1) and (min-width: 900px){
+  .wy-copy{ padding:0 max(var(--mc-gutter-d), calc((100vw - 1200px) / 2)) 13vh; }
+  .wy-still--portrait .wy-stage{ grid-template-rows:none; grid-template-columns:minmax(0,38fr) minmax(0,62fr); }
+  .wy-still--portrait .wy-copy{ order:0; align-content:center;
+    padding:var(--mc-head-h, 56px) var(--s-7) 0 max(var(--mc-gutter-d), calc((100vw - 1200px) / 2)); }
+  .wy-copy--wall{ padding-top:calc(var(--mc-head-h, 56px) + 7vh); }
+}
+
+/* ---- the plain version: no JS, or reduced motion ------------------------------ */
+html:not(.wy-on) .wy-film .wy-stage{ position:relative; }
+html:not(.wy-on) .wy-video{ position:relative; height:auto; aspect-ratio:9 / 16; max-height:80vh; }
+html:not(.wy-on) .wy-copy{ position:relative; padding:var(--s-6) var(--mc-gutter-m); background:var(--mc-navy); gap:var(--s-4); }
+html:not(.wy-on) .wy-beat{ grid-area:auto; }
+html:not(.wy-on) .wy-still--welcome .wy-photo{ position:relative; aspect-ratio:4 / 3; }
+html:not(.wy-on) .wy-still--portrait .wy-photo{ aspect-ratio:4 / 3; }
+@media (min-aspect-ratio: 1/1){ html:not(.wy-on) .wy-video{ aspect-ratio:16 / 9; } }
+
+/* ---- the record ---------------------------------------------------------------- */
+.wy-proof{ background:var(--mc-band); }
+.wy-proof__l{ list-style:none; margin-block:0; display:grid; grid-template-columns:repeat(2, minmax(0,1fr));
+  gap:var(--s-6) var(--s-4); padding-block:var(--s-8); }
+.wy-proof__l li{ display:flex; flex-direction:column; gap:var(--s-2); min-width:0; }
+.wy-proof__l b{ font-size:clamp(2.4rem, 10vw, 4.4rem); line-height:.95; letter-spacing:-.04em; color:var(--mc-ink);
+  font-variant-numeric:tabular-nums; }
+.wy-proof__l span{ font-size:var(--t-body); line-height:1.4; color:var(--mc-ink-2); max-width:22ch; }
+@media (min-width:900px){ .wy-proof__l{ grid-template-columns:repeat(4, minmax(0,1fr)); } }
+
+/* ---- their words ------------------------------------------------------------- */
+.wy-say{ padding-block:var(--s-8); }
+.wy-say__h{ margin:0 0 var(--s-6); font-size:clamp(2.2rem, 8vw, 4.4rem); line-height:1; letter-spacing:-.035em; color:var(--mc-ink); }
+.wy-say__l{ list-style:none; margin:0; padding:0; display:grid; gap:var(--s-5); }
+.wy-q figure{ margin:0; height:100%; background:var(--mc-surface); border:1px solid var(--mc-hairline); }
+.wy-q__ph{ aspect-ratio:4 / 3; overflow:hidden; background:var(--mc-band); }
+.wy-q__ph img{ width:100%; height:100%; object-fit:cover; display:block; }
+.wy-q__t{ margin:0; padding:var(--s-4) var(--s-4) var(--s-2); font-size:var(--t-body); line-height:1.6; color:var(--mc-ink); }
+.wy-q__by{ padding:0 var(--s-4) var(--s-4); font-size:var(--t-body); font-weight:600; color:var(--mc-ink); }
+.wy-say__all{ display:inline-flex; align-items:center; min-height:44px; margin-top:var(--s-4); font-weight:600; }
+@media (max-width:899px){
+  .wy-say__l{ grid-auto-flow:column; grid-auto-columns:82%; overflow-x:auto; scroll-snap-type:x mandatory;
+    overscroll-behavior-x:contain; scrollbar-width:none; margin-inline:calc(var(--mc-gutter-m) * -1);
+    padding-inline:var(--mc-gutter-m); scroll-padding-inline:var(--mc-gutter-m); }
+  .wy-say__l::-webkit-scrollbar{ display:none; }
+  .wy-q{ scroll-snap-align:start; }
+}
+@media (min-width:900px){ .wy-say__l{ grid-template-columns:repeat(3, minmax(0,1fr)); } }
+
+/* ---- the way in ------------------------------------------------------------ */
+.wy-end{ background:var(--mc-navy); color:#FFFFFF; }
+.wy-end__in{ padding-block:var(--s-8); }
+.wy-end__h{ margin:0 0 var(--s-3); font-size:clamp(2.2rem, 8vw, 4.4rem); line-height:1; letter-spacing:-.035em; color:#FFFFFF; max-width:16ch; }
+.wy-end__p{ margin:0 0 var(--s-6); font-size:var(--t-sub); color:rgba(255,255,255,.88); }
+.wy-end__act{ display:flex; flex-wrap:wrap; gap:var(--s-2); max-width:36rem; }
+.wy-end__act .mc-btn{ flex:1 1 14rem; justify-content:center; min-height:48px; white-space:nowrap; }
+.wy-end__ghost{ background:transparent; border:1.5px solid #FFFFFF; color:#FFFFFF; }
+.wy-end__ghost:hover{ background:#FFFFFF; color:var(--mc-navy); }
+.wy-end :focus-visible{ outline-color:#FFFFFF; }
+
+/* fixes after the first phone pass */
+.wy-beat--act .mc-btn{ white-space:nowrap; min-height:48px; padding-inline:1.4rem; }
+.wy-beat--sub .wy-l{ display:inline; }
+.wy-beat--sub .wy-l + .wy-l::before{ content:" "; }
+@media (min-aspect-ratio: 1/1) and (min-width: 900px){
+  .wy-still--portrait .wy-copy{ order:1; }
+  .wy-still--portrait .wy-photo{ order:2; }
+  .wy-still--portrait .wy-beat--line{ font-size:clamp(2.6rem, 4.6vw, 5rem); }
+  .wy-still--portrait .wy-beat--sub{ font-size:clamp(1.1rem, 1.4vw, 1.4rem); }
+}
+
+/* second pass: a wrapped line must not be clipped (inline + clip-path cut "sin pasarte de una") */
+.wy-on .wy-beat--sub .wy-l{ clip-path:none !important; }
+/* welcome: title on his white wall above, the promise on the pale asphalt below */
+.wy-copy--wall{ align-content:space-between; padding-bottom:calc(9vh + env(safe-area-inset-bottom)); }
+.wy-still--welcome .wy-photo > img{ object-position:49% 22%; }
+@media (min-aspect-ratio: 1/1) and (min-width: 900px){
+  .wy-still--portrait .wy-stage{ grid-template-columns:minmax(0,46fr) minmax(0,54fr); }
+  .wy-still--portrait .wy-copy{ padding:var(--mc-head-h, 56px) var(--s-7) 0 max(var(--mc-gutter-d), calc((100vw - 1280px) / 2)); }
+  .wy-still--portrait .wy-beat--line{ max-width:13ch; }
+  .wy-copy--wall .wy-beat--sub{ max-width:48ch; }
+}
+@media (min-aspect-ratio: 1/1) and (min-width: 900px){ .wy-copy--wall .wy-beat--sub{ font-size:clamp(1.15rem, 1.5vw, 1.5rem); } }
+/* a phone on its side: little height, so smaller words */
+@media (min-aspect-ratio: 1/1) and (max-height: 500px){
+  .wy-beat--open, .wy-beat--line{ font-size:clamp(1.8rem, 6.5vh + 1rem, 3rem); }
+  .wy-beat--word{ font-size:clamp(2.6rem, 14vh, 5rem); }
+  .wy-copy{ padding-bottom:10vh; }
+  .wy-still--portrait .wy-beat--line{ font-size:clamp(1.6rem, 6vh + .8rem, 2.6rem); }
+}
+@media (min-aspect-ratio: 1/1) and (max-height: 500px){
+  .wy-still--portrait .wy-stage{ grid-template-rows:none; grid-template-columns:minmax(0,48fr) minmax(0,52fr); }
+  .wy-still--portrait .wy-copy{ order:1; align-content:center; padding:1rem 1.25rem 1rem max(var(--mc-gutter-m), env(safe-area-inset-left)); gap:.6rem; }
+  .wy-still--portrait .wy-photo{ order:2; }
+  .wy-copy--wall{ padding-top:5vh; padding-bottom:6vh; }
+  .wy-copy--wall .wy-beat--line{ font-size:clamp(1.4rem, 7.5vh + .4rem, 2.4rem); max-width:none; }
+  .wy-copy--wall .wy-beat--sub{ font-size:.95rem; max-width:60ch; }
+  .wy-still--welcome .wy-photo > img{ object-position:49% 40%; }
+}
+/* plain version: the ink words sit on white, the white words on navy */
+html:not(.wy-on) .wy-copy--ink, html:not(.wy-on) .wy-copy--wall{ background:var(--mc-surface); }
+html:not(.wy-on) .wy-still--portrait .wy-stage{ display:block; }
+html:not(.wy-on) .wy-still--welcome .wy-photo{ position:relative; }
+html:not(.wy-on) .wy-still--welcome .wy-photo{ clip-path:none; }
