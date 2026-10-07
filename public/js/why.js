@@ -1,269 +1,216 @@
-/* /por-que-nosotros — the scroll plays the films, frame by frame, like a video.
+/* /por-que-nosotros — the films play in chapters; the scroll decides which.
 
-   The technique Apple uses on its product pages, not video seeking (seeking an
-   H.264 file stepped at 10-17 new pictures a second, measured). Each film is a
-   sequence of stills cut from his original footage and graded at extraction
-   (/storage/why/seq/<film>/p = upright 608×1080 for phones, d = 1600×900 for
-   anything wider), drawn on a <canvas> that covers the stage.
+   Scrubbing a film with the scroll (seeking a video, then a sequence of stills)
+   steps: ~0.2 s of footage per step, and the eye sees every one. So the films
+   are not scrubbed. Each is cut into chapters at the cars, one per line of
+   text (<video data-ends>: the end of each chapter, in seconds; the encode
+   puts a keyframe on each). Scrolling into a line PLAYS the film natively on
+   to the end of its chapter, where it holds on a composed frame; the line
+   arrives with it. Scrolling back, or forward past more than one line: a
+   short dissolve (the current frame copied to the <canvas> above the video,
+   faded out once the video stands on the new frame) to that chapter.
+   Phones (taller than wide) get the upright file, wider screens the 16:9 one;
+   turning the phone swaps them at the same moment of the film. Film A loads at
+   once (its first frame is the preloaded poster underneath), film B when it is
+   a screen and a half away. If a phone refuses to play (iOS Low Power Mode),
+   the film still dissolves from held frame to held frame.
 
-   - Loading: frame 0 is the poster under the canvas (preloaded by the page);
-     then every 8th frame, so the whole film can be scrubbed at once; then the
-     4th, 2nd and the rest. Film B starts loading a screen and a half before it
-     arrives. Frames are fetched as bytes and only the ones around the current
-     position are decoded (createImageBitmap, off the main thread), ahead in
-     the direction of travel first; older browsers get <img> frames.
-   - Between two frames the next is blended over the current one, so a slow
-     glide, or a film still loading, never steps.
-   - The follow: the page scroll is followed by a smoothed position — two
-     identical exponential stages in series (critically damped: never
-     overshoots, never runs backwards), time-based so it is the same at 60 or
-     120 Hz. When the finger stops the film glides to rest in ~0.6 s and lands
-     on a whole frame. On a fast flick the stages tighten as the gap grows, so
-     the film stays within about a third of a screen of the finger.
-   - One curve (smoothstep) for everything that moves, all read from that one
-     position: the film (starting and ending at rest), each line's opacity,
-     rise and blur-to-sharp (the same distance of scroll for every line in
-     every scene), the shade under the words, every picture settling from
-     106% to 100%, the dips: films rise out of the page white and dissolve
-     back into it. The first film instead fades up from night on load, its
-     words land, and only then may it move.
-   - Idle: the loop runs only while something moves; nothing when settled.
-   - Phones (taller than wide) get the upright frames; turning the phone swaps
-     the set at the same moment of the film.
-   Without IntersectionObserver / canvas, or with reduced motion, nothing runs
-   and the CSS shows the plain page (html:not(.wy-on)) with the first frames. */
+   Everything else follows one smoothed scroll position (two exponential
+   stages, time-based, critically damped) on one curve (smoothstep): films
+   rise out of the page white and dissolve back into it, every picture settles
+   from 106% to 100% across its scene, the welcome photograph opens. The words
+   and the shade under them move on time, on the same curve: a line rises
+   0.32em and sharpens from a 6px blur in 0.7 s, leaves in 0.45 s. The
+   opening fades up from night, its words land, and only then does film A play.
+   The loop runs only while something moves.
+   Without IntersectionObserver, or with reduced motion, nothing runs and the
+   CSS shows the plain page (html:not(.wy-on)). */
 (function () {
   'use strict';
   var root = document.documentElement;
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var scenes = Array.prototype.slice.call(document.querySelectorAll('[data-scene]'));
-  var cv = document.createElement('canvas');
-  if (!scenes.length || reduce || !('IntersectionObserver' in window) || !window.requestAnimationFrame || !cv.getContext) return;
+  if (!scenes.length || reduce || !('IntersectionObserver' in window) || !window.requestAnimationFrame) return;
   root.classList.add('wy-on');
 
-  var TAU = 0.11;          // s, each of the two stages: rest in ~0.6 s
-  var LAG = 0.35;          // screens: past this the follow tightens
-  var SNAP_MS = 140;       // idle this long → settle on a whole frame
-  var IN = 0.22, OUT = 0.16, STAGGER = 0.3;   // screens of scroll per reveal / exit; second line later
-  var RISE = 0.32, LIFT = 0.22, BLUR = 6;      // em a line rises in / lifts out; px of blur while it arrives
-  var PUSH = 0.06;         // every picture eases from 106% to 100% across its scene
-  var DIP_IN = 0.8, DIP_OUT = 0.6;            // screens over which a film rises from / dissolves to the page
-  var INTRO = [0.9, 0.45, 0.75, 0.18];        // s: picture fades up; first line starts, takes, next line after
-  var CONC = 6;
+  var TAU = 0.11, LAG = 0.35;                  // the follow: s per stage; screens before it tightens
+  var T_IN = 0.7, T_OUT = 0.45, T_STAG = 0.12; // s: a line arrives, leaves; the next line after
+  var RISE = 0.32, LIFT = 0.22, BLUR = 6;      // em up on arrival, em up on leaving, px of blur arriving
+  var PUSH = 0.06;                             // every picture eases from 106% to 100% across its scene
+  var DIP_IN = 0.8, DIP_OUT = 0.6;             // screens: a film rises from / dissolves to the page
+  var ENTER = 0.15;                            // screens before its top a film starts its first chapter
+  var XF = 0.32;                               // s: the dissolve between chapters
+  var INTRO = [0.9, 0.45, 0.75];               // s: night fades; first line starts; takes
 
-  var upright = window.matchMedia('(max-aspect-ratio: 1/1)');
-  var set = function () { return upright.matches ? 'p' : 'd'; };
-  // ONE curve for everything that moves: film, pictures, words, dips
   var E = function (t) { t = t < 0 ? 0 : t > 1 ? 1 : t; return t * t * (3 - 2 * t); };
   var clamp = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
-  var F = E;
-  function Finv(f) { var a = 0, b = 1; for (var k = 0; k < 30; k++) { var c = (a + b) / 2; if (E(c) < f) a = c; else b = c; } return (a + b) / 2; }
-  var t0 = performance.now(), intro = 0;   // seconds since the page started; the opening runs on time, not scroll
-  var introEnd = INTRO[1] + INTRO[2] + INTRO[3];
+  var upright = window.matchMedia('(max-aspect-ratio: 1/1)');
+  var kind = function () { return upright.matches ? 'p' : 'd'; };
+  var DIM = { p: [608, 1080], d: [1600, 900] };
+  var now = performance.now(), t0 = now, intro = 0;
+  var introEnd = INTRO[1] + INTRO[2] + T_STAG;
+  var vh = window.innerHeight;
 
-  var dpr = 1, vh = window.innerHeight;
-  var S = scenes.map(function (el) {
-    var c = el.querySelector('canvas.wy-canvas');
+  // a value that eases on time towards whatever it is told
+  function tween(v) { return { from: v, to: v, at: 0, dur: 1 }; }
+  function aim(tw, to, dur) {
+    if (tw.to === to) return;
+    tw.from = val(tw); tw.to = to; tw.at = now; tw.dur = dur;
+  }
+  function val(tw) { return tw.from + (tw.to - tw.from) * E((now - tw.at) / 1000 / tw.dur); }
+  function busy(tw) { return (now - tw.at) / 1000 < tw.dur && tw.from !== tw.to; }
+
+  var S = scenes.map(function (el, si) {
+    var v = el.querySelector('video.wy-video');
     var st = {
-      el: el, top: 0, run: 1, p: -1, near: false,
-      shade: el.querySelector('.wy-shade'), veil: el.querySelector('.wy-veil'),
-      pics: Array.prototype.slice.call(el.querySelectorAll('.wy-canvas, .wy-poster, .wy-photo > img')),
-      first: el === scenes[0] && !!el.querySelector('canvas'), sv: {},
+      el: el, top: 0, run: 1, near: false, sv: {}, key: '',
+      first: si === 0 && !!v,
+      veil: el.querySelector('.wy-veil'), shade: el.querySelector('.wy-shade'),
+      pics: Array.prototype.slice.call(el.querySelectorAll('.wy-video, .wy-canvas, .wy-poster, .wy-photo > img')),
+      still: el.classList.contains('wy-still--welcome') ? 'o' : null,
       beats: Array.prototype.slice.call(el.querySelectorAll('.wy-beat')).map(function (b) {
         var whole = b.classList.contains('wy-beat--sub') || b.classList.contains('wy-beat--act');
+        var lines = whole ? [b] : Array.prototype.slice.call(b.querySelectorAll('.wy-l'));
         return { el: b, a: parseFloat(b.getAttribute('data-in')), z: parseFloat(b.getAttribute('data-out')),
-                 act: b.classList.contains('wy-beat--act'), sty: [],
-                 lines: whole ? [b] : Array.prototype.slice.call(b.querySelectorAll('.wy-l')) };
-      }),
-      still: el.classList.contains('wy-still--welcome') ? 'o' : (el.classList.contains('wy-still') ? 'p' : null),
-      cssv: ''
+                 act: b.classList.contains('wy-beat--act'), lines: lines, sty: [],
+                 tin: lines.map(function () { return tween(0); }), tout: tween(0) };
+      })
     };
-    if (c) {
-      st.c = c; st.ctx = c.getContext('2d');
-      st.n = +c.getAttribute('data-n'); st.base = c.getAttribute('data-base');
-      st.sets = {}; st.drawn = -1; st.started = false;
+    if (v) {
+      st.v = v; st.c = el.querySelector('canvas.wy-canvas');
+      st.ctx = st.c && st.c.getContext && st.c.getContext('2d');
+      st.ends = v.getAttribute('data-ends').split(',').map(Number);
+      st.cur = -1;          // the chapter on screen (-1: the first frame, before the first chapter)
+      st.stop = 0;          // where the playing film stops
+      st.playing = false; st.loaded = false; st.xf = tween(0); st.pend = null;
     }
     return st;
   });
-  var films = S.filter(function (s) { return s.c; });
+  var films = S.filter(function (s) { return s.v; });
 
-  // ---- loading ---------------------------------------------------------------
-  // Where the browser can decode a picture off the main thread (createImageBitmap
-  // from a Blob: Chrome, Firefox, Safari 15+), each frame is fetched as bytes
-  // and only the frames around the current one are decoded, ahead in the
-  // direction of travel first; the ones left behind are freed. Drawing a frame
-  // decoded in advance costs ~2 ms on a phone; drawing an <img> the browser
-  // has to decode first costs ~21 ms (measured) — a dropped frame. Older
-  // browsers get plain <img> frames.
-  var BM = !!(window.createImageBitmap && window.fetch && window.Blob);
-  var queue = [], busy = 0;
-  function frames(st, k) {
-    var s = st.sets[k];
-    if (!s) s = st.sets[k] = { k: k, src: new Array(st.n), ok: new Array(st.n), any: false, bm: {}, req: {}, busy: 0 };
-    return s;
+  // ---- the films ---------------------------------------------------------------
+  function load(st) {
+    if (st.loaded) return;
+    st.loaded = true; st.kind = kind();
+    var v = st.v;
+    v.poster = st.el.querySelector('.wy-poster img').currentSrc || '';
+    v.preload = 'auto';
+    v.src = v.getAttribute('data-' + st.kind);
+    v.addEventListener('seeked', function () { if (st.pend) { var p = st.pend; st.pend = null; p(); } kick(); });
+    v.addEventListener('loadeddata', kick);
+    v.addEventListener('pause', function () { st.playing = false; kick(); });
+    try { v.load(); } catch (e) {}
   }
-  function order(n) {
-    var seen = {}, out = [];
-    [8, 4, 2, 1].forEach(function (d) {
-      for (var i = 0; i < n; i += d) if (!seen[i]) { seen[i] = 1; out.push(i); }
-      if (!seen[n - 1]) { seen[n - 1] = 1; out.push(n - 1); }
+  function startOf(st, k) { return k <= 0 ? 0 : st.ends[k - 1]; }
+  function play(st, until) {
+    var v = st.v;
+    st.stop = until;
+    if (v.currentTime >= until - 0.004) { return; }
+    st.playing = true;
+    var p = v.play();
+    if (p && p.catch) p.catch(function () {
+      // no playing allowed: dissolve to the chapter's held frame instead
+      st.playing = false; jump(st, until, false);
     });
-    return out;
   }
-  function start(st) {
-    var k = set(), fs = frames(st, k);
-    if (fs.queued) return; fs.queued = true; st.started = true;
-    order(st.n).forEach(function (i) { queue.push([st, fs, i]); });
-    pump();
+  // the current frame onto the canvas, then the video to t; fade when it stands there
+  function snap(st) {
+    var v = st.v, c = st.c, x = st.ctx;
+    if (!x || v.readyState < 2) return false;
+    var cw = c.clientWidth, ch = c.clientHeight, d = DIM[st.kind || kind()];
+    var k = Math.min(Math.min(window.devicePixelRatio || 1, 2), 1 / Math.max(cw / d[0], ch / d[1]));
+    var w = Math.round(cw * k), h = Math.round(ch * k);
+    if (!w || !h) return false;
+    if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
+    var iw = v.videoWidth, ih = v.videoHeight, sc = Math.max(w / iw, h / ih), sw = w / sc, sh = h / sc;
+    try { x.drawImage(v, (iw - sw) / 2, (ih - sh) / 2, sw, sh, 0, 0, w, h); } catch (e) { return false; }
+    return true;
   }
-  function pump() {
-    while (busy < CONC && queue.length) {
-      var job = queue.shift(), st = job[0], fs = job[1], i = job[2];
-      if (fs.src[i]) continue;
-      busy++;
-      (function (st, fs, i) {
-        var url = st.base + fs.k + '/' + ('00' + i).slice(-3) + '.webp', done = false;
-        var fin = function (what) {
-          if (done) return; done = true; busy--;
-          if (what) { fs.src[i] = what; fs.ok[i] = true; fs.any = true; st.drawn = -1; kick(); }
-          pump();
-        };
-        fs.src[i] = 1;   // taken
-        if (BM) {
-          fetch(url).then(function (r) { if (!r.ok) throw r; return r.blob(); })
-            .then(fin, function () { fs.src[i] = 0; fin(null); });
-        } else {
-          var im = new Image();
-          im.decoding = 'async';
-          im.onload = function () { if (im.decode) im.decode().then(function () { fin(im); }, function () { fin(im); }); else fin(im); };
-          im.onerror = function () { fs.src[i] = 0; fin(null); };
-          im.src = url;
-        }
-      })(st, fs, i);
+  function jump(st, t, thenPlay) {
+    var v = st.v;
+    if (!v.paused) v.pause();
+    st.playing = false;
+    var had = snap(st);
+    st.xf = tween(had ? 1 : 0);
+    css(st, st.c, 'opacity', had ? '1' : '0');
+    st.pend = function () {
+      // the new frame is decoded: dissolve the old one away
+      // (a paused video may already have shown it: a timer as well, whichever comes first)
+      var done = false, go = function () { if (done) return; done = true; aim(st.xf, 0, XF); if (thenPlay !== false) play(st, thenPlay); kick(); };
+      if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(go);
+      setTimeout(go, 90);
+    };
+    try { v.currentTime = t; } catch (e) { st.pend = null; }
+    if (Math.abs(v.currentTime - t) < 0.001 && !v.seeking && st.pend) { var p = st.pend; st.pend = null; p(); }
+  }
+  // which chapter the scroll asks for
+  function wanted(st, p, ready) {
+    var k = -1;
+    if (st.first ? (intro >= INTRO[1] + INTRO[2] || p > 0.02) : (x >= st.top - ENTER * vh)) k = 0;
+    if (!ready) return k;
+    for (var i = 1; i < st.beats.length && i < st.ends.length; i++) if (p >= st.beats[i].a) k = i;
+    return k;
+  }
+  function steer(st, p) {
+    var v = st.v;
+    if (!st.loaded || v.readyState < 1) return;
+    var want = wanted(st, p, true);
+    if (st.playing && v.currentTime >= st.stop - 0.008) { v.pause(); st.playing = false; }
+    if (want === st.cur || v.seeking || st.pend) return;
+    if (want > st.cur && v.currentTime >= startOf(st, want) - 0.5) {   // the next line: play on
+      st.cur = want; play(st, st.ends[want]);
+    } else if (want > st.cur) {              // further on: dissolve to its start, then play
+      st.cur = want; jump(st, startOf(st, want), st.ends[want]);
+    } else {                                 // back: dissolve to its held frame
+      st.cur = want; jump(st, want < 0 ? 0 : st.ends[want], false);
     }
   }
-  function release(fs, a, b) {
-    for (var i in fs.bm) if (i < a || i > b) { if (fs.bm[i].close) fs.bm[i].close(); delete fs.bm[i]; }
-    for (i in fs.req) if ((i < a || i > b) && !fs.bm[i]) delete fs.req[i];
+  function swap() {
+    films.forEach(function (st) {
+      if (!st.loaded || st.kind === kind()) return;
+      var v = st.v, t = v.currentTime, was = st.playing;
+      st.kind = kind(); st.playing = false;
+      v.poster = st.el.querySelector('.wy-poster img').currentSrc || '';
+      v.src = v.getAttribute('data-' + st.kind);
+      v.addEventListener('loadedmetadata', function once() {
+        v.removeEventListener('loadedmetadata', once);
+        try { v.currentTime = t; } catch (e) {}
+        if (was) play(st, st.stop);
+      });
+      try { v.load(); } catch (e) {}
+    });
+    kick();
   }
-  // keep decoded: from where the film is to where the scroll is heading, plus
-  // a margin (6 frames on a phone, 4 at 1600 px); at most ~75 MB / ~130 MB
-  function keep(st, fs, pos, goal) {
-    if (!BM) return;
-    var w = fs.k === 'p' ? 6 : 4, dir = goal >= pos ? 1 : -1;
-    var a = Math.max(0, Math.floor(Math.min(pos, goal)) - w), b = Math.min(st.n - 1, Math.ceil(Math.max(pos, goal)) + w);
-    if (b - a > 40) { if (dir > 0) b = a + 40; else a = b - 40; }
-    release(fs, a - 2, b + 2);
-    // the frames the film is about to show first (towards the scroll), then behind
-    var c = Math.round(pos), list = [], i;
-    for (i = c; i >= a && i <= b; i += dir) list.push(i);
-    for (i = c - dir; i >= a && i <= b; i -= dir) list.push(i);
-    for (var k = 0; k < list.length && fs.busy < 4; k++) {
-      i = list[k];
-      if (!fs.ok[i] || fs.req[i]) continue;
-      fs.req[i] = 1; fs.busy++;
-      (function (i) {
-        createImageBitmap(fs.src[i]).then(function (bmp) {
-          fs.busy--;
-          if (!fs.req[i]) { if (bmp.close) bmp.close(); }
-          else { fs.bm[i] = bmp; st.drawn = -1; kick(); }
-          keep(st, fs, st.pos, st.goal);
-        }, function () { fs.busy--; delete fs.req[i]; });
-      })(i);
-    }
-  }
+  if (upright.addEventListener) upright.addEventListener('change', swap); else if (upright.addListener) upright.addListener(swap);
 
   var io = new IntersectionObserver(function (es) {
     es.forEach(function (e) {
       var st = S[scenes.indexOf(e.target)];
       st.near = e.isIntersecting;
-      if (e.isIntersecting && st.c) start(st);
-      if (!e.isIntersecting && st.c) for (var k in st.sets) release(st.sets[k], 1, 0);
+      if (st.near && st.v) load(st);
+      if (!st.near && st.v && st.playing) st.v.pause();
     });
     kick();
   }, { rootMargin: '150% 0px 150% 0px' });
   scenes.forEach(function (s) { io.observe(s); });
 
-  // ---- drawing -----------------------------------------------------------------
-  // the canvas has the screen's pixels (devicePixelRatio, at most 2) but never
-  // more than the frame itself has on screen: beyond that the canvas would only
-  // be enlarging the picture, which the compositor does as well at a fraction
-  // of the cost (measured: 0.8 ms a frame instead of 8.7 on a phone).
-  var DIM = { p: [608, 1080], d: [1600, 900] };
-  function size() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2); vh = window.innerHeight;
-    films.forEach(function (st) {
-      var cw = st.c.clientWidth, ch = st.c.clientHeight, d = DIM[set()];
-      var k = Math.min(dpr, cw && ch ? 1 / Math.max(cw / d[0], ch / d[1]) : dpr);
-      var w = Math.round(cw * k), h = Math.round(ch * k);
-      if (w && h && (st.c.width !== w || st.c.height !== h)) { st.c.width = w; st.c.height = h; }
-      st.drawn = -1;
-    });
-  }
-  function pic(fs, i) { return BM ? fs.bm[i] : (fs.ok[i] && fs.src[i]); }
-  function nearest(fs, pos, dir) {
-    var i = dir < 0 ? Math.floor(pos + 1e-6) : Math.ceil(pos - 1e-6);
-    for (; i >= 0 && i < fs.ok.length; i += dir) if (pic(fs, i)) return i;
-    return -1;
-  }
-  function blit(st, im, alpha) {
-    var cw = st.c.width, ch = st.c.height, iw = im.naturalWidth || im.width, ih = im.naturalHeight || im.height;
-    if (!iw || !cw) return;
-    var sc = Math.max(cw / iw, ch / ih), sw = cw / sc, sh = ch / sc;
-    st.ctx.globalAlpha = alpha;
-    st.ctx.drawImage(im, (iw - sw) / 2, (ih - sh) / 2, sw, sh, 0, 0, cw, ch);
-  }
-  function draw(st, pos, goal) {
-    var fs = st.sets[set()];
-    if (!fs || !fs.any) { for (var k in st.sets) if (st.sets[k].any) { fs = st.sets[k]; break; } }
-    if (!fs || !fs.any) return;
-    st.pos = pos; st.goal = goal;
-    keep(st, fs, pos, goal);
-    if (Math.abs(pos - st.drawn) < 0.004) return;
-    var lo = nearest(fs, pos, -1), hi = nearest(fs, pos, 1);
-    if (lo < 0) lo = hi; if (hi < 0) hi = lo;
-    if (lo < 0) return;
-    var t = hi > lo ? (pos - lo) / (hi - lo) : 0;
-    var ctx = st.ctx;
-    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
-    if (t > 0.985) blit(st, pic(fs, hi), 1);
-    else { blit(st, pic(fs, lo), 1); if (t > 0.015) blit(st, pic(fs, hi), t); }
-    ctx.globalAlpha = 1;
-    st.drawn = pos;
-  }
-
-  // ---- the follow ----------------------------------------------------------------
-  var x = window.pageYOffset, y = x, last = 0, running = false, lastScroll = 0;
+  // ---- one smoothed scroll position --------------------------------------------
+  var x = window.pageYOffset, y = x, last = now, running = false, lastScroll = 0;
   function measure() {
     var sy = window.pageYOffset;
     S.forEach(function (st) {
       var r = st.el.getBoundingClientRect();
       st.top = r.top + sy; st.run = Math.max(1, r.height - vh);
     });
-    // the page opens with the first stage pushed down by the header: its words
-    // are lifted by that much, so they are whole on the first screen
-    var lead = Math.round(S[0].top) + 'px';
+    var lead = Math.round(S[0].top) + 'px';    // the opening words sit above the header's height
     if (lead !== S[0].lead) { S[0].lead = lead; S[0].el.style.setProperty('--wy-lead', lead); }
   }
-  function target(now) {
-    var T = window.pageYOffset;
-    if (now - lastScroll < SNAP_MS) return T;
-    // at rest inside a film: land on a whole frame, never between two
-    for (var j = 0; j < films.length; j++) {
-      var st = films[j], p = (T - st.top) / st.run;
-      if (p > 0 && p < 1) {
-        var f = Math.round(F(p) * (st.n - 1)) / (st.n - 1);
-        return st.top + Finv(f) * st.run;
-      }
-    }
-    return T;
-  }
   function follow(cur, to, dt) {
-    var d = to - cur, L = LAG * vh, r = d / L;
+    var d = to - cur, r = d / (LAG * vh);
     return cur + d * (1 - Math.exp(-dt * (1 + r * r) / TAU));
   }
   function css(st, el, k, v) {
-    var key = k + (el === st.el ? '' : st.pics.indexOf(el) + (el.className || ''));
+    var key = k + '|' + st.pics.indexOf(el) + '|' + (el.className || '');
     if (st.sv[key] === v) return; st.sv[key] = v;
     if (k.charAt(0) === '-') el.style.setProperty(k, v); else el.style[k] = v;
   }
@@ -277,19 +224,28 @@
     el.style.transform = ty ? 'translate3d(0,' + ty.toFixed(3) + 'em,0)' : 'none';
     el.style.filter = bl >= 0.1 ? 'blur(' + bl.toFixed(1) + 'px)' : 'none';
   }
-  function render(T) {
+  var moving = false;
+  function render() {
+    moving = false;
     S.forEach(function (st) {
       if (!st.near) return;
-      var q = (x - st.top) / st.run, p = clamp(q);
-      // the opening: the first film fades up from the night of the stage, then
-      // its words arrive; the film waits until the first line has landed
-      var gate = st.first ? E((intro - INTRO[1] - INTRO[2]) / 0.5) : 1;
-      if (st.c) draw(st, F(p) * (st.n - 1) * gate, F(clamp((T - st.top) / st.run)) * (st.n - 1) * gate);
-      var key = q.toFixed(5) + (st.first ? '|' + intro.toFixed(3) : '');
-      if (key === st.key) return;
-      st.key = key;
-      // films rise out of the page white and dissolve back into it: the same dip
-      // on both sides of every film (the first one rises from night instead)
+      var p = clamp((x - st.top) / st.run);
+      if (st.v) steer(st, p);
+      // which lines are on: a film's line is its chapter's; a still's by scroll
+      var on = st.v ? st.cur : -1;
+      st.beats.forEach(function (b, bi) {
+        var show;
+        if (st.v) show = bi === on || (bi === st.beats.length - 1 && on >= bi);
+        else show = p >= b.a;
+        if (st.v && bi === 0 && st.first && on < 0) show = intro >= INTRO[1];
+        if (st.v && on < 0 && bi === 0 && !st.first) show = false;
+        var gone = st.v ? (on > bi && bi !== st.beats.length - 1) : false;
+        b.tin.forEach(function (tw, j) {
+          aim(tw, show || gone ? 1 : 0, (show || gone) ? T_IN : T_OUT);
+          if (tw.to === 1 && tw.from === 0 && tw.at === now && j) tw.at = now + j * T_STAG * 1000;
+        });
+        aim(b.tout, gone ? 1 : 0, T_OUT);
+      });
       var dipIn = st.first ? 0 : 1 - E((x - (st.top - vh)) / (DIP_IN * vh));
       var dipOut = E((x - (st.top + st.run)) / (DIP_OUT * vh));
       var night = st.first ? 1 - E(intro / INTRO[0]) : 0;
@@ -298,14 +254,14 @@
         css(st, st.veil, 'opacity', Math.max(dip, night).toFixed(3));
         css(st, st.veil, 'backgroundColor', night > dip ? '#05080F' : '');
       }
-      var rin = IN * vh / st.run, rout = OUT * vh / st.run, lit = 0;
+      var lit = 0;
       st.beats.forEach(function (b) {
-        var o = b.z >= 1.5 ? 0 : E((p - (b.z - rout)) / rout), vis = 0;
+        var o = val(b.tout), vis = 0;
+        if (busy(b.tout)) moving = true;
         for (var j = 0; j < b.lines.length; j++) {
-          var i = b.a < 0
-            ? (st.first ? E((intro - INTRO[1] - j * INTRO[3]) / INTRO[2]) : 1)
-            : E((p - b.a - j * STAGGER * rin) / rin);
-          var op = i * (1 - o) * (1 - (st.c ? dip : 0));
+          var tw = b.tin[j], i = now < tw.at ? tw.from : val(tw);
+          if (busy(tw) || now < tw.at) moving = true;
+          var op = i * (1 - o) * (1 - (st.v ? dip : 0));
           setLine(b, j, op, i, o);
           vis = Math.max(vis, op);
         }
@@ -313,58 +269,43 @@
         lit = Math.max(lit, vis);
       });
       if (st.shade) css(st, st.shade, 'opacity', lit.toFixed(3));
-      // the camera: every picture settles from 106% to 100% over its scene
+      if (st.v) {
+        if (busy(st.xf)) moving = true;
+        css(st, st.c, 'opacity', val(st.xf).toFixed(3));
+        if (st.playing || st.pend) moving = true;
+      }
       var sc = 'scale(' + (1 + PUSH * (1 - E(st.still === 'o' ? p / 0.6 : p))).toFixed(4) + ')';
       st.pics.forEach(function (el) { css(st, el, 'transform', sc); });
       if (st.still === 'o') css(st, st.el, '--o', E(p / 0.35).toFixed(4));
     });
   }
-  function tick(now) {
-    var dt = Math.min(0.05, Math.max(0, (now - last) / 1000)); last = now;
-    intro = (now - t0) / 1000;
+  function tick(t) {
+    now = t;
+    var dt = Math.min(0.05, Math.max(0, (t - last) / 1000)); last = t;
+    intro = (t - t0) / 1000;
     measure();
-    var T = target(now);
+    var T = window.pageYOffset;
     y = follow(y, T, dt); x = follow(x, y, dt);
     var settled = Math.abs(T - x) < 0.25 && Math.abs(T - y) < 0.25;
-    if (settled) { x = y = T; }
-    render(T);
-    if (settled && now - lastScroll > SNAP_MS + 50 && intro > introEnd + 0.6) { running = false; return; }
+    if (settled) x = y = T;
+    render();
+    if (settled && !moving && t - lastScroll > 200 && intro > introEnd + 1) { running = false; return; }
     requestAnimationFrame(tick);
   }
   function kick() {
     if (running) return;
-    if (!S.some(function (st) { return st.near; }) && intro > introEnd + 0.6) { x = y = window.pageYOffset; return; }
     running = true; last = performance.now();
     requestAnimationFrame(tick);
   }
   window.addEventListener('scroll', function () { lastScroll = performance.now(); kick(); }, { passive: true });
-  window.addEventListener('resize', function () { size(); S.forEach(function (st) { st.p = -1; }); kick(); });
-  var swap = function () {
-    films.forEach(function (st) { if (st.started) { st.started = false; start(st); } st.drawn = -1; });
-    size(); kick();
-  };
-  if (upright.addEventListener) upright.addEventListener('change', swap); else if (upright.addListener) upright.addListener(swap);
+  window.addEventListener('resize', function () { vh = window.innerHeight; kick(); });
+  // a phone that only lets a video start after a touch: try again on the first one
+  window.addEventListener('touchstart', function retry() {
+    window.removeEventListener('touchstart', retry);
+    films.forEach(function (st) { if (st.loaded && st.cur >= 0 && st.v.paused && st.v.currentTime < st.stop - 0.01) play(st, st.stop); });
+  }, { passive: true });
 
-  size(); measure();
-  x = y = window.pageYOffset;
-  S.forEach(function (st) { var r = st.el.getBoundingClientRect(); st.near = r.bottom > -vh && r.top < 2 * vh; });
-  films.forEach(function (st) { if (st === films[0]) start(st); });
-  render(x); running = false; kick();
-
-  // the record counts up once, when it is seen
-  var nums = document.querySelectorAll('.wy-proof [data-count]');
-  var fmt = function (v) { return Math.round(v).toLocaleString('es-ES'); };
-  Array.prototype.forEach.call(nums, function (n) { n.textContent = '0'; });
-  var count = new IntersectionObserver(function (es) {
-    es.forEach(function (e) {
-      if (!e.isIntersecting) return; count.unobserve(e.target);
-      var el = e.target, to = +el.getAttribute('data-count'), t0 = null;
-      (function tick(t) {
-        if (!t0) t0 = t; var k = Math.min(1, (t - t0) / 1400);
-        el.textContent = fmt(to * (1 - Math.pow(1 - k, 3)));
-        if (k < 1) requestAnimationFrame(tick);
-      })(performance.now());
-    });
-  }, { threshold: .6 });
-  Array.prototype.forEach.call(nums, function (n) { count.observe(n); });
+  measure();
+  S.forEach(function (st) { var r = st.el.getBoundingClientRect(); st.near = r.bottom > -vh && r.top < 2.5 * vh; if (st.near && st.v) load(st); });
+  kick();
 })();

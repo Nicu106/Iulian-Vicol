@@ -3,10 +3,10 @@
    rest of the site (DM Sans, --mc-ink, --mc-navy, .mc-btn); what is new is the
    scale and the scroll. No labels, no numbering: few words, large.
 
-   Every scene is a tall section with a sticky stage of one screen. why.js reads
-   one smoothed scroll position and from it draws each film's frame on the
-   canvas and sets, per line, opacity and lift (inline styles), the shade under
-   words on a film, the dip to white between scenes, every picture's scale and
+   Every scene is a tall section with a sticky stage of one screen. why.js plays
+   each film chapter by chapter as the scroll reaches its lines, and sets per
+   line opacity, lift and blur (inline styles, on time), the shade under words
+   on a film, the dip to white between scenes, every picture's scale and
    --o (welcome opens): no CSS
    transitions, so words and film move as one. Without .wy-on on <html> (no JS,
    or reduced motion) none of this applies: the scenes are an ordinary page.
@@ -19,8 +19,10 @@
 .wy-on .wy-stage{ position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; }
 
 .wy-film .wy-stage{ background:#05080F; }
-.wy-poster, .wy-poster img, .wy-canvas, .wy-shade, .wy-veil{ position:absolute; inset:0; width:100%; height:100%; display:block; }
-.wy-poster img{ object-fit:cover; }
+.wy-poster, .wy-poster img, .wy-video, .wy-canvas, .wy-shade, .wy-veil{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+.wy-poster img, .wy-video{ object-fit:cover; }
+/* the dissolve between chapters: the last frame, copied here, fades away */
+.wy-canvas{ opacity:0; pointer-events:none; }
 /* under the words only: the bottom of the frame, where they sit (measured per beat) */
 .wy-shade{ opacity:0; pointer-events:none;
   background:linear-gradient(to top, rgba(5,8,15,.64) 0%, rgba(5,8,15,.5) 30%, rgba(5,8,15,.26) 55%, rgba(5,8,15,0) 80%); }
@@ -76,7 +78,7 @@
 
 /* ---- the plain version: no JS, or reduced motion ------------------------------ */
 html:not(.wy-on) .wy-film .wy-stage{ position:relative; }
-html:not(.wy-on) .wy-canvas, html:not(.wy-on) .wy-shade, html:not(.wy-on) .wy-veil{ display:none; }
+html:not(.wy-on) .wy-video, html:not(.wy-on) .wy-canvas, html:not(.wy-on) .wy-shade, html:not(.wy-on) .wy-veil{ display:none; }
 html:not(.wy-on) .wy-poster{ position:relative; height:auto; aspect-ratio:9 / 16; max-height:80vh; }
 html:not(.wy-on) .wy-copy{ position:relative; padding:var(--s-6) var(--mc-gutter-m); background:var(--mc-navy); gap:var(--s-4); }
 html:not(.wy-on) .wy-beat{ grid-area:auto; }

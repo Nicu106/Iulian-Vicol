@@ -40,6 +40,7 @@ Timpul tău de gândire și de verificare între prompturi, peste 15 minute, **n
 | 07.10 (2) | — | — | /por-que-nosotros refăcută ca film derulat cu scroll: 2 videouri DJI (decupaj vertical pentru telefon, 24 fps, cadru-cheie la 0,5 s), portretul la apus, poza de bun venit care se deschide; fără etichete și numerotare; verificat 320/390/768/844×390/1440, cu și fără animații |
 | 07.10 (3) | — | — | /por-que-nosotros: filmele redate ca la Apple — secvențe de cadre WebP din originalele DJI (telefon 608×1080, desktop 1600×900), gradate cinematic, desenate pe canvas; mișcare netezită care se oprește lin pe un cadru întreg; deschidere din întuneric, tranziții prin alb între scene, o singură curbă pentru tot; text verificat ca contrast pe fiecare cadru la 390 și 1440 |
 | 07.10 (4) | — | — | /por-que-nosotros: cifrele ca un kilometraj de mașină (fiecare cifră e o rotiță; cea din dreapta se învârte cel mai mult și se oprește prima); textele apar după ce cifra se oprește; „600.000” încape de la 320px |
+| 07.10 (5) | — | — | /por-que-nosotros: filmele nu mai sunt derulate cadru cu cadru (sacadat) — rulează nativ, pe capitole: fiecare rând de text pornește filmul până la mașina următoare și se oprește pe un cadru compus; înapoi sau salt lung = dizolvare scurtă. Re-codate din originale la viteză dublă, 60 fps; filmul A mai întunecat, cu vignetă unde stă textul (contrast text ≥ 7:1 la 390 și 1440); telefon 11,5 MB, desktop 20,5 MB |
 | **Total** | **37,1 h** | **134** | **14 zile** |
 
 

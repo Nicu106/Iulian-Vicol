@@ -12,8 +12,8 @@
 
 @push('head')
 {{-- the opening film's first frame, so the screen is never empty while it loads --}}
-<link rel="preload" as="image" href="/storage/why/seq/a/p/000.webp" media="(max-aspect-ratio: 1/1)" fetchpriority="high">
-<link rel="preload" as="image" href="/storage/why/seq/a/d/000.webp" media="(min-aspect-ratio: 1/1)" fetchpriority="high">
+<link rel="preload" as="image" href="/storage/why/film/a-p.webp" media="(max-aspect-ratio: 1/1)" fetchpriority="high">
+<link rel="preload" as="image" href="/storage/why/film/a-d.webp" media="(min-aspect-ratio: 1/1)" fetchpriority="high">
 @endpush
 
 @php
@@ -35,19 +35,22 @@
      4  WELCOME  arms open in front of the four cars. The photograph opens from
                  the centre to the whole screen: the keys are yours.
 
-     The scroll plays each film like a video — Apple's technique, not video
-     seeking (2026-10-07, third pass): every film is a sequence of stills cut
-     from his original footage (/storage/why/seq/<a|b>/<p|d>/NNN.webp: phones
-     an upright 608×1080 crop, wider screens 1600×900; 120 and 144 frames),
-     graded once at extraction (gentle S-curve, warm mids, a little vibrance,
-     light sharpening — baked in, no filter on the picture) and drawn on a <canvas>.
-     One smoothed scroll position moves everything, on one curve: the frame,
-     each line (scrubbed: rises 0.32em and sharpens from a 6px blur), the
-     shade under the words (only where they sit), every picture settling from
-     106% to 100%. When the finger stops the film glides to rest on a whole
-     frame. The opening fades up from night, then the first words land, then
-     the film may move. Films rise out of the page white and dissolve back into
-     it, so no scene ever cuts. Details in public/js/why.js.
+     The films PLAY, natively, in chapters (2026-10-07, fourth pass — the
+     client found scrubbed frames choppy). Each film is cut at the cars: one
+     chapter per line of text, its end on a composed frame. Scrolling into a
+     line plays the film on to the end of its chapter and holds there; the words
+     arrive with it. Back, or a long jump forward: a short dissolve to the
+     chapter's held frame, never a reverse scrub. Encoded from his originals at
+     twice the speed, 60 fps (every second source frame, an even cadence),
+     graded once — film A darker and moodier with a vignette deepest where the
+     words sit (white words at 7:1 or better), film B the lighter version of
+     it — and a keyframe on every chapter end: /storage/why/film/<a|b>-p.mp4
+     upright 608×1080 for phones, -d 1600×900 (tools/media/why-films.sh).
+     One easing curve for everything else, driven by the smoothed scroll: films
+     rise out of the page white and dissolve back into it, every picture settles
+     from 106% to 100%, the shade sits only under the words. The opening fades
+     up from night; the first words land, then the film moves. Details in
+     public/js/why.js.
      Without JavaScript, or with reduced motion: a normal page — the first
      frames as still pictures, the words beneath them (html:not(.wy-on)).
      ========================================================================== --}}
@@ -59,10 +62,12 @@
   <section class="wy-film wy-film--a" data-scene="film" aria-label="Seleccionados, revisados y preparados">
     <div class="wy-stage">
       <picture class="wy-poster">
-        <source media="(min-aspect-ratio: 1/1)" srcset="/storage/why/seq/a/d/000.webp" width="1600" height="900">
-        <img src="/storage/why/seq/a/p/000.webp" alt="" width="608" height="1080" fetchpriority="high">
+        <source media="(min-aspect-ratio: 1/1)" srcset="/storage/why/film/a-d.webp" width="1600" height="900">
+        <img src="/storage/why/film/a-p.webp" alt="" width="608" height="1080" fetchpriority="high">
       </picture>
-      <canvas class="wy-canvas" data-n="120" data-base="/storage/why/seq/a/" aria-hidden="true"></canvas>
+      <video class="wy-video" muted playsinline disableremoteplayback preload="none" aria-hidden="true"
+             data-p="/storage/why/film/a-p.mp4" data-d="/storage/why/film/a-d.mp4" data-ends="1.75,4,6.5,9.25,12.3"></video>
+      <canvas class="wy-canvas" aria-hidden="true"></canvas>
       <div class="wy-shade" aria-hidden="true"></div>
       <div class="wy-veil" aria-hidden="true"></div>
       <div class="wy-copy">
@@ -108,10 +113,12 @@
   <section class="wy-film wy-film--b" data-scene="film" aria-label="Te lo enseño antes de que vengas">
     <div class="wy-stage">
       <picture class="wy-poster">
-        <source media="(min-aspect-ratio: 1/1)" srcset="/storage/why/seq/b/d/000.webp" width="1600" height="900">
-        <img src="/storage/why/seq/b/p/000.webp" alt="" width="608" height="1080" loading="lazy">
+        <source media="(min-aspect-ratio: 1/1)" srcset="/storage/why/film/b-d.webp" width="1600" height="900">
+        <img src="/storage/why/film/b-p.webp" alt="" width="608" height="1080" loading="lazy">
       </picture>
-      <canvas class="wy-canvas" data-n="144" data-base="/storage/why/seq/b/" aria-hidden="true"></canvas>
+      <video class="wy-video" muted playsinline disableremoteplayback preload="none" aria-hidden="true"
+             data-p="/storage/why/film/b-p.mp4" data-d="/storage/why/film/b-d.mp4" data-ends="2.5,5.75,8.5,11.25,15"></video>
+      <canvas class="wy-canvas" aria-hidden="true"></canvas>
       <div class="wy-shade" aria-hidden="true"></div>
       <div class="wy-veil" aria-hidden="true"></div>
       <div class="wy-copy">
