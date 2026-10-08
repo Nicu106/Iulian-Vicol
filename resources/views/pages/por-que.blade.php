@@ -5,6 +5,13 @@
 @section('og_image', url(\App\Support\Img::url('/storage/why/welcome.jpg', 1600) ?? '/storage/why/welcome.jpg'))
 @section('current', 'porque')
 
+@php
+  // the films and their posters carry their file's time: they are cached for 30
+  // days, and a re-encode (new chapter times in data-ends) must never meet last
+  // month's film in someone's cache
+  $film = fn ($f) => '/storage/why/film/' . $f . '?v=' . @filemtime(storage_path('app/public/why/film/' . $f));
+@endphp
+
 @push('css')
 <link rel="stylesheet" href="{{ asset('css/why2.css') }}">
 <link rel="stylesheet" href="{{ asset('css/why-odo.css') }}">
@@ -17,8 +24,8 @@
      screen jumped from a poster over a navy block of words to the film --}}
 <script>(function(d){var m=window.matchMedia;if(!(m&&m('(prefers-reduced-motion: reduce)').matches)&&'IntersectionObserver' in window&&window.requestAnimationFrame)d.className+=' wy-on';})(document.documentElement)</script>
 {{-- the opening film's first frame, so the screen is never empty while it loads --}}
-<link rel="preload" as="image" href="/storage/why/film/a-p.webp" media="(max-aspect-ratio: 1/1)" fetchpriority="high">
-<link rel="preload" as="image" href="/storage/why/film/a-d.webp" media="(min-aspect-ratio: 1/1)" fetchpriority="high">
+<link rel="preload" as="image" href="{{ $film('a-p.webp') }}" media="(max-aspect-ratio: 1/1)" fetchpriority="high">
+<link rel="preload" as="image" href="{{ $film('a-d.webp') }}" media="(min-aspect-ratio: 1/1)" fetchpriority="high">
 @endpush
 
 @php
@@ -56,6 +63,23 @@
      from 106% to 100%, the shade sits only under the words. The opening fades
      up from night; the first words land, then the film moves. Details in
      public/js/why.js.
+     FILM A IS CUT AS A FILM (2026-10-08, tools/media/why-film-a.py). Shot list:
+       open   the navy 4 Cabrio three-quarter, the row receding behind it —
+              held under the title, in a 2.39 scope frame with the title in
+              the black beneath; the frame opens as the camera starts to move
+       1      along the Cabrio's nose: from rest, to rest on its kidney grille
+              and headlight (the title's frame)
+       2      past it to the C-Class: the star, the headlight, the spoked wheel
+       3      the Octavia RS's black grille, the red calipers
+       4      round to the 2 Series dead-on: symmetric, the IV plate centred
+       5      back out to the whole row against the hills
+     Each chapter is one move between two composed frames: stabilised (the
+     walk's nod gone), a speed ramp (smoothstep: out of rest, ~1.5x its mean in
+     the middle with a 1-2-1 shutter blur, settling onto the held frame), its own
+     framing per held frame for phone and desk. Night grade: the white wall pulled
+     down to slate where it is bright and high, a graduated ND from the top,
+     deep blacks, lit paint. Film B keeps its daylight (it shows what you will
+     find) in the same family: greens quieted, the same ND, lighter.
      Without JavaScript, or with reduced motion: a normal page — the first
      frames as still pictures, the words beneath them (html:not(.wy-on)).
      ========================================================================== --}}
@@ -67,13 +91,15 @@
   <section class="wy-film wy-film--a" data-scene="film" aria-label="Seleccionados, revisados y preparados">
     <div class="wy-stage">
       <picture class="wy-poster">
-        <source media="(min-aspect-ratio: 1/1)" srcset="/storage/why/film/a-d.webp" width="1600" height="900">
-        <img src="/storage/why/film/a-p.webp" alt="" width="608" height="1080" fetchpriority="high">
+        <source media="(min-aspect-ratio: 1/1)" srcset="{{ $film('a-d.webp') }}" width="1600" height="900">
+        <img src="{{ $film('a-p.webp') }}" alt="" width="608" height="1080" fetchpriority="high">
       </picture>
       <video class="wy-video" muted playsinline disableremoteplayback preload="none" aria-hidden="true"
-             data-p="/storage/why/film/a-p.mp4" data-d="/storage/why/film/a-d.mp4" data-ends="1.75,4,6.5,9.25,12.3"></video>
+             data-p="{{ $film('a-p.mp4') }}" data-d="{{ $film('a-d.mp4') }}" data-ends="2.2,4.8,7.6,10.6,13.8"></video>
       <canvas class="wy-canvas" aria-hidden="true"></canvas>
       <div class="wy-shade" aria-hidden="true"></div>
+      <div class="wy-bar wy-bar--t" aria-hidden="true"></div>
+      <div class="wy-bar wy-bar--b" aria-hidden="true"></div>
       <div class="wy-veil" aria-hidden="true"></div>
       <div class="wy-copy">
         <h1 class="wy-beat wy-beat--open" data-in="-1" data-out=".18">
@@ -118,11 +144,11 @@
   <section class="wy-film wy-film--b" data-scene="film" aria-label="Te lo enseño antes de que vengas">
     <div class="wy-stage">
       <picture class="wy-poster">
-        <source media="(min-aspect-ratio: 1/1)" srcset="/storage/why/film/b-d.webp" width="1600" height="900">
-        <img src="/storage/why/film/b-p.webp" alt="" width="608" height="1080" loading="lazy">
+        <source media="(min-aspect-ratio: 1/1)" srcset="{{ $film('b-d.webp') }}" width="1600" height="900">
+        <img src="{{ $film('b-p.webp') }}" alt="" width="608" height="1080" loading="lazy">
       </picture>
       <video class="wy-video" muted playsinline disableremoteplayback preload="none" aria-hidden="true"
-             data-p="/storage/why/film/b-p.mp4" data-d="/storage/why/film/b-d.mp4" data-ends="2.5,5.75,8.5,11.25,15"></video>
+             data-p="{{ $film('b-p.mp4') }}" data-d="{{ $film('b-d.mp4') }}" data-ends="2.5,5.75,8.5,11.25,15"></video>
       <canvas class="wy-canvas" aria-hidden="true"></canvas>
       <div class="wy-shade" aria-hidden="true"></div>
       <div class="wy-veil" aria-hidden="true"></div>

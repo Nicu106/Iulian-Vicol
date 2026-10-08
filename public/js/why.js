@@ -21,7 +21,11 @@
    from 106% to 100% across its scene, the welcome photograph opens. The words
    and the shade under them move on time, on the same curve: a line rises
    0.32em and sharpens from a 6px blur in 0.7 s, leaves in 0.45 s. The
-   opening fades up from night, its words land, and only then does film A play.
+   opening fades up from night inside a 2.39 scope frame, the title settles in
+   the black beneath it (its tracking closes to its own; no rise), and the
+   frame opens (.wy-open, CSS) as film A's first chapter rolls. Film A's
+   chapters end on held frames the encode ramps down into, so a pause a few
+   frames late still holds the same picture.
    The loop runs only while something moves.
    Without IntersectionObserver, or with reduced motion, nothing runs and the
    CSS shows the plain page (html:not(.wy-on)). */
@@ -40,7 +44,11 @@
   var DIP_IN = 0.8, DIP_OUT = 0.6;             // screens: a film rises from / dissolves to the page
   var ENTER = 0.15;                            // screens before its top a film starts its first chapter
   var XF = 0.32;                               // s: the dissolve between chapters
-  var INTRO = [0.9, 0.45, 0.75];               // s: night fades; first line starts; takes
+  var INTRO = [0.9, 0.45, 1.05];               // s: night fades; first line starts; the film rolls after
+  // the title (film A's h1) settles like a film's main title: it arrives in its
+  // place and its tracking closes from +.02em to its own -.04em, in focus, with no
+  // rise; slower than a line (T_TITLE). Never if the wider tracking would re-wrap a line.
+  var T_TITLE = 1.3, TRACK = 0.06, T_STAG_T = 0.18;
 
   var E = function (t) { t = t < 0 ? 0 : t > 1 ? 1 : t; return t * t * (3 - 2 * t); };
   var clamp = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
@@ -61,7 +69,7 @@
     im.addEventListener('error', introStart);
     setTimeout(introStart, 1200);
   })();
-  var introEnd = INTRO[1] + INTRO[2] + T_STAG;
+  var introEnd = INTRO[1] + T_TITLE + T_STAG_T;
   var vh = window.innerHeight;
 
   // a value that eases on time towards whatever it is told
@@ -86,6 +94,7 @@
         var lines = whole ? [b] : Array.prototype.slice.call(b.querySelectorAll('.wy-l'));
         return { el: b, a: parseFloat(b.getAttribute('data-in')), z: parseFloat(b.getAttribute('data-out')),
                  act: b.classList.contains('wy-beat--act'), lines: lines, sty: [],
+                 title: si === 0 && b.classList.contains('wy-beat--open'),
                  tin: lines.map(function () { return tween(0); }), tout: tween(0) };
       })
     };
@@ -123,6 +132,16 @@
     st.stop = until;
     if (v.currentTime >= until - 0.004) { return; }
     st.playing = true;
+    // the stop is kept by a timer too, not only by the frame loop: a busy page
+    // (or a slow phone) can starve requestAnimationFrame and the film ran on
+    // 0.6 s into the next move before the loop saw it (measured)
+    clearTimeout(st.stopT);
+    (function hold() {
+      if (st.stop !== until) return;
+      var left = until - v.currentTime;
+      if (left <= 0.02) { if (!v.paused) v.pause(); return; }
+      st.stopT = setTimeout(hold, Math.max(8, left * 1000 / (v.playbackRate || 1) - 12));
+    })();
     var p = v.play();
     if (p && p.catch) p.catch(function () {
       // no playing allowed: dissolve to the chapter's held frame instead
@@ -225,6 +244,16 @@
     });
     var lead = Math.round(S[0].top) + 'px';    // the opening words sit above the header's height
     if (lead !== S[0].lead) { S[0].lead = lead; S[0].el.style.setProperty('--wy-lead', lead); }
+    // the opening's scope frame sits above the title: its lower edge clears the
+    // h1 by 12px (shifted up only where a centred band would cross it)
+    var st0 = S[0], h1 = st0.first && !st0.open && st0.beats[0] && st0.beats[0].el;
+    if (h1) {
+      var stage = st0.el.querySelector('.wy-stage').getBoundingClientRect(), H = stage.height,
+          band = Math.min(H, window.innerWidth / 2.39), room = h1.getBoundingClientRect().top - stage.top - 12,
+          shift = Math.max(0, Math.min((H - band) / 2, (H + band) / 2 - room));
+      var sh = Math.round(shift) + 'px';
+      if (sh !== st0.shift) { st0.shift = sh; st0.el.style.setProperty('--wy-band-shift', sh); }
+    }
   }
   function follow(cur, to, dt) {
     var d = to - cur, r = d / (LAG * vh);
@@ -235,12 +264,28 @@
     if (st.sv[key] === v) return; st.sv[key] = v;
     if (k.charAt(0) === '-') el.style.setProperty(k, v); else el.style[k] = v;
   }
+  // would the title's wider tracking re-wrap any of its lines? (measured, per width)
+  var trackOk = null, trackW = -1;
+  function canTrack(b) {
+    if (trackW === window.innerWidth && trackOk !== null) return trackOk;
+    trackW = window.innerWidth; trackOk = true;
+    b.lines.forEach(function (el) {
+      var keep = el.style.letterSpacing, h0;
+      el.style.letterSpacing = ''; h0 = el.getBoundingClientRect().height;
+      el.style.letterSpacing = (-0.04 + TRACK) + 'em';
+      if (el.getBoundingClientRect().height > h0 + 1) trackOk = false;
+      el.style.letterSpacing = keep;
+    });
+    return trackOk;
+  }
   function setLine(b, j, op, i, o) {
-    var ty = (1 - i) * RISE - o * LIFT, bl = (1 - i) * BLUR;
-    var s = op.toFixed(3) + '|' + ty.toFixed(3) + '|' + bl.toFixed(1);
+    var tr = b.title && canTrack(b) ? (1 - i) * TRACK : 0;
+    var ty = (b.title ? 0 : (1 - i) * RISE) - o * LIFT, bl = (1 - i) * BLUR;
+    var s = op.toFixed(3) + '|' + ty.toFixed(3) + '|' + bl.toFixed(1) + '|' + tr.toFixed(4);
     if (b.sty[j] === s) return;
     b.sty[j] = s;
     var el = b.lines[j];
+    if (b.title) el.style.letterSpacing = tr ? (-0.04 + tr).toFixed(4) + 'em' : '';
     el.style.opacity = op.toFixed(3);
     el.style.transform = ty ? 'translate3d(0,' + ty.toFixed(3) + 'em,0)' : 'none';
     el.style.filter = bl >= 0.1 ? 'blur(' + bl.toFixed(1) + 'px)' : 'none';
@@ -252,6 +297,8 @@
       if (!st.near) return;
       var p = clamp((x - st.top) / st.run);
       if (st.v) steer(st, p);
+      // the opening's scope frame opens as the camera starts to move (CSS transition)
+      if (st.first && !st.open && st.cur >= 0) { st.open = true; st.el.classList.add('wy-open'); }
       // which lines are on: a film's line is its chapter's; a still's by scroll
       var on = st.v ? st.cur : -1;
       // all of a film's lines share one place: one that arrives while another is
@@ -269,8 +316,8 @@
         if (st.v && on < 0 && bi === 0 && !st.first) show = false;
         var gone = st.v ? (on > bi && bi !== st.beats.length - 1) : false;
         b.tin.forEach(function (tw, j) {
-          aim(tw, show || gone ? 1 : 0, (show || gone) ? T_IN : T_OUT);
-          if (tw.to === 1 && tw.from === 0 && tw.at === now) tw.at = now + (j * T_STAG + (show && st.v ? wait : 0)) * 1000;
+          aim(tw, show || gone ? 1 : 0, (show || gone) ? (b.title ? T_TITLE : T_IN) : T_OUT);
+          if (tw.to === 1 && tw.from === 0 && tw.at === now) tw.at = now + (j * (b.title ? T_STAG_T : T_STAG) + (show && st.v ? wait : 0)) * 1000;
         });
         aim(b.tout, gone ? 1 : 0, T_OUT);
         // back to an earlier line: it waits for the later one to leave, too

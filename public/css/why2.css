@@ -193,3 +193,21 @@ html:not(.wy-on) .wy-still--welcome .wy-photo{ clip-path:none; }
    words, not stretched to the tallest (a 3:4 photo beside a .65 one left 140px of
    empty card) */
 @media (max-width:899px){ .wy-say__l{ align-items:start; } }
+
+/* ---- the opening (2026-10-08) --------------------------------------------------
+   Film A opens like a film: its first frame fades up from night inside a scope
+   frame — 2.39:1 — with the title in the black beneath it, and the frame opens
+   to the whole screen as the camera starts to move (why.js adds .wy-open when
+   the first chapter rolls). Two night bars, each a whole screen tall, moved by
+   transform only on the site's own curve; why.js lifts the band
+   (--wy-band-shift) just enough that it never crosses the title. The grade is
+   near-black at the top, so the upper edge melts into the picture.
+   Without .wy-on (no JS, reduced motion) there are no bars. */
+.wy-bar{ display:none; }
+.wy-on .wy-film--a .wy-bar{ display:block; position:absolute; left:0; right:0; top:0; height:100%; background:#05080F;
+  pointer-events:none; will-change:transform; transition:transform calc(var(--m-reveal) * 4) var(--e-out); }
+.wy-film--a{ --wy-band: min(100svh, calc(100vw / 2.39)); }
+.wy-on .wy-film--a .wy-bar--t{ transform:translate3d(0, calc(-50% - var(--wy-band) / 2 - var(--wy-band-shift, 0px)), 0); }
+.wy-on .wy-film--a .wy-bar--b{ transform:translate3d(0, calc(50% + var(--wy-band) / 2 - var(--wy-band-shift, 0px)), 0); }
+.wy-on .wy-film--a.wy-open .wy-bar--t{ transform:translate3d(0, -100%, 0); }
+.wy-on .wy-film--a.wy-open .wy-bar--b{ transform:translate3d(0, 100%, 0); }
