@@ -211,3 +211,34 @@ html:not(.wy-on) .wy-still--welcome .wy-photo{ clip-path:none; }
 .wy-on .wy-film--a .wy-bar--b{ transform:translate3d(0, calc(50% + var(--wy-band) / 2 - var(--wy-band-shift, 0px)), 0); }
 .wy-on .wy-film--a.wy-open .wy-bar--t{ transform:translate3d(0, -100%, 0); }
 .wy-on .wy-film--a.wy-open .wy-bar--b{ transform:translate3d(0, 100%, 0); }
+
+/* ---- the keys (2026-10-08) ------------------------------------------------------
+   The last still is his own photograph with three BMWs in Málaga. Its words used
+   to lie on the welcome photo itself and, on wide screens, landed on his black
+   jumper (the client: "black, not clear"). Now set like the portrait, mirrored:
+   phone = words on white above, photograph below; wide = photograph left,
+   words right. Ink on white everywhere: nothing to measure against a picture. */
+.wy-still--keys .wy-stage{ display:grid; grid-template-rows:auto minmax(0,1fr); }
+.wy-still--keys .wy-copy{ position:relative; inset:auto; order:-1; align-content:start;
+  padding:calc(var(--mc-head-h, 56px) + 1.5rem) var(--mc-gutter-m) 1.5rem; gap:1rem; }
+.wy-still--keys .wy-beat{ grid-area:auto; }
+.wy-still--keys .wy-beat--line{ font-size:clamp(2rem, 9vw, 4.6rem); max-width:14ch; }
+.wy-still--keys .wy-photo > img{ object-position:74% 62%; transform-origin:74% 55%; }
+@media (min-aspect-ratio: 1/1) and (min-width: 900px){
+  .wy-still--keys .wy-stage{ grid-template-rows:none; grid-template-columns:minmax(0,56fr) minmax(0,44fr); }
+  .wy-still--keys .wy-copy{ order:2; align-content:center;
+    padding:var(--mc-head-h, 56px) max(var(--mc-gutter-d), calc((100vw - 1280px) / 2)) 0 var(--s-7); }
+  .wy-still--keys .wy-photo{ order:1; }
+  .wy-still--keys .wy-photo > img{ object-position:62% 60%; }
+  .wy-still--keys .wy-beat--line{ font-size:clamp(2.6rem, 4.2vw, 4.8rem); }
+  .wy-still--keys .wy-beat--sub{ font-size:clamp(1.1rem, 1.4vw, 1.4rem); max-width:34ch; }
+}
+@media (min-aspect-ratio: 1/1) and (max-height: 500px){
+  .wy-still--keys .wy-stage{ grid-template-rows:none; grid-template-columns:minmax(0,52fr) minmax(0,48fr); }
+  .wy-still--keys .wy-copy{ order:2; align-content:center; padding:1rem max(var(--mc-gutter-m), env(safe-area-inset-right)) 1rem 1.25rem; gap:.6rem; }
+  .wy-still--keys .wy-beat--line{ font-size:clamp(1.6rem, 6vh + .8rem, 2.6rem); }
+  .wy-still--keys .wy-beat--sub{ font-size:.95rem; }
+}
+html:not(.wy-on) .wy-still--keys .wy-stage{ display:block; }
+html:not(.wy-on) .wy-still--keys .wy-photo{ aspect-ratio:3 / 2; }
+html:not(.wy-on) .wy-still--keys .wy-copy{ background:var(--mc-surface); }

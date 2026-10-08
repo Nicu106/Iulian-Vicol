@@ -2,7 +2,7 @@
 
 @section('title', '¿Por qué IV MOTORCLASS? — Coches alemanes en Málaga')
 @section('description', 'Seleccionados, revisados y preparados. Te contesto yo, te lo enseño antes de que vengas y te lo llevas a tu nombre en 30 minutos.')
-@section('og_image', url(\App\Support\Img::url('/storage/why/welcome.jpg', 1600) ?? '/storage/why/welcome.jpg'))
+@section('og_image', url(\App\Support\Img::url('/storage/why/keys.jpg', 1200) ?? '/storage/why/keys.jpg'))
 @section('current', 'porque')
 
 @php
@@ -81,6 +81,13 @@
      down to slate where it is bright and high, a graduated ND from the top,
      deep blacks, lit paint. Film B keeps its daylight (it shows what you will
      find) in the same family: greens quieted, the same ND, lighter.
+     CLIENT PASS (2026-10-08, evening). Film B re-encoded at 30 fps, capped at
+     1.6 / 3 Mb/s (12 MB → 5.7 MB desk; it stalled on his connection) and
+     fetched as soon as film A can play through; words arrive sharp (no blur).
+     The 4th scene is now his photo with three BMWs (keys.jpg), set like the
+     portrait mirrored — words in ink on white, never on the picture (on the
+     old welcome photo they fell on his black jumper). The record: +9 años de
+     experiencia, 600.000 reproducciones, 1.200 km — his figures.
      HIS WORDS (2026-10-08). Between the scenes, Iulian's own text, whole and
      unedited, set as reading (.wy-txt, why-text.css): the heading on the left
      and the paragraphs on the right from 900 px, stacked on phones; each
@@ -208,13 +215,13 @@
   </section>
 
   {{-- ---- 4 · welcome ------------------------------------------------------- --}}
-  <section class="wy-still wy-still--welcome" data-scene="still" aria-labelledby="wy-keys">
+  <section class="wy-still wy-still--keys" data-scene="still" aria-labelledby="wy-keys">
     <div class="wy-stage">
       <div class="wy-photo">
-        <x-img src="/storage/why/welcome-graded.jpg" alt="Iulian delante de cuatro coches preparados para entregar"
-               sizes="(max-aspect-ratio: 4/3) 134vh, 100vw" :max="2000" :fallback="1080" />
+        <x-img src="/storage/why/keys.jpg" alt="Iulian junto a tres BMW preparados para entregar, en Málaga"
+               sizes="(min-aspect-ratio: 1/1) 56vw, 110vh" :max="1500" :fallback="1080" />
       </div>
-      <div class="wy-copy wy-copy--wall">
+      <div class="wy-copy wy-copy--ink">
         <h2 class="wy-beat wy-beat--line" id="wy-keys" data-in=".3" data-out="2">
           <span class="wy-l">Las llaves son tuyas.</span>
           <span class="wy-l">Mi teléfono sigue disponible.</span>
@@ -243,8 +250,7 @@
   {{-- ---- the record ------------------------------------------------------- --}}
   <section class="wy-proof" aria-label="En cifras">
     <ul class="wy-proof__l cat-wrap">
-      <li><b data-count="{{ $sold }}">{{ $n($sold) }}</b><span>coches entregados</span></li>
-      <li><b data-count="{{ $reviewCount }}">{{ $n($reviewCount) }}</b><span>clientes en la foto de la entrega</span></li>
+      <li><b data-count="{{ $years }}" data-prefix="+">+{{ $years }}</b><span>años de experiencia</span></li>
       <li><b data-count="{{ $plays }}">{{ $n($plays) }}</b><span>reproducciones de nuestros vídeos</span></li>
       <li><b data-count="{{ $farthest }}">{{ $n($farthest) }}</b><span>kilómetros hizo un cliente para comprar aquí</span></li>
     </ul>

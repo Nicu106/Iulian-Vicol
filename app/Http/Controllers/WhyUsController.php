@@ -26,7 +26,8 @@ class WhyUsController extends Controller
             'sold'        => Vehicle::where('status', 'sold')->count(),
             'reviewCount' => Testimonial::where('is_active', true)->whereNotNull('image_path')->count(),
             'plays'       => 600000,
-            'farthest'    => 720,    // km — Pablo, from Valladolid (/contacto, "A 720 km de aquí")
+            'years'       => 9,      // "+9 años de experiencia" — the client, 2026-10-08
+            'farthest'    => 1200,   // km — the client, 2026-10-08 (was 720, Pablo from Valladolid)
             'reviews'     => $reviews,
         ]);
     }

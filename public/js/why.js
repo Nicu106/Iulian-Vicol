@@ -39,7 +39,9 @@
 
   var TAU = 0.11, LAG = 0.35;                  // the follow: s per stage; screens before it tightens
   var T_IN = 0.7, T_OUT = 0.45, T_STAG = 0.12; // s: a line arrives, leaves; the next line after
-  var RISE = 0.32, LIFT = 0.22, BLUR = 6;      // em up on arrival, em up on leaving, px of blur arriving
+  // no blur on arrival (2026-10-08: on the client's laptop, with the film still
+  // buffering, the blurred words read as a smudge — words arrive sharp)
+  var RISE = 0.32, LIFT = 0.22, BLUR = 0;      // em up on arrival, em up on leaving, px of blur arriving
   var PUSH = 0.06;                             // every picture eases from 106% to 100% across its scene
   var DIP_IN = 0.8, DIP_OUT = 0.6;             // screens: a film rises from / dissolves to the page
   var ENTER = 0.15;                            // screens before its top a film starts its first chapter
@@ -233,6 +235,14 @@
     kick();
   }, { rootMargin: '150% 0px 150% 0px' });
   scenes.forEach(function (s) { io.observe(s); });
+  // the next film is fetched as soon as the one before it can play through, not
+  // a screen and a half before it is needed: on a slow connection film B was
+  // still buffering when its chapters began (the client saw it stall)
+  films.forEach(function (st, k) {
+    var next = films[k + 1];
+    if (!next) return;
+    st.v.addEventListener('canplaythrough', function () { load(next); }, { once: true });
+  });
 
   // ---- one smoothed scroll position --------------------------------------------
   var x = window.pageYOffset, y = x, last = now, running = false, lastScroll = 0;

@@ -19,7 +19,7 @@
     // a fresh node, so nothing else that held the old one can write into it
     var b = old.cloneNode(false);
     // from the value, not the text: an older script may have reset the text
-    var text = String(+old.getAttribute('data-count') || 0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    var text = (old.getAttribute('data-prefix') || '') + String(+old.getAttribute('data-count') || 0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     b.removeAttribute('data-count');
     var sr = document.createElement('span'); sr.className = 'wy-odo__sr'; sr.textContent = text;
     var odo = document.createElement('span'); odo.className = 'wy-odo'; odo.setAttribute('aria-hidden', 'true');

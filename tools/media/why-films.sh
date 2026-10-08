@@ -14,7 +14,8 @@
 # is bright and high, a graduated ND from the top, deep blacks, lit paint, and the
 # vignette that carries the words. Its chapter ends: 2.2,4.8,7.6,10.6,13.8.
 #
-# Film B: twice the speed at 60 fps (every second source frame), a centre crop
+# Film B: twice the speed at 30 fps (2026-10-08: at 60 fps and 6.6 Mb/s it
+# stalled on the client's connection; now capped at 1.6 / 3 Mb/s), a centre crop
 # for phones, the same grade family made lighter — it shows what you will find,
 # so nothing is hidden: greens quieted as in A, a graduated ND from the top
 # (50% at the top edge) baked into its vignette, which is deepest where the words
@@ -46,15 +47,15 @@ mask() { # size strength-of-bottom strength-of-left out — times the graduated 
   ffmpeg -v error -y -f lavfi -i color=black:s=$1 -frames:v 1 -vf "format=gray,geq=lum='$e'" "$4"
 }
 mask 608x1080 0.3 0 $TMP/bp.png; mask 1600x900 0.3 0.4 $TMP/bd.png
-one() { # src seconds geometry grade mask crf keys out
+one() { # src seconds geometry grade mask crf keys out maxrate
   ffmpeg -v error -y -t $2 -i "$1" -loop 1 -i "$5" -an -filter_complex \
-    "[0]setpts=PTS/2,fps=60,$3:$C,format=gbrp,$4[v];[1]format=gbrp[m];[v][m]blend=all_mode=multiply:shortest=1,$SH" \
-    -c:v libx264 -profile:v high -preset slow -tune film -crf $6 -g 120 -keyint_min 60 -bf 2 -force_key_frames "$7" \
+    "[0]setpts=PTS/2,fps=30,$3:$C,format=gbrp,$4[v];[1]format=gbrp[m];[v][m]blend=all_mode=multiply:shortest=1,$SH" \
+    -c:v libx264 -profile:v high -preset slow -tune film -crf $6 -maxrate $9 -bufsize $9 -g 60 -keyint_min 30 -bf 2 -force_key_frames "$7" \
     -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 -movflags +faststart "$8"
 }
 PH="crop=608:1080:656:0,scale=608:1080"; DH="scale=1600:900:flags=lanczos"
 KB="2.5,5.75,8.5,11.25"
-one "$B" 30 "$PH" "$GB" $TMP/bp.png 22 $KB "$OUT/b-p.mp4" & one "$B" 30 "$DH" "$GB" $TMP/bd.png 24 $KB "$OUT/b-d.mp4" & wait
+one "$B" 30 "$PH" "$GB" $TMP/bp.png 23 $KB "$OUT/b-p.mp4" 1600k & one "$B" 30 "$DH" "$GB" $TMP/bd.png 24 $KB "$OUT/b-d.mp4" 3000k & wait
 fi
 
 # posters: the first frame of each, the same picture the film starts on

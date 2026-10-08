@@ -31,3 +31,9 @@
 .wy-odo__s{ flex:none; }
 .wy-proof__l b{ font-size:clamp(2rem, 9.4vw, 4rem); font-variant-numeric:proportional-nums; }
 @media (min-width:900px){ .wy-proof__l b{ font-size:min(4rem, 4.2vw); } }
+
+/* three figures since 2026-10-08 (+9 años, 600.000, 1.200 km): one column on a
+   phone, each number with its words beside nothing else; three across from 900 */
+.wy-proof__l{ grid-template-columns:minmax(0,1fr); }
+@media (min-width:600px){ .wy-proof__l{ grid-template-columns:repeat(3, minmax(0,1fr)); } }
+@media (min-width:600px) and (max-width:899px){ .wy-proof__l b{ font-size:6vw; } }
