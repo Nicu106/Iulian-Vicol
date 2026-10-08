@@ -1,0 +1,21 @@
+/* /por-que-nosotros — one night, from the first frame to the record (2026-10-08).
+   The story used to cut from a dark film to a white page and back at every
+   scene: six changes of light in one scroll, and his words read as a separate,
+   smaller page. Now films, his photographs, his text and the record share the
+   films' own black, and the page dips to black between scenes instead of to
+   white (why.js dips to var(--mc-surface): redefined here). The reviews and
+   the navy end stay as on the rest of the site: daylight after the story.
+   Only the tokens change; every rule of why2/why-text/why-odo reads them. */
+.wy-film, .wy-still, .wy-txt, .wy-proof{
+  --mc-surface:#05080F; --mc-band:#0B1322;
+  --mc-ink:#FFFFFF; --mc-ink-2:#A9B5C6; --mc-ink-3:#8D9AAE;
+  background:#05080F; color:#FFFFFF;
+}
+.wy-proof{ background:#05080F; border-top:1px solid rgba(255,255,255,.08); }
+.wy-txt :focus-visible, .wy-still :focus-visible{ outline-color:#FFFFFF; }
+/* the plain version (no JS, reduced motion) wears the same night */
+html:not(.wy-on) .wy-copy--ink, html:not(.wy-on) .wy-copy--wall,
+html:not(.wy-on) .wy-still--keys .wy-copy{ background:#05080F; }
+/* the reading on black wants a touch more air and size */
+.wy-txt__b p{ line-height:1.75; }
+@media (min-width:900px){ .wy-txt__b p{ font-size:1.25rem; } .wy-txt__b{ max-width:40rem; } }

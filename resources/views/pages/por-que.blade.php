@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="{{ asset('css/why2.css') }}">
 <link rel="stylesheet" href="{{ asset('css/why-odo.css') }}">
 <link rel="stylesheet" href="{{ asset('css/why-text.css') }}">
+<link rel="stylesheet" href="{{ asset('css/why-dark.css') }}">
 @endpush
 
 @push('head')
@@ -81,6 +82,10 @@
      down to slate where it is bright and high, a graduated ND from the top,
      deep blacks, lit paint. Film B keeps its daylight (it shows what you will
      find) in the same family: greens quieted, the same ND, lighter.
+     ONE NIGHT (2026-10-08, late). The story — films, his photographs, his
+     text, the record — shares the films' black (why-dark.css: tokens only),
+     and dips to black between scenes: it used to cut to white six times.
+     Reviews and the navy end stay daylight, as on the rest of the site.
      CLIENT PASS (2026-10-08, evening). Film B re-encoded at 30 fps, capped at
      1.6 / 3 Mb/s (12 MB → 5.7 MB desk; it stalled on his connection) and
      fetched as soon as film A can play through; words arrive sharp (no blur).
@@ -222,11 +227,11 @@
                sizes="(min-aspect-ratio: 1/1) 56vw, 110vh" :max="1500" :fallback="1080" />
       </div>
       <div class="wy-copy wy-copy--ink">
-        <h2 class="wy-beat wy-beat--line" id="wy-keys" data-in=".3" data-out="2">
+        <h2 class="wy-beat wy-beat--line" id="wy-keys" data-in=".04" data-out="2">
           <span class="wy-l">Las llaves son tuyas.</span>
           <span class="wy-l">Mi teléfono sigue disponible.</span>
         </h2>
-        <p class="wy-beat wy-beat--sub" data-in=".46" data-out="2">
+        <p class="wy-beat wy-beat--sub" data-in=".16" data-out="2">
           <span class="wy-l">En 30 minutos, a tu nombre y con el seguro en vigor.</span>
           <span class="wy-l">Y después de la compra, me sigues teniendo al teléfono.</span>
         </p>
