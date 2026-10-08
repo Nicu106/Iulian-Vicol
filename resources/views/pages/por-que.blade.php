@@ -15,6 +15,7 @@
 @push('css')
 <link rel="stylesheet" href="{{ asset('css/why2.css') }}">
 <link rel="stylesheet" href="{{ asset('css/why-odo.css') }}">
+<link rel="stylesheet" href="{{ asset('css/why-text.css') }}">
 @endpush
 
 @push('head')
@@ -80,6 +81,12 @@
      down to slate where it is bright and high, a graduated ND from the top,
      deep blacks, lit paint. Film B keeps its daylight (it shows what you will
      find) in the same family: greens quieted, the same ND, lighter.
+     HIS WORDS (2026-10-08). Between the scenes, Iulian's own text, whole and
+     unedited, set as reading (.wy-txt, why-text.css): the heading on the left
+     and the paragraphs on the right from 900 px, stacked on phones; each
+     closing line in ink, the rest in the body grey. The portrait carries his
+     heading ("Una pasión personal…") and "Hablar con Iulian"; his closing
+     ("Hay coches…", the signature, the two buttons) is the navy end.
      Without JavaScript, or with reduced motion: a normal page — the first
      frames as still pictures, the words beneath them (html:not(.wy-on)).
      ========================================================================== --}}
@@ -117,25 +124,44 @@
     </div>
   </section>
 
+  {{-- ---- his words, I --------------------------------------------------------- --}}
+  <section class="wy-txt" aria-labelledby="wy-t1">
+    <div class="cat-wrap wy-txt__in">
+      <h2 class="wy-txt__h" id="wy-t1"><span>Que te enamore el coche.</span> <span>Que te dé confianza su historia.</span></h2>
+      <div class="wy-txt__b">
+        <p>Hay algo especial en encontrar el coche que encaja contigo. La motorización que querías. El color que te hace volver a mirarlo. Ese equipamiento al que no quieres renunciar.</p>
+        <p>Y, junto a esa ilusión, hay preguntas que merecen una respuesta clara: ¿cómo lo han cuidado?, ¿qué sabemos de sus kilómetros?, ¿ha tenido algún accidente?, ¿quién me atenderá después?</p>
+        <p class="wy-txt__k">En IV Motorclass, nuestra forma de trabajar empieza precisamente ahí.</p>
+      </div>
+    </div>
+  </section>
+
   {{-- ---- 2 · portrait ------------------------------------------------------ --}}
   <section class="wy-still wy-still--portrait" data-scene="still" aria-labelledby="wy-me">
     <div class="wy-stage">
       <div class="wy-photo">
-        <x-img src="/storage/why/portrait.jpg" alt="El director de IV Motorclass con dos Mercedes-Benz descapotables"
+        <x-img src="/storage/why/portrait.jpg" alt="Iulian, fundador de IV Motorclass, con dos Mercedes-Benz descapotables"
                sizes="(min-aspect-ratio: 1/1) 134vh, 86vh" :max="2000" :fallback="1080" />
       </div>
       <div class="wy-copy wy-copy--ink">
         <h2 class="wy-beat wy-beat--line" id="wy-me" data-in=".04" data-out="2">
-          <span class="wy-l">Soy el director</span>
-          <span class="wy-l">de IV Motorclass.</span>
+          <span class="wy-l">Una pasión personal.</span>
+          <span class="wy-l">Un compromiso contigo.</span>
         </h2>
-        <p class="wy-beat wy-beat--sub" data-in=".2" data-out="2">
-          <span class="wy-l">Te contesto yo y te acompaño durante toda la compra,</span>
-          <span class="wy-l">sin pasarte de una persona a otra.</span>
-        </p>
         <p class="wy-beat wy-beat--act" data-in=".34" data-out="2">
-          <a class="mc-btn mc-btn--cta" href="{{ $wa('Hola, me interesa un coche. ¿Hablamos?') }}">Hablemos por WhatsApp</a>
+          <a class="mc-btn mc-btn--cta" href="{{ $wa('Hola Iulian, me interesa un coche. ¿Hablamos?') }}">Hablar con Iulian</a>
         </p>
+      </div>
+    </div>
+  </section>
+
+  {{-- ---- his words, II -------------------------------------------------------- --}}
+  <section class="wy-txt wy-txt--me" aria-label="Iulian, fundador de IV Motorclass">
+    <div class="cat-wrap wy-txt__in">
+      <div class="wy-txt__b">
+        <p class="wy-txt__lead">Soy Iulian, fundador de IV Motorclass. Desde pequeño me han apasionado los coches alemanes. Podía pasar horas fijándome en sus formas, sus interiores y los detalles que hacían especial una versión.</p>
+        <p>Esa misma curiosidad me lleva hoy a buscar unidades con personalidad: coches que apetece conducir, conservar y disfrutar. Pero convertir una pasión en un negocio implica algo más: asumir la responsabilidad de lo que eliges y de lo que vendes.</p>
+        <p class="wy-txt__lead">Por eso me implico personalmente en la selección. Detrás de cada coche que ofrecemos está mi nombre y una relación de confianza que quiero mantener mucho después de la entrega.</p>
       </div>
     </div>
   </section>
@@ -168,11 +194,24 @@
     </div>
   </section>
 
+  {{-- ---- his words, III ------------------------------------------------------- --}}
+  <section class="wy-txt" aria-labelledby="wy-t3">
+    <div class="cat-wrap wy-txt__in">
+      <h2 class="wy-txt__h" id="wy-t3">Lo que tú no ves a primera vista también importa.</h2>
+      <div class="wy-txt__b">
+        <p>Una buena configuración llama la atención. Un historial claro, un mantenimiento documentado y un estado cuidado son lo que nos da motivos para elegirla.</p>
+        <p>Buscamos coches honestos: kilometraje respaldado por documentación, sin antecedentes de accidentes y con señales de haber recibido el cuidado que merecen. Priorizamos las unidades que conservan su pintura original y revisamos su estado más allá de las fotografías.</p>
+        <p>Antes de entregarte el coche, lo revisamos, atendemos las necesidades detectadas y te explicamos su historial y condición. Si hay un detalle relevante para tu decisión, queremos que lo conozcas antes de tomarla.</p>
+        <p class="wy-txt__k">Porque saber exactamente qué estás comprando también forma parte de disfrutarlo.</p>
+      </div>
+    </div>
+  </section>
+
   {{-- ---- 4 · welcome ------------------------------------------------------- --}}
   <section class="wy-still wy-still--welcome" data-scene="still" aria-labelledby="wy-keys">
     <div class="wy-stage">
       <div class="wy-photo">
-        <x-img src="/storage/why/welcome-graded.jpg" alt="El director de IV Motorclass delante de cuatro coches preparados para entregar"
+        <x-img src="/storage/why/welcome-graded.jpg" alt="Iulian delante de cuatro coches preparados para entregar"
                sizes="(max-aspect-ratio: 4/3) 134vh, 100vw" :max="2000" :fallback="1080" />
       </div>
       <div class="wy-copy wy-copy--wall">
@@ -184,6 +223,19 @@
           <span class="wy-l">En 30 minutos, a tu nombre y con el seguro en vigor.</span>
           <span class="wy-l">Y después de la compra, me sigues teniendo al teléfono.</span>
         </p>
+      </div>
+    </div>
+  </section>
+
+  {{-- ---- his words, IV -------------------------------------------------------- --}}
+  <section class="wy-txt" aria-labelledby="wy-t4">
+    <div class="cat-wrap wy-txt__in">
+      <h2 class="wy-txt__h" id="wy-t4">La confianza se demuestra después de la entrega.</h2>
+      <div class="wy-txt__b">
+        <p class="wy-txt__lead">Cuando te llevas las llaves, nuestro compromiso continúa.</p>
+        <p>Trabajamos con empresas especializadas para ofrecer una garantía de cobertura nacional que proteja los principales componentes del vehículo, según las condiciones contratadas. Antes de decidir, te explicamos qué incluye y cómo utilizarla.</p>
+        <p>Si surge una incidencia, tienes a quién llamar. Te escuchamos, revisamos contigo lo ocurrido y nos implicamos en su gestión, manteniéndote informado de los siguientes pasos.</p>
+        <p class="wy-txt__k">Así entendemos el trato personal: conocerte cuando buscas un coche y seguir respondiendo cuando ya es tuyo.</p>
       </div>
     </div>
   </section>
@@ -224,12 +276,14 @@
   {{-- ---- the way in -------------------------------------------------------- --}}
   <section class="wy-end">
     <div class="cat-wrap wy-end__in">
-      <h2 class="wy-end__h">¿Hablamos de tu próximo coche?</h2>
-      <p class="wy-end__p">Cuéntame qué buscas. Si no lo tengo ahora, te lo busco.</p>
+      <h2 class="wy-end__h">Hay coches que llevas tiempo imaginando.</h2>
+      <p class="wy-end__p">Puede ser tu primer BMW, un cabrio para disfrutar de la costa o esa versión concreta que rara vez aparece. Queremos ayudarte a encontrar una unidad que reúna la ilusión de tenerla y la tranquilidad de haber elegido bien.</p>
+      <p class="wy-end__p">Descubre nuestra selección o cuéntanos qué coche tienes en mente.</p>
       <div class="wy-end__act">
-        <a class="mc-btn mc-btn--cta" href="{{ $wa('Hola, quiero hablar de mi próximo coche.') }}">Escríbeme por WhatsApp</a>
-        <a class="mc-btn wy-end__ghost" href="/catalogo">Ver los coches</a>
+        <a class="mc-btn wy-end__ghost" href="/catalogo">Ver coches disponibles</a>
+        <a class="mc-btn mc-btn--cta" href="{{ $wa('Hola Iulian, quiero hablar de mi próximo coche.') }}">Hablar con Iulian</a>
       </div>
+      <p class="wy-end__sign"><b>IV Motorclass</b> <span>Coches honestos. Personas que responden.</span></p>
     </div>
   </section>
 
@@ -240,4 +294,5 @@
 {{-- if it cannot load, the plain page (the class set in <head> comes off) --}}
 <script src="{{ asset('js/why.js') }}" defer onerror="document.documentElement.classList.remove('wy-on')"></script>
 <script src="{{ asset('js/why-odo.js') }}" defer></script>
+<script src="{{ asset('js/why-text.js') }}" defer></script>
 @endpush

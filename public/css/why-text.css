@@ -1,0 +1,38 @@
+/* /por-que-nosotros — Iulian's own text, set as reading between the scenes.
+   One measure for every block: a large tight heading like the page's other
+   headings (.wy-say__h), paragraphs at prose size in the body grey, the
+   block's last line in ink, a step larger: the sentence it all leads to.
+   Phones: stacked. From 900 px: heading left (it stays in view while its
+   paragraphs pass), paragraphs right. */
+.wy-txt{ background:var(--mc-surface, #FFFFFF); }
+.wy-txt__in{ display:grid; gap:var(--s-6); padding-block:var(--s-9); }
+.wy-txt__h{ margin:0; font-size:clamp(2.1rem, 8.4vw, 4rem); line-height:1.02; letter-spacing:-.035em; color:var(--mc-ink);
+  max-width:15ch; text-wrap:balance; }
+.wy-txt__h > span{ display:block; }
+.wy-txt__b{ max-width:36rem; }
+.wy-txt__b p{ margin:0 0 var(--s-5); font-size:var(--t-prose); line-height:1.7; color:var(--mc-ink-2); text-wrap:pretty; }
+.wy-txt__b p:last-child{ margin-bottom:0; }
+.wy-txt__b .wy-txt__lead{ color:var(--mc-ink); }
+.wy-txt__b .wy-txt__k{ margin-top:var(--s-6); font-size:clamp(1.25rem, 4.6vw, 1.6rem); line-height:1.35; letter-spacing:-.015em;
+  font-weight:600; color:var(--mc-ink); text-wrap:balance; }
+
+@media (min-width:900px){
+  .wy-txt__in{ grid-template-columns:minmax(0,5fr) minmax(0,7fr); gap:var(--s-8); align-items:start; padding-block:var(--s-10); }
+  .wy-txt__h{ position:sticky; top:calc(var(--mc-header-h, 72px) + var(--s-6)); font-size:clamp(2.6rem, 3.6vw, 4rem); }
+  .wy-txt--me .wy-txt__b{ grid-column:2; }
+  .wy-txt__b p{ font-size:1.1875rem; }
+}
+
+/* the end carries his closing: the paragraphs, then the signature */
+.wy-end__p + .wy-end__p{ margin-top:calc(-1 * var(--s-6) + var(--s-3)); }
+.wy-end__p{ max-width:38rem; line-height:1.6; }
+.wy-end__sign{ margin:var(--s-8) 0 0; padding-top:var(--s-5); border-top:1px solid rgba(255,255,255,.18);
+  display:flex; flex-wrap:wrap; gap:var(--s-1) var(--s-3); align-items:baseline; }
+.wy-end__sign b{ font-size:var(--t-h3); letter-spacing:.02em; color:#FFFFFF; }
+.wy-end__sign span{ font-size:var(--t-sub); color:var(--mc-on-navy-2); }
+
+/* the single reveal of the site, once, as the words come in (why-text.js) */
+.wy-txt-on .wy-txt [data-r]{ opacity:0; transform:translateY(1.25rem);
+  transition:opacity 700ms var(--e-out, ease) var(--d, 0ms), transform 700ms var(--e-out, ease) var(--d, 0ms); }
+.wy-txt-on .wy-txt [data-r].is-in{ opacity:1; transform:none; }
+.wy-end .wy-end__h{ margin-bottom:var(--s-5); }
