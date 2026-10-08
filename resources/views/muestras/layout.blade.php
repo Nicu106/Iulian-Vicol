@@ -1,7 +1,7 @@
 {{-- The showroom's own document: the site's head (fonts, tokens, the system's
      base and buttons) without the site's header and footer. A proposal is a
-     section of the home page; framed in the showroom it should show that
-     section and nothing around it. noindex, nofollow, no canonical. --}}
+     section of a page; framed in the showroom it shows that section and
+     nothing around it. noindex, nofollow, no canonical. --}}
 @php
   $v = fn ($p) => asset($p) . '?v=' . (@filemtime(public_path($p)) ?: 1);
 @endphp
@@ -12,25 +12,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>@yield('title')</title>
-<meta name="theme-color" content="#111C2E">
+<meta name="theme-color" content="@yield('theme', '#111C2E')">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="preload" href="/fonts/dm-sans/dm-sans-latin-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="{{ asset('css/fonts.css') }}">
 <link rel="stylesheet" href="{{ asset('css/mc-tokens.css') }}">
 <link rel="stylesheet" href="{{ asset('css/brandbook.css') }}">
 <link rel="stylesheet" href="{{ $v('css/muestras-opiniones.css') }}">
+@stack('head')
 {{-- "js" only while the scripts are healthy: an error anywhere takes it off
      again, and every proposal falls back to its readable, static form. --}}
 <script>
   (function (d) {
     d.classList.add('js');
-    /* Inside the showroom (?embed=1, framed by the same origin) the frame is as
-       tall as its content, so 100vh in here would be the whole proposal and
-       every height derived from it would feed back into the frame. The
-       screen's height comes from the page around the frame instead, and so
-       does how far down the frame the visible part starts. */
+    /* ?embed=1 — inside the showroom, in a frame as tall as its content: 100vh
+       in here would be the whole proposal and every height derived from it
+       would feed back into the frame. The screen's height comes from the page
+       around the frame instead, and so does how far down the frame the
+       visible part starts.
+       ?embed=2 — a pinned sequence, in a screen-tall frame that scrolls on its
+       own: here the frame IS the screen, nothing is borrowed. */
     try {
-      if (/[?&]embed=1/.test(location.search) && window.frameElement && window.parent.location.origin === location.origin) {
+      var m = /[?&]embed=(\d)/.exec(location.search);
+      if (m && m[1] === '2') d.classList.add('is-framed');
+      if (m && m[1] === '1' && window.frameElement && window.parent.location.origin === location.origin) {
         d.classList.add('is-embed');
         var P = window.parent, F = window.frameElement;
         var view = function () {

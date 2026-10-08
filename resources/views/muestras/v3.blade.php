@@ -1,36 +1,46 @@
 @extends('muestras.layout')
 @section('title', 'Opiniones · ' . $variant[0])
+@section('theme', '#FFFFFF')
+@section('body', 'ms-paper')
 @section('content')
-{{-- 3 · Carril. Cards in a row the thumb moves, as a phone's own apps do:
-     native scrolling, snapping card by card, the next one showing at the
-     edge so the row says it continues. The photograph sits in a box of the
-     library's most common shape, or 4:5 if that is taller, so a phone shows
-     the photograph and the words together; the rest sit whole on the band. Long words open in the viewer. --}}
-<main class="ms-sec ms-v3" aria-labelledby="h-op">
-  @include('muestras._head')
-  <div class="ms-rail" data-rail>
-    <ul class="ms-rail__list" role="list" tabindex="0" aria-label="Opiniones de clientes">
-      @foreach($reviews as $r)
-        <li class="ms-rail__i">
-          <figure class="ms-card">
-            @include('muestras._ph', ['r' => $r, 'box' => max($boxRatio, 0.8), 'sizes' => '(min-width:1000px) 340px, min(78vw, 340px)', 'max' => 1080])
-            <figcaption class="ms-card__txt">
-              @include('muestras._q', ['r' => $r, 'limit' => 120, 'key' => 'r', 'mode' => 'dialog'])
-              <p class="ms-by">{{ $r->caption }}</p>
-            </figcaption>
-          </figure>
-        </li>
+{{-- 3 · Sus palabras — the strongest phrase of a review, word for word
+     (ReviewShowroomController::PHRASES, each checked to be a verbatim part of
+     the review), set as large as the screen allows, lighting line by line
+     as the scroll moves through it — the way Apple sets a quotation: the
+     lines are there, pale, and the reading brings them up. Scrubbed, so
+     linear. Under it, small and whole, the customer's photograph, the name,
+     and the whole review a touch away.
+     On paper, not on the night: 1 and 2 already live on the black, and
+     type is the whole idea here — ink on white is how a quotation is set
+     when it has to be believed (a printed page, not a film), and it keeps
+     the three ideas apart at a glance.
+     Reduced motion, no script: the phrases one under the other, fully set,
+     each with its photograph and the review itself. --}}
+<main class="ms-v3" aria-labelledby="h-op">
+  @unless($embed)
+    <div class="pl__head">@include('muestras._head')</div>
+  @else
+    <h2 class="ms-sr" id="h-op">La confianza se gana. Ellos te cuentan cómo.</h2>
+  @endunless
+  <section class="pl" data-palabras style="--n:{{ $beats->count() }}" aria-label="Sus palabras">
+    <div class="pl__stage">
+      @foreach($beats as $k => $r)
+        <figure class="pl__b{{ $k === 0 ? ' is-on' : '' }}">
+          <blockquote class="pl__q"><p class="pl__p">«{{ $r->phrase }}»</p></blockquote>
+          <figcaption class="pl__by">
+            <x-img :src="$r->img" :alt="$r->caption" :sizes="'(min-width:1000px) 220px, 140px'" :max="480" class="pl__img" />
+            <span class="pl__who">
+              <span class="pl__name">{{ $r->caption }}</span>
+              <button class="ms-link pl__more" type="button" data-open="{{ $r->id }}" aria-haspopup="dialog">Leer la opinión completa<span class="ms-sr">: {{ $r->name }}</span></button>
+              <details class="pl__all"><summary class="ms-link">Leer la opinión completa</summary>
+                @foreach($r->paras as $p)<p>{{ $p }}</p>@endforeach
+              </details>
+            </span>
+          </figcaption>
+        </figure>
       @endforeach
-    </ul>
-    <div class="ms-wrap ms-rail__nav">
-      <button class="ms-ctl" type="button" data-step="-1" aria-label="Anteriores">
-        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M15 4 7 12l8 8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
-      </button>
-      <button class="ms-ctl" type="button" data-step="1" aria-label="Siguientes">
-        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
-      </button>
     </div>
-  </div>
+  </section>
 </main>
 @endsection
 @push('after') @include('muestras._viewer') @endpush

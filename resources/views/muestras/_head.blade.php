@@ -1,6 +1,6 @@
-{{-- The home section's own heading and paragraph, word for word. Inside the
-     showroom's frames (?embed=1) it is left out: the showroom names each
-     proposal itself, and ten copies of it would fill every first screen. --}}
+{{-- The section's own heading and paragraph, word for word. Inside the
+     showroom's frames (?embed) it is left out: the showroom names each
+     proposal itself, and the first screen belongs to the customers. --}}
 @unless(!empty($embed))
 <div class="ms-wrap ms-head">
   <h2 class="ms-h2" id="h-op">La confianza se gana. Ellos te cuentan cómo.</h2>

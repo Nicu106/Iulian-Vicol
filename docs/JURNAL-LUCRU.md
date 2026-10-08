@@ -49,7 +49,8 @@ Timpul tău de gândire și de verificare între prompturi, peste 15 minute, **n
 | 08.10 (5) | — | — | Filmele mai frumoase: filmul 2 refăcut ca primul — stabilizat, încetinește și se oprește pe cadre alese (BMW-ul cabrio din spate, profilul lui, interiorul cu volanul și scaunele, steaua Mercedes de aproape, Clasa C din trei sferturi), încadrare separată telefon/calculator; ambele filme cu aceeași culoare: vopseaua strălucește, nu mai e gri-tulbure, negrul identic cu al paginii; umbra de sub texte mai ușoară; contrast text minim 5,3:1 pe 7 ecrane; telefon 2,5 MB, calculator 5,1 MB |
 | 08.10 (6) | — | — | Pagină privată de ales recenziile, /muestras/opiniones (nelegată din site, noindex): 10 variante cu cele 27 de recenzii reale (mozaic, carusel, rând glisant, perete de poze, recenzie mare cu clienți de ales, două rânduri în mișcare, poză fixă, album, text întâi, trei recenzii principale); fiecare gândită întâi pe telefon (o recenzie întreagă pe primul ecran, maxim 2 ecrane înălțime), poze niciodată tăiate; fiecare variantă se vede ca pe telefon, tabletă sau calculator, cu o previzualizare a celor 10 și comparare două câte două; 0 erori de contrast |
 | 09.10 | — | — | Test în 3 motoare de browser (Chrome, Safari/WebKit, Firefox), telefon + calculator, 7 pagini: fără erori, fără depășiri; galeria mașinii (deschis + Înapoi) și filmele din /por-que-nosotros merg în toate; reparat imaginea goală din galerie semnalată de Safari |
-| **Total** | **52,5 h** | **184** | **19 zile** |
+| 08.10 (7) | — | — | /muestras/opiniones, runda a doua (clientul le-a respins pe toate 10): 4 propuneri, fiecare dusă mult mai departe — „La entrega” (secvență pe negrul din /por-que-nosotros, un client pe ecran: poza întreagă pe propria ei lumină estompată, cuvintele mari; trecere prin negru, nu suprapunere), „El muro” (toate cele 27 de poze întregi, rânduri echilibrate la fel de late; poza atinsă zboară în față și crește, cu recenzia; glisare înainte/înapoi pe telefon), „Sus palabras” (cea mai puternică frază, exactă, din 8 recenzii, enormă, se aprinde rând cu rând la scroll, pe alb) și „Pares” (schița clientului: poză în față, text în spate pe diagonală; textul atins vine în față, poza atinsă se deschide întreagă, × o pune la loc); testat 320/360/390/768/1440/1920, cadre din fiecare animație, fără JS și fără animații; Chrome, Safari (WebKit) și Firefox, telefon + calculator; contrast 0 erori |
+| **Total** | **53,1 h** | **190** | **19 zile** |
 
 
 **Consum de tokeni** (sesiunea principală plus sub-agenți, din 1 septembrie)
@@ -115,6 +116,7 @@ Timpul tău de gândire și de verificare între prompturi, peste 15 minute, **n
 Detaliile sunt în `docs/STRATEGIE-SI-SCHIMBARI.md` §4. Pe scurt:
 
 ### Decizii care îți aparțin
+- [ ] Recenziile: care din cele 4 propuneri din /muestras/opiniones (La entrega, El muro, Sus palabras, Pares) și pe ce pagină
 - [ ] Premiul pentru recomandare (`REFERRAL_REWARD`)
 - [ ] Recomandări v2 (discutate pe 17.09):
   - [ ] beneficiul pentru prietenul care completează formularul;

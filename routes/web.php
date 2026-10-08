@@ -60,7 +60,7 @@ Route::get('/catalogo', [App\Http\Controllers\BrandCatalogController::class, 'in
 Route::get('/coche/{slug}', [App\Http\Controllers\CarPageController::class, 'show'])->name('coche');
 Route::get('/contacto', [App\Http\Controllers\ContactPageController::class, 'index'])->name('contacto');
 Route::get('/por-que-nosotros', [App\Http\Controllers\WhyUsController::class, 'index'])->name('why');
-// A private showroom for the client: ten ways to show the reviews. Not linked, noindex,
+// A private showroom for the client: four ways to show the reviews. Not linked, noindex,
 // not in the sitemap — App\Http\Controllers\ReviewShowroomController.
 Route::get('/muestras/opiniones', [App\Http\Controllers\ReviewShowroomController::class, 'index'])->name('muestras.opiniones');
 Route::get('/muestras/opiniones/{n}', [App\Http\Controllers\ReviewShowroomController::class, 'show'])->whereNumber('n')->name('muestras.opiniones.show');
