@@ -207,6 +207,25 @@
     on(next, 'click', function () { go(1); });
     on(row, 'scroll', ends, { passive: true });
     on(window, 'resize', ends);
+
+    /* the row's height: the tallest pair in view, plus the row's own padding
+       (room for the shadows). Measured on the pair's content, so a card that
+       came to the front, or a new width, is followed. */
+    var fitT = null;
+    function fitH() {
+      var R = row.getBoundingClientRect(), cs = getComputedStyle(row), max = 0;
+      items.forEach(function (li) {
+        var r = li.getBoundingClientRect();
+        var seen = Math.min(r.right, R.right) - Math.max(r.left, R.left);
+        if (seen > r.width * 0.5) max = Math.max(max, li.firstElementChild.getBoundingClientRect().height);
+      });
+      if (max) row.style.height = Math.ceil(max + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom)) + 'px';
+    }
+    var fitSoon = function () { clearTimeout(fitT); fitT = setTimeout(fitH, 90); };
+    on(row, 'scroll', fitSoon, { passive: true });
+    on(window, 'resize', fitSoon);
+    if ('ResizeObserver' in window) { var ro = new ResizeObserver(fitSoon); items.forEach(function (li) { ro.observe(li.firstElementChild); }); }
+    fitH();
     ends();
 
     /* a mouse drags the row like a thumb does; let go, it settles on a pair */

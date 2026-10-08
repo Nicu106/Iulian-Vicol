@@ -101,10 +101,14 @@ html:has(dialog[open]){ overflow:hidden; }
 @media (min-width:1000px){ .ms-v4 .ms-wrap{ max-width:var(--row-max); } }
 .pr{ position:relative; }
 .pr__row{ display:flex; gap:var(--gap); margin:0; list-style:none;
-  padding:var(--s-2) var(--mc-gutter-m) var(--s-7);
+  padding:var(--s-2) var(--mc-gutter-m) var(--s-6);
   overflow-x:auto; overscroll-behavior-x:contain; scroll-snap-type:x mandatory;
   scroll-padding-inline:var(--mc-gutter-m); scrollbar-width:none; -webkit-overflow-scrolling:touch; }
 .pr__row::-webkit-scrollbar{ display:none; }
+/* the row is as tall as the pairs in view (set by the script), not as the
+   tallest pair anywhere in it: the arrows stay close under what is seen */
+.js .pr__row{ overflow-y:hidden; transition:height var(--m-move) var(--e-out); }
+@media (prefers-reduced-motion:reduce){ .js .pr__row{ transition:none; } }
 .pr__row.is-drag{ scroll-snap-type:none; cursor:grabbing; user-select:none; }
 /* fixed width, never shrinking: Safari lays a flex line out against the visible box */
 .pr__i{ flex-grow:0; flex-shrink:0; flex-basis:calc(100% - var(--peek)); scroll-snap-align:start; display:flex; }
@@ -141,7 +145,7 @@ html:has(dialog[open]){ overflow:hidden; }
   background:var(--mc-surface); color:var(--mc-ink);
   box-shadow:0 1px 2px rgba(var(--mc-scrim), .06); transform-origin:60% 40%; }
 .pr__txt::after{ content:""; position:absolute; inset:0; pointer-events:none; opacity:0;
-  box-shadow:0 2px 4px rgba(var(--mc-scrim), .08), 0 28px 56px -24px rgba(var(--mc-scrim), .45);
+  box-shadow:0 2px 4px rgba(var(--mc-scrim), .08), 0 16px 30px -14px rgba(var(--mc-scrim), .42);
   transition:opacity var(--m-reveal) var(--e-out); }
 .pr__txt.is-front{ z-index:3; }
 .pr__txt.is-front::after{ opacity:1; }
@@ -180,7 +184,13 @@ html:has(dialog[open]){ overflow:hidden; }
   .pr__i > .pr__pair{ --pw:68cqi; }
   /* one pair in view: each card as long as its own words, no empty white */
   .pr__i{ align-items:flex-start; }
-  .pr__rest{ padding:calc(var(--pw) * 2 / 3 + var(--s-4)) var(--s-4) var(--s-4); }
+  /* the card tucks only 28px under the photograph (client, 2026-10-09: half
+     a photograph of empty white beside it read as a hole), so its words
+     start just under the photograph and a short review makes a short card */
+  .pr__pair{ --ov:1.75rem; }
+  .pr__txt{ margin-top:calc(var(--ov) * -1); }
+  .pr__rest{ padding:calc(var(--ov) + var(--s-4)) var(--s-4) var(--s-4); }
+  html:not(.js) .pr__full{ padding-top:calc(var(--ov) + var(--s-4)); }
   .pr__by{ order:2; height:auto; padding:var(--s-3) 0 0; }
   .pr__by span{ font-size:var(--t-small); }
   .pr__by b{ display:inline; }
@@ -190,7 +200,7 @@ html:has(dialog[open]){ overflow:hidden; }
 }
 
 /* the arrows, centred under the row, in the thumb's reach */
-.pr__nav{ display:flex; justify-content:center; gap:var(--s-4); margin-top:calc(var(--s-2) * -1); }
+.pr__nav{ display:flex; justify-content:center; gap:var(--s-4); margin-top:0; }
 
 /* without script: the row still scrolls natively; every card carries the
    whole review (beside the photograph's corner), scrolling if it is long */
