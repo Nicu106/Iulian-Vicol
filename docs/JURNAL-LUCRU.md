@@ -46,7 +46,8 @@ Timpul tău de gândire și de verificare între prompturi, peste 15 minute, **n
 | 08.10 (2) | — | — | /por-que-nosotros: textul lui Iulian pus întreg, între scene (4 blocuri de lectură: titlu mare + paragrafe, ultima frază evidențiată); portretul: „Una pasión personal. Un compromiso contigo.” + „Hablar con Iulian”; finalul: „Hay coches que llevas tiempo imaginando.”, semnătura și cele 2 butoane; flip-ul recenziilor scos la cererea clientului |
 | 08.10 (3) | — | — | Feedback client: filmul 2 refăcut la 30 fps și plafonat (12 MB → 5,7 MB calculator, 6,9 → 3,1 MB telefon), se încarcă imediat după primul film; textele fără estompare; scena 4 cu poza nouă (Iulian + 3 BMW), text pe alb lângă poză, nu peste ea; cifrele: +9 ani experiență, 600.000 vizualizări, 1.200 km |
 | 08.10 (4) | — | — | /por-que-nosotros dintr-o bucată: toată povestea (filme, poze, textul lui Iulian, cifrele) pe negrul filmelor, trecerile dintre scene prin negru, nu prin alb; textul mai mare pe calculator; „Las llaves son tuyas” apare odată cu poza; contrast 0 erori din 260 |
-| **Total** | **48,4 h** | **176** | **18 zile** |
+| 08.10 (5) | — | — | Filmele mai frumoase: filmul 2 refăcut ca primul — stabilizat, încetinește și se oprește pe cadre alese (BMW-ul cabrio din spate, profilul lui, interiorul cu volanul și scaunele, steaua Mercedes de aproape, Clasa C din trei sferturi), încadrare separată telefon/calculator; ambele filme cu aceeași culoare: vopseaua strălucește, nu mai e gri-tulbure, negrul identic cu al paginii; umbra de sub texte mai ușoară; contrast text minim 5,3:1 pe 7 ecrane; telefon 2,5 MB, calculator 5,1 MB |
+| **Total** | **52,5 h** | **184** | **19 zile** |
 
 
 **Consum de tokeni** (sesiunea principală plus sub-agenți, din 1 septembrie)

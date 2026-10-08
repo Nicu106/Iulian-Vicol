@@ -19,3 +19,21 @@ html:not(.wy-on) .wy-still--keys .wy-copy{ background:#05080F; }
 /* the reading on black wants a touch more air and size */
 .wy-txt__b p{ line-height:1.75; }
 @media (min-width:900px){ .wy-txt__b p{ font-size:1.25rem; } .wy-txt__b{ max-width:40rem; } }
+
+/* the welcome photograph is back (the client, 2026-10-08): the words stay in ink
+   on his white wall — the night tokens above must not turn them white — and on
+   wide screens the promise sits with the title on the wall, never lower down
+   where it fell on his black jumper */
+.wy-copy--wall .wy-beat, .wy-copy--wall .wy-beat--sub{ color:#111C2E; }
+@media (min-aspect-ratio: 1/1){
+  .wy-copy--wall{ align-content:start; }
+}
+html:not(.wy-on) .wy-copy--wall .wy-beat{ color:#FFFFFF; }
+/* a laptop (1280×720) has little height: the wall's words are sized by the
+   height, and the photograph shows more wall above his head */
+@media (min-aspect-ratio: 1/1) and (min-height: 501px){
+  .wy-copy--wall{ padding-top:calc(var(--mc-head-h, 56px) + 4vh); gap:1.2vh; }
+  .wy-copy--wall .wy-beat--line{ font-size:min(4.4rem, 7vh); }
+  .wy-copy--wall .wy-beat--sub{ font-size:min(1.4rem, 2.4vh); }
+  .wy-still--welcome .wy-photo > img{ object-position:49% 6%; }
+}

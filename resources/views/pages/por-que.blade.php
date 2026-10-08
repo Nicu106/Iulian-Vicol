@@ -2,7 +2,7 @@
 
 @section('title', '¿Por qué IV MOTORCLASS? — Coches alemanes en Málaga')
 @section('description', 'Seleccionados, revisados y preparados. Te contesto yo, te lo enseño antes de que vengas y te lo llevas a tu nombre en 30 minutos.')
-@section('og_image', url(\App\Support\Img::url('/storage/why/keys.jpg', 1200) ?? '/storage/why/keys.jpg'))
+@section('og_image', url(\App\Support\Img::url('/storage/why/welcome-graded.jpg', 1200) ?? '/storage/why/welcome-graded.jpg'))
 @section('current', 'porque')
 
 @php
@@ -65,7 +65,7 @@
      from 106% to 100%, the shade sits only under the words. The opening fades
      up from night; the first words land, then the film moves. Details in
      public/js/why.js.
-     FILM A IS CUT AS A FILM (2026-10-08, tools/media/why-film-a.py). Shot list:
+     FILM A IS CUT AS A FILM (2026-10-08, tools/media/why-film.py). Shot list:
        open   the navy 4 Cabrio three-quarter, the row receding behind it —
               held under the title, in a 2.39 scope frame with the title in
               the black beneath; the frame opens as the camera starts to move
@@ -89,16 +89,41 @@
      CLIENT PASS (2026-10-08, evening). Film B re-encoded at 30 fps, capped at
      1.6 / 3 Mb/s (12 MB → 5.7 MB desk; it stalled on his connection) and
      fetched as soon as film A can play through; words arrive sharp (no blur).
-     The 4th scene is now his photo with three BMWs (keys.jpg), set like the
-     portrait mirrored — words in ink on white, never on the picture (on the
-     old welcome photo they fell on his black jumper). The record: +9 años de
-     experiencia, 600.000 reproducciones, 1.200 km — his figures.
+     The record: +9 años de experiencia, 600.000 reproducciones, 1.200 km —
+     his figures. (That evening the 4th scene became his photo with three BMWs,
+     keys.jpg; the client then brought back the welcome photo, arms open —
+     welcome-graded.jpg — with its opening approach: see WELCOME BACK below.)
      HIS WORDS (2026-10-08). Between the scenes, Iulian's own text, whole and
      unedited, set as reading (.wy-txt, why-text.css): the heading on the left
      and the paragraphs on the right from 900 px, stacked on phones; each
      closing line in ink, the rest in the body grey. The portrait carries his
      heading ("Una pasión personal…") and "Hablar con Iulian"; his closing
      ("Hay coches…", the signature, the two buttons) is the navy end.
+     WELCOME BACK (2026-10-08, night). The client wants the old welcome photo
+     (arms open in front of the cars, welcome-graded.jpg) and its opening —
+     the photograph opening from the centre to the whole screen — back instead
+     of keys.jpg; the words in ink on his wall (why-dark.css), sized by height
+     on wide screens. og:image is that photo.
+     BOTH FILMS, ONE FILM (2026-10-08, night; tools/media/why-film.py, one
+     script for both). Film B was the raw walk at 2x — not stabilised, a centre
+     crop on phones, a daylight grade — and read as a cheaper film than A. Now
+     it is cut like A: stabilised, a speed ramp per chapter onto composed held
+     frames, its own window per hold for phone and desk, 30 fps capped at
+     1.6 / 3 Mb/s (2.5 MB / 5.1 MB). Shot list (source s → held frame):
+       open   0     the navy 4 Cabrio from behind, three-quarter, the C-Class beside
+       te lo enseño 4.75  the Cabrio square on: roundel, plate, the open cabin
+       exterior     6.6   its rear three-quarter: flank, paint, the wheel
+       interior     8.4   a slow push in to the open cabin: seats, the wheel
+       desperfectos 12.5  close on the C-Class: the star, the chrome, the boot's
+                          paint, the black bumper where the words sit
+       encontrar    16.0  the C-Class three-quarter, the Cabrio behind
+     One grade for both (film A had read murky on the black page): deep blacks
+     with a floor of the page's #05080F, mids and speculars kept so the paint
+     glows, greens quieted, background pulled to slate where bright and high,
+     ND 50% at the top (was 28%), a lighter vignette. The runtime shade is
+     lighter too (.5 at the foot, gone by 75%; was .64, gone by 80%), with a
+     taller layer only behind film A's four-line title (--wy-tall). White words
+     measured on the held frames at 320–1920: p99 ≥ 5.3:1, p90 ≥ 7.3:1.
      Without JavaScript, or with reduced motion: a normal page — the first
      frames as still pictures, the words beneath them (html:not(.wy-on)).
      ========================================================================== --}}
@@ -186,7 +211,7 @@
         <img src="{{ $film('b-p.webp') }}" alt="" width="608" height="1080" loading="lazy">
       </picture>
       <video class="wy-video" muted playsinline disableremoteplayback preload="none" aria-hidden="true"
-             data-p="{{ $film('b-p.mp4') }}" data-d="{{ $film('b-d.mp4') }}" data-ends="2.5,5.75,8.5,11.25,15"></video>
+             data-p="{{ $film('b-p.mp4') }}" data-d="{{ $film('b-d.mp4') }}" data-ends="2.6,5.2,7.8,10.6,13.6"></video>
       <canvas class="wy-canvas" aria-hidden="true"></canvas>
       <div class="wy-shade" aria-hidden="true"></div>
       <div class="wy-veil" aria-hidden="true"></div>
@@ -220,18 +245,18 @@
   </section>
 
   {{-- ---- 4 · welcome ------------------------------------------------------- --}}
-  <section class="wy-still wy-still--keys" data-scene="still" aria-labelledby="wy-keys">
+  <section class="wy-still wy-still--welcome" data-scene="still" aria-labelledby="wy-keys">
     <div class="wy-stage">
       <div class="wy-photo">
-        <x-img src="/storage/why/keys.jpg" alt="Iulian junto a tres BMW preparados para entregar, en Málaga"
-               sizes="(min-aspect-ratio: 1/1) 56vw, 110vh" :max="1500" :fallback="1080" />
+        <x-img src="/storage/why/welcome-graded.jpg" alt="Iulian delante de cuatro coches preparados para entregar"
+               sizes="(max-aspect-ratio: 4/3) 134vh, 100vw" :max="2000" :fallback="1080" />
       </div>
-      <div class="wy-copy wy-copy--ink">
-        <h2 class="wy-beat wy-beat--line" id="wy-keys" data-in=".04" data-out="2">
+      <div class="wy-copy wy-copy--wall">
+        <h2 class="wy-beat wy-beat--line" id="wy-keys" data-in=".3" data-out="2">
           <span class="wy-l">Las llaves son tuyas.</span>
           <span class="wy-l">Mi teléfono sigue disponible.</span>
         </h2>
-        <p class="wy-beat wy-beat--sub" data-in=".16" data-out="2">
+        <p class="wy-beat wy-beat--sub" data-in=".46" data-out="2">
           <span class="wy-l">En 30 minutos, a tu nombre y con el seguro en vigor.</span>
           <span class="wy-l">Y después de la compra, me sigues teniendo al teléfono.</span>
         </p>

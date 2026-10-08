@@ -25,7 +25,11 @@
 .wy-canvas{ opacity:0; pointer-events:none; }
 /* under the words only: the bottom of the frame, where they sit (measured per beat) */
 .wy-shade{ opacity:0; pointer-events:none;
-  background:linear-gradient(to top, rgba(5,8,15,.64) 0%, rgba(5,8,15,.5) 30%, rgba(5,8,15,.26) 55%, rgba(5,8,15,0) 80%); }
+  background:linear-gradient(to top, rgba(5,8,15,.5) 0%, rgba(5,8,15,.36) 30%, rgba(5,8,15,.14) 55%, rgba(5,8,15,0) 75%); }
+/* film A's title is four lines and sits higher: while it is on screen the shade
+   reaches up behind it (why.js sets --wy-tall from 0 to 1) */
+.wy-shade::after{ content:""; position:absolute; inset:0; opacity:var(--wy-tall, 0);
+  background:linear-gradient(to top, rgba(5,8,15,.24) 0%, rgba(5,8,15,.38) 40%, rgba(5,8,15,.34) 62%, rgba(5,8,15,0) 85%); }
 /* the dip: a film rises out of the page white and dissolves back into it */
 .wy-veil{ opacity:0; pointer-events:none; background:var(--mc-surface); }
 

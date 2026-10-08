@@ -341,7 +341,7 @@
         css(st, st.veil, 'opacity', Math.max(dip, night).toFixed(3));
         css(st, st.veil, 'backgroundColor', night > dip ? '#05080F' : 'var(--mc-surface)');
       }
-      var lit = 0;
+      var lit = 0, tall = 0;
       st.beats.forEach(function (b) {
         var o = val(b.tout), vis = 0;
         if (busy(b.tout)) moving = true;
@@ -354,8 +354,14 @@
         }
         if (b.act) b.el.style.pointerEvents = vis > 0.6 ? 'auto' : 'none';
         lit = Math.max(lit, vis);
+        if (b.title) tall = vis;
       });
-      if (st.shade) css(st, st.shade, 'opacity', lit.toFixed(3));
+      if (st.shade) {
+        css(st, st.shade, 'opacity', lit.toFixed(3));
+        // the title is four lines, taller than any other words: while it is the
+        // line on screen the shade reaches higher (.wy-shade::after, why2.css)
+        if (st.first) css(st, st.shade, '--wy-tall', (lit > 0.001 ? Math.min(1, tall / lit) : 0).toFixed(3));
+      }
       if (st.v) {
         if (busy(st.xf)) moving = true;
         css(st, st.c, 'opacity', val(st.xf).toFixed(3));
