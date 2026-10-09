@@ -57,15 +57,19 @@ Route::post('/inquiries', [App\Http\Controllers\InquiryController::class, 'store
 // A guest is sent to the login and brought back here after it.
 Route::get('/brandbook', [App\Http\Controllers\BrandbookController::class, 'index'])->middleware('auth')->name('brandbook');
 Route::get('/catalogo', [App\Http\Controllers\BrandCatalogController::class, 'index'])->name('catalogo');
+// /muestras/*: private proposals for the client, behind a 4-digit PIN
+Route::middleware(App\Http\Middleware\MuestrasPin::class)->group(function () {
+    Route::get('/muestras/opiniones', [App\Http\Controllers\ReviewShowroomController::class, 'index'])->name('muestras.opiniones');
+    Route::get('/muestras/opiniones/{n}', [App\Http\Controllers\ReviewShowroomController::class, 'show'])->whereNumber('n')->name('muestras.opiniones.show');
+    Route::get('/muestras/por-que', [App\Http\Controllers\WhyShowroomController::class, 'index'])->name('muestras.porque');
+    Route::get('/muestras/por-que/{n}', [App\Http\Controllers\WhyShowroomController::class, 'show'])->whereNumber('n')->name('muestras.porque.show');
+});
+Route::post('/muestras/pin', [App\Http\Middleware\MuestrasPin::class, 'check'])->middleware('throttle:12,1');
 Route::get('/coche/{slug}', [App\Http\Controllers\CarPageController::class, 'show'])->name('coche');
 Route::get('/contacto', [App\Http\Controllers\ContactPageController::class, 'index'])->name('contacto');
 Route::get('/por-que-nosotros', [App\Http\Controllers\WhyUsController::class, 'index'])->name('why');
 // A private showroom for the client: four ways to show the reviews. Not linked, noindex,
 // not in the sitemap — App\Http\Controllers\ReviewShowroomController.
-Route::get('/muestras/opiniones', [App\Http\Controllers\ReviewShowroomController::class, 'index'])->name('muestras.opiniones');
-Route::get('/muestras/opiniones/{n}', [App\Http\Controllers\ReviewShowroomController::class, 'show'])->whereNumber('n')->name('muestras.opiniones.show');
-Route::get('/muestras/por-que', [App\Http\Controllers\WhyShowroomController::class, 'index'])->name('muestras.porque');
-Route::get('/muestras/por-que/{n}', [App\Http\Controllers\WhyShowroomController::class, 'show'])->whereNumber('n')->name('muestras.porque.show');
 
 // Recommendations without accounts — App\Support\Referral has the rules.
 // What the page script reports as a WhatsApp or e-mail press leaves the site.
