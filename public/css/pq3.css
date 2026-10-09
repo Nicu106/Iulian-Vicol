@@ -1,0 +1,94 @@
+/* =============================================================================
+   /muestras/por-que/3 · Inmersiva — the reels (pq3.js moves them).
+   Everything else on the page (his text, the portrait, the welcome, the record,
+   the reviews, the end) is styled by the live page's own why*.css.
+
+   A reel is a tall section with one sticky screen (.pq-stage). Every photograph
+   in it is an absolutely placed box the size of the stage's cover box (4:3),
+   moved by transform only (translate · rotate · scale, origin top-left) and
+   shown by opacity only. A photograph that arrives in a zoom-through has a twin
+   (.pq-shot--f) with a soft elliptical mask: it opens as a window around the
+   detail while the photograph before it is still there around it.
+   Without .pq-on (no JavaScript, reduced motion) the reels are a photo essay.
+   ========================================================================== */
+.pq{
+  /* the story's black, the same as why-dark.css (#05080F): no token carries it */
+  --pq-night:#05080F;
+  --pq-ink:#111C2E;      /* = --mc-ink; literal because why-dark.css redefines the token to white in the story */
+  --pq-g:var(--mc-gutter-m, 1.25rem);
+}
+.pq-reel{ position:relative; background:var(--pq-night); color:#FFFFFF; }
+.pq-l{ display:block; }
+
+/* ---- the reels ------------------------------------------------------------- */
+.pq-on .pq-reel{ height:calc((var(--u, 6) + 1) * 100vh); height:calc((var(--u, 6) + 1) * 100svh); }
+.pq-on .pq-stage{ position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; background:var(--pq-night);
+  contain:layout paint; }
+.pq-on .pq-beat{ display:contents; }
+.pq-on .pq-shot{ position:absolute; left:0; top:0; width:var(--wc, 100vw); height:var(--hc, 75vw);
+  transform-origin:0 0; opacity:0; display:none; will-change:transform, opacity; backface-visibility:hidden; }
+.pq-on .pq-shot.is-live{ display:block; }
+.pq-shot picture{ display:block; width:100%; height:100%; }
+.pq-shot img{ display:block; width:100%; height:100%; object-fit:cover; }
+/* the window the next photograph opens through: opaque in the middle, gone at the edge */
+.pq-on .pq-shot--f{ -webkit-mask-image:radial-gradient(closest-side, #000 64%, rgba(0,0,0,.5) 82%, transparent 100%);
+                            mask-image:radial-gradient(closest-side, #000 64%, rgba(0,0,0,.5) 82%, transparent 100%); }
+
+/* the words: each line arrives on time (pq3.js), the block drifts with the camera */
+.pq-w{ margin:0; font-weight:700; color:#FFFFFF; }
+.pq-on .pq-w{ position:absolute; z-index:2; pointer-events:none; will-change:transform; }
+.pq-on .pq-w .pq-l{ opacity:0; will-change:transform, opacity; }
+.pq-w--ink{ color:var(--pq-ink); }
+.pq-on .pq-w:not(.pq-w--ink){ text-shadow:0 2px 30px rgba(5,8,15,.45); }
+.pq-w--h1{ font-size:clamp(1.9rem, min(10.6vw, 5.6svh), 6.4rem); line-height:.98; letter-spacing:-.04em; max-width:11ch; }
+.pq-w--line{ font-size:clamp(2.1rem, 9.2vw, 5.6rem); line-height:1; letter-spacing:-.035em; max-width:13ch; }
+/* a single word fills its measure (pq3.js fits it: --fit-w wide, never above --fit-max) */
+.pq-w--word{ font-size:clamp(3rem, 15vw, 10rem); line-height:.95; letter-spacing:-.05em; white-space:nowrap; }
+.pq-on .pq-w--word{ width:var(--fit-w); }
+
+/* ---- where each line sits: upright screens (phone first) -------------------
+   Every place below was read off the photograph under it (luminance and
+   gradient per cell, then the frames themselves): his white wall for the ink
+   words, the darkest paint for the white ones. */
+.pq-on [data-b]{ left:var(--pq-g); right:var(--pq-g); --fit-w:calc(100vw - 2 * var(--pq-g)); --fit-max:200; }
+.pq-on [data-b="a1"]{ top:5.5svh; }
+.pq-on [data-b="a2"]{ top:7svh; }
+.pq-on [data-b="a3"]{ top:3svh; }
+.pq-on [data-b="a4"]{ bottom:calc(4svh + env(safe-area-inset-bottom)); }
+.pq-on [data-b="a5"]{ top:38svh; }
+.pq-on [data-b="b1"]{ top:8svh; }
+.pq-on [data-b="b2"]{ top:7svh; }
+.pq-on [data-b="b3"]{ bottom:calc(10svh + env(safe-area-inset-bottom)); --fit-w:calc((100vw - 2 * var(--pq-g)) * .65); }
+.pq-on [data-b="b4"]{ top:35svh; }
+.pq-on [data-b="b5"]{ bottom:calc(2svh + env(safe-area-inset-bottom)); font-size:clamp(1.4rem, min(7.6vw, 4.6svh), 5.4rem); }
+.pq-on [data-b="b5"] .pq-l{ white-space:nowrap; }
+
+/* ---- wide screens ------------------------------------------------------------ */
+@media (min-aspect-ratio: 1/1){
+  .pq{ --pq-g:max(var(--mc-gutter-d, 2rem), calc((100vw - 1280px) / 2)); }
+  .pq-on [data-b]{ right:auto; --fit-w:46vw; --fit-max:176; }
+  .pq-w--h1{ font-size:clamp(2.4rem, min(5.2vw, 9.4vh), 6.4rem); max-width:none; }
+  .pq-w--h1 .pq-l, .pq-w--line .pq-l{ white-space:nowrap; }
+  .pq-w--line{ font-size:clamp(2rem, min(4.6vw, 8.6vh), 5.4rem); max-width:none; }
+  .pq-on [data-b="a1"]{ top:7vh; }
+  .pq-on [data-b="a2"]{ left:auto; right:var(--pq-g); text-align:right; }
+  .pq-on [data-b="a3"]{ top:auto; bottom:10vh; }
+  .pq-on [data-b="a4"]{ --fit-w:34vw; left:33vw; text-align:center; top:38vh; bottom:auto; }
+  .pq-on [data-b="a5"]{ width:60vw; left:20vw; text-align:center; top:40vh; }
+  .pq-on [data-b="b2"]{ left:auto; right:var(--pq-g); text-align:right; }
+  .pq-on [data-b="b3"]{ bottom:14vh; --fit-w:30vw; left:var(--mc-gutter-d, 2rem); }
+  .pq-on [data-b="b4"]{ top:34vh; --fit-w:40vw; }
+  .pq-on [data-b="b5"]{ bottom:3vh; font-size:clamp(1.6rem, min(4.6vw, 8.6vh), 5.4rem); }
+}
+
+/* ---- the essay: no JavaScript, or reduced motion ------------------------------
+   One photograph per line of text, whole (4:3), the words above it on black. */
+html:not(.pq-on) .pq-reel{ padding-bottom:var(--s-7); }
+html:not(.pq-on) .pq-beat{ display:block; }
+html:not(.pq-on) .pq-shot{ display:none; }
+html:not(.pq-on) .pq-shot--key{ display:block; aspect-ratio:4 / 3; max-height:86vh; margin-inline:auto; }
+html:not(.pq-on) .pq-w{ padding:var(--s-8) var(--pq-g) var(--s-5); }
+html:not(.pq-on) .pq-w--ink{ color:#FFFFFF; }
+html:not(.pq-on) .pq-w--word{ white-space:normal; font-size:clamp(2.6rem, 12vw, 7rem); }
+html:not(.pq-on) .pq-beat[data-beat="a2"] .pq-w{ padding-top:var(--s-6); }
+@media (min-aspect-ratio: 1/1){ html:not(.pq-on) .pq-shot--key{ width:min(100%, 1280px); } }
