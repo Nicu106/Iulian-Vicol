@@ -1,0 +1,262 @@
+/* =============================================================================
+   /muestras/por-que/1 · "Cine" — the page cut like a film from his photographs.
+   Phone first: every rule below is the 390 x 844 screen; the wide screen is the
+   (min-aspect-ratio: 1/1) block. Reading text, the record, the reviews, the end
+   and the welcome scene keep the live page's own styles (why2, why-dark,
+   why-text, why-odo); this file is the frames.
+
+   A chapter (.pq-ch) is a tall section with a sticky stage one screen high; its
+   frames (.pq-shot) are stacked in the stage and pq1.js shows one at a time as
+   the scroll runs through the chapter (--len screens). Without .pq-on on <html>
+   (no JavaScript, or reduced motion) the same frames stand one under another,
+   one screen each, words in place, nothing moving.
+
+   Three kinds of frame:
+   - a cover frame: the photograph fills the screen; the phone gets its own
+     upright crop (.pq-pic, <source>), wider screens the whole photograph placed
+     by --op (its own focal point, never the centre by default);
+   - an anchored frame (.pq-anchor): the photograph at its own 4:3 (.pq-box),
+     pinned by an anchor point (--ax/--ay, a fraction of the photo) to a point
+     on the screen (--sx/--sy), with the wall carried on around it (.pq-ext);
+   - a hero (.pq-hero): an anchored frame whose car is cut out and laid on top
+     (.pq-car), so the words stand between the wall and the car.
+   ========================================================================== */
+.pq{ --pq-night:#05080F; }
+.pq-ch{ position:relative; background:var(--pq-night); }
+.pq-stage{ position:relative; overflow:hidden; background:var(--pq-night); }
+.pq-shot{ position:relative; margin:0; overflow:hidden; height:100vh; height:100svh; min-height:30rem; background:var(--pq-night); }
+.pq-veil{ display:none; }
+
+/* ---- the motion version ---------------------------------------------------- */
+.pq-on .pq-ch{ height:calc((var(--len) + 1) * 100vh); }
+.pq-on .pq-stage{ position:sticky; top:0; height:100vh; height:100svh; }
+.pq-on .pq-shot{ position:absolute; inset:0; height:auto; min-height:0; opacity:0; pointer-events:none; }
+.pq-on .pq-shot.is-on{ pointer-events:auto; }
+.pq-on .pq-veil{ display:block; position:absolute; inset:0; z-index:9; background:var(--pq-night); opacity:0; pointer-events:none; }
+/* the opening starts from night (pq1.js lifts it once the first frame is there) */
+.pq-on .pq-ch--first .pq-veil{ opacity:1; }
+
+/* ---- a cover frame ----------------------------------------------------------- */
+.pq-pic, .pq-pic img{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+.pq-pic img{ object-fit:cover; object-position:var(--op-p, 50% 50%); transform-origin:var(--fo-p, 50% 50%); }
+@media (min-aspect-ratio: 2/3){
+  .pq-pic img{ object-position:var(--op, 50% 50%); transform-origin:var(--fo, 50% 50%); }
+}
+
+/* ---- an anchored frame -------------------------------------------------------
+   The box is the photograph's own rectangle; its anchor point lands on
+   (--sx, --sy). --pw is its width; its height is three quarters of that. */
+.pq-box{ position:absolute; z-index:1; width:var(--pw); aspect-ratio:4 / 3;
+  left:calc(var(--sx, 50%) - var(--ax) * var(--pw));
+  top:calc(var(--sy) - var(--ay) * var(--pw) * .75);
+  transform-origin:calc(var(--ax) * 100%) calc(var(--ay) * 100%); }
+.pq-box img{ position:absolute; display:block; max-width:none; }
+.pq-ph, .pq-car img{ inset:0; width:100%; height:100%; }
+/* the wall around it: a canvas three photographs wide and 2.9 tall, the photo
+   sitting one width in and 1.6 heights down (tools/media/pq1-media.py) */
+.pq-ext{ left:-100%; width:300%; top:-160%; height:290%; }
+.pq-car{ z-index:3; }
+.pq-anchor .pq-box, .pq-hero .pq-box{ will-change:transform; }
+
+/* ---- the words ------------------------------------------------------------------ */
+.pq-w{ position:absolute; z-index:2; margin:0; font-weight:700; line-height:.98; letter-spacing:-.04em; text-wrap:balance; }
+.pq-l{ display:block; }
+.pq-ink{ color:var(--mc-ink); }
+.pq-white{ color:#FFFFFF; }
+/* fitted words: each line keeps to itself; pq1.js sets the size that makes the
+   longest line fill its measure (CSS sizes stand in without the script) */
+[data-fit] .pq-l{ white-space:nowrap; width:max-content; max-width:none; }
+.pq-w--word{ font-size:clamp(3rem, 15vw, 9rem); letter-spacing:-.05em; line-height:.92; }
+.pq-w--line{ font-size:clamp(2.1rem, 9.6vw, 3.1rem); line-height:1; letter-spacing:-.035em; max-width:11ch; }
+.pq-w--line .pq-l{ display:block; }
+
+/* where they sit: the margins of the frame, by corner */
+.pq-shot{ --gx:max(1.25rem, env(safe-area-inset-left)); --gt:10svh; --gb:calc(9svh + env(safe-area-inset-bottom)); }
+.pq-at-tl{ left:var(--gx); top:var(--gt); }
+.pq-at-tr{ right:var(--gx); top:var(--gt); text-align:right; }
+.pq-at-tr .pq-l{ margin-left:auto; }
+.pq-at-bl{ left:var(--gx); bottom:var(--gb); }
+
+/* hero words: centred on the car, their foot behind its roof (--ov of the
+   last line is covered); the car's top is --cy of the photograph */
+.pq-w--hero{ left:0; right:0; text-align:center; color:var(--mc-ink);
+  font-size:clamp(2.4rem, 12.6vw, 4.2rem); line-height:.94; letter-spacing:-.045em;
+  bottom:calc(100% - var(--sy) + (var(--ay) - var(--cy)) * var(--pw) * .75 - var(--ov, .3em)); }
+.pq-w--hero .pq-l{ margin-inline:auto; }
+.pq-w--hero.pq-w--word{ font-size:clamp(3rem, 15vw, 9rem); line-height:.9; letter-spacing:-.05em; }
+.pq-f{ display:block; }
+
+/* ---- the frames, one by one ------------------------------------------------------
+   Phone values first, then the wide screen. Every focal point was chosen on the
+   photograph; the anchors are measured on the cut-out (car box, badge). */
+
+/* the opening: 4 Series Cabrio, dead on. Anchor: the roundel. */
+.pq-k-open{ --ax:.504; --ay:.597; --cy:.074; --cb:.931; --ov:.1em; --pw:min(122vw, 62svh); --gap:4svh;
+  --sy:calc(100% - (var(--cb) - var(--ay)) * var(--pw) * .75 - var(--gap)); }
+/* match cut: the C-Class's star lands where the roundel was, its body as wide as
+   the Cabrio's was at the end of the walk in (0.807 x 1.10 / 0.886 = 1.00) */
+.pq-k-sel{ --ax:.506; --ay:.575; --cy:.053; --pw:min(122vw, 62svh); --gap:4svh;
+  --sy:calc(100% - (.931 - .597) * var(--pw) * .75 - var(--gap)); --ov:.08em; }
+/* the end: the Cabrio three-quarter, the car centred, anchored on its roundel */
+.pq-k-end{ --ax:.71; --ay:.594; --cy:.212; --cb:.901; --pw:min(112vw, 58svh); --gap:5svh;
+  --sx:calc(50% + .2215 * var(--pw));
+  --sy:calc(100% - (var(--cb) - var(--ay)) * var(--pw) * .75 - var(--gap)); --ov:.12em; }
+/* one car turning: the grey C-Class dead on; no cut-out, so the words stand clear */
+.pq-k-show{ --ax:.508; --ay:.69; --cy:.075; --cb:.93; --pw:min(122vw, 62svh); --gap:4svh;
+  --sy:calc(100% - (var(--cb) - var(--ay)) * var(--pw) * .75 - var(--gap)); --ov:-.3em; }
+/* his portrait: on a phone at the foot of the screen, him in the middle, the
+   evening sky carried on above for the words */
+.pq-k-me{ --ax:.59; --ay:1; --pw:calc(min(64svh, 160vw) * 4 / 3); --sy:100%; }
+
+/* cover frames: --op-p on the phone crop, --op on the whole photograph */
+.pq-k-revw{ --op:50% 0%; --fo-p:41% 72%; --fo:66% 72%; }
+.pq-k-rev{ --op-p:40% 50%; --op:50% 50%; }
+.pq-k-prep{ --op:50% 30%; }
+.pq-k-disf{ --op:50% 60%; }
+.pq-k-mot{ --op:50% 60%; }
+.pq-k-color{ --op:50% 40%; }
+.pq-k-equip{ --op:50% 50%; }
+.pq-k-cuid{ --op:50% 60%; }
+.pq-k-km{ --op:50% 50%; }
+.pq-k-acc{ --op:50% 40%; }
+.pq-k-ext{ --op:50% 40%; }
+.pq-k-int{ --op:50% 50%; }
+.pq-k-desp{ --op:50% 40%; }
+.pq-k-enc{ --op:50% 40%; }
+.pq-k-noves{ --op:50% 40%; }
+.pq-k-conf{ --op:50% 30%; }
+
+/* his portrait: the question, then his heading, in ink on the sky */
+.pq-w--me{ left:var(--gx); right:var(--gx); top:var(--gt); display:grid; justify-items:start; gap:1.1rem; color:var(--mc-ink); }
+.pq-w--me > .pq-beat{ margin:0; color:inherit; }   /* a global h2 colour must not win */
+.pq-w--me > .pq-w--line{ grid-area:1 / 1; position:static; }
+.pq-act .mc-btn{ white-space:nowrap; min-height:48px; padding-inline:1.4rem; }
+
+/* headings set on a frame: longer than a line, a step smaller */
+.pq-w--h{ font-size:clamp(1.9rem, 8.4vw, 2.7rem); max-width:12ch; }
+
+/* frame by frame, where the photograph asks for it (luminance maps in pq1-media.py) */
+.pq-k-disf, .pq-k-mot{ --gb:calc(3.5svh + env(safe-area-inset-bottom)); }   /* on the dark sill, the grille's foot */
+.pq-k-disf .pq-w, .pq-k-acc .pq-w{ font-size:clamp(1.6rem, 8.6vw, 3.1rem); max-width:none; }   /* two lines, never three: the seat is white, the bumper light */
+.pq-k-acc{ --gb:calc(5svh + env(safe-area-inset-bottom)); }
+.pq-k-conf .pq-w{ font-size:clamp(1.75rem, 7.6vw, 2.5rem); max-width:13ch; }
+.pq-k-equip{ --gt:6svh; }                            /* on the white wall above the door's trim */
+.pq-k-equip .pq-w{ font-size:clamp(1.5rem, 7.2vw, 2.4rem); max-width:none; }
+.pq-nw .pq-l{ white-space:nowrap; }
+.pq-k-int{ --gb:26svh; }                             /* on the black band of the dash */
+.pq-k-km{ --gt:11svh; }                             /* ink on the pale windscreen, under the mirror */
+.pq-k-km .pq-w{ font-size:clamp(1.5rem, 7.2vw, 2.4rem); max-width:none; }
+.pq-k-conf{ --gt:6svh; }
+
+/* a tablet upright: the whole photograph, more wall beside the mirror */
+@media (min-aspect-ratio: 2/3) and (max-aspect-ratio: 1/1){
+  .pq-k-noves{ --op:0% 40%; }
+}
+
+/* ---- the wide screen ------------------------------------------------------------ */
+@media (min-aspect-ratio: 1/1){
+  .pq-shot{ --gx:max(6vw, calc((100vw - 1440px) / 2)); --gt:12vh; --gb:12vh; }
+  .pq-f{ display:inline; }
+  .pq-w--line{ font-size:clamp(2.4rem, min(4.6vw, 8.4vh), 5.6rem); max-width:13ch; }
+  .pq-w--word, .pq-w--hero.pq-w--word{ font-size:min(11vw, 22vh); }
+  .pq-w--hero{ font-size:min(7vw, 12vh); }
+  .pq-k-open, .pq-k-sel, .pq-k-show{ --pw:min(97svh, 70vw); --gap:5svh; }
+  /* the photograph's floor feathers into the carried-on floor at its sides; the
+     wall above the floor line (--wl, measured per photo) stays whole */
+  .pq-hero .pq-ph, .pq-k-show .pq-ph{
+    -webkit-mask-image:linear-gradient(to right, transparent 0, #000 7%, #000 93%, transparent 100%), linear-gradient(#000 0, #000 calc(var(--wl) * 100%), transparent calc(var(--wl) * 100% + 4%));
+    -webkit-mask-composite:source-over;
+            mask-image:linear-gradient(to right, transparent 0, #000 7%, #000 93%, transparent 100%), linear-gradient(#000 0, #000 calc(var(--wl) * 100%), transparent calc(var(--wl) * 100% + 4%));
+            mask-composite:add; }
+  .pq-k-open{ --wl:.31; } .pq-k-sel{ --wl:.56; } .pq-k-end{ --wl:.44; } .pq-k-show{ --wl:.39; }
+  .pq-k-end{ --pw:min(100svh, 74vw); --gap:4svh; }
+  /* his portrait: the photograph to the right, him in it whole; the words on the
+     night to its left, where the photo's own edge falls into black */
+  .pq-k-me{ --ax:1; --ay:1; --sx:100%; --pw:calc(100svh * 4 / 3); }
+  .pq-k-me .pq-box{ -webkit-mask-image:linear-gradient(to right, transparent 0%, #000 34%);
+                            mask-image:linear-gradient(to right, transparent 0%, #000 34%); }
+  .pq-k-me .pq-ext{ display:none; }
+  .pq-k-me{ --sx:calc(100% + .16 * var(--pw)); }
+  .pq-w--me{ right:auto; top:auto; bottom:var(--gb); max-width:min(30vw, 30rem); color:#FFFFFF; }
+  .pq-w--h{ font-size:clamp(2.2rem, min(3.7vw, 6.8vh), 4.6rem); max-width:15ch; }
+  .pq-k-equip{ --gt:7vh; --op:50% 0%; }
+  .pq-k-equip .pq-w{ font-size:clamp(2.4rem, min(4.2vw, 7.6vh), 5rem); }
+  .pq-k-int{ --gb:12vh; }
+  /* Para que disfrutes: one line along the dark sill */
+  .pq-k-disf{ --op:50% 100%; --gb:4vh; }
+  .pq-k-prep{ --op:50% 0%; }
+  .pq-k-acc{ --gb:3.5vh; }
+  .pq-k-acc .pq-w{ font-size:min(4.2vw, 6.6vh); max-width:none; }   /* two lines inside the dark band at the foot */
+  .pq-k-disf .pq-w{ font-size:min(3.8vw, 6.6vh); }
+  .pq-k-disf .pq-w{ max-width:none; }
+  .pq-k-disf .pq-l{ display:inline; }
+  .pq-k-disf .pq-l + .pq-l::before{ content:" "; }
+  /* kilómetros: white on the black of the door, the gauges left */
+  /* one line on the pale windscreen, under the mirror, above the dash
+     (the band is 15-31% of the frame's height at 4:3 shown from the top) */
+  .pq-k-km{ --op:50% 0%; }
+  .pq-k-km .pq-w{ left:23vw; right:auto; top:calc(100vw * .75 * .165); font-size:min(3.5vw, 6vh); max-width:none; text-align:left; }
+  .pq-k-km .pq-l{ display:inline; }
+  .pq-k-acc{ --op:50% 100%; }
+  .pq-k-conf{ --op:50% 20%; --gt:9vh; }
+  .pq-k-conf .pq-w{ font-size:clamp(2.2rem, min(3.4vw, 6.4vh), 4.4rem); max-width:16ch; }
+  .pq-k-noves{ --op:50% 25%; }
+  .pq-k-ext{ --op:50% 0%; }
+  .pq-k-end{ --ov:-.04em; }
+  .pq-k-enc{ --op:50% 30%; --gt:9vh; }
+}
+
+
+/* ---- each frame's tone ----------------------------------------------------------
+   The colour of the photograph BEHIND ITS WORDS, measured on the rendered frames
+   at 390 and 1440 (glyph pixels and a 2px ring; the darkest 5% for ink, the
+   lightest 5% for white — the conservative end). It is painted under the
+   photograph: invisible once the picture is there, the words readable before it
+   arrives on a slow phone, and it is what the contrast audit reads (it cannot
+   see an image). Worst measured on the pixels: 6.25:1 (390), 7.17:1 (1440). */
+.pq-shot{ background:var(--tone, var(--pq-night)); }
+.pq-k-open{ --tone:#BABDBA; }
+.pq-k-sel{ --tone:#D1D6D2; }
+.pq-k-revw{ --tone:#B5C2C7; }
+.pq-k-prep{ --tone:#C2C6BE; }
+.pq-k-disf{ --tone:#394050; }
+.pq-k-mot{ --tone:#535B6D; }
+.pq-k-color{ --tone:#B9BEBD; }
+.pq-k-equip{ --tone:#E6E7EB; }
+.pq-k-cuid{ --tone:#404042; }
+.pq-k-km{ --tone:#969F93; }
+.pq-k-acc{ --tone:#3C464E; }
+.pq-k-show{ --tone:#CBDADB; }
+.pq-k-ext{ --tone:#C4CFD0; }
+.pq-k-int{ --tone:#555F67; }
+.pq-k-desp{ --tone:#DBE6E7; }
+.pq-k-enc{ --tone:#CBD6D7; }
+.pq-k-noves{ --tone:#DEE2DD; }
+.pq-k-conf{ --tone:#D0D5CF; }
+.pq-k-end{ --tone:#C4CAC3; }
+.pq-k-me{ --tone:#E0EFF3; }
+.pq-k-rev{ --tone:#2B2D31; }
+@media (min-aspect-ratio: 1/1){ .pq-k-me{ --tone:var(--pq-night); } }
+/* the car and the carried-on wall are pictures, not grounds: the audit samples through them */
+.pq-car, .pq-ext{ pointer-events:none; }
+
+/* ---- the plain version: no JS, or reduced motion -------------------------------- */
+html:not(.pq-on) .pq-w .pq-l, html:not(.pq-on) .pq-beat{ opacity:1; }
+/* the portrait's two lines share one place in the film; in the essay they stack */
+html:not(.pq-on) .pq-w--me > .pq-w--line{ grid-area:auto; }
+
+/* ---- the motion version: the words wait for their frame -------------------------- */
+.pq-on .pq-w .pq-l, .pq-on .pq-act{ opacity:0; will-change:transform, opacity; }
+
+/* the end: his closing paragraphs follow the last frame on navy, as on the live page */
+.pq-end{ background:var(--pq-night); }
+.pq-end .wy-end__in{ padding-top:var(--s-7); }
+
+/* ---- the welcome (the live scene, untouched) ------------------------------------
+   Under his photograph, the tone of the asphalt behind the promise (measured:
+   median 6.14:1, 90% of the pixels behind the glyphs at 4.84:1 or more, at 390;
+   the title on his wall 11.6:1): invisible once the photo is there, and what the
+   audit reads. And while why.js holds a line at opacity 0 it is also hidden, so
+   nothing invisible is measured against the black around the opening frame. */
+.pq .wy-still--welcome .wy-photo{ background-color:#878A7B; }
+.pq .wy-beat[style*="opacity: 0;"], .pq .wy-l[style*="opacity: 0;"]{ visibility:hidden; }
