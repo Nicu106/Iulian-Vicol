@@ -64,6 +64,8 @@ Route::get('/por-que-nosotros', [App\Http\Controllers\WhyUsController::class, 'i
 // not in the sitemap — App\Http\Controllers\ReviewShowroomController.
 Route::get('/muestras/opiniones', [App\Http\Controllers\ReviewShowroomController::class, 'index'])->name('muestras.opiniones');
 Route::get('/muestras/opiniones/{n}', [App\Http\Controllers\ReviewShowroomController::class, 'show'])->whereNumber('n')->name('muestras.opiniones.show');
+Route::get('/muestras/por-que', [App\Http\Controllers\WhyShowroomController::class, 'index'])->name('muestras.porque');
+Route::get('/muestras/por-que/{n}', [App\Http\Controllers\WhyShowroomController::class, 'show'])->whereNumber('n')->name('muestras.porque.show');
 
 // Recommendations without accounts — App\Support\Referral has the rules.
 // What the page script reports as a WhatsApp or e-mail press leaves the site.
