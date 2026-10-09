@@ -246,9 +246,9 @@
   <section class="pq-welcome" aria-labelledby="pq-keys">
     <div class="pq-open">
       <div class="pq-open__in">
-        {{-- welcome-graded.jpg, white-balanced with the set (pq2/welcome.jpg: its wall
-             was the one warm-yellow wall on the page; 85% neutral, brightness kept) --}}
-        <x-img src="/storage/why/pq2/welcome.jpg" alt="Iulian, con los brazos abiertos, delante de cuatro coches preparados para entregar"
+        {{-- the welcome exactly as the client approved it on the live page (a neutral
+             copy, pq2/welcome.jpg, read colder; the warm wall is kept on purpose) --}}
+        <x-img src="/storage/why/welcome-graded.jpg" alt="Iulian, con los brazos abiertos, delante de cuatro coches preparados para entregar"
                sizes="(max-aspect-ratio: 4/3) 134vh, 100vw" :max="2000" />
         <h2 class="pq-w" id="pq-keys"><span>Las llaves son tuyas.</span> <span>Mi teléfono sigue disponible.</span></h2>
       </div>
