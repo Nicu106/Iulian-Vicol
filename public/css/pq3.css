@@ -4,11 +4,10 @@
    the reviews, the end) is styled by the live page's own why*.css.
 
    A reel is a tall section with one sticky screen (.pq-stage). Every photograph
-   in it is an absolutely placed box the size of the stage's cover box (4:3),
-   moved by transform only (translate · rotate · scale, origin top-left) and
-   shown by opacity only. A photograph that arrives in a zoom-through has a twin
-   (.pq-shot--f) with a soft elliptical mask: it opens as a window around the
-   detail while the photograph before it is still there around it.
+   in it is one or two absolutely placed cuts of it (see pq3.js), moved by
+   transform only (translate · rotate · scale, origin top-left) and shown by
+   opacity only. Nothing is masked: a zoom-through dissolves whole photographs
+   that the match has locked together.
    Without .pq-on (no JavaScript, reduced motion) the reels are a photo essay.
    ========================================================================== */
 .pq{
@@ -25,14 +24,15 @@
 .pq-on .pq-stage{ position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; background:var(--pq-night);
   contain:layout paint; }
 .pq-on .pq-beat{ display:contents; }
-.pq-on .pq-shot{ position:absolute; left:0; top:0; width:var(--wc, 100vw); height:var(--hc, 75vw);
-  transform-origin:0 0; opacity:0; display:none; will-change:transform, opacity; backface-visibility:hidden; }
+/* a shot is its cuts (img.pq-i: level 0, and level 1 for the deepest zoom), each
+   a layer sized to its cut and placed by pq3.js */
+.pq-on .pq-shot{ display:none; }
 .pq-on .pq-shot.is-live{ display:block; }
-.pq-shot picture{ display:block; width:100%; height:100%; }
+.pq-on .pq-i{ position:absolute; left:0; top:0; max-width:none; transform-origin:0 0; opacity:0;
+  will-change:transform, opacity; backface-visibility:hidden; }
 .pq-shot img{ display:block; width:100%; height:100%; object-fit:cover; }
-/* the window the next photograph opens through: opaque in the middle, gone at the edge */
-.pq-on .pq-shot--f{ -webkit-mask-image:radial-gradient(closest-side, #000 64%, rgba(0,0,0,.5) 82%, transparent 100%);
-                            mask-image:radial-gradient(closest-side, #000 64%, rgba(0,0,0,.5) 82%, transparent 100%); }
+.pq-i--1{ display:none; }
+.pq-on .pq-i--1{ display:block; }
 
 /* the words: each line arrives on time (pq3.js), the block drifts with the camera */
 .pq-w{ margin:0; font-weight:700; color:#FFFFFF; }
@@ -53,7 +53,7 @@
 .pq-on [data-b]{ left:var(--pq-g); right:var(--pq-g); --fit-w:calc(100vw - 2 * var(--pq-g)); --fit-max:200; }
 .pq-on [data-b="a1"]{ top:5.5svh; }
 .pq-on [data-b="a2"]{ top:7svh; }
-.pq-on [data-b="a3"]{ top:3svh; }
+.pq-on [data-b="a3"]{ top:9.5svh; left:auto; text-align:right; --fit-w:calc((100vw - 2 * var(--pq-g)) * .62); }
 .pq-on [data-b="a4"]{ bottom:calc(4svh + env(safe-area-inset-bottom)); }
 .pq-on [data-b="a5"]{ top:38svh; }
 .pq-on [data-b="b1"]{ top:8svh; }
@@ -72,7 +72,7 @@
   .pq-w--line{ font-size:clamp(2rem, min(4.6vw, 8.6vh), 5.4rem); max-width:none; }
   .pq-on [data-b="a1"]{ top:7vh; }
   .pq-on [data-b="a2"]{ left:auto; right:var(--pq-g); text-align:right; }
-  .pq-on [data-b="a3"]{ top:auto; bottom:10vh; }
+  .pq-on [data-b="a3"]{ top:4vh; left:auto; right:var(--pq-g); text-align:right; --fit-w:34vw; }
   .pq-on [data-b="a4"]{ --fit-w:34vw; left:33vw; text-align:center; top:38vh; bottom:auto; }
   .pq-on [data-b="a5"]{ width:60vw; left:20vw; text-align:center; top:40vh; }
   .pq-on [data-b="b2"]{ left:auto; right:var(--pq-g); text-align:right; }
@@ -87,6 +87,7 @@ html:not(.pq-on) .pq-reel{ padding-bottom:var(--s-7); }
 html:not(.pq-on) .pq-beat{ display:block; }
 html:not(.pq-on) .pq-shot{ display:none; }
 html:not(.pq-on) .pq-shot--key{ display:block; aspect-ratio:4 / 3; max-height:86vh; margin-inline:auto; }
+html:not(.pq-on) .pq-i:not([src]){ display:none; }
 html:not(.pq-on) .pq-w{ padding:var(--s-8) var(--pq-g) var(--s-5); }
 html:not(.pq-on) .pq-w--ink{ color:#FFFFFF; }
 html:not(.pq-on) .pq-w--word{ white-space:normal; font-size:clamp(2.6rem, 12vw, 7rem); }

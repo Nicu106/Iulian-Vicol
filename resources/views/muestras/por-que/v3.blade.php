@@ -12,24 +12,27 @@
      record, the reviews and the end are the live page's, unchanged; the two
      films are gone and two reels of photographs take their place.
 
-     A reel is one sticky screen. The scroll is a camera: it pushes slowly from
-     the whole car into a detail, and at the detail the next photograph of the
-     same car arrives at exactly the same scale, position and roll, so the
-     camera seems to keep going (a "zoom-through"). The pairs were matched by
-     feature points on the originals (SIFT + RANSAC, a similarity transform per
-     pair; table in public/js/pq3.js). The incoming photograph opens as a soft
-     window around the detail and widens to the whole screen; between cars the
-     picture dips to the story's black. Words sit on his white wall in ink, or
-     white on the darkest paint, and drift a little with the camera.
+     A reel is one sticky screen. The scroll is a camera: it pushes from the
+     whole car into a detail, and at the detail the next photograph of the same
+     car is already there at exactly the same scale, position and roll, so the
+     camera seems to keep going (a "zoom-through"). The pairs were matched on the
+     originals, on what each screen shape sees at the handover (tools/media/
+     pq3-media.py; table in public/js/pq3.js). The two are locked together and
+     the next one dissolves in whole, in time (a pause never freezes a double
+     image). Between cars, a cut through the story's black, also in time. Words
+     sit on his white wall in ink, or white on the darkest paint, and drift a
+     little with the camera.
 
      reel A  14 grey C-Class whole  →  15 its front           (headlight, star)
-             40 black C-Class 3/4   →  41 its front quarter  →  42 headlight, wheel
+             40 black C-Class 3/4   →  41 its front quarter   (headlight, wheel)
              43 black C-Class front →  44 closer               (the star)
              19 4 Cabrio, roof up   →  21 the same, roof down  (the grille)
-     reel B  22 the Cabrio's profile · 27 its rear three-quarter
-             26 its cabin           →  29 at the wheel         (the roundel)
-             30 its door, close · 24 the white leather from above
+     reel B  22 the Cabrio's profile · 27 its rear three-quarter · 26 its cabin
+             · 29 at the wheel · 30 its door, close · 24 the white leather from above
 
+     Every photograph is cut from the original for the screen that shows it: a
+     phone gets the upright slice its camera path sees, wide screens the whole
+     photograph, and both a small dense cut for the deepest zoom.
      Phone first: every frame has its own focus and zoom for an upright screen
      and for a wide one (pq3.js), never a centre crop. Without JavaScript, or
      with reduced motion: a calm photo essay, one photograph per line of text.
@@ -40,39 +43,39 @@
   $n   = fn ($v) => number_format((int) $v, 0, ',', '.');
   $ph  = fn ($id) => '/storage/why/photos/' . [
       '14' => '14_DJI_20260329_154326_944.jpg', '15' => '15_DJI_20260329_154341_391.jpg',
-      '40' => '40_IMG_1862.jpg', '41' => '41_IMG_1863.jpg', '42' => '42_IMG_1868.jpg',
+      '40' => '40_IMG_1862.jpg', '41' => '41_IMG_1863.jpg',
       '43' => '43_IMG_1869.jpg', '44' => '44_IMG_1871.jpg',
       '19' => '19_IMG_1252.jpg', '21' => '21_IMG_1274.jpg',
       '22' => '22_IMG_1276.jpg', '27' => '27_IMG_1313.jpg', '26' => '26_IMG_1310.jpg',
       '29' => '29_IMG_1325.jpg', '30' => '30_IMG_1350.jpg', '24' => '24_IMG_1280.jpg',
   ][$id];
-  // what the frame measures at its deepest opaque zoom: 1.4 × the cover width
-  // (an upright screen covers by height: 4/3 of it). A phone is the exception: it
-  // wants more pixels than any file has at every density, so it is given the 1600
-  // file (native up to a 1.42 zoom of its 1125px cover box; the reels go to ~1.4):
-  // -1.1 MB over the whole page against the 2000 file (measured, 390×844 @3x)
-  // wide screens get the photograph whole (2400, re-encoded once into why/pq3):
-  // the 2000 file would be upscaled 1.3x at 1920 before the camera even moves in
-  $big = fn ($id) => '/storage/why/pq3/' . $id . '-2400.webp?v=' . @filemtime(storage_path('app/public/why/pq3/' . $id . '-2400.webp'));
-  $wide = '(min-aspect-ratio: 1/1) and (min-width: 1100px)';
-  $sz = '(max-width: 600px) and (max-aspect-ratio: 1/1) and (min-resolution: 2.5dppx) 530px, '
-      . '(max-width: 600px) and (max-aspect-ratio: 1/1) and (min-resolution: 1.5dppx) 790px, '
-      . '(max-width: 600px) and (max-aspect-ratio: 1/1) 1580px, (max-aspect-ratio: 4/3) 187vh, 140vw';
-  // [id, alt (key frames only: the one shown in the plain essay), incoming twin?]
+  // the cuts the reels show (tools/media/pq3-media.py; pq3.js knows their rects):
+  // <id>-p0 a phone's upright slice of the photograph, <id>-l0 the whole of it for
+  // every other screen, <id>-p1 / -l1 the small, dense cut for the deepest zoom.
+  // A cut that is not there is simply not offered (the photo above is used).
+  $cut = function ($id, $k) {
+      $f = storage_path('app/public/why/pq3/' . $id . '-' . $k . '.webp');
+      return is_file($f) ? '/storage/why/pq3/' . $id . '-' . $k . '.webp?v=' . filemtime($f) : null;
+  };
+  // the essay (no JavaScript, reduced motion) shows each key photograph whole, at most 1280 wide
+  $essay = '(min-aspect-ratio: 1/1) min(100vw, 1280px), 100vw';
+  // the screens that are sent the phone's slices (pq3.js makes the same choice)
+  $phone = '(max-width: 600px) and (orientation: portrait)';
+  // [id, alt (key frames only: the one shown in the plain essay)]
   $reels = [
     'a' => ['label' => 'Seleccionados, revisados y preparados', 'beats' => [
-      ['a1', [['14', 'Mercedes-Benz Clase C gris delante de la pared blanca', false]]],
-      ['a2', [['15', 'El frontal del mismo Mercedes-Benz, de cerca', true]]],
-      ['a3', [['40', '', false], ['41', '', true], ['42', 'El faro y la llanta de un Mercedes-Benz Clase C negro, de cerca', true]]],
-      ['a4', [['43', '', false], ['44', 'La estrella del Mercedes-Benz Clase C negro, de frente', true]]],
-      ['a5', [['19', '', false], ['21', 'BMW Serie 4 Cabrio azul con la capota abierta y el interior blanco', true]]],
+      ['a1', [['14', 'Mercedes-Benz Clase C gris delante de la pared blanca']]],
+      ['a2', [['15', 'El frontal del mismo Mercedes-Benz, de cerca']]],
+      ['a3', [['40', ''], ['41', 'El faro y la llanta de un Mercedes-Benz Clase C negro, de cerca']]],
+      ['a4', [['43', ''], ['44', 'La estrella del Mercedes-Benz Clase C negro, de frente']]],
+      ['a5', [['19', ''], ['21', 'BMW Serie 4 Cabrio azul con la capota abierta y el interior blanco']]],
     ]],
     'b' => ['label' => 'Te lo enseño antes de que vengas', 'beats' => [
-      ['b1', [['22', 'BMW Serie 4 Cabrio azul de perfil, delante de la pared blanca', false]]],
-      ['b2', [['27', 'El mismo Cabrio desde atrás', false]]],
-      ['b3', [['26', '', false], ['29', 'El interior del Cabrio: volante y asientos de cuero blanco', true]]],
-      ['b4', [['30', 'La puerta del Cabrio, de cerca: cuero blanco y altavoz harman/kardon', false]]],
-      ['b5', [['24', 'Los asientos de cuero blanco del Cabrio, vistos desde arriba', false]]],
+      ['b1', [['22', 'BMW Serie 4 Cabrio azul de perfil, delante de la pared blanca']]],
+      ['b2', [['27', 'El mismo Cabrio desde atrás']]],
+      ['b3', [['26', ''], ['29', 'El interior del Cabrio: volante y asientos de cuero blanco']]],
+      ['b4', [['30', 'La puerta del Cabrio, de cerca: cuero blanco y altavoz harman/kardon']]],
+      ['b5', [['24', 'Los asientos de cuero blanco del Cabrio, vistos desde arriba']]],
     ]],
   ];
   $words = [
@@ -101,8 +104,11 @@
 {{-- decided before the first paint, by the same test pq3.js makes, so the page
      never paints the essay and then jumps to the reels --}}
 <script>(function(d){var m=window.matchMedia;if(!(m&&m('(prefers-reduced-motion: reduce)').matches)&&'IntersectionObserver' in window&&window.requestAnimationFrame)d.className+=' pq-on wy-on';})(document.documentElement)</script>
-<link rel="preload" as="image" imagesrcset="{{ \App\Support\Img::srcset($ph('14'), 2000) }}" imagesizes="{{ $sz }}" media="not all and {{ $wide }}" fetchpriority="high">
-<link rel="preload" as="image" imagesrcset="{{ \App\Support\Img::url($ph('14'), 2000) }} 2000w, {{ $big('14') }} 2400w" imagesizes="140vw" media="{{ $wide }}" fetchpriority="high">
+{{-- the opening photograph, asked for before the script that shows it runs --}}
+@if($cut('14', 'p0'))
+<link rel="preload" as="image" href="{{ $cut('14', 'p0') }}" media="{{ $phone }} and (prefers-reduced-motion: no-preference)" fetchpriority="high">
+<link rel="preload" as="image" href="{{ $cut('14', 'l0') }}" media="(min-width: 601px) and (prefers-reduced-motion: no-preference), (orientation: landscape) and (prefers-reduced-motion: no-preference)" fetchpriority="high">
+@endif
 @endpush
 
 @section('content')
@@ -157,17 +163,15 @@
         @foreach($reel['beats'] as [$bid, $shots])
           <div class="pq-beat" data-beat="{{ $bid }}">
             {!! $words[$bid] !!}
-            @foreach($shots as [$id, $alt, $twin])
-              @if($twin)
-                <div class="pq-shot pq-shot--f" data-twin="{{ $id }}" aria-hidden="true"><picture>
-                  <source media="{{ $wide }}" srcset="{{ \App\Support\Img::url($ph($id), 2000) }} 2000w, {{ $big($id) }} 2400w" sizes="140vw">
-                  <x-img :src="$ph($id)" alt="" :sizes="$sz" :max="2000" :fallback="1600" />
-                </picture></div>
-              @endif
-              <div class="pq-shot{{ $alt ? ' pq-shot--key' : '' }}" data-shot="{{ $id }}" @unless($alt) aria-hidden="true" @endunless><picture>
-                <source media="{{ $wide }}" srcset="{{ \App\Support\Img::url($ph($id), 2000) }} 2000w, {{ $big($id) }} 2400w" sizes="140vw">
-                <x-img :src="$ph($id)" :alt="$alt" :sizes="$sz" :max="2000" :fallback="1600" :priority="$id === '14'" />
-              </picture></div>
+            @foreach($shots as [$id, $alt])
+              <div class="pq-shot{{ $alt ? ' pq-shot--key' : '' }}" data-shot="{{ $id }}" @unless($alt) aria-hidden="true" @endunless
+                   @foreach(['p0', 'p1', 'l0', 'l1'] as $k) @if($cut($id, $k)) data-{{ $k }}="{{ $cut($id, $k) }}" @endif @endforeach>
+                {{-- no src: the reels give it its cut (pq3.js), the essay its photograph
+                     (pq3.js, from data-*; without JavaScript, the copy in <noscript>) --}}
+                <img class="pq-i" alt="{{ $alt }}" width="2400" height="1800" decoding="async"
+                     data-src="{{ \App\Support\Img::url($ph($id), 1600) }}" data-srcset="{{ \App\Support\Img::srcset($ph($id), 2000) }}" data-sizes="{{ $essay }}">
+                @if($alt)<noscript><x-img :src="$ph($id)" :alt="$alt" :sizes="$essay" :max="2000" :fallback="1600" /></noscript>@endif
+              </div>
             @endforeach
           </div>
         @endforeach
@@ -271,8 +275,8 @@
 @endsection
 
 @push('js')
-{{-- if it cannot load, the essay (the classes set in <head> come off) --}}
-<script src="{{ asset('js/pq3.js') }}?v={{ @filemtime(public_path('js/pq3.js')) }}" defer onerror="document.documentElement.classList.remove('pq-on','wy-on')"></script>
+{{-- if it cannot load, the essay (the classes set in <head> come off, the photographs go in) --}}
+<script src="{{ asset('js/pq3.js') }}?v={{ @filemtime(public_path('js/pq3.js')) }}" defer onerror="document.documentElement.classList.remove('pq-on','wy-on');document.querySelectorAll('.pq-shot--key img[data-src]').forEach(function(i){i.sizes=i.dataset.sizes;i.srcset=i.dataset.srcset;i.src=i.dataset.src})"></script>
 <script src="{{ asset('js/why-odo.js') }}" defer></script>
 <script src="{{ asset('js/why-text.js') }}" defer></script>
 @endpush
