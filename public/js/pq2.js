@@ -3,11 +3,15 @@
    1  arrival: each [data-r] gets .is-in once, as it comes on screen (CSS does
       the rest: the picture rises 12% into its frame and settles).
    2  drift: every .pq-px on screen moves ±3% of its frame's height as the
-      frame crosses the viewport. Scrubbed, so linear, and dt-free: it is a
+      frame crosses the viewport (±2% on a plate: no more than the asphalt its
+      --cut keeps below the window; none on a phone plate, whose picture ends
+      exactly at the window's foot). Scrubbed, so linear, and dt-free: it is a
       function of the scroll position, nothing accumulates.
    3  the welcome opens: its window scales from 90% to 100% as it rises into
       the screen, the picture inside by the inverse (it stands still).
    4  the record rolls in like an odometer (the live page's drums).
+   5  the gallery (a swipe on phones): only the slides wholly in view show their
+      word, so the next one never peeks in cut in half.
    The loop runs only while something on screen can move. Reduced motion, or
    no IntersectionObserver: nothing runs and .pq-on comes off (a still page). */
 (function () {
@@ -38,7 +42,7 @@
   });
 
   /* 2 + 3 · drift and the opening ------------------------------------------- */
-  // on a phone a plate is a stretched wall over a whole photograph: nothing may move inside it
+  // on a phone a plate's picture ends exactly at the foot of its window: no drift there
   var phonePlate = matchMedia('(max-width: 999px) and (max-aspect-ratio: 1/1)');
   var AMP = 0.03;
   var items = [];
@@ -69,7 +73,7 @@
       // -1 as the frame enters at the foot of the screen, +1 as it leaves at the top
       var t = ((vh + r.height) / 2 - (r.top + r.height / 2)) / ((vh + r.height) / 2);
       t = t < -1 ? -1 : t > 1 ? 1 : t;
-      var y = Math.round(-t * AMP * r.height * 10) / 10;
+      var y = Math.round(-t * (it.plate ? 0.02 : AMP) * r.height * 10) / 10;
       if (y !== it.last) { it.el.style.transform = 'translate3d(0,' + y + 'px,0)'; it.last = y; }
     });
     if (openItem && openItem.on) {
@@ -88,6 +92,22 @@
   addEventListener('scroll', kick, { passive: true });
   addEventListener('resize', kick);
   kick();
+
+  /* 5 · the gallery's current slide ---------------------------------------- */
+  var gal = document.querySelector('.pq-gal');
+  if (gal) {
+    var slides = Array.prototype.slice.call(gal.children), gt = 0;
+    var mark = function () {
+      gt = 0;
+      // a slide is "in place" when it is whole inside the row's visible box
+      var g = gal.getBoundingClientRect();
+      slides.forEach(function (li) { var r = li.getBoundingClientRect();
+        li.classList.toggle('is-cur', r.left >= g.left - 2 && r.right <= g.right + 2); });
+    };
+    mark(); gal.classList.add('is-live');
+    gal.addEventListener('scroll', function () { if (!gt) gt = requestAnimationFrame(mark); }, { passive: true });
+    addEventListener('resize', mark);
+  }
 
   /* 4 · the record ---------------------------------------------------------- */
   var nums = Array.prototype.slice.call(document.querySelectorAll('.pq-proof [data-count]'));

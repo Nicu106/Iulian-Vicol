@@ -20,17 +20,12 @@
 @php
   $wa = fn ($t) => 'https://wa.me/34614753187?text=' . urlencode($t);
   $n  = fn ($v) => number_format((int) $v, 0, ',', '.');
-  // the client's photographs (storage/app/public/why/photos), by their number
-  $ph = fn ($k) => '/storage/why/photos/' . [
-      14 => '14_DJI_20260329_154326_944.jpg', 16 => '16_DJI_20260329_154527_712.jpg',
-      17 => '17_DJI_20260329_154542_802.jpg', 18 => '18_DJI_20260329_155058_223.jpg',
-      19 => '19_IMG_1252.jpg', 22 => '22_IMG_1276.jpg', 24 => '24_IMG_1280.jpg',
-      27 => '27_IMG_1313.jpg', 30 => '30_IMG_1350.jpg', 35 => '35_IMG_1750.jpg',
-      36 => '36_IMG_1757.jpg', 40 => '40_IMG_1862.jpg', 46 => '46_IMG_1877.jpg',
-      48 => '48_IMG_1880.jpg', 51 => '51_IMG_2816.jpg',
-  ][$k];
-  // the wall above a plate's photograph, for phones (pq2/wall-NN.jpg: its top rows)
-  $wall = fn ($k) => "--wall:url('/storage/why/pq2/wall-$k.jpg?v=" . @filemtime(storage_path("app/public/why/pq2/wall-$k.jpg")) . "')";
+  // his photographs, graded as one set (storage/app/public/why/pq2/NN.jpg: the wall
+  // of every picture made the same neutral grey, in linear light; recipe in the commit)
+  $ph = fn ($k) => sprintf('/storage/why/pq2/%02d.jpg', $k);
+  // a plate's photograph with its own wall carried on above it (pq2/tall-NN.jpg):
+  // one picture, so there is no seam to hide and the plate may move like any other
+  $tall = fn ($k) => sprintf('/storage/why/pq2/tall-%02d.jpg', $k);
 @endphp
 
 {{-- =============================================================================
@@ -46,13 +41,19 @@
      the page onto the wall and back — that is the whole idea.
 
      One rule: the big lines are set in ink on his wall (a "plate").
-       wide screens  the photograph cropped to the plate's own window, the
-                     words on the wall inside it, sized in cqi so they keep
-                     their place in the picture at any width
-       phones        the whole photograph, full width, and the wall carried on
-                     above it (pq2/wall-NN.jpg: the photo's own top rows, stretched;
-                     his panels are vertical, so the seams run on) — the words get
-                     a wall of their own and the car is never cropped
+       Every plate is ONE picture: pq2/tall-NN.jpg, his photograph with its own
+       wall carried on above it (per column the tone of the top band, so the panel
+       joints run on straight; a grain matched to his; the last rows fade into a
+       mirror of the photo's first rows). No seam exists, so the plate can move.
+       phones        the plate is the words, then a 4:3 window: the picture is
+                     anchored at its foot, the whole photograph shows under the
+                     words and the car is never cropped
+       wide screens  the plate is a window on the same picture, the words set on
+                     the wall inside it in cqi; --cut trims the asphalt so the
+                     wall, not the car, gets the room
+     All his photographs are graded as one set (pq2/NN.jpg): the wall of each is
+     the same neutral grey (sRGB 208) in linear light, close shots white balance
+     only, a soft shoulder so the white leather never clips.
      Where a photograph has no wall (details, interiors) the words sit beside
      it on the page, like a caption, at reading size or larger — never small.
 
@@ -64,10 +65,11 @@
      the delivery (48) · the record · their words · the end (27).
 
      Motion is quiet and transform/opacity only: a picture arrives through its
-     own frame (a mask: the frame clips, the picture rises 12% into it and its
-     scale settles), and drifts ±3% inside the frame as you scroll (scrubbed,
-     linear). The welcome's frame opens from 90% to the whole width as it comes
-     up (scrubbed). No JS or reduced motion: the same page, still.
+     own frame (the frame clips, the picture rises into it and its scale settles
+     slowly), and drifts a little inside the frame as you scroll (scrubbed,
+     linear). On a plate the words come a beat after their wall. The welcome's
+     frame opens from 90% to the whole width (scrubbed). No JS or reduced motion:
+     the same page, still.
      ========================================================================== --}}
 
 @section('content')
@@ -75,12 +77,13 @@
 
   {{-- ---- the cover ---------------------------------------------------------- --}}
   <section class="pq-cover pq-wrap" aria-labelledby="pq-h1">
-    <div class="pq-plate pq-plate--cover" style="{{ $wall(22) }}">
+    <div class="pq-plate pq-plate--cover">
       <div class="pq-plate__in">
         <h1 class="pq-w" id="pq-h1"><span>Un coche bien elegido.</span> <span>Y alguien que responde.</span></h1>
+        <div class="pq-win" aria-hidden="true"></div>
         <div class="pq-f"><div class="pq-px">
-          <x-img :src="$ph(22)" alt="BMW Serie 4 Cabrio azul con la capota abierta, de perfil, ante una pared blanca"
-                 sizes="(min-width: 600px) min(92vw, 1600px), 100vw" :max="2000" :fallback="1080" :priority="true" />
+          <x-img :src="$tall(22)" alt="BMW Serie 4 Cabrio azul con la capota abierta, de perfil, ante una pared blanca"
+                 sizes="(min-width: 1000px) min(92vw, 1600px), 100vw" :max="2000" :fallback="1080" :priority="true" />
         </div></div>
       </div>
     </div>
@@ -88,28 +91,32 @@
 
   {{-- ---- seleccionados, revisados, preparados ---------------------------------- --}}
   <section class="pq-three pq-wrap" aria-label="Seleccionados, revisados y preparados">
-    <div class="pq-plate pq-plate--sel" style="{{ $wall(40) }}" data-r>
+    <div class="pq-plate pq-plate--sel" data-r>
       <div class="pq-plate__in">
         <p class="pq-w">Seleccionados.</p>
+        <div class="pq-win" aria-hidden="true"></div>
         <div class="pq-f"><div class="pq-px">
-          <x-img :src="$ph(40)" alt="Mercedes-Benz Clase C negro con llantas AMG, de tres cuartos"
-                 sizes="(min-width: 1000px) 62vw, (min-width: 600px) 92vw, 100vw" :max="2000" />
+          <x-img :src="$tall(40)" alt="Mercedes-Benz Clase C negro con llantas AMG, de tres cuartos"
+                 sizes="(min-width: 1000px) 60vw, 100vw" :max="2000" />
         </div></div>
       </div>
     </div>
+    {{-- the word above its picture, like the two on the wall: each of the three
+         words is the top-left corner of its own photograph --}}
     <figure class="pq-pic pq-pic--rev">
+      <figcaption class="pq-word">Revisados.</figcaption>
       <div class="pq-f" data-r><div class="pq-f__in"><div class="pq-px">
         <x-img :src="$ph(35)" alt="Rueda del Škoda Octavia RS con la pinza de freno roja"
-               sizes="(min-width: 1000px) 28vw, (min-width: 600px) 60vw, 134vw" :max="1080" />
+               sizes="(min-width: 1000px) 28vw, 82vw" :max="1080" />
       </div></div></div>
-      <figcaption class="pq-word">Revisados.</figcaption>
     </figure>
-    <div class="pq-plate pq-plate--pre" style="{{ $wall(51) }}" data-r>
+    <div class="pq-plate pq-plate--pre" data-r>
       <div class="pq-plate__in">
         <p class="pq-w">Preparados.</p>
+        <div class="pq-win" aria-hidden="true"></div>
         <div class="pq-f"><div class="pq-px">
-          <x-img :src="$ph(51)" alt="Mercedes-Benz Clase C plata AMG, de tres cuartos"
-                 sizes="(min-width: 1000px) 70vw, (min-width: 600px) 92vw, 100vw" :max="2000" />
+          <x-img :src="$tall(51)" alt="Mercedes-Benz Clase C plata AMG, de tres cuartos"
+                 sizes="(min-width: 1000px) 60vw, 100vw" :max="2000" />
         </div></div>
       </div>
     </div>
@@ -175,12 +182,13 @@
   {{-- ---- te lo enseño: one car, walked round ---------------------------------- --}}
   <section class="pq-show" aria-labelledby="pq-show">
     <div class="pq-wrap">
-      <div class="pq-plate pq-plate--show" style="{{ $wall(14) }}" data-r>
+      <div class="pq-plate pq-plate--show" data-r>
         <div class="pq-plate__in">
           <h2 class="pq-w" id="pq-show"><span>Te lo enseño</span> <span>antes de que vengas.</span></h2>
+          <div class="pq-win" aria-hidden="true"></div>
           <div class="pq-f"><div class="pq-px">
-            <x-img :src="$ph(14)" alt="Mercedes-Benz Clase C gris, de tres cuartos"
-                   sizes="(min-width: 600px) min(92vw, 1600px), 100vw" :max="2000" />
+            <x-img :src="$tall(14)" alt="Mercedes-Benz Clase C gris, de tres cuartos"
+                   sizes="(min-width: 1000px) min(92vw, 1600px), 100vw" :max="2000" />
           </div></div>
         </div>
       </div>
@@ -238,7 +246,9 @@
   <section class="pq-welcome" aria-labelledby="pq-keys">
     <div class="pq-open">
       <div class="pq-open__in">
-        <x-img src="/storage/why/welcome-graded.jpg" alt="Iulian, con los brazos abiertos, delante de cuatro coches preparados para entregar"
+        {{-- welcome-graded.jpg, white-balanced with the set (pq2/welcome.jpg: its wall
+             was the one warm-yellow wall on the page; 85% neutral, brightness kept) --}}
+        <x-img src="/storage/why/pq2/welcome.jpg" alt="Iulian, con los brazos abiertos, delante de cuatro coches preparados para entregar"
                sizes="(max-aspect-ratio: 4/3) 134vh, 100vw" :max="2000" />
         <h2 class="pq-w" id="pq-keys"><span>Las llaves son tuyas.</span> <span>Mi teléfono sigue disponible.</span></h2>
       </div>
@@ -248,12 +258,13 @@
 
   {{-- ---- his words, IV: after the delivery ----------------------------------- --}}
   <section class="pq-after pq-wrap" aria-labelledby="pq-t4">
-    <div class="pq-plate pq-plate--after" style="{{ $wall(48) }}" data-r>
+    <div class="pq-plate pq-plate--after" data-r>
       <div class="pq-plate__in">
         <h2 class="pq-w" id="pq-t4"><span>La confianza se demuestra</span> <span>después de la entrega.</span></h2>
+        <div class="pq-win" aria-hidden="true"></div>
         <div class="pq-f"><div class="pq-px">
-          <x-img :src="$ph(48)" alt="Mercedes-Benz Clase C negro, de tres cuartos trasero"
-                 sizes="(min-width: 600px) min(92vw, 1600px), 100vw" :max="2000" />
+          <x-img :src="$tall(48)" alt="Mercedes-Benz Clase C negro, de tres cuartos trasero"
+                 sizes="(min-width: 1000px) min(92vw, 1600px), 100vw" :max="2000" />
         </div></div>
       </div>
     </div>
@@ -302,12 +313,13 @@
 
   {{-- ---- the way in ---------------------------------------------------------- --}}
   <section class="pq-end pq-wrap" aria-labelledby="pq-end">
-    <div class="pq-plate pq-plate--end" style="{{ $wall(27) }}" data-r>
+    <div class="pq-plate pq-plate--end" data-r>
       <div class="pq-plate__in">
         <h2 class="pq-w" id="pq-end">Hay coches que llevas tiempo imaginando.</h2>
+        <div class="pq-win" aria-hidden="true"></div>
         <div class="pq-f"><div class="pq-px">
-          <x-img :src="$ph(27)" alt="BMW Serie 4 Cabrio azul con la capota abierta, de tres cuartos trasero"
-                 sizes="(min-width: 600px) min(92vw, 1600px), 100vw" :max="2000" />
+          <x-img :src="$tall(27)" alt="BMW Serie 4 Cabrio azul con la capota abierta, de tres cuartos trasero"
+                 sizes="(min-width: 1000px) min(92vw, 1600px), 100vw" :max="2000" />
         </div></div>
       </div>
     </div>

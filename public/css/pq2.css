@@ -3,44 +3,64 @@
    Phone first. Tokens only (mc-tokens.css); the few local values are named
    here with the reason. The view's header comment holds the direction.
 
-   Two modes for a "plate" (a photograph with words on its wall):
-     phone   (upright, < 1000 px: phones and tablets)  the whole 4:3 photograph, full width, and
-             above it the wall carried on (--wall: the photo's own top rows,
-             stretched to fit); the words sit on that wall in normal flow.
-     frame   (1000 px and up, or any landscape screen)  the photograph cropped
-             to the plate's window (--ar-t upright, --ar-d landscape), the
-             words absolutely placed on the wall, sized in cqi of the plate.
+   A "plate" is one picture (pq2/tall-NN.jpg: his photograph with its own wall
+   carried on above it) with the words set on that wall.
+     phone   (upright, < 1000 px)  the words in flow, then .pq-win, a 4:3 box:
+             the picture fills the plate anchored at its foot, so the whole
+             photograph sits exactly in the window and the wall runs on above it.
+     frame   (1000 px and up, or any landscape screen)  .pq-win is the window
+             (--ar-d), the words absolutely placed on the wall, sized in cqi;
+             --cut lowers the picture past its foot (trims asphalt, adds wall).
+
+   THE GRID. One left edge for every word on a phone: the margin (--pq-m). From
+   1000 px a 12-column grid; every column of reading text starts on column 8, every
+   picture beside it ends on column 6, so one column of air runs down the page.
+
+   THE TYPE. Five sizes, no others:
+     d1  one or two words that ARE the scene (on the wall, or above a detail)
+     d2  a heading (h2, a plate's sentence)
+     d3  a line a picture answers (captions, the gallery's words)
+     l   the lede: one sentence between a heading and the prose, set in 500
+     prose  the reading text
    ========================================================================== */
 
 .pq{
-  /* the magazine's margin: the site gutter on a phone, opening to 80 px */
-  --pq-m: clamp(var(--mc-gutter-m), 5vw, 5rem);
+  /* the magazine's margin: 20 px on a phone, opening to 80 px */
+  --pq-m: clamp(1.25rem, 5vw, 5rem);
   /* wider than --mc-container (1200): photographs want the room; text keeps its own measure */
   --pq-max: 1600px;
   --pq-gap: clamp(var(--s-4), 2.4vw, var(--s-7));
-  --pq-sec: var(--s-9);                    /* the air between scenes */
+  --pq-sec: var(--s-9);                    /* the air between scenes: 96 */
+  --pq-d1: clamp(2.5rem, 12.6vw, 6.5rem);
+  --pq-d2: clamp(1.75rem, 9vw, 4.25rem);
+  --pq-d3: clamp(1.5rem, 6.4vw, 2.375rem);
+  --pq-l:  clamp(1.25rem, 5.1vw, 1.625rem);
+  /* the slow curve of every arrival: out, long tail (--e-out is the 420 ms UI curve) */
+  --pq-e: cubic-bezier(.16, .84, .3, 1);
   background: var(--mc-surface); color: var(--mc-ink);
 }
 @media (min-width: 1000px){ .pq{ --pq-sec: var(--s-10); } }
 .pq-wrap{ max-width: var(--pq-max); margin-inline: auto; padding-inline: var(--pq-m); box-sizing: border-box; }
-.pq figure{ margin: 0; }
+/* :where() keeps this at zero specificity: the figures' own bleeds below must win
+   (`.pq figure{margin:0}` used to beat every one of them — no figure ever bled) */
+:where(.pq) figure{ margin: 0; }
 .pq > section + section{ margin-top: var(--pq-sec); }
 
 /* ---- type ----------------------------------------------------------------- */
-.pq-w, .pq-h, .pq-line, .pq-word{ margin: 0; color: var(--mc-ink); font-weight: 700; text-wrap: balance; }
-.pq-w{ line-height: .98; letter-spacing: -.045em; }
+.pq-w, .pq-h, .pq-line, .pq-word, .pq-cap figcaption{ margin: 0; color: var(--mc-ink); text-wrap: balance; }
 .pq-w > span, .pq-h > span, .pq-line > span{ display: block; }
-.pq-h{ font-size: clamp(2.1rem, 8.4vw, 4rem); line-height: 1.02; letter-spacing: -.035em; max-width: 16ch; }
-.pq-line{ font-size: clamp(2rem, 8.6vw, 4.4rem); line-height: 1.02; letter-spacing: -.035em; }
-.pq-word{ font-size: clamp(2.4rem, 12.4vw, 5.5rem); line-height: 1; letter-spacing: -.045em; }
-.pq-lede{ margin: 0; font-size: clamp(1.25rem, 4.6vw, 1.75rem); line-height: 1.35; letter-spacing: -.015em;
-  font-weight: 600; color: var(--mc-ink); max-width: 30ch; text-wrap: balance; }
-.pq-read{ max-width: 36rem; }
-.pq-read p{ margin: 0 0 var(--s-5); font-size: var(--t-prose); line-height: 1.7; color: var(--mc-ink-2); text-wrap: pretty; }
+.pq-w   { font-weight: 700; line-height: .96; letter-spacing: -.05em; }
+.pq-word{ font-weight: 700; line-height: .96; letter-spacing: -.05em; font-size: var(--pq-d1); }
+.pq-h   { font-weight: 700; line-height: 1;   letter-spacing: -.042em; font-size: var(--pq-d2); max-width: 15ch; }
+.pq-line{ font-weight: 700; line-height: 1;   letter-spacing: -.042em; font-size: var(--pq-d2); }
+.pq-lede{ margin: 0; font-size: var(--pq-l); line-height: 1.32; letter-spacing: -.018em;
+  font-weight: 500; color: var(--mc-ink); max-width: 26ch; text-wrap: balance; }
+.pq-read{ max-width: 34rem; }
+.pq-read p{ margin: 0 0 1.25em; font-size: var(--t-prose); line-height: 1.68; color: var(--mc-ink-2); text-wrap: pretty; }
 .pq-read p:last-child{ margin-bottom: 0; }
 .pq-read .pq-lead{ color: var(--mc-ink); }
-.pq-read .pq-k{ margin-top: var(--s-6); font-size: clamp(1.25rem, 4.6vw, 1.6rem); line-height: 1.35; letter-spacing: -.015em;
-  font-weight: 600; color: var(--mc-ink); text-wrap: balance; }
+.pq-read .pq-k{ margin-top: var(--s-7); font-size: var(--pq-l); line-height: 1.32; letter-spacing: -.018em;
+  font-weight: 500; color: var(--mc-ink); text-wrap: balance; }
 @media (min-width: 1000px){ .pq-read p{ font-size: 1.1875rem; } }
 
 /* ---- a frame: the photograph inside its window ------------------------------ */
@@ -50,99 +70,137 @@
   object-fit: cover; object-position: var(--op, 50% 50%); }
 
 /* ---- a plate: phone mode first ------------------------------------------------ */
-.pq-plate{ position: relative; overflow: hidden; margin-inline: calc(var(--pq-m) * -1); }
-.pq-plate__in{ display: flex; flex-direction: column; background: var(--wall) 0 0 / 100% 100% no-repeat var(--mc-band); }
-.pq-plate .pq-w{ padding: var(--s-7) var(--pq-m) var(--s-5); font-size: var(--fs, 12.4vw); }
-.pq-plate .pq-f{ --ar: 4 / 3; background: none; }
+.pq-plate{ position: relative; overflow: hidden; margin-inline: calc(var(--pq-m) * -1); container-type: inline-size; }
+.pq-plate__in{ position: relative; display: flex; flex-direction: column; }
+.pq-plate .pq-w{ position: relative; z-index: 1; padding: var(--pq-wt, var(--s-8)) var(--pq-m) 0;
+  font-size: var(--fs, var(--pq-d1)); }
+/* the window: the whole 4:3 photograph, pulled up under the words by --pull of
+   its own (bare wall) height, so every plate keeps the same air between words and roof */
+.pq-win{ aspect-ratio: 4 / 3; margin-top: calc(var(--pull, 0) * -75cqi); }
+.pq-plate .pq-f{ position: absolute; inset: 0; aspect-ratio: auto; background: var(--mc-band); }
+.pq-plate .pq-f img{ object-position: 50% 100%; }
 
 /* the cover is one screen: the wall grows, the car stands at the foot */
 .pq-plate--cover .pq-plate__in{ min-height: calc(100svh - var(--mc-head-h)); }
-.pq-plate--cover .pq-w{ flex: 1; padding-top: var(--s-8); --fs: 12.6vw; }
-.pq-plate--sel{ --fs: 12.4vw; }
-.pq-plate--pre{ --fs: 12.4vw; }
-.pq-plate--show{ --fs: 10vw; }
-.pq-plate--after .pq-w, .pq-plate--end .pq-w{ --fs: 8.8vw; }
+.pq-plate--cover .pq-w{ flex: 1; }
+.pq-plate--cover .pq-win{ margin-top: 0; }
+/* --roof: where the car's roof line is, as a share of the photograph's height
+   (measured on pq2/NN.jpg: the first row where 4% of the pixels leave the wall's
+   tone). It places the words: on a phone the window slides up under them until
+   the roof is 13% of the photo's height below them; on a wide screen their foot
+   is set --gap above the roof, whatever the window's height. */
+.pq-plate--cover{ --roof: .398; }
+.pq-plate--sel  { --roof: .207; }
+.pq-plate--pre  { --roof: .253; }
+.pq-plate--show { --roof: .258; --fs: var(--pq-d2); }
+.pq-plate--after{ --roof: .238; --fs: var(--pq-d2); }
+.pq-plate--end  { --roof: .28;  --fs: var(--pq-d2); }
+.pq-plate:not(.pq-plate--cover){ --pull: calc(var(--roof) - .13); }
 
 /* frame mode */
 @media (min-width: 1000px), (min-aspect-ratio: 1 / 1){
-  .pq-plate{ margin-inline: 0; container-type: inline-size; }
-  .pq-plate__in{ display: block; position: relative; background: none; }
-  /* width is set, so a max-height below shortens the window instead of being
-     transferred through aspect-ratio into a narrower plate (it was: 1206 of 1296 px) */
-  .pq-plate .pq-f{ width: 100%; aspect-ratio: var(--ar-t, 4 / 3); background: var(--mc-band); }
-  .pq-plate .pq-w{ position: absolute; z-index: 1; left: var(--wl, 4.2cqi); top: var(--wt, 3.8cqi); padding: 0;
-    max-width: var(--wm, 80%); font-size: var(--fs-d, 7cqi); }
+  .pq-plate{ margin-inline: 0; }
+  .pq-plate__in{ display: block; }
+  .pq-win{ width: 100%; margin: 0; aspect-ratio: var(--ar-d, 16 / 9);
+    max-height: calc(100svh - var(--mc-head-h) - var(--s-6)); }
+  .pq-plate .pq-f img{ object-position: 50% calc(100% + var(--cut, 0cqi)); }
+  .pq-plate .pq-w{ position: absolute; left: var(--wl, 5cqi); top: var(--wt, 4.6cqi); padding: 0;
+    max-width: var(--wm, 80%); font-size: var(--fs-d, 6.4cqi); }
+  .pq-plate--cover .pq-plate__in{ min-height: 0; }
 }
-@media (min-aspect-ratio: 1 / 1){
-  .pq-plate .pq-f{ aspect-ratio: var(--ar-d, 3 / 2); max-height: calc(100svh - var(--mc-head-h) - var(--s-5)); }
-  .pq-plate .pq-f img{ object-position: var(--op-d, 50% 40%); }
+/* per plate, in frame mode: window, cut, size. A full-width window is shorter than
+   the 4:3 photograph (75cqi), so --cut decides which band of it shows: about 3cqi
+   of asphalt under the tyres, and the rest of the height goes to the wall above
+   the roof. There the words stand on the roof line (bottom = the photo's height
+   under the roof, less the cut, plus --gap), not on the window's top edge. */
+.pq-plate--cover{ --ar-d: 16 / 9;  --cut: 13cqi;  --fs-d: min(7.2cqi, 9svh); }
+.pq-plate--sel  { --ar-d: 1;       --cut: 3cqi;   --fs-d: 10.6cqi; --wt: 6.5cqi; --wl: 6.5cqi; }
+.pq-plate--pre  { --ar-d: 1;       --cut: 2cqi;   --fs-d: 10.6cqi; --wt: 6.5cqi; --wl: 6.5cqi; }
+.pq-plate--show { --ar-d: 3 / 2;   --cut: 12cqi;  --fs-d: min(5.2cqi, 7.4svh); }
+.pq-plate--after{ --ar-d: 3 / 2;   --cut: 11cqi;  --fs-d: min(5.2cqi, 7.4svh); }
+.pq-plate--end  { --ar-d: 3 / 2;   --cut: 11cqi;  --fs-d: min(5.2cqi, 7.4svh); --wm: 56%; }
+@media (min-width: 1000px), (min-aspect-ratio: 1 / 1){
+  .pq-plate--cover .pq-w, .pq-plate--show .pq-w, .pq-plate--after .pq-w, .pq-plate--end .pq-w{
+    top: auto; bottom: calc(75cqi * (1 - var(--roof)) - var(--cut) + var(--gap, 3.6cqi)); }
+  /* on a short screen (1280x720) the window clamped to it cut the words' first line
+     off: it may never be shorter than the photo under the roof, the gap, two lines
+     and a margin above them — then the plate is simply a little taller than the screen */
+  .pq-plate--cover .pq-win, .pq-plate--show .pq-win, .pq-plate--after .pq-win, .pq-plate--end .pq-win{
+    max-height: max(calc(100svh - var(--mc-head-h) - var(--s-6)),
+      calc(75cqi * (1 - var(--roof)) - var(--cut) + var(--gap, 3.6cqi) + 2 * var(--fs-d) + 4cqi)); }
 }
-/* per plate, in frame mode: how large, and where the window sits on the photo */
-.pq-plate--cover{ --fs-d: min(6.8cqi, 9svh); }
-.pq-plate--sel  { --fs-d: min(8.4cqi, 9svh); --ar-d: 4 / 3; --wm: 70%; }
-.pq-plate--pre  { --fs-d: min(8.4cqi, 9svh); --ar-d: 4 / 3; --wm: 70%; }
-.pq-plate--show { --fs-d: min(4.8cqi, 6.4svh); --op-d: 50% 12%; }
-.pq-plate--after{ --fs-d: min(4.4cqi, 6svh); --op-d: 50% 30%; }
-.pq-plate--end  { --fs-d: min(4.4cqi, 6svh); --op-d: 50% 30%; --wm: 52%; }
 
-/* ---- a picture with its words beside or under it ------------------------------ */
-.pq-pic .pq-word, .pq-pic .pq-line{ margin-top: var(--s-4); }
+/* ---- a picture with its words beside, under or above it ----------------------- */
+.pq-pic .pq-line{ margin-top: var(--s-5); }
+/* "para que disfrutes…" closes the three words as the leather's caption: d3, so it
+   does not stand as a second heading beside the next section's h2 */
+.pq-pic--joy .pq-line{ font-size: var(--pq-d3); font-weight: 600; letter-spacing: -.032em; line-height: 1.1; }
+.pq-pic .pq-word{ margin-bottom: var(--s-5); }
 
 /* ---- seleccionados · revisados · preparados · para que disfrutes -------------- */
-.pq-three{ display: grid; gap: var(--s-8); }
+.pq-three{ display: grid; gap: var(--s-9); }
 .pq-pic--rev .pq-f{ --ar: 1; --op: 46% 62%; }
 .pq-pic--joy .pq-f{ --ar: 4 / 5; --op: 62% 55%; }
-@media (max-width: 599px){
-  .pq-pic--rev, .pq-pic--joy{ margin-inline: calc(var(--pq-m) * -1); }
-  .pq-pic--rev figcaption, .pq-pic--joy figcaption{ padding-inline: var(--pq-m); }
+@media (max-width: 999px){
+  /* the caliper steps in from the left and runs off the right edge: the stagger
+     that breaks three full-width pictures in a row */
+  .pq-pic--rev .pq-f{ margin-left: 14%; margin-right: calc(var(--pq-m) * -1); }
+  .pq-pic--joy .pq-f{ margin-inline: calc(var(--pq-m) * -1); }
 }
-@media (min-width: 600px){
-  .pq-pic--rev{ width: 62%; margin-left: auto; }
-  .pq-pic--rev .pq-f{ --ar: 4 / 3; --op: 50% 50%; }
-  .pq-pic--joy .pq-f{ --ar: 4 / 3; --op: 50% 50%; }
+@media (min-width: 600px) and (max-width: 999px){
+  .pq-pic--rev .pq-f{ margin-left: 38%; }
+  .pq-pic--joy .pq-f{ --ar: 4 / 3; --op: 50% 55%; }
 }
+@media (min-aspect-ratio: 1 / 1) and (max-width: 999px){ .pq-pic--rev .pq-f{ margin-left: 50%; } }
 @media (min-width: 1000px){
-  .pq-three{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); row-gap: var(--s-10); align-items: end; }
-  .pq-plate--sel{ grid-column: 1 / 9; }
-  .pq-pic--rev{ grid-column: 9 / 13; width: auto; margin: 0; }
-  .pq-pic--rev .pq-word{ font-size: clamp(2.4rem, 3.6vw, 4rem); }
-  .pq-plate--pre{ grid-column: 4 / 13; }
-  .pq-pic--joy{ grid-column: 1 / 13; display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    column-gap: var(--pq-gap); align-items: end; }
-  .pq-pic--joy .pq-line{ margin: 0 0 var(--s-2); }
+  /* two rows that answer each other: big left + small right, small left + big right */
+  .pq-three{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); row-gap: var(--s-10); }
+  .pq-plate--sel{ grid-column: 1 / 9; grid-row: 1; }
+  .pq-pic--rev{ grid-column: 9 / 13; grid-row: 1; align-self: end; }
+  .pq-pic--rev .pq-word{ font-size: min(5rem, 5.4vw); }
+  .pq-pic--joy{ grid-column: 1 / 5; grid-row: 2; align-self: start; }
+  .pq-plate--pre{ grid-column: 5 / 13; grid-row: 2; }
 }
 
 /* ---- his words, I: three details and his sentences as their captions ---------- */
 .pq-love{ display: grid; gap: var(--s-6); }
-.pq-caps{ display: grid; gap: var(--s-8); margin-block: var(--s-4); }
-.pq-cap figcaption{ margin-top: var(--s-3); font-size: clamp(1.5rem, 6.2vw, 2.25rem); line-height: 1.15;
-  letter-spacing: -.03em; font-weight: 700; color: var(--mc-ink); max-width: 22ch; text-wrap: balance; }
-.pq-cap--a .pq-f{ --ar: 4 / 5; --op: 0% 70%; }
-.pq-cap--b .pq-f{ --ar: 1; --op: 50% 45%; }
-.pq-cap--c .pq-f{ --ar: 4 / 5; --op: 0% 50%; }
+.pq-love > .pq-read{ margin-top: var(--s-4); }
+.pq-caps{ display: grid; gap: var(--s-9); margin-block: var(--s-6) var(--s-4); }
+.pq-cap figcaption{ margin-top: var(--s-4); font-size: var(--pq-d3); line-height: 1.1; letter-spacing: -.032em;
+  font-weight: 600; max-width: 20ch; }
+.pq-cap--a .pq-f{ --ar: 4 / 5; --op: 6% 70%; }
+.pq-cap--b .pq-f{ --ar: 1;     --op: 50% 45%; }
+.pq-cap--c .pq-f{ --ar: 4 / 5; --op: 22% 50%; }
 @media (max-width: 599px){
-  /* an editorial stagger: the first leaves the left margin, the second the right */
-  .pq-cap--a{ margin-left: calc(var(--pq-m) * -1); margin-right: 10%; }
+  /* an editorial stagger: the first leaves the left margin, the second the right,
+     the third is the whole width; every caption stays on the one left edge */
+  .pq-cap--a{ margin-left: calc(var(--pq-m) * -1); margin-right: 12%; }
   .pq-cap--a figcaption{ padding-left: var(--pq-m); }
-  .pq-cap--b{ margin-left: 18%; margin-right: calc(var(--pq-m) * -1); }
+  .pq-cap--b{ margin-left: 22%; margin-right: calc(var(--pq-m) * -1); }
   .pq-cap--c{ margin-inline: calc(var(--pq-m) * -1); }
   .pq-cap--c figcaption{ padding-inline: var(--pq-m); }
 }
 @media (min-width: 600px){
-  .pq-caps{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); row-gap: var(--s-8); }
+  .pq-caps{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); row-gap: var(--s-9); }
   .pq-cap--a{ grid-column: 1 / 8; }
-  .pq-cap--b{ grid-column: 8 / 13; align-self: start; margin-top: var(--s-10); }
+  .pq-cap--b{ grid-column: 9 / 13; align-self: start; margin-top: var(--s-10); }
   .pq-cap--c{ grid-column: 3 / 10; }
-  .pq-cap--a .pq-f{ --ar: 4 / 3; --op: 50% 50%; }
+  .pq-cap--a .pq-f{ --ar: 4 / 3; --op: 50% 55%; }
   .pq-cap--b .pq-f{ --ar: 4 / 5; --op: 50% 40%; }
   .pq-cap--c .pq-f{ --ar: 3 / 2; --op: 50% 60%; }
 }
 @media (min-width: 1000px){
-  .pq-love{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); row-gap: var(--s-7); }
-  .pq-love > .pq-h{ grid-column: 1 / 9; }
-  .pq-love > .pq-lede{ grid-column: 1 / 7; }
-  .pq-caps{ grid-column: 1 / 13; }
-  .pq-love > .pq-read{ grid-column: 7 / 13; }
+  /* the details join the section's own grid, so the third one and the questions
+     can share a row: picture 1-6, text from 8 */
+  .pq-love{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); row-gap: var(--s-6); }
+  .pq-caps{ display: contents; }
+  .pq-love > .pq-h{ grid-column: 1 / 9; grid-row: 1; max-width: none; }
+  .pq-love > .pq-lede{ grid-column: 1 / 6; grid-row: 2; }
+  .pq-cap--a{ grid-column: 1 / 8; grid-row: 3; margin-top: var(--s-8); }
+  .pq-cap--b{ grid-column: 9 / 13; grid-row: 3; margin-top: var(--s-10); }
+  .pq-cap--c{ grid-column: 1 / 7; grid-row: 4; margin-top: var(--s-9); }
+  .pq-cap--c .pq-f{ --ar: 4 / 3; }
+  .pq-love > .pq-read{ grid-column: 8 / 13; grid-row: 4; align-self: end; margin: 0; }
 }
 
 /* ---- the portrait and his story ------------------------------------------------ */
@@ -150,39 +208,49 @@
 .pq-me__ph .pq-f{ --ar: 4 / 5; --op: 56% 50%; }
 @media (max-width: 599px){ .pq-me__ph{ margin-inline: calc(var(--pq-m) * -1); } }
 @media (min-width: 600px){ .pq-me__ph .pq-f{ --ar: 4 / 3; --op: 50% 50%; } }
-.pq-act{ margin: var(--s-6) 0 0; }
+.pq-act{ margin: var(--s-7) 0 0; }
 .pq-act .mc-btn{ min-height: 48px; padding-inline: 1.4rem; white-space: nowrap; }
 @media (min-width: 1000px){
-  .pq-me{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); row-gap: var(--s-6); align-items: start; }
-  .pq-me__ph{ grid-column: 1 / 8; grid-row: 1 / 3; position: sticky; top: var(--s-6); }
+  .pq-me{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); row-gap: var(--s-7); align-items: start; }
+  .pq-me__ph{ grid-column: 1 / 7; grid-row: 1 / 3; position: sticky; top: calc(var(--mc-head-h) + var(--s-6)); }
+  .pq-me__ph .pq-f{ --ar: 4 / 5; --op: 58% 50%; }
   .pq-me__h{ grid-column: 8 / 13; grid-row: 1; }
   .pq-me__t{ grid-column: 8 / 13; grid-row: 2; }
 }
 
 /* ---- te lo enseño: the grey C-Class walked round ---------------------------------- */
-.pq-gal{ list-style: none; margin: var(--s-6) 0 0; padding: 0; }
+.pq-gal{ list-style: none; margin: var(--s-5) 0 0; padding: 0; }
 .pq-slide figure{ height: 100%; }
-.pq-slide .pq-word{ margin-top: var(--s-3); font-size: clamp(1.75rem, 7.6vw, 2.6rem); letter-spacing: -.035em; }
+.pq-slide .pq-word{ margin-top: var(--s-4); font-size: var(--pq-d3); letter-spacing: -.035em; }
 .pq-slide--ext .pq-f{ --op: 66% 60%; }
 .pq-slide--int .pq-f{ --op: 52% 55%; }
 .pq-slide--det .pq-f{ --op: 40% 62%; }
 @media (max-width: 999px){
   /* a swipe that fits the thumb: one picture and the edge of the next */
-  .pq-gal{ display: flex; gap: var(--s-3); overflow-x: auto; overscroll-behavior-x: contain;
+  .pq-gal{ display: flex; gap: var(--s-2); overflow-x: auto; overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory; scroll-padding-inline: var(--pq-m); padding-inline: var(--pq-m);
     scrollbar-width: none; -webkit-overflow-scrolling: touch; }
   .pq-gal::-webkit-scrollbar{ display: none; }
-  .pq-slide{ flex-grow: 0; flex-shrink: 0; flex-basis: 84%; scroll-snap-align: start; }
+  .pq-slide{ flex-grow: 0; flex-shrink: 0; flex-basis: 86%; scroll-snap-align: start; }
   .pq-slide .pq-f{ --ar: 4 / 5; }
   .pq-gal:focus-visible{ outline: 2px solid var(--mc-focus); outline-offset: 2px; }
+  /* the next slide's word does not peek in, cut in half: only slides wholly in view
+     are captioned (pq2.js marks them; without JS every word stays) */
+  .pq-on .pq-slide .pq-word{ transition: opacity 1.1s var(--pq-e); }
+  .pq-on .pq-gal.is-live .pq-slide:not(.is-cur) .pq-word{ opacity: 0; }
 }
-@media (min-width: 600px) and (max-width: 999px){ .pq-slide{ flex-basis: 46%; } }
+@media (min-width: 600px) and (max-width: 999px){
+  .pq-slide{ flex-basis: 46%; }
+  .pq-cap figcaption{ font-size: clamp(1.375rem, 3.4vw, 2rem); }
+}
 @media (min-width: 1000px){
-  .pq-gal{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--pq-gap);
-    max-width: var(--pq-max); margin-inline: auto; padding-inline: var(--pq-m); box-sizing: border-box; }
-  .pq-slide .pq-f{ --ar: 4 / 3; --op: 50% 50%; }
+  .pq-gal{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--pq-gap);
+    max-width: var(--pq-max); margin: var(--pq-gap) auto 0; padding-inline: var(--pq-m); box-sizing: border-box; align-items: start; }
+  .pq-slide .pq-f{ --ar: 4 / 5; }
+  .pq-slide .pq-word{ font-size: min(2.375rem, 2.6vw); }
 }
 .pq-show__end{ margin-top: var(--s-8); }
+@media (min-width: 1000px){ .pq-show__end{ margin-top: var(--s-9); } }
 
 /* ---- what you don't see ---------------------------------------------------------- */
 .pq-paint{ display: grid; gap: var(--s-6); }
@@ -190,11 +258,11 @@
 @media (max-width: 599px){ .pq-paint__ph{ margin-inline: calc(var(--pq-m) * -1); } }
 @media (min-width: 600px){ .pq-paint__ph .pq-f{ --ar: 4 / 3; --op: 50% 50%; } }
 @media (min-width: 1000px){
-  .pq-paint{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); row-gap: var(--s-6); align-items: start; }
-  .pq-paint__ph{ grid-column: 1 / 7; grid-row: 1 / 3; position: sticky; top: var(--s-6); }
+  .pq-paint{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); row-gap: var(--s-7); align-items: start; }
+  .pq-paint__ph{ grid-column: 1 / 7; grid-row: 1 / 3; position: sticky; top: calc(var(--mc-head-h) + var(--s-6)); }
   .pq-paint__ph .pq-f{ --ar: 4 / 5; --op: 30% 50%; }
-  .pq-paint__h{ grid-column: 7 / 13; grid-row: 1; }
-  .pq-paint__t{ grid-column: 7 / 13; grid-row: 2; }
+  .pq-paint__h{ grid-column: 8 / 13; grid-row: 1; }
+  .pq-paint__t{ grid-column: 8 / 13; grid-row: 2; }
 }
 
 /* ---- the welcome: edge to edge, the one bold moment ------------------------------- */
@@ -202,44 +270,48 @@
 .pq-open__in{ position: absolute; inset: 0; }
 .pq-open img{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 49% 22%; display: block; }
 .pq-welcome .pq-w{ position: absolute; z-index: 1; left: 0; right: 0; top: 0; text-align: center;
-  padding: var(--s-8) var(--pq-m) 0; font-size: clamp(1.9rem, 8.6vw, 4.4rem); }
+  padding: var(--s-8) var(--pq-m) 0; font-size: var(--pq-d2); }
 .pq-welcome .pq-w > span{ max-width: 16ch; margin-inline: auto; }
-.pq-welcome__sub{ margin: var(--s-6) auto 0; font-size: clamp(1.15rem, 4.4vw, 1.5rem); line-height: 1.45; font-weight: 600;
-  letter-spacing: -.01em; color: var(--mc-ink); text-align: center; max-width: 44rem; text-wrap: balance; }
+.pq-welcome__sub{ margin: var(--s-7) auto 0; font-size: var(--pq-l); line-height: 1.38; font-weight: 500;
+  letter-spacing: -.018em; color: var(--mc-ink); text-align: center; max-width: 40rem; text-wrap: balance; }
+.pq-welcome__sub > span{ display: block; }
+.pq-welcome__sub > span + span{ margin-top: .35em; }
 @media (min-aspect-ratio: 1 / 1){
   .pq-open{ height: min(100svh, 75vw); }
   .pq-open img{ object-position: 49% 8%; }
-  .pq-welcome .pq-w{ padding-top: calc(var(--s-7) + 2vh); font-size: min(4.4rem, 7.4vh); }
+  .pq-welcome .pq-w{ padding-top: calc(var(--s-7) + 2vh); font-size: min(4.6rem, 7.6vh); }
   .pq-welcome .pq-w > span{ max-width: none; }
 }
 
 /* ---- after the delivery ------------------------------------------------------------ */
 .pq-after__t{ display: grid; gap: var(--s-6); margin-top: var(--s-7); }
 @media (min-width: 1000px){
-  .pq-after__t{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); margin-top: var(--s-8); }
-  .pq-after__lede{ grid-column: 1 / 6; position: sticky; top: var(--s-6); align-self: start; }
-  .pq-after__t .pq-read{ grid-column: 7 / 13; }
+  .pq-after__t{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); margin-top: var(--s-9); }
+  .pq-after__lede{ grid-column: 1 / 6; position: sticky; top: calc(var(--mc-head-h) + var(--s-6)); align-self: start; }
+  .pq-after__t .pq-read{ grid-column: 8 / 13; }
 }
 
-/* ---- the record ---------------------------------------------------------------------- */
-.pq-proof{ background: var(--mc-band); }
-.pq-proof__l{ list-style: none; margin-block: 0; display: grid; grid-template-columns: minmax(0, 1fr);
-  gap: var(--s-7) var(--pq-gap); padding-block: var(--s-9); }
-.pq-proof__l li{ display: flex; flex-direction: column; gap: var(--s-2); min-width: 0; }
-.pq-proof__l b{ font-size: clamp(3rem, 15vw, 5rem); line-height: .95; letter-spacing: -.04em; color: var(--mc-ink); font-weight: 700; }
+/* ---- the record: on the paper, between rules ---------------------------------------- */
+/* was a blue-grey band (--mc-band): the one cold colour on a page whose every wall is
+   now neutral. The figures stand on the paper, held by ink rules. */
+.pq-proof__l{ list-style: none; margin-block: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 var(--pq-gap); }
+.pq-proof__l li{ display: flex; flex-direction: column; gap: var(--s-2); min-width: 0;
+  padding-block: var(--s-5) var(--s-6); border-top: 1px solid var(--mc-ink); }
+.pq-proof__l b{ font-size: clamp(3.25rem, 17vw, 6rem); line-height: .92; letter-spacing: -.05em; color: var(--mc-ink); font-weight: 700; }
 .pq-proof__l li > span{ font-size: var(--t-prose); line-height: 1.4; color: var(--mc-ink-2); max-width: 22ch; }
 @media (min-width: 600px){
   .pq-proof__l{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .pq-proof__l b{ font-size: min(5.5rem, 7vw); }
+  .pq-proof__l li{ padding-block: var(--s-5) 0; }
+  .pq-proof__l b{ font-size: min(6.5rem, 7.4vw); }
 }
 /* the odometer (pq2.js builds the drums; without it the plain numbers stay) */
 .pq-odo{ display: inline-flex; align-items: flex-start; line-height: 1; }
-.pq-odo__c{ position: relative; display: flex; justify-content: center; height: 1em; overflow: hidden; margin-inline-end: -.04em;
+.pq-odo__c{ position: relative; display: flex; justify-content: center; height: 1em; overflow: hidden; margin-inline-end: -.05em;
   -webkit-mask-image: linear-gradient(transparent, #000 10%, #000 90%, transparent);
           mask-image: linear-gradient(transparent, #000 10%, #000 90%, transparent); }
 .pq-odo__s{ display: block; flex: none; letter-spacing: 0; }
 .pq-odo__s > i{ display: block; height: 1em; font-style: normal; text-align: center; }
-.pq-odo__sep{ display: inline-block; margin-inline-end: -.04em; }
+.pq-odo__sep{ display: inline-block; margin-inline-end: -.05em; }
 .pq-odo.is-rolling .pq-odo__s{ will-change: transform; }
 .pq-sr{ position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .pq-odo-on .pq-proof__l li > span{ opacity: 0; transform: translateY(.5em);
@@ -247,53 +319,73 @@
 .pq-odo-on .pq-proof__l li.is-landed > span{ opacity: 1; transform: none; }
 
 /* ---- their words (a customer's photograph is never cropped) ---------------------------- */
-.pq-say .pq-h{ margin-bottom: var(--s-6); }
-.pq-say__l{ list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-5); }
-.pq-q figure{ height: 100%; background: var(--mc-surface); border: 1px solid var(--mc-hairline); }
+/* no cards: the photograph, the words in the system's voice for customers (italic),
+   the name. Like the letters page of a magazine. */
+.pq-say .pq-h{ margin-bottom: var(--s-7); }
+.pq-say__l{ list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-6); }
+.pq-q figure{ height: 100%; }
 .pq-q__ph{ aspect-ratio: var(--r, .75); overflow: hidden; background: var(--mc-band); }
 .pq-q__ph img{ width: 100%; height: 100%; object-fit: contain; display: block; }
-.pq-q__t{ margin: 0; padding: var(--s-4) var(--s-4) var(--s-2); font-size: var(--t-body); line-height: 1.6; color: var(--mc-ink); }
-.pq-q__by{ padding: 0 var(--s-4) var(--s-4); font-size: var(--t-body); font-weight: 600; color: var(--mc-ink); }
-.pq-say__all{ display: inline-flex; align-items: center; min-height: 44px; margin-top: var(--s-4); font-weight: 600; }
+.pq-q__t{ margin: 0; padding-top: var(--s-4); font-family: var(--f-voice); font-style: italic;
+  font-size: 1.0625rem; line-height: 1.55; color: var(--mc-ink); text-wrap: pretty; }
+.pq-q__by{ padding-top: var(--s-3); font-size: var(--t-body); font-weight: 600; color: var(--mc-ink); }
+.pq-say__all{ display: inline-flex; align-items: center; min-height: 44px; margin-top: var(--s-6); font-weight: 600; }
 @media (max-width: 599px){
-  .pq-say__l{ grid-auto-flow: column; grid-auto-columns: 82%; overflow-x: auto; scroll-snap-type: x mandatory;
+  .pq-say__l{ grid-auto-flow: column; grid-auto-columns: 82%; gap: var(--s-4); overflow-x: auto; scroll-snap-type: x mandatory;
     overscroll-behavior-x: contain; scrollbar-width: none; margin-inline: calc(var(--pq-m) * -1);
     padding-inline: var(--pq-m); scroll-padding-inline: var(--pq-m); align-items: start; }
   .pq-say__l::-webkit-scrollbar{ display: none; }
   .pq-q{ scroll-snap-align: start; }
 }
-@media (min-width: 600px){ .pq-say__l{ grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; } }
+@media (min-width: 600px){ .pq-say__l{ grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--pq-gap); align-items: start; } }
 
 /* ---- the way in ------------------------------------------------------------------------ */
 .pq-end{ padding-bottom: var(--pq-sec); }
 .pq-end__t{ margin-top: var(--s-7); }
-.pq-end__p{ margin: 0 0 var(--s-4); max-width: 38rem; font-size: var(--t-sub); line-height: 1.6; color: var(--mc-ink-2); }
-.pq-end__act{ display: flex; flex-wrap: wrap; gap: var(--s-2); max-width: 36rem; margin-top: var(--s-6); }
+.pq-end__p{ margin: 0 0 1.1em; max-width: 34rem; font-size: var(--t-prose); line-height: 1.68; color: var(--mc-ink-2); text-wrap: pretty; }
+.pq-end__p + .pq-end__p{ color: var(--mc-ink); font-size: var(--pq-l); line-height: 1.32; letter-spacing: -.018em; font-weight: 500; max-width: 26ch; text-wrap: balance; }
+.pq-end__act{ display: flex; flex-wrap: wrap; gap: var(--s-2); max-width: 34rem; margin-top: var(--s-6); }
 .pq-end__act .mc-btn{ flex: 1 1 14rem; justify-content: center; min-height: 48px; white-space: nowrap; }
-.pq-end__sign{ margin: var(--s-8) 0 0;
+.pq-end__sign{ margin: var(--s-9) 0 0; padding-top: var(--s-5); border-top: 1px solid var(--mc-ink);
   display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-3); align-items: baseline; }
-.pq-end__sign b{ font-size: var(--t-h3); letter-spacing: .02em; color: var(--mc-ink); }
+.pq-end__sign b{ font-size: var(--t-h3); letter-spacing: -.01em; color: var(--mc-ink); }
 .pq-end__sign span{ font-size: var(--t-sub); color: var(--mc-ink-2); }
+@media (min-width: 1000px){
+  .pq-end__t{ display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); margin-top: var(--s-9); }
+  .pq-end__t > *{ grid-column: 8 / 13; }
+  .pq-end__t > .pq-end__p:first-child{ grid-column: 1 / 6; grid-row: 1 / 3; }
+  .pq-end__sign{ grid-column: 1 / 13; }
+}
 
 /* ---- motion (only with .pq-on: JS present, motion allowed) ------------------------------
-   A picture arrives through its own frame: the frame clips, the picture rises
-   12% into it and fades up, its scale settles from 112% to the 106% the drift
-   needs. Transform and opacity only. pq2.js adds .is-in once, and drifts
-   .pq-px by ±3% of the frame as it crosses the screen (scrubbed, linear). */
-.pq-on [data-r] .pq-f__in, .pq-on .pq-plate[data-r] > .pq-plate__in{
-  opacity: 0; transform: translate3d(0, 12%, 0);
-  transition: opacity calc(var(--m-reveal) * 2) var(--e-out), transform calc(var(--m-reveal) * 3) var(--e-out); }
-.pq-on [data-r].is-in .pq-f__in, .pq-on .pq-plate[data-r].is-in > .pq-plate__in{ opacity: 1; transform: none; }
-.pq-on .pq-px img{ transform: scale(1.12); transition: transform calc(var(--m-reveal) * 4) var(--e-out); }
-.pq-on .is-in .pq-px img{ transform: scale(1.06); }
+   A picture arrives through its own frame: the frame clips, the picture rises 8%
+   into it and fades up, its scale settles from 110% to the 105% the drift needs.
+   On a plate the wall arrives first and the words a beat later, rising 0.3em.
+   Transform and opacity only. Slow: 1.1 s to 2.4 s, on a long-tailed curve. */
+.pq-on [data-r] .pq-f__in{
+  opacity: 0; transform: translate3d(0, 8%, 0);
+  transition: opacity 1.1s var(--pq-e), transform 1.6s var(--pq-e); }
+.pq-on [data-r].is-in .pq-f__in{ opacity: 1; transform: none; }
+.pq-on .pq-px img{ transform: scale(1.1); transition: transform 2.2s var(--pq-e); }
+.pq-on .is-in .pq-px img{ transform: scale(1.05); }
 .pq-on .pq-px{ will-change: transform; }
+/* a plate: the picture grows from its foot (the car stays standing), words after it */
+.pq-on .pq-plate .pq-px img{ transform-origin: 50% 100%; }
+.pq-on .pq-plate[data-r] .pq-f{ opacity: 0; transition: opacity 1.1s var(--pq-e); }
+.pq-on .pq-plate[data-r].is-in .pq-f{ opacity: 1; }
+.pq-on .pq-plate[data-r] .pq-w{ opacity: 0; transform: translate3d(0, .3em, 0);
+  transition: opacity 1.1s var(--pq-e) .25s, transform 1.6s var(--pq-e) .25s; }
+.pq-on .pq-plate[data-r].is-in .pq-w{ opacity: 1; transform: none; }
 /* the cover arrives on its own, with the page (no observer needed) */
-.pq-on .pq-plate--cover .pq-px img{ animation: pq-settle calc(var(--m-reveal) * 4) var(--e-out) both; transform: scale(1.06); }
-@keyframes pq-settle{ from{ transform: scale(1.12); } to{ transform: scale(1.06); } }
-/* a phone plate shows the whole photograph under its stretched wall: any scale or
-   drift would open a seam between the two, so there the plate moves as one piece */
+.pq-on .pq-plate--cover .pq-px img{ animation: pq-settle 2.4s var(--pq-e) both; transform: scale(1.05); }
+.pq-on .pq-plate--cover .pq-w{ animation: pq-rise 1.6s var(--pq-e) .3s both; }
+@keyframes pq-settle{ from{ transform: scale(1.1); } to{ transform: scale(1.05); } }
+@keyframes pq-rise{ from{ opacity: 0; transform: translate3d(0, .3em, 0); } to{ opacity: 1; transform: none; } }
+/* on a phone a plate's picture does not settle: a 1170 x 2700 px bitmap scaling for
+   2.2 s took the frames over 20 ms from 12% to 29% (390 DPR3, CPU x4, A/B). It
+   arrives by opacity alone and its words rise after it. */
 @media (max-width: 999px) and (max-aspect-ratio: 1 / 1){
-  .pq-on .pq-plate .pq-px img{ transform: none; transition: none; animation: none; }
+  .pq-on .pq-plate .pq-px img, .pq-on .pq-plate--cover .pq-px img{ transform: none; transition: none; animation: none; }
   .pq-on .pq-plate .pq-px{ will-change: auto; }
 }
 /* the welcome opens: pq2.js scales the window from 90% to 100% and the picture
@@ -306,12 +398,14 @@
   .pq-word{ font-size: min(4.4rem, 15vh); }
   .pq-h, .pq-line{ font-size: min(3.4rem, 11vh); }
   .pq-lede{ font-size: min(1.6rem, 6.4vh); }
+  .pq-cap figcaption, .pq-slide .pq-word{ font-size: min(2rem, 8vh); }
   .pq-pic--joy .pq-f, .pq-cap .pq-f, .pq-me__ph .pq-f, .pq-paint__ph .pq-f, .pq-slide .pq-f{ max-height: 86vh; }
+  /* a window clamped to the screen's height leaves no wall: there the plate keeps
+     its proportion and is simply taller than the screen */
+  .pq-win{ max-height: none; }
 }
-/* on a phone on its side a window clamped to the screen's height left 50 px of
-   wall and the words ran onto the roof (14, 48 at 844x390): there the plate keeps
-   a 16:9 window and is simply taller than the screen */
-@media (min-aspect-ratio: 1 / 1) and (max-height: 500px){
-  .pq-plate .pq-f{ max-height: none; aspect-ratio: var(--ar-s, 16 / 9); }
-  .pq-plate--sel, .pq-plate--pre{ --ar-s: 4 / 3; }
+/* a phone on its side, under 1000 px: the three words' plates are full width there,
+   so a square window would be a screen and a half of bare wall */
+@media (min-aspect-ratio: 1 / 1) and (max-width: 999px){
+  .pq-plate--sel, .pq-plate--pre{ --ar-d: 4 / 3; --fs-d: 9cqi; --wt: 5cqi; --wl: 5cqi; }
 }
