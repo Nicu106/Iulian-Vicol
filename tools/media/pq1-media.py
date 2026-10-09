@@ -2,7 +2,8 @@
 """/muestras/por-que/1 "Cine" — the pictures, made once from the client's photos.
 
 Run with the rembg venv (rembg, pillow, numpy, scipy):
-    $VENV/bin/python tools/media/pq1-media.py [--only NAME ...]
+    $VENV/bin/python tools/media/pq1-media.py [--only NAME ...] [--ext | --ext-only]
+    $VENV/bin/python tools/media/pq1-media.py --map km equip     (where words can stand)
 
 Writes storage/app/public/why/pq1/ (then chown -R www-data:www-data it):
 
@@ -42,9 +43,9 @@ PHONE = {
     'disf':  ('24_IMG_1280', 0.58),
     'mot':   ('36_IMG_1757', 0.50),
     'color': ('22_IMG_1276', 0.30),
-    'equip': ('30_IMG_1350', 0.62),
+    'equip': ('30_IMG_1350', 0.74),
     'cuid':  ('05_DJI_20250318_103924_729', 0.46),
-    'km':    ('25_IMG_1283', 0.24),
+    'km':    ('25_IMG_1283', 0.34),
     'acc':   ('55_IMG_2853', 0.36),
     'ext':   ('14_DJI_20260329_154326_944', 0.70),
     'int':   ('18_DJI_20260329_155058_223', 0.35),
@@ -165,6 +166,18 @@ EXT_SCALE = 0.25                        # it is wall: a quarter of the resolutio
 NIGHT = np.array([5, 8, 15], np.float32)
 
 def ext(key, src, sides):
+    """The canvas the photograph sits in on a wide screen (and above it on a
+    phone): three photos wide, 2.9 tall, the photo one width in, 1.6 heights down.
+
+    Above the photo: each column's top rows carried up (the panel seams go on),
+    the light falling off into night. Beside it, for a wall frame: the wall
+    carried sideways from the edge column, continuing the photo's own wall line
+    at its own slope (the camera is never quite level), and below that line a
+    FLOOR THAT IS LIGHT, NOT TEXTURE: the asphalt's real grain only next to the
+    photo (mirrored, so it is continuous at the seam), dissolving within 0.28
+    of a photo width into the floor's own smooth tone, which falls off slowly
+    like the edge of a pool of light. A mirrored texture carried far reads as a
+    pattern, and blurred it reads as smudges (it did, at 1440: 2026-10-09)."""
     path = os.path.join(OUT, src + '.jpg') if src.endswith('-wall') else os.path.join(SRC, src + '.jpg')
     im = Image.open(path).convert('RGB')
     W0, H0 = im.size
@@ -174,11 +187,8 @@ def ext(key, src, sides):
     CW, CH = W + 2 * L, T + H + B
     cv = np.zeros((CH, CW, 3), np.float32)
     cv[T:T + H, L:L + W] = ph
-    # above: each column's top rows, carried up (the panel seams continue)
-    top = ph[:4].mean(0)                                  # (W,3)
+    top = ph[:4].mean(0)
     cv[:T, L:L + W] = top[None]
-    # the wall line at each edge: the first row (from the top) where the strip
-    # stops being calm wall (texture or a step in brightness)
     def wall_line(strip):
         lum = strip.mean(2)
         sd = ndi.uniform_filter1d(lum.std(1), 9)
@@ -190,42 +200,48 @@ def ext(key, src, sides):
     yl, yr = wall_line(ph[:, :12]), wall_line(ph[:, -12:])
     if key in WALL_LINE:
         yl, yr = int(WALL_LINE[key][0] * H), int(WALL_LINE[key][1] * H)
+    slope = (yr - yl) / float(W)          # rows per column
     print(key, 'wall line left %.3f right %.3f' % (yl / H, yr / H))
-    yy = np.arange(CH)[:, None]
+    yy = np.arange(CH, dtype=np.float32)[:, None]
     for side in ('l', 'r'):
-        yw = yl if side == 'l' else yr
+        yw0 = yl if side == 'l' else yr
         edge = ph[:, :6].mean(1) if side == 'l' else ph[:, -6:].mean(1)      # (H,3)
-        d = (np.arange(L)[::-1] + 1)[None, :] if side == 'l' else (np.arange(L) + 1)[None, :]   # distance from the photo
-        reg = np.zeros((CH, L, 3), np.float32)
+        d = ((np.arange(L)[::-1] + 1) if side == 'l' else (np.arange(L) + 1)).astype(np.float32)[None, :]
         if sides == 'wall':
-            # wall rows: the edge column carried sideways; the rows above it the same
+            # the wall line, carried on outwards at the photo's own slope
+            yw = T + yw0 + (-slope * d if side == 'l' else slope * d)          # (1,L)
             colv = np.concatenate([np.repeat(edge[:1], T, 0), edge, np.repeat(edge[-1:], B, 0)], 0)
-            reg[:] = colv[:, None, :]
-            # floor rows: the real asphalt beside the car (the outer 8% of the
-            # photo, never the filled-in car), mirror-tiled outwards, falling
-            # into night
-            sw = max(8, int(W * 0.08))
+            wall = np.repeat(colv[:, None, :], L, 1)
+            wall = wall * (1 - 0.16 * np.clip(d / L, 0, 1) ** 1.5)[..., None]
+            # the floor: real grain near the photo, its smooth tone beyond
+            sw = max(8, int(W * 0.10))
             strip = ph[:, :sw] if side == 'l' else ph[:, -sw:][:, ::-1]      # [edge ... inward]
-            tile = np.concatenate([strip, strip[:, ::-1]], 1)                 # edge-out mirror pair
+            tile = np.concatenate([strip, strip[:, ::-1]], 1)
             reps = int(np.ceil(L / tile.shape[1])) + 1
-            mir = np.concatenate([tile] * reps, 1)[:, :L]                      # distance 0 = at the photo
+            mir = np.concatenate([tile] * reps, 1)[:, :L]
             if side == 'l':
                 mir = mir[:, ::-1]
-            floor = np.zeros((CH, L, 3), np.float32)
-            floor[T:T + H] = mir
-            floor[T + H:] = mir[::-1][:B]
-            # the further from the photo, the softer: a mirrored tile repeated
-            # sharp reads as a pattern (it did, at 1440); out of focus it is floor
-            soft = ndi.gaussian_filter(floor, (3, 9, 0))
-            ks = np.clip(d / (0.12 * W), 0, 1)[..., None]
-            floor = floor * (1 - ks) + soft * ks
-            # the edge column's own streaks never reach the floor: below the
-            # wall line the side is floor only
-            fy = np.clip((yy - (T + yw)) / (0.04 * H), 0, 1)[..., None]      # 0 on the wall, 1 on the floor
-            fall = np.exp(-(d / (0.24 * W)) ** 1.5)[..., None]
-            reg = reg * (1 - fy) + (floor * fall + NIGHT * (1 - fall)) * fy
-            # the wall itself dims a little with distance, like the light falling off
-            reg = reg * (1 - 0.18 * np.clip(d / L, 0, 1) ** 2)[..., None] + 0
+            rows = np.zeros((CH, L, 3), np.float32)
+            rows[T:T + H] = mir
+            rows[T + H:] = mir[::-1][:B]
+            rows[:T] = mir[:1]
+            # the smooth tone: the floor strip's per-row median, held steady
+            med = strip.mean(1)                                                # (H,3)
+            med = np.concatenate([np.repeat(med[:1], T, 0), med, med[::-1][:B]], 0)
+            med = ndi.gaussian_filter1d(med, 0.03 * H, axis=0)
+            tone = np.repeat(med[:, None, :], L, 1)
+            kt = np.clip(1 - d / (0.28 * W), 0, 1); kt = kt * kt * (3 - 2 * kt)   # grain weight
+            floor = rows * kt[..., None] + tone * (1 - kt[..., None])
+            # a whisper of grain so the tone never bands (fixed seed: rebuilds are identical)
+            rng = np.random.default_rng(7 if side == 'l' else 11)
+            floor += ndi.gaussian_filter(rng.normal(0, 1.6, (CH, L, 1)), 0.7) * (1 - kt[..., None])
+            # light: full at the photo, falling off like the edge of a pool
+            light = 0.30 + 0.70 * np.exp(-(d / (0.5 * W)) ** 2)
+            floor = floor * light[..., None] + NIGHT * (1 - light[..., None])
+            # wall above its line, floor below; a soft contact line where they meet
+            fy = np.clip((yy - yw) / (0.012 * H), 0, 1)[..., None]
+            contact = 1 - 0.14 * np.exp(-((yy - yw - 0.01 * H) / (0.012 * H)) ** 2)[..., None]
+            reg = (wall * (1 - fy) + floor * fy) * contact
         else:
             fall = np.exp(-d / (0.10 * W))[..., None]
             colv = np.concatenate([np.repeat(edge[:1], T, 0), edge, np.repeat(edge[-1:], B, 0)], 0)
@@ -234,26 +250,48 @@ def ext(key, src, sides):
             cv[:, :L] = reg
         else:
             cv[:, L + W:] = reg
-    # below the photo: its floor mirrored, falling into night
     below = ph[::-1][:B]
     fb = np.exp(-np.arange(1, B + 1) / (0.12 * H))[:, None, None]
     cv[T + H:, L:L + W] = below * fb + NIGHT * (1 - fb)
-    # sides below the photo were built above; the top: light falls off upward
-    up = np.clip((T - 0.55 * H - yy) / (0.9 * H), 0, 1) ** 1.3        # 0 near the photo, 1 at the canvas top
+    up = np.clip((T - 0.55 * H - yy) / (0.9 * H), 0, 1) ** 1.3
     cv = cv * (1 - up[..., None]) + NIGHT * up[..., None]
     Image.fromarray(np.clip(cv, 0, 255).astype(np.uint8)).save(os.path.join(OUT, key + '-ext.jpg'), quality=84, optimize=True)
     print('   canvas', CW, 'x', CH)
 
+def lummap(key, view=(390, 844)):
+    """Where words can stand on a phone frame: the visible part of the crop at
+    `view`, as a grid of mean luminance (0-9) and calm ('.' flat, ':' some
+    texture, '~' busy). Ink goes on 7-9 '.', white on 0-2 '.'; never a scrim."""
+    n, fx = PHONE[key]
+    im = load(n).convert('L'); W, H = im.size
+    x0 = max(0, min(W - CROP_W, int(round(fx * W - CROP_W / 2))))
+    c = np.asarray(im.crop((x0, 0, x0 + CROP_W, H))).astype(float)
+    vw = int(H * view[0] / view[1]); off = (CROP_W - vw) // 2
+    c = c[:, max(0, off):off + vw]
+    h, w = c.shape
+    print(key, n, 'fx', fx, 'visible', w, 'x', h)
+    for r in range(24):
+        row = ''
+        for k in range(10):
+            b = c[r * h // 24:(r + 1) * h // 24, k * w // 10:(k + 1) * w // 10]
+            row += str(min(9, int(b.mean() / 25.6))) + ('.' if b.std() < 10 else ':' if b.std() < 22 else '~') + ' '
+        print('%3d%% ' % (r * 100 // 24) + row)
+
 if __name__ == '__main__':
+    if '--map' in sys.argv:          # pq1-media.py --map km [equip ...]
+        for k in sys.argv[sys.argv.index('--map') + 1:]:
+            lummap(k)
+        sys.exit()
     only = [x for x in sys.argv[sys.argv.index('--only') + 1:] if not x.startswith('--')] if '--only' in sys.argv else None
     os.makedirs(OUT, exist_ok=True)
+    extonly = '--ext-only' in sys.argv     # just the canvases (no rembg, no crops)
     for k, (n, fx) in PHONE.items():
-        if only is None or k in only:
+        if (only is None or k in only) and not extonly:
             phone(k, n, fx)
     for k, n in HERO.items():
-        if only is None or k in only:
+        if (only is None or k in only) and not extonly:
             hero(k, n)
-    if '--ext' in sys.argv:
+    if '--ext' in sys.argv or extonly:
         for k, (src, sides) in EXT.items():
             if only is None or k in only:
                 ext(k, src, sides)

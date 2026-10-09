@@ -27,9 +27,13 @@
      3  Scrolling is the camera. On those frames the layers scale about the car's
         badge at three rates (wall 3%, words 6%, car 10%): a dolly in. Every
         other frame settles from 106% to 100%. Transform and opacity only.
-     4  The cut. A match cut between the two symmetric fronts (the badge never
-        moves, the car changes), a push-in from the Octavia whole to its wheel,
-        quick dissolves inside a chapter, a dip to black between chapters.
+     4  The cut, always calm. A match dissolve between the two symmetric fronts
+        (the badge never moves, the car changes), a push-in from the Octavia
+        whole that dissolves into its wheel, 0.8 s dissolves inside a chapter, a
+        dip towards night between chapters. A frame waits for its picture.
+     5  Two type sizes: one for the single words, one for every sentence; one
+        left margin, one top line, one foot line. Where a frame's photograph
+        asks for another place it gets one (km, int, disf, mot), never a size.
 
      Iulian's paragraph is set as he wrote it, but each of its sentences gets its
      own picture; his four questions end on his portrait. "Te lo enseño…" is one
@@ -62,14 +66,21 @@
         . '</picture>');
   };
   // an anchored frame: the photograph at its own 4:3, the wall carried on
-  // around it (<k>-ext.jpg, a quarter-resolution canvas three photos wide)
-  $box = function ($key, $photoPath, $alt = '', $first = false, $cls = 'pq-wall') use ($Q, $lq) {
+  // around it (<k>-ext.jpg, a quarter-resolution canvas three photos wide).
+  // On a phone what shows of the canvas is the wall going up into the night, a
+  // gradient: it is fetched at 1080 (sizes 92vw), not at its full 1800.
+  // $plate: the photo is a hero's clean plate — the car is laid over it from its
+  // own sharp file, so what shows of the plate is wall and floor: on a phone it
+  // is fetched at about 2x (sizes 72vw of a 106vw box), not 3x (measured: the
+  // three plates 336 KB -> see the commit; nothing but asphalt grain changes)
+  $box = function ($key, $photoPath, $alt = '', $first = false, $plate = false) use ($Q, $lq) {
+      $cls = 'pq-wall';
       $load = $first ? 'fetchpriority="high" loading="eager"' : 'loading="lazy" decoding="async"';
       $ext = $Q . $key . '-ext.jpg';
       return new \Illuminate\Support\HtmlString(
         '<div class="pq-box ' . $cls . '">'
-        . '<img class="pq-ext" src="' . e(Img::url($ext, 1080) ?? $ext) . '" srcset="' . e(Img::srcset($ext, 2000)) . '" sizes="(min-aspect-ratio: 1/1) 300vh, 360vw" width="1800" height="1305" alt="" ' . $load . '>'
-        . '<img class="pq-ph" src="' . e(Img::url($photoPath, 1080) ?? $photoPath) . '" srcset="' . e(Img::srcset($photoPath, 2000)) . '" sizes="(min-aspect-ratio: 1/1) 100vh, 122vw" width="2400" height="1800" alt="' . e($alt) . '" ' . $load . $lq($photoPath) . '>'
+        . '<img class="pq-ext" src="' . e(Img::url($ext, 1080) ?? $ext) . '" srcset="' . e(Img::srcset($ext, 2000)) . '" sizes="(min-aspect-ratio: 1/1) 300vh, 92vw" width="1800" height="1305" alt="" ' . $load . '>'
+        . '<img class="pq-ph" src="' . e(Img::url($photoPath, 1080) ?? $photoPath) . '" srcset="' . e(Img::srcset($photoPath, 2000)) . '" sizes="(min-aspect-ratio: 1/1) 100vh, ' . ($plate ? '72vw' : '107vw') . '" width="2400" height="1800" alt="' . e($alt) . '" ' . $load . $lq($photoPath) . '>'
         . '</div>');
   };
   // the car, cut out: same frame as the photograph, so it sits exactly on it.
@@ -78,7 +89,7 @@
       $c = $Q . $key . '-car.webp';
       $load = $first ? 'fetchpriority="high" loading="eager"' : 'loading="lazy" decoding="async"';
       return new \Illuminate\Support\HtmlString(
-        '<div class="pq-box pq-car"><img src="' . e(Img::url($c, 1080) ?? $c) . '" srcset="' . e(Img::srcset($c, 2000)) . '" sizes="(min-aspect-ratio: 1/1) 100vh, 122vw" width="2400" height="1800" alt="" ' . $load . '></div>');
+        '<div class="pq-box pq-car"><img src="' . e(Img::url($c, 1080) ?? $c) . '" srcset="' . e(Img::srcset($c, 2000)) . '" sizes="(min-aspect-ratio: 1/1) 100vh, 107vw" width="2400" height="1800" alt="" ' . $load . '></div>');
   };
 @endphp
 
@@ -95,18 +106,18 @@
      scripts make), so the screen never jumps from the essay to the film --}}
 <script>(function(d){var m=window.matchMedia;if(!(m&&m('(prefers-reduced-motion: reduce)').matches)&&'IntersectionObserver' in window&&window.requestAnimationFrame)d.className+=' wy-on pq-on';})(document.documentElement)</script>
 {{-- the opening frame: its wall, its car --}}
-<link rel="preload" as="image" imagesrcset="{{ Img::srcset($Q.'open-wall.jpg', 2000) }}" imagesizes="(min-aspect-ratio: 1/1) 100vh, 122vw" fetchpriority="high">
-<link rel="preload" as="image" imagesrcset="{{ Img::srcset($Q.'open-car.webp', 2000) }}" imagesizes="(min-aspect-ratio: 1/1) 100vh, 122vw" fetchpriority="high">
+<link rel="preload" as="image" imagesrcset="{{ Img::srcset($Q.'open-wall.jpg', 2000) }}" imagesizes="(min-aspect-ratio: 1/1) 100vh, 72vw" fetchpriority="high">
+<link rel="preload" as="image" imagesrcset="{{ Img::srcset($Q.'open-car.webp', 2000) }}" imagesizes="(min-aspect-ratio: 1/1) 100vh, 107vw" fetchpriority="high">
 @endpush
 
 @section('content')
 <main class="wy pq">
 
   {{-- ---- I · the opening: four words, four cars ------------------------------ --}}
-  <section class="pq-ch pq-ch--first" data-pq style="--len:6.35" aria-label="Seleccionados, revisados y preparados">
+  <section class="pq-ch pq-ch--first" data-pq style="--len:6.6" aria-label="Seleccionados, revisados y preparados">
     <div class="pq-stage">
       <figure class="pq-shot pq-hero pq-k-open" data-len="1.3" data-cut="night">
-        {{ $box('open', $Q.'open-wall.jpg', '', true) }}
+        {{ $box('open', $Q.'open-wall.jpg', '', true, true) }}
         <h1 class="pq-w pq-w--hero" data-fit=".9" data-rise>
           <span class="pq-l"><span class="pq-f">Un coche</span> <span class="pq-f">bien elegido.</span></span>
           <span class="pq-l"><span class="pq-f">Y alguien</span> <span class="pq-f">que responde.</span></span>
@@ -114,7 +125,7 @@
         {{ $car('open', true) }}
       </figure>
       <figure class="pq-shot pq-hero pq-k-sel" data-len="1.1" data-cut="match">
-        {{ $box('sel', $Q.'sel-wall.jpg') }}
+        {{ $box('sel', $Q.'sel-wall.jpg', '', false, true) }}
         <p class="pq-w pq-w--hero pq-w--word" data-fit=".92"><span class="pq-l">Seleccionados.</span></p>
         {{ $car('sel') }}
       </figure>
@@ -122,14 +133,14 @@
            and cuts to the wheel itself: the proof, without words --}}
       <figure class="pq-shot pq-k-revw" data-len="1.2" data-cut="cut" data-push>
         {{ $cover('revw', '33_IMG_1739') }}
-        <p class="pq-w pq-w--word pq-at-tl pq-ink pq-beat" data-to=".62" data-fit=".86" data-fit-d=".5"><span class="pq-l">Revisados.</span></p>
+        <p class="pq-w pq-w--word pq-at-tl pq-ink pq-beat" data-to=".62"><span class="pq-l">Revisados.</span></p>
       </figure>
-      <figure class="pq-shot pq-k-rev" data-len=".55" data-cut="hard">
+      <figure class="pq-shot pq-k-rev" data-len=".8" data-cut="cut">
         {{ $cover('rev', '35_IMG_1750') }}
       </figure>
       <figure class="pq-shot pq-k-prep" data-len="1" data-cut="cut">
         {{ $cover('prep', '40_IMG_1862') }}
-        <p class="pq-w pq-w--word pq-at-tl pq-ink" data-fit=".86" data-fit-d=".5"><span class="pq-l">Preparados.</span></p>
+        <p class="pq-w pq-w--word pq-at-tl pq-ink"><span class="pq-l">Preparados.</span></p>
       </figure>
       <figure class="pq-shot pq-k-disf" data-len="1.2" data-cut="cut">
         {{ $cover('disf', '24_IMG_1280') }}
@@ -164,7 +175,7 @@
       </figure>
       <figure class="pq-shot pq-k-equip" data-len="1.1" data-cut="cut">
         {{ $cover('equip', '30_IMG_1350') }}
-        <p class="pq-w pq-w--line pq-at-tr pq-ink pq-nw"><span class="pq-l">Ese equipamiento</span> <span class="pq-l">al que no quieres</span> <span class="pq-l">renunciar.</span></p>
+        <p class="pq-w pq-w--line pq-at-tl pq-ink pq-nw"><span class="pq-l">Ese equipamiento</span> <span class="pq-l">al que no quieres</span> <span class="pq-l">renunciar.</span></p>
       </figure>
       <div class="pq-veil" aria-hidden="true"></div>
     </div>
@@ -187,7 +198,7 @@
       </figure>
       <figure class="pq-shot pq-k-km" data-len="1" data-cut="cut">
         {{ $cover('km', '25_IMG_1283') }}
-        <p class="pq-w pq-w--line pq-at-tr pq-ink"><span class="pq-l">¿qué sabemos</span> <span class="pq-l">de sus kilómetros?</span></p>
+        <p class="pq-w pq-w--line pq-at-tr pq-ink pq-nw"><span class="pq-l">¿qué sabemos</span> <span class="pq-l">de sus kilómetros?</span></p>
       </figure>
       <figure class="pq-shot pq-k-acc" data-len="1" data-cut="cut">
         {{ $cover('acc', '55_IMG_2853') }}
@@ -234,11 +245,11 @@
       </figure>
       <figure class="pq-shot pq-k-ext" data-len="1" data-cut="cut">
         {{ $cover('ext', '14_DJI_20260329_154326_944') }}
-        <p class="pq-w pq-w--word pq-at-tl pq-ink" data-fit=".8" data-fit-d=".34"><span class="pq-l">El exterior.</span></p>
+        <p class="pq-w pq-w--word pq-at-tl pq-ink"><span class="pq-l">El exterior.</span></p>
       </figure>
       <figure class="pq-shot pq-k-int" data-len="1" data-cut="cut">
         {{ $cover('int', '18_DJI_20260329_155058_223') }}
-        <p class="pq-w pq-w--word pq-at-bl pq-white" data-fit=".8" data-fit-d=".46"><span class="pq-l">El interior.</span></p>
+        <p class="pq-w pq-w--word pq-at-bl pq-white"><span class="pq-l">El interior.</span></p>
       </figure>
       <figure class="pq-shot pq-k-desp" data-len="1" data-cut="cut">
         {{ $cover('desp', '16_DJI_20260329_154527_712') }}
@@ -263,7 +274,7 @@
     <div class="pq-stage">
       <figure class="pq-shot pq-k-noves" data-len="1.2" data-drift>
         {{ $cover('noves', '46_IMG_1877') }}
-        <h2 class="pq-w pq-w--line pq-w--h pq-at-tl pq-ink" id="wy-t3"><span class="pq-l">Lo que tú no ves a primera vista también importa.</span></h2>
+        <h2 class="pq-w pq-w--line pq-w--h pq-at-tl pq-ink pq-nw" id="wy-t3"><span class="pq-l">Lo que tú no ves</span> <span class="pq-l">a primera vista</span> <span class="pq-l">también importa.</span></h2>
       </figure>
       <div class="pq-veil" aria-hidden="true"></div>
     </div>
@@ -304,7 +315,7 @@
     <div class="pq-stage">
       <figure class="pq-shot pq-k-conf" data-len="1.2">
         {{ $cover('conf', '48_IMG_1880') }}
-        <h2 class="pq-w pq-w--line pq-w--h pq-at-tl pq-ink" id="wy-t4"><span class="pq-l">La confianza se demuestra después de la entrega.</span></h2>
+        <h2 class="pq-w pq-w--line pq-w--h pq-at-tl pq-ink pq-nw" id="wy-t4"><span class="pq-l">La confianza se</span> <span class="pq-l">demuestra después</span> <span class="pq-l">de la entrega.</span></h2>
       </figure>
       <div class="pq-veil" aria-hidden="true"></div>
     </div>
@@ -356,7 +367,7 @@
   <section class="pq-ch pq-ch--end" data-pq style="--len:1.3" aria-labelledby="pq-end-h">
     <div class="pq-stage">
       <figure class="pq-shot pq-hero pq-k-end" data-len="1.3">
-        {{ $box('end', $Q.'end-wall.jpg') }}
+        {{ $box('end', $Q.'end-wall.jpg', '', false, true) }}
         <h2 class="pq-w pq-w--hero pq-w--line2" id="pq-end-h" data-fit=".9">
           <span class="pq-l"><span class="pq-f">Hay coches</span> <span class="pq-f">que llevas</span></span>
           <span class="pq-l"><span class="pq-f">tiempo</span> <span class="pq-f">imaginando.</span></span>

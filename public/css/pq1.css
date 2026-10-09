@@ -66,12 +66,19 @@
 /* fitted words: each line keeps to itself; pq1.js sets the size that makes the
    longest line fill its measure (CSS sizes stand in without the script) */
 [data-fit] .pq-l{ white-space:nowrap; width:max-content; max-width:none; }
-.pq-w--word{ font-size:clamp(3rem, 15vw, 9rem); letter-spacing:-.05em; line-height:.92; }
-.pq-w--line{ font-size:clamp(2.1rem, 9.6vw, 3.1rem); line-height:1; letter-spacing:-.035em; max-width:11ch; }
+/* The type is two sizes and nothing else. --pq-word is the single word of a
+   frame (Revisados., Preparados., El exterior., El interior.): every one the
+   same size, so the cut from one to the next is a change of picture, never of
+   scale. --pq-line is every sentence set on a frame — the questions, his
+   sentences, the two headings — one size, one leading. The heroes (the
+   opening, Seleccionados., Te lo enseño, the end) are fitted to their car. */
+.pq-shot{ --pq-word:clamp(3rem, 17.4vw, 9rem); --pq-line:clamp(1.55rem, 8.2vw, 2.6rem); }
+.pq-w--word{ font-size:var(--pq-word); letter-spacing:-.05em; line-height:.92; }
+.pq-w--line{ font-size:var(--pq-line); line-height:1.04; letter-spacing:-.03em; max-width:12ch; }
 .pq-w--line .pq-l{ display:block; }
 
-/* where they sit: the margins of the frame, by corner */
-.pq-shot{ --gx:max(1.25rem, env(safe-area-inset-left)); --gt:10svh; --gb:calc(9svh + env(safe-area-inset-bottom)); }
+/* where they sit: one left margin, one top line, one foot line for every frame */
+.pq-shot{ --gx:max(1.25rem, env(safe-area-inset-left)); --gt:9svh; --gb:calc(8svh + env(safe-area-inset-bottom)); }
 .pq-at-tl{ left:var(--gx); top:var(--gt); }
 .pq-at-tr{ right:var(--gx); top:var(--gt); text-align:right; }
 .pq-at-tr .pq-l{ margin-left:auto; }
@@ -91,18 +98,20 @@
    photograph; the anchors are measured on the cut-out (car box, badge). */
 
 /* the opening: 4 Series Cabrio, dead on. Anchor: the roundel. */
-.pq-k-open{ --ax:.504; --ay:.597; --cy:.074; --cb:.931; --ov:.1em; --pw:min(122vw, 62svh); --gap:4svh;
+/* on a phone the whole car is in the frame (86% of the width, mirrors in),
+   with air on both sides; the dolly takes it to 95% */
+.pq-k-open{ --ax:.504; --ay:.597; --cy:.074; --cb:.931; --ov:.22em; --pw:min(106.5vw, 58svh); --gap:6svh;
   --sy:calc(100% - (var(--cb) - var(--ay)) * var(--pw) * .75 - var(--gap)); }
 /* match cut: the C-Class's star lands where the roundel was, its body as wide as
    the Cabrio's was at the end of the walk in (0.807 x 1.10 / 0.886 = 1.00) */
-.pq-k-sel{ --ax:.506; --ay:.575; --cy:.053; --pw:min(122vw, 62svh); --gap:4svh;
-  --sy:calc(100% - (.931 - .597) * var(--pw) * .75 - var(--gap)); --ov:.08em; }
+.pq-k-sel{ --ax:.506; --ay:.575; --cy:.053; --pw:min(106.5vw, 58svh); --gap:6svh;
+  --sy:calc(100% - (.931 - .597) * var(--pw) * .75 - var(--gap)); --ov:.2em; }
 /* the end: the Cabrio three-quarter, the car centred, anchored on its roundel */
-.pq-k-end{ --ax:.71; --ay:.594; --cy:.212; --cb:.901; --pw:min(112vw, 58svh); --gap:5svh;
+.pq-k-end{ --ax:.71; --ay:.594; --cy:.212; --cb:.901; --pw:min(100vw, 54svh); --gap:7svh;
   --sx:calc(50% + .2215 * var(--pw));
   --sy:calc(100% - (var(--cb) - var(--ay)) * var(--pw) * .75 - var(--gap)); --ov:.12em; }
 /* one car turning: the grey C-Class dead on; no cut-out, so the words stand clear */
-.pq-k-show{ --ax:.508; --ay:.69; --cy:.075; --cb:.93; --pw:min(122vw, 62svh); --gap:4svh;
+.pq-k-show{ --ax:.508; --ay:.69; --cy:.075; --cb:.93; --pw:min(106.5vw, 58svh); --gap:6svh;
   --sy:calc(100% - (var(--cb) - var(--ay)) * var(--pw) * .75 - var(--gap)); --ov:-.3em; }
 /* his portrait: on a phone at the foot of the screen, him in the middle, the
    evening sky carried on above for the words */
@@ -132,33 +141,35 @@
 .pq-w--me > .pq-w--line{ grid-area:1 / 1; position:static; }
 .pq-act .mc-btn{ white-space:nowrap; min-height:48px; padding-inline:1.4rem; }
 
-/* headings set on a frame: longer than a line, a step smaller */
-.pq-w--h{ font-size:clamp(1.9rem, 8.4vw, 2.7rem); max-width:12ch; }
+/* the two headings set on a frame are sentences like the others: same size */
+.pq-w--h{ max-width:13ch; }
 
-/* frame by frame, where the photograph asks for it (luminance maps in pq1-media.py) */
-.pq-k-disf, .pq-k-mot{ --gb:calc(3.5svh + env(safe-area-inset-bottom)); }   /* on the dark sill, the grille's foot */
-.pq-k-disf .pq-w, .pq-k-acc .pq-w{ font-size:clamp(1.6rem, 8.6vw, 3.1rem); max-width:none; }   /* two lines, never three: the seat is white, the bumper light */
-.pq-k-acc{ --gb:calc(5svh + env(safe-area-inset-bottom)); }
-.pq-k-conf .pq-w{ font-size:clamp(1.75rem, 7.6vw, 2.5rem); max-width:13ch; }
-.pq-k-equip{ --gt:6svh; }                            /* on the white wall above the door's trim */
-.pq-k-equip .pq-w{ font-size:clamp(1.5rem, 7.2vw, 2.4rem); max-width:none; }
+/* frame by frame, only where the photograph asks for it (luminance maps:
+   tools/media/pq1-media.py --map) — a place, never a size */
+.pq-nw{ max-width:none; }
 .pq-nw .pq-l{ white-space:nowrap; }
+.pq-k-disf, .pq-k-mot{ --gb:calc(4svh + env(safe-area-inset-bottom)); }   /* on the dark sill, the grille's foot */
 .pq-k-int{ --gb:26svh; }                             /* on the black band of the dash */
-.pq-k-km{ --gt:11svh; }                             /* ink on the pale windscreen, under the mirror */
-.pq-k-km .pq-w{ font-size:clamp(1.5rem, 7.2vw, 2.4rem); max-width:none; }
-.pq-k-conf{ --gt:6svh; }
+.pq-k-km{ --gt:12.5svh; }                           /* on the pale windscreen, under the mirror */
 
 /* a tablet upright: the whole photograph, more wall beside the mirror */
 @media (min-aspect-ratio: 2/3) and (max-aspect-ratio: 1/1){
   .pq-k-noves{ --op:0% 40%; }
 }
+/* wherever the whole photograph shows (not the phone's crop), the mirror is on
+   the left of "Ese equipamiento": the words go right, on the wall */
+@media (min-aspect-ratio: 2/3){
+  .pq-k-equip .pq-w{ left:auto; right:var(--gx); text-align:right; }
+  .pq-k-equip .pq-l{ margin-left:auto; }
+}
 
 /* ---- the wide screen ------------------------------------------------------------ */
 @media (min-aspect-ratio: 1/1){
-  .pq-shot{ --gx:max(6vw, calc((100vw - 1440px) / 2)); --gt:12vh; --gb:12vh; }
+  .pq-shot{ --gx:max(6vw, calc((100vw - 1440px) / 2)); --gt:11vh; --gb:11vh;
+             --pq-word:min(10vw, 19vh); --pq-line:clamp(2rem, min(3.5vw, 6.4vh), 4.6rem); }
   .pq-f{ display:inline; }
-  .pq-w--line{ font-size:clamp(2.4rem, min(4.6vw, 8.4vh), 5.6rem); max-width:13ch; }
-  .pq-w--word, .pq-w--hero.pq-w--word{ font-size:min(11vw, 22vh); }
+  .pq-w--line{ max-width:14ch; }
+  .pq-w--hero.pq-w--word{ font-size:min(11vw, 22vh); }
   .pq-w--hero{ font-size:min(7vw, 12vh); }
   .pq-k-open, .pq-k-sel, .pq-k-show{ --pw:min(97svh, 70vw); --gap:5svh; }
   /* the photograph's floor feathers into the carried-on floor at its sides; the
@@ -178,16 +189,16 @@
   .pq-k-me .pq-ext{ display:none; }
   .pq-k-me{ --sx:calc(100% + .16 * var(--pw)); }
   .pq-w--me{ right:auto; top:auto; bottom:var(--gb); max-width:min(30vw, 30rem); color:#FFFFFF; }
-  .pq-w--h{ font-size:clamp(2.2rem, min(3.7vw, 6.8vh), 4.6rem); max-width:15ch; }
-  .pq-k-equip{ --gt:7vh; --op:50% 0%; }
-  .pq-k-equip .pq-w{ font-size:clamp(2.4rem, min(4.2vw, 7.6vh), 5rem); }
+  .pq-w--h{ max-width:13ch; }
+  .pq-w--h.pq-nw{ max-width:13ch; }
+  .pq-w--h .pq-l{ display:inline; }   /* its phrases flow; each phrase stays whole */
+  .pq-k-equip{ --op:50% 0%; }
   .pq-k-int{ --gb:12vh; }
   /* Para que disfrutes: one line along the dark sill */
   .pq-k-disf{ --op:50% 100%; --gb:4vh; }
   .pq-k-prep{ --op:50% 0%; }
   .pq-k-acc{ --gb:3.5vh; }
-  .pq-k-acc .pq-w{ font-size:min(4.2vw, 6.6vh); max-width:none; }   /* two lines inside the dark band at the foot */
-  .pq-k-disf .pq-w{ font-size:min(3.8vw, 6.6vh); }
+  .pq-k-acc .pq-w{ max-width:none; }   /* two lines inside the dark band at the foot */
   .pq-k-disf .pq-w{ max-width:none; }
   .pq-k-disf .pq-l{ display:inline; }
   .pq-k-disf .pq-l + .pq-l::before{ content:" "; }
@@ -195,45 +206,47 @@
   /* one line on the pale windscreen, under the mirror, above the dash
      (the band is 15-31% of the frame's height at 4:3 shown from the top) */
   .pq-k-km{ --op:50% 0%; }
-  .pq-k-km .pq-w{ left:23vw; right:auto; top:calc(100vw * .75 * .165); font-size:min(3.5vw, 6vh); max-width:none; text-align:left; }
+  .pq-k-km .pq-w{ left:23vw; right:auto; top:calc(100vw * .75 * .165); max-width:none; text-align:left; }
   .pq-k-km .pq-l{ display:inline; }
   .pq-k-acc{ --op:50% 100%; }
   .pq-k-conf{ --op:50% 20%; --gt:9vh; }
-  .pq-k-conf .pq-w{ font-size:clamp(2.2rem, min(3.4vw, 6.4vh), 4.4rem); max-width:16ch; }
   .pq-k-noves{ --op:50% 25%; }
   .pq-k-ext{ --op:50% 0%; }
   .pq-k-end{ --ov:-.04em; }
+  /* the car is smaller against the words here: the roof takes only the descenders */
+  .pq-k-open{ --ov:.08em; } .pq-k-sel{ --ov:.1em; }
   .pq-k-enc{ --op:50% 30%; --gt:9vh; }
 }
 
 
 /* ---- each frame's tone ----------------------------------------------------------
    The colour of the photograph BEHIND ITS WORDS, measured on the rendered frames
-   at 390 and 1440 (glyph pixels and a 2px ring; the darkest 5% for ink, the
-   lightest 5% for white — the conservative end). It is painted under the
+   at 320, 360, 390, 844x390, 768, 1440 and 1920 (glyph pixels and a 2px ring;
+   the darkest 5% for ink, the lightest 5% for white, the worst width kept). It is painted under the
    photograph: invisible once the picture is there, the words readable before it
    arrives on a slow phone, and it is what the contrast audit reads (it cannot
-   see an image). Worst measured on the pixels: 6.25:1 (390), 7.17:1 (1440). */
+   see an image). Worst measured on the pixels, 2026-10-09: 4.06:1 (320, 26px bold), 3.55:1
+   (844x390, 74px), 8.88:1 (1440). */
 .pq-shot{ background:var(--tone, var(--pq-night)); }
-.pq-k-open{ --tone:#BABDBA; }
-.pq-k-sel{ --tone:#D1D6D2; }
-.pq-k-revw{ --tone:#B5C2C7; }
+.pq-k-open{ --tone:#ABADAC; }
+.pq-k-sel{ --tone:#CCD0CF; }
+.pq-k-revw{ --tone:#B5C2C9; }
 .pq-k-prep{ --tone:#C2C6BE; }
-.pq-k-disf{ --tone:#394050; }
-.pq-k-mot{ --tone:#535B6D; }
-.pq-k-color{ --tone:#B9BEBD; }
-.pq-k-equip{ --tone:#E6E7EB; }
-.pq-k-cuid{ --tone:#404042; }
-.pq-k-km{ --tone:#969F93; }
-.pq-k-acc{ --tone:#3C464E; }
-.pq-k-show{ --tone:#CBDADB; }
-.pq-k-ext{ --tone:#C4CFD0; }
-.pq-k-int{ --tone:#555F67; }
-.pq-k-desp{ --tone:#DBE6E7; }
-.pq-k-enc{ --tone:#CBD6D7; }
-.pq-k-noves{ --tone:#DEE2DD; }
+.pq-k-disf{ --tone:#3A4052; }
+.pq-k-mot{ --tone:#646A75; }
+.pq-k-color{ --tone:#B7BCBA; }
+.pq-k-equip{ --tone:#E7E6EB; }
+.pq-k-cuid{ --tone:#7C7671; }
+.pq-k-km{ --tone:#B7CDC5; }
+.pq-k-acc{ --tone:#747F8E; }
+.pq-k-show{ --tone:#AFBABD; }
+.pq-k-ext{ --tone:#C3CED1; }
+.pq-k-int{ --tone:#818990; }
+.pq-k-desp{ --tone:#DAE5E6; }
+.pq-k-enc{ --tone:#C6D3D3; }
+.pq-k-noves{ --tone:#DFE2DD; }
 .pq-k-conf{ --tone:#D0D5CF; }
-.pq-k-end{ --tone:#C4CAC3; }
+.pq-k-end{ --tone:#919694; }
 .pq-k-me{ --tone:#E0EFF3; }
 .pq-k-rev{ --tone:#2B2D31; }
 @media (min-aspect-ratio: 1/1){ .pq-k-me{ --tone:var(--pq-night); } }
@@ -260,3 +273,10 @@ html:not(.pq-on) .pq-w--me > .pq-w--line{ grid-area:auto; }
    nothing invisible is measured against the black around the opening frame. */
 .pq .wy-still--welcome .wy-photo{ background-color:#878A7B; }
 .pq .wy-beat[style*="opacity: 0;"], .pq .wy-l[style*="opacity: 0;"]{ visibility:hidden; }
+
+/* a phone on its side: the frame is a letterbox, so "La confianza…" takes two
+   long lines instead of three short ones (three reached the C-Class's roof) */
+@media (min-aspect-ratio: 1/1) and (max-height: 520px){
+  .pq-k-conf .pq-w--h.pq-nw{ max-width:24ch; }
+  .pq-k-conf .pq-w--h .pq-l{ white-space:normal; }
+}

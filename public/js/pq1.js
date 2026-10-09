@@ -6,23 +6,29 @@
    stages, time-based, as on the live page), so the picture and the finger never
    disagree and a flick still lands softly.
 
-   Between frames, the cut (data-cut on the frame that comes in):
-     match  a hard cut, nothing else: the two fronts are pinned by their badge,
-            so the grille stays where it was and the car changes
-     hard   a hard cut (after a push-in: the wheel, close)
-     cut    a short dissolve (0.18 s) — reads as a cut, never flashes
-   Between chapters: a dip to black, scrubbed by the scroll.
+   Between frames (data-cut on the frame that comes in), all of it calm:
+     match  a 1.1 s dissolve with the badge pinned: the two fronts sit on the
+            same point, so the grille stays where it was and the car changes
+     cut    a 0.8 s dissolve, the new frame over the old one, which stays whole
+            underneath until it is covered (no dip in the light halfway); the
+            client reads quick photo changes as cheap, so there are none
+     hard   an instant cut (kept for the record; no frame uses it now)
+   A frame whose picture has not arrived waits for it (at most 1.5 s) while the
+   outgoing frame holds the screen: a blur is never dissolved in.
+   Between chapters: a dip to 60% night, scrubbed by the scroll, so the next
+   picture is seen arriving, never a black slab.
 
    Inside a frame (t = 0..1 across its data-len), scrubbed, linear:
      hero    wall x1.00 -> 1.03, words x1.00 -> 1.06, car x1.00 -> 1.10, all
              about the car's badge: a dolly in, the words between wall and car
      anchor  the frame x1.00 -> 1.04 about its anchor
-     cover   settles from 106% to 100%; data-push: x1.00 -> 1.32 into its focal
-             point, ending on the cut to the close-up; data-drift: a slow pan
-   The words move on time, not on the scroll: they arrive 0.12 s after their
-   frame, line by line (0.7 s, 0.12 s apart, rising 0.32 em; the opening's rise
-   from behind the car's roof), and go with the frame. A frame with beats
-   (.pq-beat data-at / data-to, in t) changes its words inside the frame.
+     cover   settles from 106% to 100%; data-push: x1.00 -> 1.16 into its focal
+             point, dissolving into the close-up; data-drift: a slow pan
+   The words move on time, not on the scroll: they arrive 0.32 s after their
+   frame, line by line (1.1 s on a long exponential ease, 0.09 s apart, rising
+   0.2 em; the opening's rise from behind the car's roof), and go with the
+   frame. A frame with beats (.pq-beat data-at / data-to, in t) changes its
+   words inside the frame. Only a lit frame is its own compositor layer.
 
    Fitted headlines ([data-fit]): sized so the longest line fills that share of
    the screen's width, never taller than the room above the car. Measured, not
@@ -40,25 +46,29 @@
   root.classList.add('pq-on');
 
   var TAU = 0.11, LAG = 0.35;                     // the follow: s per stage; screens before it tightens
-  var T_IN = 0.7, T_OUT = 0.3, STAG = 0.12, WAIT = 0.12;
-  var RISE = 0.32, RISE_HERO = 0.55;              // em: a line rises; the opening rises from behind the roof
-  var XF = 0.18;                                  // s: the dissolve that reads as a cut
-  var SETTLE = 0.06, PUSH = 0.32, DRIFT = 0.03;
+  var T_IN = 1.1, T_OUT = 0.45, STAG = 0.09, WAIT = 0.32;
+  var RISE = 0.2, RISE_HERO = 0.36;               // em: a line rises; the opening rises from behind the roof
+  var XF = 0.8, XF_MATCH = 1.1;                   // s: a calm dissolve between frames; the match dissolve (badge pinned)
+  var SETTLE = 0.06, PUSH = 0.16, DRIFT = 0.03;
   var HERO = [0.03, 0.06, 0.10], ANCHOR = 0.04;   // wall, words, car
-  var DIP_IN = 0.8, DIP_OUT = 0.6;                // screens
+  var DIP_IN = 0.75, DIP_OUT = 0.6, DIP = 0.6;    // screens; how dark: the picture is seen arriving, dimmed, never as a black slab
   var NIGHT = 0.9, FIRST_WORDS = 0.35;            // s: the opening fades up; its words start
+  var WAIT_IMG = 1.5;                             // s: longest a frame waits for its picture
 
-  var E = function (t) { t = t < 0 ? 0 : t > 1 ? 1 : t; return t * t * (3 - 2 * t); };
+  // dissolves and dips: an even in-out (sine); words: a long exponential
+  // arrival, most of the travel in the first third, then a slow settle
+  var E = function (t) { t = t < 0 ? 0 : t > 1 ? 1 : t; return 0.5 - 0.5 * Math.cos(Math.PI * t); };
+  var EX = function (t) { t = t < 0 ? 0 : t > 1 ? 1 : t; return (1 - Math.pow(2, -9 * t)) / (1 - Math.pow(2, -9)); };
   var clamp = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
   var now = performance.now(), vh = window.innerHeight;
   var started = false, t0 = now;
 
-  function tween(v) { return { from: v, to: v, at: 0, dur: 1 }; }
+  function tween(v, ease) { return { from: v, to: v, at: 0, dur: 1, e: ease || E }; }
   function aim(tw, to, dur, delay) {
     if (tw.to === to) return;
     tw.from = val(tw); tw.to = to; tw.at = now + (delay || 0) * 1000; tw.dur = dur;
   }
-  function val(tw) { return now < tw.at ? tw.from : tw.from + (tw.to - tw.from) * E((now - tw.at) / 1000 / tw.dur); }
+  function val(tw) { return now < tw.at ? tw.from : tw.from + (tw.to - tw.from) * tw.e((now - tw.at) / 1000 / tw.dur); }
   function busy(tw) { return tw.from !== tw.to && (now - tw.at) / 1000 < tw.dur; }
   function snap(tw, v) { tw.from = tw.to = v; tw.at = 0; }
 
@@ -82,14 +92,15 @@
         push: s.hasAttribute('data-push'), drift: s.hasAttribute('data-drift'),
         wall: s.querySelector('.pq-wall'), car: s.querySelector('.pq-car'),
         pic: s.querySelector('.pq-pic img'), words: words,
-        op: tween(0), on: false, sty: {},
+        imgs: Array.prototype.slice.call(s.querySelectorAll('img')),
+        op: tween(0), on: false, sty: {}, pending: null,
         beats: groups.map(function (b) {
           var lines = b.classList.contains('pq-act') ? [b] : Array.prototype.slice.call(b.querySelectorAll('.pq-l'));
           return { el: b, at: parseFloat(b.getAttribute('data-at')) || 0,
                    to: b.hasAttribute('data-to') ? parseFloat(b.getAttribute('data-to')) : 9,
                    act: b.classList.contains('pq-act') || !!b.querySelector('a'),
                    rise: b.hasAttribute('data-rise') ? RISE_HERO : RISE,
-                   lines: lines, tin: lines.map(function () { return tween(0); }), sty: [] };
+                   lines: lines, tin: lines.map(function () { return tween(0, EX); }), sty: [] };
         })
       };
       acc += len;
@@ -178,24 +189,41 @@
     var inc = ch.shots[k], out = prev >= 0 ? ch.shots[prev] : null;
     // the boundary's kind belongs to the later of the two frames
     var kind = out ? ch.shots[Math.max(k, prev)].cut : 'hard';
+    var xf = kind === 'match' ? XF_MATCH : XF;
+    var soft = out && kind !== 'hard';
+    // the incoming frame dissolves in OVER the outgoing one, which stays whole
+    // underneath until it is covered (no dip in the light halfway through); a
+    // dissolve already running is taken from where it is, so a flick never flashes
+    var from = Math.min(1, val(inc.op));
     ch.shots.forEach(function (sh, i) {
       if (i === k) return;
-      if (sh === out && kind === 'cut') { aim(sh.op, 0, 0.01, XF); }   // goes once the new frame is in
-      else snap(sh.op, 0);
-      sh.on = false; sh.el.classList.remove('is-on'); sh.el.style.zIndex = '';
+      if (sh === out && soft) { sh.el.style.zIndex = '1'; aim(sh.op, 0, 0.01, xf); }   // goes once the new frame is in
+      else { snap(sh.op, 0); sh.el.style.zIndex = ''; }
+      sh.on = false; sh.el.classList.remove('is-on');
     });
     inc.on = true; inc.el.classList.add('is-on'); inc.el.style.zIndex = '2';
-    if (kind === 'cut' && out) { snap(inc.op, 0); aim(inc.op, 1, XF); }
+    if (soft && from < 0.999) {
+      snap(inc.op, from);
+      // a picture still on its way is never dissolved in as a blur: the frame
+      // waits for it (at most WAIT_IMG), the outgoing one holds the screen
+      if (ready(inc)) aim(inc.op, 1, xf * (1 - from));
+      else { inc.pending = { since: now, xf: xf * (1 - from), out: out }; out.op.at = Infinity; }
+    }
     else snap(inc.op, 1);
+    ch.shots.forEach(function (sh) { if (sh !== inc) sh.pending = null; });
     // its words arrive after it; the other frames' words are reset for next time
     ch.shots.forEach(function (sh, i) {
       if (i === k) return;
       sh.beats.forEach(function (b) { b.tin.forEach(function (tw) { snap(tw, 0); }); });
     });
   }
+  function ready(sh) {
+    for (var i = 0; i < sh.imgs.length; i++) { var im = sh.imgs[i]; if (!(im.complete && im.naturalWidth)) return false; }
+    return true;
+  }
   function wordsFor(ch, sh, t, firstHold) {
     sh.beats.forEach(function (b) {
-      var on = sh.on && !firstHold && t >= b.at && t < b.to;
+      var on = sh.on && !sh.pending && !firstHold && t >= b.at && t < b.to;
       if (b.act && b.el.contains(document.activeElement)) on = true;
       b.tin.forEach(function (tw, j) {
         if (on && tw.to !== 1) aim(tw, 1, T_IN, WAIT + j * STAG);
@@ -217,17 +245,30 @@
       show(ch, k);
       var intro = ch.first ? (started ? (now - t0) / 1000 : 0) : 99;
       // the dip: the stage rises out of the black and falls back into it
-      var dipIn = ch.first ? 0 : 1 - E((x - (ch.top - vh)) / (DIP_IN * vh));
-      var dipOut = E((x - (ch.top + ch.run)) / (DIP_OUT * vh));
+      var dipIn = ch.first ? 0 : DIP * (1 - E((x - (ch.top - vh)) / (DIP_IN * vh)));
+      var dipOut = DIP * E((x - (ch.top + ch.run)) / (DIP_OUT * vh));
       var night = ch.first ? 1 - E(intro / NIGHT) : 0;
       var veil = Math.max(dipIn, dipOut, night);
       if (ch.veil) set(ch.sv, 'veil', ch.veil, 'opacity', veil.toFixed(3));
       if (night > 0.001) moving = true;
 
       ch.shots.forEach(function (sh, i) {
+        if (sh.pending) {
+          moving = true;
+          if (ready(sh) || now - sh.pending.since > WAIT_IMG * 1000) {
+            aim(sh.op, 1, sh.pending.xf);
+            if (sh.pending.out) { sh.pending.out.op.at = 0; snap(sh.pending.out.op, 1); aim(sh.pending.out.op, 0, 0.01, sh.pending.xf); }
+            sh.pending = null;
+          }
+        }
         var op = val(sh.op);
         if (busy(sh.op) || now < sh.op.at) moving = true;
         set(sh.sty, 'op', sh.el, 'opacity', op.toFixed(3));
+        // only a frame that is lit is its own layer (a dissolve is then a
+        // composite, not a repaint of two screens); the rest cost no memory
+        var lit = op > 0.001 || sh.on;
+        set(sh.sty, 'wc', sh.el, 'willChange', lit ? 'opacity' : 'auto');
+        if (sh.pic) set(sh.sty, 'wcp', sh.pic, 'willChange', lit ? 'transform' : 'auto');
         if (op <= 0.001 && !sh.on) return;
         var t = clamp((s - sh.start) / sh.len);
         if (i < k) t = 1; else if (i > k) t = 0;
@@ -241,7 +282,7 @@
           set(sh.sty, 'w', sh.wall, 'transform', 'scale(' + (1 + ANCHOR * t).toFixed(4) + ')');
         } else if (sh.pic) {
           var tr;
-          if (sh.push) tr = 'scale(' + (1 + PUSH * t * t).toFixed(4) + ')';        // the push gathers speed into the cut
+          if (sh.push) tr = 'scale(' + (1 + PUSH * t).toFixed(4) + ')';            // scrubbed, so linear: the scroll is the dolly
           else if (sh.drift) tr = 'scale(' + (1 + SETTLE).toFixed(3) + ') translate3d(' + ((0.5 - t) * DRIFT * 100).toFixed(3) + '%,0,0)';
           else tr = 'scale(' + (1 + SETTLE * (1 - t)).toFixed(4) + ')';
           set(sh.sty, 'p', sh.pic, 'transform', tr);
@@ -301,7 +342,7 @@
       if (ch.near) Array.prototype.forEach.call(ch.el.querySelectorAll('img[loading="lazy"]'), function (im) { im.loading = 'eager'; });
     });
     kick();
-  }, { rootMargin: '150% 0px 150% 0px' });
+  }, { rootMargin: '250% 0px 250% 0px' });
   chEls.forEach(function (el) { io.observe(el); });
 
   // the opening fades up from night when its wall and car can be painted (at most 1.4 s)
