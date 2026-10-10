@@ -28,6 +28,10 @@ class ImageController extends Controller
         if ($path === '') {
             return response('Bad request', 400);
         }
+        // a WIDE width (App\Support\Img::WIDE) is honoured only for a why/ file,
+        // decided below once the path is resolved; for anything else it rounds
+        // exactly as before (down to the top of WIDTHS)
+        $asked = $w;
         if (!in_array($w, self::WIDTHS, true)) {
             $w = null;
             foreach (self::WIDTHS as $c) {
@@ -73,6 +77,10 @@ class ImageController extends Controller
             return response('Not found', 404);
         }
         $sourceFsPath = $real;
+        if (in_array($asked, \App\Support\Img::WIDE, true) && strpos($parsed, '/storage/') === 0
+            && \App\Support\Img::wideAllowed($relative)) {
+            $w = $asked;
+        }
 
         $cacheDir = storage_path('app/public/cache');
         if (!is_dir($cacheDir)) {

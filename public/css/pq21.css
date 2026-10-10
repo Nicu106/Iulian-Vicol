@@ -1,5 +1,6 @@
 /* =============================================================================
-   /muestras/por-que/2 — GALERÍA. /por-que-nosotros as a car magazine.
+   /muestras/por-que/2.1 — GALERÍA, version 2.1 (a copy of 2, which stays frozen
+   in pq2.css). /por-que-nosotros as a car magazine.
    Phone first. Tokens only (mc-tokens.css); the few local values are named
    here with the reason. The view's header comment holds the direction.
 
@@ -37,12 +38,29 @@
      prose  the reading text: ink, not grey; 19 px on a phone, 20 from 1000 px,
             paragraphs indented like a printed page instead of spaced
    and one face for the figures: the same DM Sans file, drawn light (below).
+
+   2.1 (2026-10-10), measured against 2 at 320 → 5120 px:
+   - ONE TEXT EDGE ON A DESK. The header's logo stands on the site container's
+     edge (152 px at 1440, 392 at 1920, 1152 at 3440); the page's words stood on
+     its own 1600 px grid (72 / 240 / 1000). Pictures keep that grid; every word
+     that starts a column-1 line now starts on the logo's x (--pq-ind), so a
+     picture may stand left of the words, never the words left of the logo.
+   - ULTRAWIDE. The grid and the type stop where they stopped (≈1600 px, the
+     sizes of a 1920 screen). The two full-bleed pictures are capped instead:
+     never wider than 2560 px, nor than 1.95 (cover) / 2.4 (welcome) times the
+     screen's height, centred on the paper. The cover's words are inside it at
+     every size; the welcome keeps Iulian whole and all four cars.
    ========================================================================== */
 
 /* the record's figures: the page's own DM Sans file (already loaded, so no new
    bytes) declared once more with its whole weight axis. The site's @font-face
    stops at 400; a magazine sets big figures light. Digits, plus, point and the
    opening quote mark that hangs over their letters. */
+/* the distance from the 1600 px grid's edge to the header logo's x, worked out
+   once on each section (against main.pq, the query container) and inherited as
+   pixels — so a word inside a plate, whose own cqi is the plate, can use it too */
+@property --pq-ind{ syntax: "<length>"; inherits: true; initial-value: 0px; }
+
 @font-face{
   font-family: "PQ Figures";
   src: url(/fonts/dm-sans/dm-sans-latin-normal.woff2) format("woff2");
@@ -76,7 +94,16 @@
 @media (min-width: 1000px){
   .pq{ --pq-head: var(--mc-head-h); --pq-near: var(--s-6); --pq-beat: var(--s-9);
        --pq-sec: calc(var(--s-10) * 1.25);            /* 160 */
-       --pq-p: 1.25rem; }
+       --pq-p: 1.25rem;
+       /* the logo's x: .cat-wrap's content edge (the container, less its desk
+          gutter), from main's own width — not 100vw, which counts the scrollbar */
+       --pq-logo: calc(max(0px, (100cqi - var(--mc-container)) / 2) + var(--mc-gutter-d));
+       /* the margin never wider than the logo's x: from 1000 to 1263 px the pictures
+          and the words come out to the logo (32-63 px) instead of 50-63 px */
+       --pq-m: min(clamp(1.25rem, 5vw, 5rem), var(--pq-logo)); }
+  main.pq{ container: pq / inline-size; }
+  .pq > *, .pq-show > .pq-wrap{
+    --pq-ind: max(0px, var(--pq-logo) - max(0px, (100cqi - var(--pq-max)) / 2) - var(--pq-m)); }
 }
 .pq-wrap{ max-width: var(--pq-max); margin-inline: auto; padding-inline: var(--pq-m); box-sizing: border-box; }
 /* :where() keeps this at zero specificity: the figures' own bleeds below must win */
@@ -86,6 +113,9 @@
 /* ---- type ----------------------------------------------------------------- */
 .pq-w, .pq-h, .pq-line, .pq-word, .pq-cap figcaption{ margin: 0; color: var(--mc-ink); text-wrap: balance; }
 .pq-w > span, .pq-h > span, .pq-line > span{ display: block; }
+/* at -.05em tracking the word space closes with the letters ("Uncoche" at 390):
+   give a little of it back */
+.pq-w, .pq-h, .pq-line, .pq-word{ word-spacing: .06em; }
 .pq-w   { font-weight: 700; line-height: .95; letter-spacing: -.05em; }
 .pq-word{ font-weight: 700; line-height: .95; letter-spacing: -.05em; font-size: var(--pq-d1); }
 .pq-h   { font-weight: 700; line-height: 1;   letter-spacing: -.045em; font-size: var(--pq-d2); max-width: 14ch; }
@@ -169,10 +199,20 @@
   .pq-plate--cover .pq-f img{ inset: 0; width: 100%; height: 100%; min-height: 0; }
   .pq-plate--cover .pq-w{ left: max(var(--pq-m), calc((100cqi - var(--pq-max)) / 2 + var(--pq-m))); right: auto; }
 }
+@media (min-width: 1000px){
+  /* the cover's words on the logo's x. Written from the plate's own width, which
+     is all a word inside it can measure: with the plate centred, logo − plate's
+     left = (plate − container) / 2 + gutter, whatever the screen */
+  .pq-plate--cover .pq-w{ left: max(var(--mc-gutter-d), calc((100cqi - var(--mc-container)) / 2 + var(--mc-gutter-d))); }
+  /* the plates' words on the same x (the plate starts on the grid's edge) */
+  /* (.pq raises them over the per-plate values declared below) */
+  .pq .pq-plate--sel{ --wl: max(6.5cqi, var(--pq-ind)); }
+  .pq .pq-plate--show, .pq .pq-plate--after, .pq .pq-plate--end{ --wl: max(5cqi, var(--pq-ind)); }
+}
 /* per plate, in frame mode: window, cut, size. --cut is the asphalt dk-NN.jpg had
    trimmed under the photograph; the words stand on the roof line (bottom = the
    photo's height under the roof, less the cut, plus --gap), not on the window's top. */
-.pq-plate--cover{ --ar-d: 3 / 2;   --cut: 13cqi;  --fs-d: min(7.6cqi, 11svh); }
+.pq-plate--cover{ --ar-d: 3 / 2;   --cut: 13cqi;  --fs-d: min(7.6cqi, 11svh, 7.5rem); }
 .pq-plate--sel  { --ar-d: 1;       --cut: 3cqi;   --fs-d: 10.6cqi; --wt: 6.5cqi; --wl: 6.5cqi; }
 .pq-plate--pre  { --ar-d: 1;       --cut: 2cqi;   --fs-d: 10.6cqi; --wt: 6.5cqi; --wl: 6.5cqi; }
 .pq-plate--show { --ar-d: 3 / 2;   --cut: 12cqi;  --fs-d: min(5.6cqi, 7.8svh); }
@@ -194,7 +234,22 @@
   .pq-plate--cover .pq-w{ bottom: calc(72.8cqi * (1 - var(--roof)) - 12.6cqi + 4.2cqi); }
   .pq-plate--cover .pq-win{
     height: max(min(calc(100svh - var(--pq-head)), 64.7cqi),
-      calc(72.8cqi * (1 - var(--roof)) - 12.6cqi + 4.2cqi + 2 * var(--fs-d) + 4cqi)); }
+      calc(72.8cqi * (1 - var(--roof)) - 12.6cqi + 4.2cqi + 2 * var(--fs-d) + 4cqi));
+    /* 2.0 clipped its words here: the general .pq-win max-height (one screen less
+       32 px) beat the height above, so on any screen wider than about 1.9:1 the
+       words, anchored to the roof, were pushed out over the top (-222 px at
+       3440 x 1300, -707 at 5120 x 1440). The height above already decides. */
+    max-height: none; }
+}
+/* ultrawide: the cover is never wider than 2560 px nor than 1.95 x the screen's
+   height under the header, centred on the paper. 1.95 is the widest box in which
+   the photo under the roof, the gap and two lines of words still fit one screen
+   (the words' height-bound size is 11svh); so the words stay inside the picture
+   and on the wall at every size. Only from 2.1:1 or 2720 px, so a screen just
+   past the limit never gets a sliver of paper either side (at 2.1:1 the margin
+   is at least 3.5% a side). */
+@media (min-width: 1000px) and (min-aspect-ratio: 21 / 10), (min-width: 2720px){
+  .pq-cover .pq-plate{ max-width: min(100%, 2560px, calc((100svh - var(--pq-head)) * 1.95)); margin-inline: auto; }
 }
 
 /* ---- a picture with its words beside, under or above it ----------------------- */
@@ -236,7 +291,13 @@
 .pq-cap figcaption{ margin-top: var(--pq-tight); font-size: var(--pq-d3); line-height: 1.1; letter-spacing: -.032em;
   font-weight: 600; max-width: 20ch; }
 .pq-cap--a{ grid-column: 1 / -1; }
-.pq-cap--a .pq-f{ --ar: 4 / 5; --op: 6% 70%; }
+/* the vRS on a phone: 5:4, the photograph drawn at 150% from its bottom-left
+   corner, so the window is its left two thirds and lower 71% — the grille, the
+   whole headlamp and the vRS badge, ending in the dark joint between the two
+   lamps. 2.0's 4:5 showed the whole height, so 65% of it was bare bonnet with
+   the tree's green in it, and the badge sat in the bottom 15%. */
+.pq-cap--a .pq-f{ --ar: 5 / 4; }
+.pq-cap--a .pq-f img{ top: auto; right: auto; bottom: 0; left: 0; width: 150%; height: auto; transform-origin: 33% 64%; }
 .pq-cap--b .pq-f{ --ar: 4 / 5; --op: 50% 40%; }
 .pq-cap--c .pq-f{ --ar: 4 / 5; --op: 30% 50%; }
 @media (max-width: 999px){
@@ -249,6 +310,7 @@
 }
 @media (min-width: 600px) and (max-width: 999px){
   .pq-cap--a .pq-f{ --ar: 3 / 2; --op: 50% 60%; }
+  .pq-cap--a .pq-f img{ inset: 0; width: 100%; height: 100%; transform-origin: 50% 50%; }
 }
 @media (min-width: 1000px){
   /* the details join the section's own grid, so the third one and the questions
@@ -259,7 +321,17 @@
      the five beside it, each with its sentence; the questions under them */
   .pq-love > .pq-h{ grid-column: 1 / 9; grid-row: 1; max-width: none; }
   .pq-love > .pq-lede{ grid-column: 1 / 6; grid-row: 2; }
-  .pq-cap--a{ grid-column: 1 / 8; grid-row: 3 / 5; margin-top: var(--pq-beat); }
+  /* the vRS holds its place while the bonnet, the door and the questions read
+     beside it (2.0 left about 650 px of empty columns under it): sticky across
+     the three rows, never taller than the screen with its caption */
+  .pq-cap--a{ grid-column: 1 / 8; grid-row: 3 / 6; margin-top: var(--pq-beat); align-self: start;
+    position: sticky; top: calc(var(--mc-head-h) + var(--s-6)); }
+  .pq-cap--a .pq-f{ width: min(100%, calc((100svh - var(--mc-head-h) - 2 * var(--s-6) - var(--pq-tight) - 3rem) * 4 / 3)); }
+  .pq-cap--a .pq-f img{ inset: 0; width: 100%; height: 100%; transform-origin: 50% 50%; }
+  .pq-love > .pq-h, .pq-love > .pq-lede{ margin-left: var(--pq-ind); }
+  /* its two sentences are its two lines: with the indent, eight columns broke the
+     second one at 1920 (2 lines in 2.0, 3 with the indent); nothing stands beside it */
+  .pq-love > .pq-h{ grid-column: 1 / 13; }
   .pq-cap--b{ grid-column: 8 / 13; grid-row: 3; margin-top: var(--pq-beat); }
   .pq-cap--c{ grid-column: 8 / 13; grid-row: 4; margin-top: var(--pq-near); align-self: end; }
   .pq-cap--a .pq-f{ --ar: 4 / 3; --op: 50% 60%; }
@@ -280,6 +352,10 @@
   .pq-me{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); row-gap: var(--pq-near); align-items: start; }
   .pq-me__ph{ margin: 0; grid-column: 1 / 7; grid-row: 1 / 3; position: sticky; top: calc(var(--mc-head-h) + var(--s-6)); }
   .pq-me__ph .pq-f{ --ar: 4 / 5; --op: 58% 50%; }
+  /* sticky: never taller than the screen under the header (2.0: 871 px in 888 at
+     1920 x 960, 788 in 828 at 1440 x 900 — and cut on any shorter screen); it
+     narrows towards the text and keeps its ratio */
+  .pq-me__ph .pq-f, .pq-paint__ph .pq-f{ width: min(100%, calc((100svh - var(--mc-head-h) - 2 * var(--s-6)) * .8)); margin-left: auto; }
   .pq-me__h{ grid-column: 8 / 13; grid-row: 1; }
   .pq-me__t{ grid-column: 8 / 13; grid-row: 2; margin-top: var(--pq-near); }
 }
@@ -314,7 +390,13 @@
   .pq-slide .pq-f{ --ar: 4 / 5; }
   .pq-slide .pq-word{ font-size: min(2.375rem, 2.6vw); }
 }
-.pq-show__end{ margin-top: var(--pq-beat); }
+/* "Para que sepas…" closes the walk-round as its caption, like "Para que
+   disfrutes…" closes the three words: d3, not a second d2 headline straight
+   before "Lo que tú no ves…". And back on the grid: in 2.0 .pq-line{margin:0}
+   (declared later) beat .pq-wrap's auto margins, so from 1600 px the line sat
+   at x = 80 while its column started at 240 / 1000 / 1840. */
+.pq-show__end{ margin: var(--pq-beat) auto 0; font-size: var(--pq-d3); font-weight: 600; letter-spacing: -.032em; line-height: 1.1; }
+@media (min-width: 1000px){ .pq-show__end{ padding-left: calc(var(--pq-m) + var(--pq-ind)); } }
 
 /* ---- what you don't see ---------------------------------------------------------- */
 .pq-paint{ display: grid; gap: var(--pq-near); }
@@ -343,16 +425,27 @@
 .pq-welcome__sub > span + span{ margin-top: .5em; }
 @media (min-aspect-ratio: 1 / 1){
   .pq-open{ height: min(100svh, 75vw); }
-  .pq-open img{ object-position: 49% 8%; }
+  /* the photograph's band follows the box's shape: its foot at 72% of the
+     picture (Iulian's shoes are at 67.5%, the cars' tyres at 64%) and never
+     past its top. 100cqb - 54cqi = box height − 0.72 × the drawn height (0.75 ×
+     the width). 2.0's fixed 8% lost his legs and the cars from 2.1:1 on. */
+  .pq-open__in{ container-type: size; }
+  .pq-open img{ object-position: 49% min(0px, calc(100cqb - 54cqi)); }
   .pq-welcome .pq-w{ padding-top: calc(var(--s-7) + 2vh); font-size: min(4.6rem, 7.6vh); }
   .pq-welcome .pq-w > span{ max-width: none; }
+}
+
+/* ultrawide: the welcome never wider than 2560 px nor 2.4 x its height, centred on
+   the paper (from 2.5:1 or 2720 px, so the margin is never a sliver) */
+@media (min-aspect-ratio: 5 / 2), (min-width: 2720px){
+  .pq-open{ width: min(100%, 2560px, calc(min(100svh, 75vw) * 2.4)); margin-inline: auto; }
 }
 
 /* ---- after the delivery ------------------------------------------------------------ */
 .pq-after__t{ display: grid; gap: var(--pq-near); margin-top: var(--pq-beat); }
 @media (min-width: 1000px){
   .pq-after__t{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); }
-  .pq-after__lede{ grid-column: 1 / 6; position: sticky; top: calc(var(--mc-head-h) + var(--s-6)); align-self: start; }
+  .pq-after__lede{ margin-left: var(--pq-ind); grid-column: 1 / 6; position: sticky; top: calc(var(--mc-head-h) + var(--s-6)); align-self: start; }
   .pq-after__t .pq-read{ grid-column: 8 / 13; }
 }
 
@@ -377,7 +470,7 @@
   .pq-proof__l li{ display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap);
     align-items: last baseline; padding-block: var(--pq-near); }
   .pq-proof__l li:last-child{ padding-bottom: 0; }
-  .pq-proof__l b{ grid-column: 1 / 8; font-size: min(11rem, 11.5vw); }
+  .pq-proof__l b{ grid-column: 1 / 8; font-size: min(11rem, 11.5vw); margin-left: var(--pq-ind); }
   .pq-proof__l li > span{ grid-column: 8 / 13; font-size: var(--pq-l); line-height: 1.3; letter-spacing: -.02em; max-width: 18ch; }
 }
 /* the odometer (pq2.js builds the drums; without it the plain numbers stay) */
@@ -390,6 +483,12 @@
 .pq-odo__sep{ display: inline-block; margin-inline: .01em .02em; }
 .pq-odo.is-rolling .pq-odo__s{ will-change: transform; }
 .pq-sr{ position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* a tabular 1 carries its side bearings: a leading one is pulled in to the edge */
+.pq-odo__c.is-one{ margin-left: -.08em; }
+/* never a wrong number on screen: until a figure rolls (when 60% of it is in
+   view) it is not drawn at all, so no still frame reads "+0" or "0.000" */
+.pq-odo{ transition: opacity calc(var(--m-reveal) * 1.5) var(--e-out); }
+.pq-odo.is-wait{ opacity: 0; }
 .pq-odo-on .pq-proof__l li > span{ opacity: 0; transform: translateY(.5em);
   transition: opacity var(--m-reveal) var(--e-out), transform var(--m-reveal) var(--e-out); }
 .pq-odo-on .pq-proof__l li.is-landed > span{ opacity: 1; transform: none; }
@@ -398,7 +497,12 @@
 .pq-say .pq-h{ margin-bottom: var(--pq-beat); }
 .pq-say__l{ list-style: none; margin: 0; padding: 0; display: grid; gap: var(--pq-near); }
 .pq-q figure{ height: 100%; }
-.pq-q__ph{ aspect-ratio: var(--r, .75); overflow: hidden; background: var(--mc-band); }
+/* one photo height for the row: the tallest that lets the widest photograph fill
+   its column (--rmax, from the view), each box as wide as its own ratio makes it.
+   Tops, feet and the first line of every letter on one line; nothing cropped */
+.pq-say__l{ container-type: inline-size; }
+.pq-q__ph{ --H: min(75svh, calc(84cqi / var(--rmax, .75)));
+  height: var(--H); width: min(100%, calc(var(--H) * var(--r, .75))); overflow: hidden; background: var(--mc-band); }
 .pq-q__ph img{ width: 100%; height: 100%; object-fit: contain; display: block; }
 /* the letter: a big opening quote mark hung above it, the words in the reading voice */
 .pq-q__t{ margin: 0; padding-top: var(--pq-near); font-family: var(--f-voice); font-style: italic;
@@ -418,8 +522,10 @@
 }
 @media (min-width: 600px){
   .pq-say__l{ grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--pq-gap); align-items: start; }
-  /* the middle letter set a beat lower: a page of letters, not a row of cards */
-  .pq-q:nth-child(3n + 2){ margin-top: var(--pq-beat); }
+  .pq-q__ph{ --H: min(75svh, calc((100cqi - 2 * var(--pq-gap)) / 3 / var(--rmax, .75))); }
+}
+@media (min-width: 1000px){
+  .pq-say > .pq-h, .pq-say__all{ margin-left: var(--pq-ind); }
 }
 
 /* ---- the way in: the closing spread ---------------------------------------------------- */
@@ -442,10 +548,12 @@
 @media (min-width: 1000px){
   .pq-end__t{ display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); align-items: start; }
   .pq-end__t > *{ grid-column: 8 / 13; }
-  .pq-end__t > .pq-end__p:first-child{ grid-column: 1 / 6; grid-row: 1 / 3; }
+  .pq-end__t > .pq-end__p:first-child{ grid-column: 1 / 6; grid-row: 1 / 3; margin-left: var(--pq-ind); }
   .pq-end__p + .pq-end__p{ margin-top: 0; }
-  .pq-end__sign{ grid-column: 1 / 13; flex-direction: row; align-items: baseline; justify-content: space-between; gap: var(--pq-gap); }
-  .pq-end__sign span{ max-width: none; text-align: right; }
+  /* the signature on the page's left edge, as on a phone: the name, then his
+     line (2.0 set the line flush right, the page's only right-aligned display text) */
+  .pq-end__sign{ grid-column: 1 / 13; padding-left: var(--pq-ind); }
+  .pq-end__sign span{ max-width: 24ch; }
 }
 
 /* ---- the buttons: the page's ink, square like the cards; WhatsApp stays in the mark ---- */
@@ -499,11 +607,12 @@
   .pq-word{ font-size: min(4.4rem, 15vh); }
   .pq-h, .pq-line{ font-size: min(3.4rem, 11vh); }
   .pq-lede, .pq-read .pq-k, .pq-read .pq-lead{ font-size: min(1.6rem, 6.4vh); }
-  .pq-cap figcaption, .pq-slide .pq-word, .pq-read .pq-pull, .pq-end__p + .pq-end__p{ font-size: min(2rem, 8vh); }
+  .pq-cap figcaption, .pq-slide .pq-word, .pq-read .pq-pull, .pq-end__p + .pq-end__p, .pq-show__end{ font-size: min(2rem, 8vh); }
   .pq-pic--joy .pq-f, .pq-cap .pq-f, .pq-me__ph .pq-f, .pq-paint__ph .pq-f, .pq-slide .pq-f{ max-height: 86vh; }
   .pq-caps{ grid-template-columns: repeat(3, minmax(0, 1fr)); margin-inline: 0; column-gap: var(--pq-gap); }
   .pq-cap--a{ grid-column: auto; }
   .pq-cap--a .pq-f{ --ar: 4 / 5; }
+  .pq-cap--a .pq-f img{ inset: 0; width: 100%; height: 100%; transform-origin: 50% 50%; }
   .pq-cap figcaption{ padding-inline: 0; }
   /* a window clamped to the screen's height leaves no wall: there the plate keeps
      its proportion and is simply taller than the screen */

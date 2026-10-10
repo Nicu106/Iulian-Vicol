@@ -1,4 +1,4 @@
-/* /muestras/por-que/2 — GALERÍA. Quiet motion, transform and opacity only.
+/* /muestras/por-que/2.1 — GALERÍA (2.1; 2 stays in pq2.js). Quiet motion, transform and opacity only.
 
    1  arrival: each [data-r] gets .is-in once, as it comes on screen (CSS does
       the rest: the picture rises 12% into its frame and settles).
@@ -8,7 +8,10 @@
       function of the scroll position, nothing accumulates.
    3  the welcome opens: its window scales from 90% to 100% as it rises into
       the screen, the picture inside by the inverse (it stands still).
-   4  the record rolls in like an odometer (the live page's drums).
+   4  the record rolls in like an odometer (the live page's drums): only once
+      60% of a figure is in view, a short roll (the last few digits of each drum,
+      ≤ 1.2 s); until then the figure is not drawn, so no still frame reads "+0"
+      or "0.000". A figure scrolled past before it rolled simply stands final.
    5  the gallery (a swipe on phones): only the slides wholly in view show their
       word, so the next one never peeks in cut in half.
    The loop runs only while something on screen can move. Reduced motion, or
@@ -70,6 +73,17 @@
     });
   }, { rootMargin: '10% 0px 10% 0px' });
   items.forEach(function (it) { it.frame.__pq = it; seen.observe(it.frame); });
+  // no drift on a picture that holds still on purpose: a sticky one (it would swim
+  // while pinned) and the cover when it is a centred plate on the paper (2.1:1+)
+  var cover = document.querySelector('.pq-plate--cover');
+  function still() {
+    items.forEach(function (it) {
+      var f = it.frame.closest('figure');
+      it.hold = !!(f && getComputedStyle(f).position === 'sticky') ||
+        (!!cover && cover.contains(it.el) && cover.getBoundingClientRect().width < document.documentElement.clientWidth - 1);
+    });
+  }
+  still(); addEventListener('resize', function () { still(); kick(); });
   if (openItem) { open.__pq = openItem; seen.observe(open); }
 
   var raf = 0;
@@ -79,7 +93,7 @@
     var vh = window.innerHeight, still = phonePlate.matches;
     items.forEach(function (it) {
       if (!it.on) return;
-      if (it.plate && still) { if (it.last !== 0) { it.el.style.transform = ''; it.last = 0; } return; }
+      if ((it.plate && still) || it.hold) { if (it.last !== 0) { it.el.style.transform = ''; it.last = 0; } return; }
       var r = it.frame.getBoundingClientRect();
       // -1 as the frame enters at the foot of the screen, +1 as it leaves at the top
       var t = ((vh + r.height) / 2 - (r.top + r.height / 2)) / ((vh + r.height) / 2);
@@ -138,10 +152,13 @@
       // are set big now (86 px on a phone, 176 on a desk), and a strip of 40 cells
       // at DPR 3 is a 10,000 px layer while it moves: WebKit crashed the page on it
       // (measured, Playwright WebKit 390 DPR 3; 5rem passed, 22vw did not).
+      // a short roll: the drum shows its digit's three predecessors and stops on it
+      // (9 → 6 7 8 9, 1 → 8 9 0 1). A 0 that leads nothing in still rolls, so the
+      // figure moves as one.
       var d = +ch, fromRight = digits - 1 - seenD++;
-      var n = d, html = '';
-      for (var i = 0; i <= n; i++) html += '<i>' + (i % 10) + '</i>';
-      var c = document.createElement('span'); c.className = 'pq-odo__c';
+      var n = 3, html = '';
+      for (var i = 0; i <= n; i++) html += '<i>' + ((d - n + i + 10) % 10) + '</i>';
+      var c = document.createElement('span'); c.className = 'pq-odo__c' + (seenD === 1 && d === 1 ? ' is-one' : '');
       var strip = document.createElement('span'); strip.className = 'pq-odo__s'; strip.innerHTML = html;
       c.appendChild(strip); odo.appendChild(c);
       drums.push({ el: strip, to: n, fromRight: fromRight });
@@ -153,15 +170,24 @@
     // WebKit's page at DPR 2-3 with the figures this size (Playwright WebKit,
     // every phone width tried; bisected to this one line).
     drums.forEach(function (dr) { dr.el.style.transform = 'translateY(0)'; });
-    return { b: b, odo: odo, li: b.closest('li'), drums: drums };
+    odo.classList.add('is-wait');
+    return { b: b, odo: odo, li: b.closest('li'), drums: drums, done: false };
   }
   var odos = nums.map(build);
+  // the figure as it ends: every drum on its last cell, nothing moving
+  function land(it) {
+    if (it.done) return; it.done = true;
+    it.drums.forEach(function (dr) { dr.el.style.transform = 'translateY(' + (-dr.to) + 'em)'; });
+    it.odo.classList.remove('is-wait');
+    if (it.li) it.li.classList.add('is-landed');
+  }
   function roll(it, delay) {
+    if (it.done) return; it.done = true;
     it.odo.classList.add('is-rolling');
+    setTimeout(function () { it.odo.classList.remove('is-wait'); }, delay);
     var last = 0;
     it.drums.forEach(function (dr) {
-      if (!dr.to) { dr.el.style.transform = 'none'; return; }
-      var dur = 1250 + dr.fromRight * 190, end = -dr.to, give = .07;
+      var dur = 900 + dr.fromRight * 75, end = -dr.to, give = .07;
       dr.el.animate([
         { transform: 'translateY(0)' },
         { transform: 'translateY(' + (end - give) + 'em)', offset: .9, easing: 'cubic-bezier(.3,.6,.4,1)' },
@@ -174,15 +200,17 @@
   var queue = [], timer = 0;
   var oio = new IntersectionObserver(function (es) {
     es.forEach(function (e) {
-      if (!e.isIntersecting) return;
-      oio.unobserve(e.target);
-      queue.push(odos.filter(function (it) { return it.b === e.target; })[0]);
+      var it = odos.filter(function (o) { return o.b === e.target; })[0];
+      if (!it || it.done) return;
+      if (e.isIntersecting && e.intersectionRatio >= 0.6) { oio.unobserve(e.target); queue.push(it); }
+      // gone off the top of the screen before it rolled (a jump, a fast fling): final
+      else if (!e.isIntersecting && e.boundingClientRect.top < 0) { oio.unobserve(e.target); land(it); }
     });
-    if (!timer) timer = setTimeout(function () {
+    if (queue.length && !timer) timer = setTimeout(function () {
       queue.sort(function (a, b) { return odos.indexOf(a) - odos.indexOf(b); });
       queue.forEach(function (it, i) { roll(it, i * 140); });
       queue = []; timer = 0;
     }, 60);
-  }, { threshold: 1, rootMargin: '0px 0px -12% 0px' });
+  }, { threshold: [0, 0.6] });
   odos.forEach(function (it) { oio.observe(it.b); });
 })();

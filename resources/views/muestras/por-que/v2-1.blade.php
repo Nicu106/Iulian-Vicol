@@ -33,6 +33,11 @@
   // frame mode: the media query pq2.css uses for it, word for word
   $frame = '(min-width: 1000px), (min-aspect-ratio: 1/1)';
   $src = fn ($k) => \App\Support\Img::srcset($dk($k), 2000);
+  // 2.1, screens 2200 px and wider only: the two full-bleed pictures from files
+  // wide enough for them (Img::wideSrcset, why/ files only, up to 3840 w). The
+  // cover is pq21/dkw-22.jpg, dk-22 rebuilt from the original HEIC at 4153 px
+  // (same grade, same window); a phone never matches these sources.
+  $wide = '(min-width: 2200px)';
 @endphp
 
 {{-- =============================================================================
@@ -102,6 +107,9 @@
         {{-- art-directed: on an upright screen the Cabrio from three quarters (20), whose
              body fills the frame; on a wide one, the same car in profile (22) --}}
         <div class="pq-f"><div class="pq-px"><picture>
+          {{-- the cover's width (pq21.css): min(100vw, 2560px, 1.95 x (100svh - 72px)), the last only from 2.1:1 --}}
+          <source media="{{ $wide }}" srcset="{{ \App\Support\Img::wideSrcset('/storage/why/pq21/dkw-22.jpg') }}"
+                  sizes="(min-width: 2720px) and (min-height: 1385px) 2560px, (min-aspect-ratio: 21/10) calc(195vh - 140px), (min-width: 2560px) 2560px, 100vw">
           <source media="{{ $frame }}" srcset="{{ $src(22) }}" sizes="100vw">
           <x-img :src="$tall(20)" alt="BMW Serie 4 Cabrio azul con la capota abierta, ante una pared blanca"
                  sizes="106vw" :max="1600" :fallback="1080" :priority="true" />
@@ -274,8 +282,13 @@
       <div class="pq-open__in">
         {{-- the welcome exactly as the client approved it on the live page (a neutral
              copy, pq2/welcome.jpg, read colder; the warm wall is kept on purpose) --}}
-        <x-img src="/storage/why/welcome-graded.jpg" alt="Iulian, con los brazos abiertos, delante de cuatro coches preparados para entregar"
-               sizes="(max-aspect-ratio: 4/3) 134vh, 100vw" :max="2000" />
+        <picture>
+          {{-- its width on these screens (pq21.css): min(100vw, 2560px, 2.4 x 100vh) --}}
+          <source media="{{ $wide }}" srcset="{{ \App\Support\Img::wideSrcset('/storage/why/welcome-graded.jpg') }}"
+                  sizes="(max-height: 1066px) 240vh, (min-width: 2560px) 2560px, 100vw">
+          <x-img src="/storage/why/welcome-graded.jpg" alt="Iulian, con los brazos abiertos, delante de cuatro coches preparados para entregar"
+                 sizes="(max-aspect-ratio: 4/3) 134vh, 100vw" :max="2000" />
+        </picture>
         <h2 class="pq-w" id="pq-keys"><span>Las llaves son tuyas.</span> <span>Mi teléfono sigue disponible.</span></h2>
       </div>
     </div>
@@ -318,15 +331,21 @@
   @if($reviews->count())
   <section class="pq-say pq-wrap" aria-labelledby="pq-say-h">
     <h2 class="pq-h" id="pq-say-h">Lo cuentan ellos</h2>
-    <ul class="pq-say__l">
+    @php
+      // each photograph's own ratio (clamped as before), and the widest of them: the
+      // row takes one photo height, the one at which the widest fills its column
+      $ratio = function ($t) { $d = \App\Support\Img::size($t->image_path);
+        return $d && $d[1] ? round(max(.6, min(1.6, $d[0] / $d[1])), 4) : .75; };
+      $rmax = $reviews->take(3)->map($ratio)->max() ?: .75;
+    @endphp
+    <ul class="pq-say__l" style="--rmax: {{ $rmax }}">
       @foreach($reviews->take(3) as $t)
-        @php $d = \App\Support\Img::size($t->image_path); @endphp
         <li class="pq-q">
           <figure>
             {{-- a customer's photograph is never cropped: the box takes the file's own ratio --}}
-            <div class="pq-q__ph" style="--r: {{ $d && $d[1] ? round(max(.6, min(1.6, $d[0] / $d[1])), 4) : .75 }}">
+            <div class="pq-q__ph" style="--r: {{ $ratio($t) }}">
               <x-img :src="$t->image_path" :alt="$t->author_name.', el día de la entrega'"
-                     sizes="(min-width: 1000px) 380px, (min-width: 600px) 30vw, 82vw" :max="1080" :fallback="720" />
+                     sizes="(min-width: 1000px) min(30vw, 480px), (min-width: 600px) 30vw, 82vw" :max="1080" :fallback="720" />
             </div>
             <blockquote class="pq-q__t">{{ trim($t->quote) }}</blockquote>
             <figcaption class="pq-q__by">{{ $t->author_name }}</figcaption>

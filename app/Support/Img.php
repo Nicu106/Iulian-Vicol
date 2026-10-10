@@ -34,6 +34,55 @@ final class Img
     /** Quality and cache generation live here, and the controller reads them from
      *  here, so the name of a cached file is decided in exactly one place. */
     public const QUALITY = 82;
+
+    /**
+     * Widths past 2000, for one case only: the full-bleed photographs of the
+     * "why us" pages (files under /storage/why/) on screens 2200 px and wider,
+     * where the 2000 px file was being drawn 2.0-2.8x enlarged (measured at
+     * 3440-5120 wide). They are NOT in WIDTHS, so nearestWidth(), url(),
+     * srcset() and ladder() — every URL any page builds today — are untouched:
+     * a wide width exists only where a template asks for it through
+     * wideSrcset(), and the endpoint builds it only for a why/ file
+     * (ImageController). A dealer's 5,712 px upload can never spawn one.
+     */
+    public const WIDE = [2560, 3200, 3840];
+    public const WIDE_ROOT = 'why/';
+
+    /** Whether a cache-relative path (as relativeFor() returns it) may have WIDE widths. */
+    public static function wideAllowed(string $relative): bool
+    {
+        return str_starts_with($relative, self::WIDE_ROOT) && !str_contains($relative, '..');
+    }
+
+    /**
+     * The srcset for a <source media="(min-width: 2200px)">: the top of the
+     * normal ladder (the same URLs srcset() names) and then the WIDE steps,
+     * stopping one step past the file's own width. Anything outside /storage/why/
+     * gets exactly srcset($path, 2000).
+     */
+    public static function wideSrcset(?string $path, int $max = 3840): string
+    {
+        $path = self::clean($path);
+        if ($path === null) {
+            return '';
+        }
+        if (!str_starts_with($path, '/storage/') || !self::wideAllowed(self::relativeFor($path))) {
+            return self::srcset($path, min($max, 2000));
+        }
+        $native = self::width($path);
+        $out = [];
+        foreach ([1600, 2000, ...self::WIDE] as $w) {
+            if ($w > $max) {
+                break;
+            }
+            $out[] = self::build($path, $w) . ' ' . $w . 'w';
+            if ($native && $w >= $native) {
+                break;
+            }
+        }
+
+        return implode(', ', $out);
+    }
     public const GENERATION = 'v3';
 
     /**
@@ -56,6 +105,12 @@ final class Img
         }
         $w = self::nearestWidth($w);
 
+        return self::build($path, $w);
+    }
+
+    /** The URL for an exact width already decided by the caller (url() or wideUrl()). */
+    private static function build(string $path, int $w): string
+    {
         $cached = self::cachedUrl($path, $w);
         if ($cached !== null) {
             return $cached;
