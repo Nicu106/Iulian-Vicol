@@ -2,7 +2,9 @@
 """/muestras/por-que/1 "Cine" — the pictures, made once from the client's photos.
 
 Run with the rembg venv (rembg, pillow, numpy, scipy):
-    $VENV/bin/python tools/media/pq1-media.py [--only NAME ...] [--ext | --ext-only]
+    $VENV/bin/python tools/media/pq1-media.py [--only NAME ...] [--ext | --ext-only] [--keep-mask] [--raw]
+    (--keep-mask: re-grade the heroes on their existing, touched-up masks;
+     --raw: no grade, the photographs as shot)
     $VENV/bin/python tools/media/pq1-media.py --map km equip     (where words can stand)
 
 Writes storage/app/public/why/pq1/ (then chown -R www-data:www-data it):
@@ -17,6 +19,11 @@ Writes storage/app/public/why/pq1/ (then chown -R www-data:www-data it):
                   the scaled car no longer covers shows wall, never a ghost car.
   <k>-p.jpg       phone frame: a 0.56:1 upright crop around the frame's focal
                   point (960x1714), so a phone downloads only what it shows.
+  <k>-d.jpg       a cover frame's whole photograph for wider screens, graded.
+  <k>-ph.jpg      an anchored frame's photograph (show, me, the record), graded.
+  <k>-ext.jpg     the wall carried on around an anchored frame (see ext()).
+
+Everything is printed through one grade (see GRADE below): one film.
 
 Every crop has its own focal point, chosen by looking at the photo (no centre
 crop). The words are placed where the luminance grid says the frame is calm.
@@ -58,8 +65,80 @@ CROP_W = 1008   # of a 2400x1800 frame: 0.56:1 — a phone is 0.46-0.56
 CROP_OUT = (960, 1714)   # stored size: 1.5x up on a 3x phone, inside the frame's 1.06 settle;
                          # measured: the page's frames 3.3 MB -> see the commit
 
+# ---- the grade: one film ------------------------------------------------------
+# Every photograph of the page is printed on the same stock. The white wall of
+# each is the grey card: its robust median (top 12% of the frame, brightest 60%)
+# is brought, in linear light, to ONE wall (sRGB 208,207,202: neutral with a
+# breath of warmth, between the neutral walls and the client's welcome, which is
+# warmer and stays exactly as approved), exposure capped at +-0.35 EV. A frame
+# with no wall (interiors, close details) takes the gains of its own session's
+# walls. Then one tone curve for all: a soft shoulder (white leather and sky
+# never clip; print white 250), a gentle S in the mids, the blacks lifted off
+# zero to the page's own night (#05080F at 80%) so a photo's shadows and the
+# black around it are the same black, and the highlights a little less
+# saturated, as film does. No grain in the files: it is what WebP spends bytes
+# on (measured -20% when it was taken out), and the screen should not look dirty.
+WALL_TARGET = np.array([208, 207, 202], np.float32)
+SESSION = {   # photo number -> the walls whose gains it takes
+    5: [2, 3, 4], 18: [14, 17], 24: [20, 21, 22, 27], 25: [20, 21, 22, 27],
+    30: [20, 21, 22, 27], 35: [33], 36: [33],
+}
+WB_ONLY = {46}               # a close shot whose wall is lit brighter: colour, not exposure
+TONE_ONLY = {57, 'portrait'} # his portrait at dusk: the sky is not a wall
+GRADE = '--raw' not in sys.argv
+
+def _lin(a): return np.where(a <= .04045, a / 12.92, ((a + .055) / 1.055) ** 2.4)
+def _srgb(a):
+    a = np.clip(a, 0, 1); return np.where(a <= .0031308, a * 12.92, 1.055 * a ** (1 / 2.4) - .055)
+_Y = np.array([.2126, .7152, .0722], np.float32)
+
+def _raw(name):
+    path = name if name.startswith('/') else os.path.join(SRC, name + '.jpg')
+    return Image.open(path).convert('RGB')
+
+def _wall_gains(name):
+    a = np.asarray(_raw(name).resize((600, 450), Image.BILINEAR)).astype(np.float32) / 255
+    r = _lin(a[:54]).reshape(-1, 3); y = r @ _Y
+    w = np.median(r[y > np.percentile(y, 40)], 0)
+    g = _lin(WALL_TARGET / 255) / w
+    ev = np.log2(g @ _Y)
+    if abs(ev) > .35: g = g / 2 ** (ev - np.sign(ev) * .35)
+    return g
+
+def _num(name):
+    b = os.path.basename(name)
+    return 'portrait' if b.startswith('portrait') else int(b[:2])
+
+def gains(name):
+    n = _num(name)
+    if n in TONE_ONLY: return np.ones(3, np.float32)
+    if n in SESSION:
+        import glob
+        return np.mean([_wall_gains(os.path.basename(glob.glob(os.path.join(SRC, '%02d_*.jpg' % k))[0])[:-4]) for k in SESSION[n]], 0)
+    g = _wall_gains(name)
+    if n in WB_ONLY: g = g / (g @ _Y)
+    return g
+
+NIGHT_BLACK = np.array([5, 8, 15], np.float32) / 255 * .8
+def tone(rgb_lin):
+    """the print: shoulder, S, lifted blacks, softer highlights (linear in, sRGB 0-1 out)"""
+    L = rgb_lin
+    k = .78; L = np.where(L > k, k + (1 - k) * (1 - np.exp(-(L - k) / (1 - k))), L)
+    Y = L @ _Y
+    sat = .97 - .14 * np.clip((Y - .45) / .5, 0, 1)            # highlights a little paler
+    L = Y[..., None] + (L - Y[..., None]) * sat[..., None]
+    v = _srgb(L)
+    v = v + .10 * (v * v * (3 - 2 * v) - v)                     # a gentle S in the mids
+    return NIGHT_BLACK + (250 / 255 - NIGHT_BLACK) * v          # blacks to the night, print white 250
+
+_cache = {}
 def load(name):
-    return Image.open(os.path.join(SRC, name + '.jpg')).convert('RGB')
+    if not GRADE: return _raw(name)
+    if name in _cache: return _cache[name]
+    a = _lin(np.asarray(_raw(name)).astype(np.float32) / 255) * gains(name)
+    im = Image.fromarray((tone(a) * 255 + .5).clip(0, 255).astype(np.uint8))
+    _cache[name] = im
+    return im
 
 def phone(key, name, fx):
     im = load(name)
@@ -130,8 +209,12 @@ def hero(key, name):
     im = load(name)
     print(key, name)
     car = os.path.join(OUT, key + '-car.webp')
-    if '--walls' in sys.argv and os.path.exists(car):
+    if ('--walls' in sys.argv or '--keep-mask' in sys.argv) and os.path.exists(car):
+        # the cut-out's mask as it was made and touched up; only the picture is new
         a = np.asarray(Image.open(car))[:, :, 3].astype(np.float32) / 255.0
+        if '--keep-mask' in sys.argv:
+            rgba = np.dstack([np.asarray(im), (a * 255).round().astype(np.uint8)])
+            Image.fromarray(rgba, 'RGBA').save(car, quality=86, method=6)
         clean_wall(im, a).save(os.path.join(OUT, key + '-wall.jpg'), quality=88, optimize=True)
         return
     a = touch_up(mask_for(im))
@@ -157,10 +240,45 @@ EXT = {
     'end':  ('end-wall', 'wall'),
     'show': ('13_DJI_20260329_154306_816', 'wall'),
     'me':   ('57_IMG_2968', 'dark'),
+    'yrs':  ('yrs-wall', 'wall'),
+    'vid':  ('vid-wall', 'wall'),
+    'far':  ('far-wall', 'wall'),
 }
+# the record's cars reach the photo's edges: the floor carried sideways is
+# built from a clean plate (the car taken out, as for the heroes), or a
+# mirrored wheel shows beside the photo (it did, 2026-10-10)
+PLATE = {'yrs': '03_DJI_20250318_102100_822', 'vid': '07_DJI_20260329_145042_933', 'far': '47_IMG_1878'}
+
+def plate(key, name):
+    im = load(name)
+    a = touch_up(mask_for(im))
+    clean_wall(im, a).save(os.path.join(OUT, key + '-wall.jpg'), quality=88, optimize=True)
+    print(key, 'clean plate')
+# anchored frames that are not heroes: the graded photograph itself (<k>-ph.jpg),
+# laid in its box over the carried-on wall. The record's three cars stand whole
+# at the foot of the screen (car boxes, rembg, measured 2026-10-10:
+# 03 x .057-.953 y .252-.788; 07 x .079-.927 y .104-.882; 47 x .136-.898 y .071-.883)
+BOXPH = {
+    'show': '13_DJI_20260329_154306_816',
+    'me':   os.path.join(os.path.dirname(SRC), 'portrait.jpg'),
+    'yrs':  '03_DJI_20250318_102100_822',
+    'vid':  '07_DJI_20260329_145042_933',
+    'far':  '47_IMG_1878',
+}
+# cover frames on a wide screen: the whole graded photograph (<k>-d.jpg)
+DESK = dict((k, n) for k, (n, fx) in PHONE.items())
+
+def boxph(key, name):
+    load(name).resize((2400, 1800), Image.LANCZOS).save(os.path.join(OUT, key + '-ph.jpg'), quality=88, optimize=True)
+    print(key, 'box photo')
+
+def desk(key, name):
+    load(name).save(os.path.join(OUT, key + '-d.jpg'), quality=88, optimize=True)
+    print(key, 'desk')
 # where the detector misreads the wall line, the line as read off the photo
 # (none now: 44's pale concrete strip along the wall really runs to 0.58)
 WALL_LINE = {}
+UP = {'yrs': (1.0, 0.6), 'vid': (1.0, 0.6), 'far': (1.0, 0.6)}   # night exactly at the canvas top (1.6)   # (fall starts, length) in photo heights above it
 EXT_L, EXT_T, EXT_B = 1.0, 1.6, 0.3   # canvas margins, in photo widths / heights
 EXT_SCALE = 0.25                        # it is wall: a quarter of the resolution is plenty
 NIGHT = np.array([5, 8, 15], np.float32)
@@ -178,8 +296,8 @@ def ext(key, src, sides):
     of a photo width into the floor's own smooth tone, which falls off slowly
     like the edge of a pool of light. A mirrored texture carried far reads as a
     pattern, and blurred it reads as smudges (it did, at 1440: 2026-10-09)."""
-    path = os.path.join(OUT, src + '.jpg') if src.endswith('-wall') else os.path.join(SRC, src + '.jpg')
-    im = Image.open(path).convert('RGB')
+    # a built wall is already graded; a photograph is graded here
+    im = Image.open(os.path.join(OUT, src + '.jpg')).convert('RGB') if src.endswith('-wall') else load(src)
     W0, H0 = im.size
     W, H = int(W0 * EXT_SCALE), int(H0 * EXT_SCALE)
     ph = np.asarray(im.resize((W, H), Image.LANCZOS)).astype(np.float32)
@@ -253,7 +371,10 @@ def ext(key, src, sides):
     below = ph[::-1][:B]
     fb = np.exp(-np.arange(1, B + 1) / (0.12 * H))[:, None, None]
     cv[T + H:, L:L + W] = below * fb + NIGHT * (1 - fb)
-    up = np.clip((T - 0.55 * H - yy) / (0.9 * H), 0, 1) ** 1.3
+    # the light falls off into night above the photo; the record's frames keep
+    # their wall lit higher (their words stand there, in ink)
+    u0, ul = UP.get(key, (0.55, 0.9))
+    up = np.clip((T - u0 * H - yy) / (ul * H), 0, 1) ** 1.3
     cv = cv * (1 - up[..., None]) + NIGHT * up[..., None]
     Image.fromarray(np.clip(cv, 0, 255).astype(np.uint8)).save(os.path.join(OUT, key + '-ext.jpg'), quality=84, optimize=True)
     print('   canvas', CW, 'x', CH)
@@ -291,6 +412,15 @@ if __name__ == '__main__':
     for k, n in HERO.items():
         if (only is None or k in only) and not extonly:
             hero(k, n)
+    for k, n in BOXPH.items():
+        if (only is None or k in only) and not extonly:
+            boxph(k, n)
+    for k, n in PLATE.items():
+        if (only is None or k in only) and not extonly:
+            plate(k, n)
+    for k, n in DESK.items():
+        if (only is None or k in only) and not extonly:
+            desk(k, n)
     if '--ext' in sys.argv or extonly:
         for k, (src, sides) in EXT.items():
             if only is None or k in only:

@@ -54,6 +54,7 @@
   var DIP_IN = 0.75, DIP_OUT = 0.6, DIP = 0.6;    // screens; how dark: the picture is seen arriving, dimmed, never as a black slab
   var NIGHT = 0.9, FIRST_WORDS = 0.35;            // s: the opening fades up; its words start
   var WAIT_IMG = 1.5;                             // s: longest a frame waits for its picture
+  var END_DIM = 0.86, END_FALL = 0.5;             // the end: how far the lights go down; over how many screens
 
   // dissolves and dips: an even in-out (sine); words: a long exponential
   // arrival, most of the travel in the first third, then a slow settle
@@ -77,7 +78,7 @@
     var shots = Array.prototype.slice.call(el.querySelectorAll('.pq-shot'));
     var acc = 0;
     var ch = {
-      el: el, stage: el.querySelector('.pq-stage'), veil: el.querySelector('.pq-veil'),
+      el: el, stage: el.querySelector('.pq-stage'), veil: el.querySelector('.pq-veil'), cred: el.querySelector('.pq-cred'),
       first: ci === 0 && el.classList.contains('pq-ch--first'),
       top: 0, run: 1, near: false, cur: -1, sv: {}
     };
@@ -89,7 +90,7 @@
       var sh = {
         el: s, i: si, len: len, start: acc, cut: s.getAttribute('data-cut') || 'cut',
         hero: s.classList.contains('pq-hero'), anchor: s.classList.contains('pq-anchor'),
-        push: s.hasAttribute('data-push'), drift: s.hasAttribute('data-drift'),
+        push: s.hasAttribute('data-push') ? (parseFloat(s.getAttribute('data-push')) || PUSH) : 0, drift: s.hasAttribute('data-drift'),
         wall: s.querySelector('.pq-wall'), car: s.querySelector('.pq-car'),
         pic: s.querySelector('.pq-pic img'), words: words,
         imgs: Array.prototype.slice.call(s.querySelectorAll('img')),
@@ -128,10 +129,16 @@
         });
       });
       var tall = w.getBoundingClientRect().height;
-      // the room above it: from the top of the frame (below a margin) to its foot
       var foot = H - (parseFloat(getComputedStyle(w).bottom) || 0);
       var isHero = w.classList.contains('pq-w--hero');
-      var room = isHero ? foot - H * 0.09 : H * 0.36;
+      // the room above it: from 9% below the top of the frame to its foot. The
+      // opening is first seen under the header (its frame lifted by it): there
+      // the words keep at least 4.5% of air below the header (at 1440 they
+      // stood 9 px under it)
+      var top = H * 0.09;
+      if (isHero && shot.parentNode.firstElementChild === shot && chEls[0].contains(shot))
+        top = Math.max(top, Math.max(0, chEls[0].getBoundingClientRect().top + window.pageYOffset) + H * 0.045);
+      var room = isHero ? foot - top : H * 0.36;
       // never wider than the frame less its margin on both sides
       var ws = getComputedStyle(w), side = Math.min(parseFloat(ws.left) || 1e9, parseFloat(ws.right) || 1e9);
       var gutter = isHero ? 0 : 2 * (side < 1e8 ? side : 20);
@@ -148,6 +155,8 @@
     C.forEach(function (ch) {
       var r = ch.el.getBoundingClientRect();
       ch.top = r.top + sy; ch.run = Math.max(1, r.height - vh);
+      // the end: its frames run over the hold only, before the credits come up
+      if (ch.cred) ch.run = Math.max(1, ch.cred.getBoundingClientRect().top + sy - ch.top - ch.stage.offsetHeight);
     });
     // the first stage starts below the header: until the header has scrolled
     // away its frame is lifted by what is left of it, so the car sits on the
@@ -246,10 +255,16 @@
       var intro = ch.first ? (started ? (now - t0) / 1000 : 0) : 99;
       // the dip: the stage rises out of the black and falls back into it
       var dipIn = ch.first ? 0 : DIP * (1 - E((x - (ch.top - vh)) / (DIP_IN * vh)));
-      var dipOut = DIP * E((x - (ch.top + ch.run)) / (DIP_OUT * vh));
+      // the end does not dip: the lights go down on its picture as the credits
+      // rise (scrubbed, so linear), and stay down under them
+      var dipOut = ch.cred ? END_DIM * clamp((x - (ch.top + ch.run)) / (END_FALL * vh))
+                           : DIP * E((x - (ch.top + ch.run)) / (DIP_OUT * vh));
       var night = ch.first ? 1 - E(intro / NIGHT) : 0;
       var veil = Math.max(dipIn, dipOut, night);
       if (ch.veil) set(ch.sv, 'veil', ch.veil, 'opacity', veil.toFixed(3));
+      // under the credits the night is the ground (it is what a hit test there
+      // finds); during the hold it lets the frame be the frame
+      if (ch.cred && ch.veil) set(ch.sv, 'pe', ch.veil, 'pointerEvents', veil > 0.5 ? 'auto' : 'none');
       if (night > 0.001) moving = true;
 
       ch.shots.forEach(function (sh, i) {
@@ -282,7 +297,7 @@
           set(sh.sty, 'w', sh.wall, 'transform', 'scale(' + (1 + ANCHOR * t).toFixed(4) + ')');
         } else if (sh.pic) {
           var tr;
-          if (sh.push) tr = 'scale(' + (1 + PUSH * t).toFixed(4) + ')';            // scrubbed, so linear: the scroll is the dolly
+          if (sh.push) tr = 'scale(' + (1 + sh.push * t).toFixed(4) + ')';         // scrubbed, so linear: the scroll is the dolly
           else if (sh.drift) tr = 'scale(' + (1 + SETTLE).toFixed(3) + ') translate3d(' + ((0.5 - t) * DRIFT * 100).toFixed(3) + '%,0,0)';
           else tr = 'scale(' + (1 + SETTLE * (1 - t)).toFixed(4) + ')';
           set(sh.sty, 'p', sh.pic, 'transform', tr);
@@ -400,6 +415,14 @@
     });
   });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { relayout(); kick(); });
+
+  // ---- a picture shows only once it is whole (pq1.css fades it in over its tone)
+  function loaded(im) { im.classList.add('is-ld'); }
+  Array.prototype.forEach.call(document.querySelectorAll('.pq-shot img, .pq-q__ph img'), function (im) {
+    if (im.complete && im.naturalWidth) loaded(im);
+    im.addEventListener('load', function () { loaded(im); });
+    im.addEventListener('error', function () { loaded(im); });
+  });
 
   relayout(); place();
   C.forEach(function (ch) { var r = ch.el.getBoundingClientRect(); ch.near = r.bottom > -1.5 * vh && r.top < 2.5 * vh; });

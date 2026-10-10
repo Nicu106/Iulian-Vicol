@@ -59,7 +59,8 @@
 .pq-anchor .pq-box, .pq-hero .pq-box{ will-change:transform; }
 
 /* ---- the words ------------------------------------------------------------------ */
-.pq-w{ position:absolute; z-index:2; margin:0; font-weight:700; line-height:.98; letter-spacing:-.04em; text-wrap:balance; }
+.pq-w{ position:absolute; z-index:2; margin:0; font-weight:700; line-height:.98; letter-spacing:-.035em; text-wrap:balance;
+  font-kerning:normal; font-optical-sizing:auto; }
 .pq-l{ display:block; }
 .pq-ink{ color:var(--mc-ink); }
 .pq-white{ color:#FFFFFF; }
@@ -72,13 +73,22 @@
    scale. --pq-line is every sentence set on a frame — the questions, his
    sentences, the two headings — one size, one leading. The heroes (the
    opening, Seleccionados., Te lo enseño, the end) are fitted to their car. */
-.pq-shot{ --pq-word:clamp(3rem, 17.4vw, 9rem); --pq-line:clamp(1.55rem, 8.2vw, 2.6rem); }
-.pq-w--word{ font-size:var(--pq-word); letter-spacing:-.05em; line-height:.92; }
-.pq-w--line{ font-size:var(--pq-line); line-height:1.04; letter-spacing:-.03em; max-width:12ch; }
+/* 2026-10-10: the sentence is a step lighter (600) and a step looser than the
+   word, so the two read as voice and title, not as two sizes of one thing; the
+   word is to the sentence about 2.2 : 1 on a phone, 2.6 : 1 wide. Tracking by
+   size (DM Sans at 700 above 40 px already runs on its tight optical cut; at
+   -.05em its letters touched: "is", "co", "ch" measured 0-1 px apart at 68 px):
+   words -.035em, sentences -.015em. Optical margin: a large capital stands a
+   few px inside the box (its side bearing grows with the size), so a word is
+   drawn back by --om to stand on the same left line as the sentences. */
+.pq{ --pq-word:clamp(3rem, 17.4vw, 9rem); --pq-line:clamp(1.5rem, 7.9vw, 2.5rem); }
+.pq-w--word{ font-size:var(--pq-word); letter-spacing:-.035em; line-height:.92; }
+.pq-w--line{ font-size:var(--pq-line); font-weight:600; line-height:1.08; letter-spacing:-.015em; max-width:14ch; }
+.pq-at-tl.pq-w--word, .pq-at-bl.pq-w--word{ margin-left:var(--om, -.045em); }
 .pq-w--line .pq-l{ display:block; }
 
 /* where they sit: one left margin, one top line, one foot line for every frame */
-.pq-shot{ --gx:max(1.25rem, env(safe-area-inset-left)); --gt:9svh; --gb:calc(8svh + env(safe-area-inset-bottom)); }
+.pq{ --gx:max(1.25rem, env(safe-area-inset-left)); --gt:9svh; --gb:calc(8svh + env(safe-area-inset-bottom)); }
 .pq-at-tl{ left:var(--gx); top:var(--gt); }
 .pq-at-tr{ right:var(--gx); top:var(--gt); text-align:right; }
 .pq-at-tr .pq-l{ margin-left:auto; }
@@ -87,10 +97,10 @@
 /* hero words: centred on the car, their foot behind its roof (--ov of the
    last line is covered); the car's top is --cy of the photograph */
 .pq-w--hero{ left:0; right:0; text-align:center; color:var(--mc-ink);
-  font-size:clamp(2.4rem, 12.6vw, 4.2rem); line-height:.94; letter-spacing:-.045em;
+  font-size:clamp(2.4rem, 12.6vw, 4.2rem); line-height:.94; letter-spacing:-.035em;
   bottom:calc(100% - var(--sy) + (var(--ay) - var(--cy)) * var(--pw) * .75 - var(--ov, .3em)); }
 .pq-w--hero .pq-l{ margin-inline:auto; }
-.pq-w--hero.pq-w--word{ font-size:clamp(3rem, 15vw, 9rem); line-height:.9; letter-spacing:-.05em; }
+.pq-w--hero.pq-w--word{ font-size:clamp(3rem, 15vw, 9rem); line-height:.9; letter-spacing:-.035em; }
 .pq-f{ display:block; }
 
 /* ---- the frames, one by one ------------------------------------------------------
@@ -100,7 +110,7 @@
 /* the opening: 4 Series Cabrio, dead on. Anchor: the roundel. */
 /* on a phone the whole car is in the frame (86% of the width, mirrors in),
    with air on both sides; the dolly takes it to 95% */
-.pq-k-open{ --ax:.504; --ay:.597; --cy:.074; --cb:.931; --ov:.22em; --pw:min(106.5vw, 58svh); --gap:6svh;
+.pq-k-open{ --ax:.504; --ay:.597; --cy:.074; --cb:.931; --ov:.1em; --pw:min(106.5vw, 58svh); --gap:6svh;
   --sy:calc(100% - (var(--cb) - var(--ay)) * var(--pw) * .75 - var(--gap)); }
 /* match cut: the C-Class's star lands where the roundel was, its body as wide as
    the Cabrio's was at the end of the walk in (0.807 x 1.10 / 0.886 = 1.00) */
@@ -109,10 +119,22 @@
 /* the end: the Cabrio three-quarter, the car centred, anchored on its roundel */
 .pq-k-end{ --ax:.71; --ay:.594; --cy:.212; --cb:.901; --pw:min(100vw, 54svh); --gap:7svh;
   --sx:calc(50% + .2215 * var(--pw));
-  --sy:calc(100% - (var(--cb) - var(--ay)) * var(--pw) * .75 - var(--gap)); --ov:.12em; }
+  --sy:calc(100% - (var(--cb) - var(--ay)) * var(--pw) * .75 - var(--gap)); --ov:.05em; }
 /* one car turning: the grey C-Class dead on; no cut-out, so the words stand clear */
 .pq-k-show{ --ax:.508; --ay:.69; --cy:.075; --cb:.93; --pw:min(106.5vw, 58svh); --gap:6svh;
   --sy:calc(100% - (var(--cb) - var(--ay)) * var(--pw) * .75 - var(--gap)); --ov:-.3em; }
+/* the record: three cars standing whole at the foot, as "Te lo enseño" does;
+   anchored on the car's bottom centre (car boxes in pq1-media.py) */
+.pq-rec{ --ay:var(--cb); --pw:min(106.5vw, 58svh); --gap:6svh; --sy:calc(100% - var(--gap)); }
+.pq-k-yrs{ --ax:.505; --cy:.252; --cb:.788; }
+.pq-k-vid{ --ax:.503; --cy:.104; --cb:.882; }
+.pq-k-far{ --ax:.517; --cy:.071; --cb:.883; }
+/* the figure, then its words, on the wall above the roof, on the left line */
+.pq-w--rec{ left:var(--gx); right:var(--gx); color:var(--mc-ink);
+  bottom:calc(100% - var(--sy) + (var(--ay) - var(--cy)) * var(--pw) * .75 + 3.5svh); }
+.pq-w--rec .pq-l{ display:block; font-size:var(--pq-line); font-weight:600; line-height:1.08; letter-spacing:-.015em; max-width:14ch; }
+.pq-w--rec .pq-fig{ font-size:var(--pq-word); font-weight:700; line-height:1; letter-spacing:-.035em; max-width:none;
+  margin:0 0 .12em -.025em; font-variant-numeric:lining-nums proportional-nums; }   /* digits stand closer to their box than capitals: measured ink 18-20 px at 390 with -.045em */
 /* his portrait: on a phone at the foot of the screen, him in the middle, the
    evening sky carried on above for the words */
 .pq-k-me{ --ax:.59; --ay:1; --pw:calc(min(64svh, 160vw) * 4 / 3); --sy:100%; }
@@ -165,8 +187,8 @@
 
 /* ---- the wide screen ------------------------------------------------------------ */
 @media (min-aspect-ratio: 1/1){
-  .pq-shot{ --gx:max(6vw, calc((100vw - 1440px) / 2)); --gt:11vh; --gb:11vh;
-             --pq-word:min(10vw, 19vh); --pq-line:clamp(2rem, min(3.5vw, 6.4vh), 4.6rem); }
+  .pq{ --gx:max(6vw, calc((100vw - 1440px) / 2)); --gt:11vh; --gb:11vh;
+             --pq-word:min(10vw, 19vh); --pq-line:clamp(1.9rem, min(3.5vw, 6.6vh), 4.6rem); }
   .pq-f{ display:inline; }
   .pq-w--line{ max-width:14ch; }
   .pq-w--hero.pq-w--word{ font-size:min(11vw, 22vh); }
@@ -174,12 +196,27 @@
   .pq-k-open, .pq-k-sel, .pq-k-show{ --pw:min(97svh, 70vw); --gap:5svh; }
   /* the photograph's floor feathers into the carried-on floor at its sides; the
      wall above the floor line (--wl, measured per photo) stays whole */
+  .pq-k-show .pq-ph{ --fe:7%; }
   .pq-hero .pq-ph, .pq-k-show .pq-ph{
-    -webkit-mask-image:linear-gradient(to right, transparent 0, #000 7%, #000 93%, transparent 100%), linear-gradient(#000 0, #000 calc(var(--wl) * 100%), transparent calc(var(--wl) * 100% + 4%));
+    -webkit-mask-image:linear-gradient(to right, transparent 0, #000 var(--fe, 20%), #000 calc(100% - var(--fe, 20%)), transparent 100%), linear-gradient(#000 0, #000 calc(var(--wl) * 100%), transparent calc(var(--wl) * 100% + 4%));
     -webkit-mask-composite:source-over;
-            mask-image:linear-gradient(to right, transparent 0, #000 7%, #000 93%, transparent 100%), linear-gradient(#000 0, #000 calc(var(--wl) * 100%), transparent calc(var(--wl) * 100% + 4%));
+            mask-image:linear-gradient(to right, transparent 0, #000 var(--fe, 20%), #000 calc(100% - var(--fe, 20%)), transparent 100%), linear-gradient(#000 0, #000 calc(var(--wl) * 100%), transparent calc(var(--wl) * 100% + 4%));
             mask-composite:add; }
   .pq-k-open{ --wl:.31; } .pq-k-sel{ --wl:.56; } .pq-k-end{ --wl:.44; } .pq-k-show{ --wl:.39; }
+  /* wide: the words keep the frame's top line and the car stands smaller
+     below them (on the bottom formula the C-Class's low roof pushed "1.200"
+     to 30 px from the top at 1440) */
+  .pq-rec{ --pw:min(80svh, 60vw); --gap:5svh; }
+  .pq-w--rec{ top:var(--gt); bottom:auto; }
+  .pq-k-cuid{ --gb:12vh; }
+  /* their cars come close to the photo's edges: a 3% feather, not 7% */
+  .pq-rec .pq-ph{
+    -webkit-mask-image:linear-gradient(to right, transparent 0, #000 3%, #000 97%, transparent 100%), linear-gradient(#000 0, #000 calc(var(--wl) * 100%), transparent calc(var(--wl) * 100% + 4%));
+    -webkit-mask-composite:source-over;
+            mask-image:linear-gradient(to right, transparent 0, #000 3%, #000 97%, transparent 100%), linear-gradient(#000 0, #000 calc(var(--wl) * 100%), transparent calc(var(--wl) * 100% + 4%));
+            mask-composite:add; }
+  .pq-k-yrs{ --wl:.66; } .pq-k-vid{ --wl:.52; } .pq-k-far{ --wl:.36; }
+  .pq-w--rec .pq-l{ max-width:16ch; }
   .pq-k-end{ --pw:min(100svh, 74vw); --gap:4svh; }
   /* his portrait: the photograph to the right, him in it whole; the words on the
      night to its left, where the photo's own edge falls into black */
@@ -188,7 +225,7 @@
                             mask-image:linear-gradient(to right, transparent 0%, #000 34%); }
   .pq-k-me .pq-ext{ display:none; }
   .pq-k-me{ --sx:calc(100% + .16 * var(--pw)); }
-  .pq-w--me{ right:auto; top:auto; bottom:var(--gb); max-width:min(30vw, 30rem); color:#FFFFFF; }
+  .pq-w--me{ right:auto; top:auto; bottom:var(--gb); max-width:min(36vw, 36rem); color:#FFFFFF; }
   .pq-w--h{ max-width:13ch; }
   .pq-w--h.pq-nw{ max-width:13ch; }
   .pq-w--h .pq-l{ display:inline; }   /* its phrases flow; each phrase stays whole */
@@ -214,7 +251,15 @@
   .pq-k-ext{ --op:50% 0%; }
   .pq-k-end{ --ov:-.04em; }
   /* the car is smaller against the words here: the roof takes only the descenders */
-  .pq-k-open{ --ov:.08em; } .pq-k-sel{ --ov:.1em; }
+  /* the roof takes the foot of the descenders, never so much that a q reads as
+     an a ("que" at .08em did, 2026-10-10) */
+  .pq-k-open{ --ov:.0em; } .pq-k-sel{ --ov:.1em; }
+  /* the vRS badge sits at the grille's foot (the words on it read as a
+     collision) and the hood carries the sky (white on it measured 2.0:1): the
+     words go to the black bumper under the headlights, at the right */
+  .pq-k-mot{ --op:50% 100%; }
+  .pq-k-mot .pq-w{ left:auto; right:calc(var(--gx) + 4vw); text-align:right; }
+  .pq-k-mot .pq-l{ margin-left:auto; }
   .pq-k-enc{ --op:50% 30%; --gt:9vh; }
 }
 
@@ -225,31 +270,35 @@
    the darkest 5% for ink, the lightest 5% for white, the worst width kept). It is painted under the
    photograph: invisible once the picture is there, the words readable before it
    arrives on a slow phone, and it is what the contrast audit reads (it cannot
-   see an image). Worst measured on the pixels, 2026-10-09: 4.06:1 (320, 26px bold), 3.55:1
-   (844x390, 74px), 8.88:1 (1440). */
+   see an image). Re-measured on the graded pictures, 2026-10-10 (each tone is
+   the worst of the seven sizes): worst 3.35:1 (1440, 50px white, "La
+   motorización" on the bumper), 4.51:1 (320, 25px). */
 .pq-shot{ background:var(--tone, var(--pq-night)); }
-.pq-k-open{ --tone:#ABADAC; }
-.pq-k-sel{ --tone:#CCD0CF; }
-.pq-k-revw{ --tone:#B5C2C9; }
-.pq-k-prep{ --tone:#C2C6BE; }
-.pq-k-disf{ --tone:#3A4052; }
-.pq-k-mot{ --tone:#646A75; }
-.pq-k-color{ --tone:#B7BCBA; }
-.pq-k-equip{ --tone:#E7E6EB; }
-.pq-k-cuid{ --tone:#7C7671; }
-.pq-k-km{ --tone:#B7CDC5; }
-.pq-k-acc{ --tone:#747F8E; }
-.pq-k-show{ --tone:#AFBABD; }
-.pq-k-ext{ --tone:#C3CED1; }
-.pq-k-int{ --tone:#818990; }
-.pq-k-desp{ --tone:#DAE5E6; }
-.pq-k-enc{ --tone:#C6D3D3; }
-.pq-k-noves{ --tone:#DFE2DD; }
-.pq-k-conf{ --tone:#D0D5CF; }
-.pq-k-end{ --tone:#919694; }
-.pq-k-me{ --tone:#E0EFF3; }
+.pq-k-open{ --tone:#A4A5A2; }
+.pq-k-sel{ --tone:#B6B9B6; }
+.pq-k-revw{ --tone:#C0C0C0; }
+.pq-k-prep{ --tone:#C5C6C1; }
+.pq-k-disf{ --tone:#3C4159; }
+.pq-k-mot{ --tone:#9E8970; }
+.pq-k-color{ --tone:#CBC9C7; }
+.pq-k-equip{ --tone:#E8E5E9; }
+.pq-k-cuid{ --tone:#7D7469; }
+.pq-k-km{ --tone:#C2D1CA; }
+.pq-k-acc{ --tone:#6F787C; }
+.pq-k-show{ --tone:#B0B0AE; }
+.pq-k-ext{ --tone:#CBCBC7; }
+.pq-k-int{ --tone:#858486; }
+.pq-k-desp{ --tone:#CCCBC7; }
+.pq-k-enc{ --tone:#C8C9C4; }
+.pq-k-noves{ --tone:#DEDFDA; }
+.pq-k-conf{ --tone:#CECDCB; }
+.pq-k-end{ --tone:#949794; }
+.pq-k-me{ --tone:#DFEAEB; }
 .pq-k-rev{ --tone:#2B2D31; }
-@media (min-aspect-ratio: 1/1){ .pq-k-me{ --tone:var(--pq-night); } }
+.pq-k-yrs{ --tone:#A5A6A1; }
+.pq-k-vid{ --tone:#B2B2B2; }
+.pq-k-far{ --tone:#BEBDB9; }
+@media (min-aspect-ratio: 1/1){ .pq-k-me{ --tone:#1D1E22; } }
 /* the car and the carried-on wall are pictures, not grounds: the audit samples through them */
 .pq-car, .pq-ext{ pointer-events:none; }
 
@@ -261,9 +310,6 @@ html:not(.pq-on) .pq-w--me > .pq-w--line{ grid-area:auto; }
 /* ---- the motion version: the words wait for their frame -------------------------- */
 .pq-on .pq-w .pq-l, .pq-on .pq-act{ opacity:0; will-change:transform, opacity; }
 
-/* the end: his closing paragraphs follow the last frame on navy, as on the live page */
-.pq-end{ background:var(--pq-night); }
-.pq-end .wy-end__in{ padding-top:var(--s-7); }
 
 /* ---- the welcome (the live scene, untouched) ------------------------------------
    Under his photograph, the tone of the asphalt behind the promise (measured:
@@ -280,3 +326,125 @@ html:not(.pq-on) .pq-w--me > .pq-w--line{ grid-area:auto; }
   .pq-k-conf .pq-w--h.pq-nw{ max-width:24ch; }
   .pq-k-conf .pq-w--h .pq-l{ white-space:normal; }
 }
+
+/* =============================================================================
+   Third pass (2026-10-10): the page after the welcome belongs to the film.
+   ========================================================================== */
+
+/* ---- one left line ------------------------------------------------------------
+   His reading text used the site's container (16 px in on a phone, 152 px at
+   1440) while every frame stands on --gx (20 px, 86 px): the text jumped
+   sideways at every cut. Now everything that is not centred on a car stands
+   on --gx. */
+.pq .wy-txt__in{ max-width:none; padding-inline:var(--gx); }
+
+/* ---- pictures never show half-loaded ---------------------------------------
+   No blurred placeholders any more: under every picture is its frame's
+   measured tone. A picture that arrives after its frame (the frame waits for
+   it up to WAIT_IMG) fades in over that tone instead of popping in. */
+.pq-on .pq-shot img, .pq-on .pq-q__ph img{ transition:opacity 900ms cubic-bezier(.33, 0, .2, 1); }
+.pq-on .pq-shot img:not(.is-ld), .pq-on .pq-q__ph img:not(.is-ld){ opacity:0; }
+
+/* ---- in their words ------------------------------------------------------------ */
+.pq-say{ background:var(--pq-night); color:#FFFFFF; padding:16svh 0 12svh; }
+.pq-say__in{ padding-inline:var(--gx); }
+.pq-say__h{ margin:0 0 7svh; font-size:var(--pq-line); font-weight:600; line-height:1.08; letter-spacing:-.015em; color:#FFFFFF; }
+.pq-say__l{ list-style:none; margin:0; padding:0; display:grid; row-gap:12svh; }
+.pq-q figure{ margin:0; }
+/* the photograph whole, at its own shape; a tall one is held to 72% of the
+   screen's height and keeps its ratio (the width follows) */
+.pq-q__ph{ width:min(100%, calc(72svh * var(--r))); aspect-ratio:var(--r); background:#0B1322; }
+.pq-q__ph img{ display:block; width:100%; height:100%; object-fit:contain; }
+.pq-q__t{ margin:1.75rem 0 0; max-width:32rem; font-size:clamp(1.125rem, 4.9vw, 1.3rem); line-height:1.55; font-weight:400;
+  letter-spacing:-.005em; color:#FFFFFF; text-wrap:pretty; }
+.pq-q__by{ margin-top:1rem; font-size:1rem; line-height:1.4; font-weight:600; color:#A9B5C6; }
+.pq-say__all{ display:inline-flex; align-items:center; min-height:44px; margin-top:9svh; font-size:1.0625rem; font-weight:600;
+  color:#FFFFFF; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:.35em;
+  text-decoration-color:rgba(255,255,255,.45); transition:text-decoration-color var(--m-state) var(--e-out); }
+.pq-say__all:hover{ text-decoration-color:#FFFFFF; }
+@media (min-width:900px){
+  .pq-say{ padding:20vh 0 16vh; }
+  .pq-say__h{ margin-bottom:9vh; }
+  /* three across: the photographs stand on one line (their feet aligned),
+     the words of all three start on the next */
+  .pq-say__l{ grid-template-columns:repeat(3, minmax(0, 1fr)); grid-template-rows:auto auto auto; column-gap:4vw; row-gap:0; }
+  .pq-q{ display:grid; grid-row:span 3; grid-template-rows:subgrid; }
+  .pq-q figure{ display:contents; }
+  .pq-q__ph{ align-self:end; width:min(100%, calc(52vh * var(--r))); }
+  .pq-q__t{ font-size:clamp(1.125rem, 1.3vw, 1.3rem); }
+}
+
+/* ---- the end: the lights go down, the credits roll ------------------------------
+   The closing stands in the end chapter after its stage. In the film the
+   stage stays pinned under it: the Cabrio holds (--len screens), then pq1.js
+   brings the night down over it (scrubbed, linear) while the text rolls up
+   from the foot of the screen, white on the dimmed picture. Without the film
+   it simply follows the frame on the night. */
+.pq-cred{ position:relative; z-index:12; color:#FFFFFF; padding:12svh var(--gx) 16svh; }
+.pq-on .pq-ch--end{ height:auto; }
+.pq-on .pq-cred{ margin-top:calc(var(--len) * 100vh); padding-top:56svh; }
+.pq-cred__in{ max-width:34rem; }
+.pq-cred__p{ margin:0; font-size:clamp(1.125rem, 4.9vw, 1.375rem); line-height:1.6; font-weight:400; letter-spacing:-.005em;
+  color:#FFFFFF; text-wrap:pretty; }
+.pq-cred__p + .pq-cred__p{ margin-top:1.4em; }
+/* the two ways in: one column as wide as the wider of them, the quiet one first */
+.pq-cred__act{ display:grid; grid-template-columns:max-content; gap:.75rem; margin-top:7svh; }
+.pq-cred__act .mc-btn{ min-height:52px; padding-inline:1.6rem; white-space:nowrap; }
+/* the last card, after a held breath of night */
+.pq-cred__sign{ margin:24svh 0 0; display:grid; gap:.6rem; }
+.pq-cred__sign b{ font-size:var(--pq-line); font-weight:700; line-height:1; letter-spacing:-.025em; color:#FFFFFF; }
+.pq-cred__sign span{ font-size:clamp(1.0625rem, 4.4vw, 1.25rem); line-height:1.4; color:#A9B5C6; }
+@media (min-aspect-ratio: 1/1){
+  .pq-cred__act{ grid-template-columns:max-content max-content; gap:1rem; }
+  .pq-cred{ padding-bottom:20vh; }
+  .pq-cred__in{ max-width:min(40rem, 44vw); }
+  .pq-cred__p{ font-size:clamp(1.125rem, 1.3vw, 1.6rem); }
+  .pq-cred__sign span{ font-size:clamp(1.0625rem, 1.15vw, 1.4rem); }
+}
+/* a phone on its side shows only the top of the Octavia: the push goes to its
+   front corner, the nearest thing to the wheel in view */
+@media (min-aspect-ratio: 1/1) and (max-height: 520px){
+  .pq-k-revw{ --fo:78% 100%; }
+}
+
+/* ---- the buttons on the film ----------------------------------------------------
+   The site's green slab was the loudest colour on the page. On the night the
+   way to him is white, the WhatsApp mark keeps its green (5.40:1 on white);
+   the way to the cars is a hairline. On his sky (the portrait, on a phone) the
+   same button in ink. */
+.pq, .pq-page .mc-head{ --mc-focus:#FFFFFF; --mc-focus-inner:#05080F; }
+.pq .mc-btn{ font-weight:600; letter-spacing:.005em; }
+.pq .mc-btn--cta, .pq-page .mc-head .mc-btn--cta{ --btn-bg:#FFFFFF; --btn-fg:#111C2E; --btn-bd:#FFFFFF; }
+.pq .mc-btn--cta:hover, .pq-page .mc-head .mc-btn--cta:hover{ --btn-bg:#E3E8F0; --btn-bd:#E3E8F0; }
+.pq .mc-btn--cta::before, .pq-page .mc-head .mc-btn--cta::before{ background:var(--mc-wa); }
+.pq .pq-btn-line{ --btn-bg:transparent; --btn-fg:#FFFFFF; --btn-bd:rgba(255,255,255,.5); }
+.pq .pq-btn-line:hover{ --btn-bg:rgba(255,255,255,.08); --btn-bd:#FFFFFF; }
+@media (max-aspect-ratio: 1/1){
+  .pq-k-me{ --mc-focus:#111C2E; --mc-focus-inner:#FFFFFF; }
+  .pq-k-me .mc-btn--cta{ --btn-bg:#111C2E; --btn-fg:#FFFFFF; --btn-bd:#111C2E; }
+  .pq-k-me .mc-btn--cta:hover{ --btn-bg:#0E2E57; --btn-bd:#0E2E57; }
+  .pq-k-me .mc-btn--cta::before{ background:#25D366; }
+}
+.pq-say__all:focus-visible{ outline:2px solid #FFFFFF; outline-offset:4px; }
+
+/* ---- the header: the film starts under it, so it is night too ------------------- */
+.pq-page .mc-head{ background:var(--pq-night, #05080F); box-shadow:none; border-bottom:1px solid rgba(255,255,255,.08); }
+.pq-page .mc-logo{ color:#FFFFFF; }
+.pq-page .mc-nav__i{ color:#C3CCD9; transition:color var(--m-state) var(--e-out); }
+.pq-page .mc-nav__i:hover, .pq-page .mc-nav__i.is-current{ color:#FFFFFF; }
+.pq-page .mc-head a:focus-visible{ outline:2px solid #FFFFFF; outline-offset:3px; }
+.pq-page{ --pq-night:#05080F; }
+/* his heading on the portrait: each phrase on one line where it fits */
+.pq-w--me .pq-w--line{ max-width:none; }
+/* an anchored frame's carried-on wall ends 1.6 photo heights above the photo;
+   above that line the frame is night, not its tone (a grey band showed over
+   the end and the record on a phone) — the tone stays the ground colour the
+   audit reads */
+.pq-anchor, .pq-hero, .pq-rec{
+  background-image:linear-gradient(var(--pq-night) calc(var(--sy) - (var(--ay) + 1.6) * var(--pw) * .75 + 2px), transparent 0); }
+/* the display sizes are drawn on DM Sans's display cut (opsz 40) in every
+   engine: Chromium picks it by itself above 40 px, WebKit on the test box did
+   not, and "Preparados." ran 30 px past the edge of a 390 phone in it */
+.pq-w--word, .pq-w--hero, .pq-fig, .pq-cred__sign b{ font-variation-settings:"opsz" 40; }
+.pq-w--line, .pq-w--rec .pq-l:not(.pq-fig), .pq-say__h{ font-variation-settings:"opsz" 30; }
+@media (min-aspect-ratio: 1/1){ .pq-w--line, .pq-w--rec .pq-l:not(.pq-fig), .pq-say__h{ font-variation-settings:"opsz" 40; } }
