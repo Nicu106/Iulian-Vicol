@@ -62,7 +62,7 @@ Route::middleware(App\Http\Middleware\MuestrasPin::class)->group(function () {
     Route::get('/muestras/opiniones', [App\Http\Controllers\ReviewShowroomController::class, 'index'])->name('muestras.opiniones');
     Route::get('/muestras/opiniones/{n}', [App\Http\Controllers\ReviewShowroomController::class, 'show'])->whereNumber('n')->name('muestras.opiniones.show');
     Route::get('/muestras/por-que', [App\Http\Controllers\WhyShowroomController::class, 'index'])->name('muestras.porque');
-    Route::get('/muestras/por-que/{n}', [App\Http\Controllers\WhyShowroomController::class, 'show'])->whereNumber('n')->name('muestras.porque.show');
+    Route::get('/muestras/por-que/{v}', [App\Http\Controllers\WhyShowroomController::class, 'show'])->where('v', '[0-9]+(\.[0-9]+)?')->name('muestras.porque.show');
 });
 Route::post('/muestras/pin', [App\Http\Middleware\MuestrasPin::class, 'check'])->middleware('throttle:12,1');
 Route::get('/coche/{slug}', [App\Http\Controllers\CarPageController::class, 'show'])->name('coche');

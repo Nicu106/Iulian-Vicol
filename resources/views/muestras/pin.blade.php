@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -29,13 +29,13 @@
     <input type="hidden" name="back" value="{{ $back }}">
     <input type="hidden" name="pin" id="pin">
     <div class="m">IV MOTORCLASS</div>
-    <div class="pin" role="group" aria-label="Código de 4 cifras">
+    <div class="pin" role="group" aria-label="4-digit code">
       @for($i = 0; $i < 4; $i++)
-        <input inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Cifra {{ $i + 1 }}" @if($i === 0) autofocus @endif>
+        <input inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Digit {{ $i + 1 }}" @if($i === 0) autofocus @endif>
       @endfor
     </div>
-    <p class="err" aria-live="polite">{{ $wrong ? 'Código incorrecto' : '' }}</p>
-    <button type="submit">Entrar</button>
+    <p class="err" aria-live="polite">{{ $wrong ? 'Wrong code' : '' }}</p>
+    <button type="submit">Enter</button>
   </form>
 </main>
 <script>
