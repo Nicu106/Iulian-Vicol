@@ -2,10 +2,9 @@
 
    1  arrival: each [data-r] gets .is-in once, as it comes on screen (CSS does
       the rest: the picture rises 12% into its frame and settles).
-   2  drift: every .pq-px on screen moves ±3% of its frame's height as the
-      frame crosses the viewport (±2% on a plate: no more than the asphalt its
-      --cut keeps below the window; none on a phone plate, whose picture ends
-      exactly at the window's foot). Scrubbed, so linear, and dt-free: it is a
+   2  drift: every .pq-px on screen moves ±2% of its frame's height as the
+      frame crosses the viewport (inside the 2.5% its 105% scale overhangs; none
+      on a phone plate, whose picture ends exactly at the window's foot). Scrubbed, so linear, and dt-free: it is a
       function of the scroll position, nothing accumulates.
    3  the welcome opens: its window scales from 90% to 100% as it rises into
       the screen, the picture inside by the inverse (it stands still).
@@ -21,6 +20,16 @@
   if (reduce || !('IntersectionObserver' in window) || !window.requestAnimationFrame) { root.classList.remove('pq-on'); return; }
   root.classList.add('pq-on');
   window.pq2 = true;
+
+  /* 0 · the header's real height, for the cover's one screen (pq2.css carries the
+     same measured numbers, 100 / 72 px, so this only corrects an unusual header) */
+  var pqMain = document.querySelector('main.pq');
+  function head() {
+    if (!pqMain) return;
+    var t = Math.round(pqMain.getBoundingClientRect().top + window.pageYOffset);
+    if (t > 0 && t < 240) pqMain.style.setProperty('--pq-head', t + 'px');
+  }
+  head(); addEventListener('resize', head);
 
   /* 1 · arrival ------------------------------------------------------------- */
   var io = new IntersectionObserver(function (es) {
@@ -44,7 +53,9 @@
   /* 2 + 3 · drift and the opening ------------------------------------------- */
   // on a phone a plate's picture ends exactly at the foot of its window: no drift there
   var phonePlate = matchMedia('(max-width: 999px) and (max-aspect-ratio: 1/1)');
-  var AMP = 0.03;
+  // ±2%, inside the 2.5% the 105% scale overhangs each edge: at ±3% a 4 px band of
+  // the frame's ground showed at the foot of a picture near the screen's edge (measured)
+  var AMP = 0.02;
   var items = [];
   Array.prototype.forEach.call(document.querySelectorAll('.pq-px'), function (px) {
     items.push({ el: px, frame: px.parentNode.closest('.pq-f') || px.parentNode, plate: !!px.closest('.pq-plate'), on: false, last: null });
@@ -73,7 +84,7 @@
       // -1 as the frame enters at the foot of the screen, +1 as it leaves at the top
       var t = ((vh + r.height) / 2 - (r.top + r.height / 2)) / ((vh + r.height) / 2);
       t = t < -1 ? -1 : t > 1 ? 1 : t;
-      var y = Math.round(-t * (it.plate ? 0.02 : AMP) * r.height * 10) / 10;
+      var y = Math.round(-t * AMP * r.height * 10) / 10;
       if (y !== it.last) { it.el.style.transform = 'translate3d(0,' + y + 'px,0)'; it.last = y; }
     });
     if (openItem && openItem.on) {
@@ -123,8 +134,12 @@
     var drums = [], digits = text.replace(/\D/g, '').length, seenD = 0;
     text.split('').forEach(function (ch) {
       if (!/\d/.test(ch)) { var s = document.createElement('span'); s.className = 'pq-odo__sep'; s.textContent = ch; odo.appendChild(s); return; }
+      // each drum rolls from 0 to its own digit, once: no extra turns. The figures
+      // are set big now (86 px on a phone, 176 on a desk), and a strip of 40 cells
+      // at DPR 3 is a 10,000 px layer while it moves: WebKit crashed the page on it
+      // (measured, Playwright WebKit 390 DPR 3; 5rem passed, 22vw did not).
       var d = +ch, fromRight = digits - 1 - seenD++;
-      var n = Math.max(0, 3 - fromRight) * 10 + d, html = '';
+      var n = d, html = '';
       for (var i = 0; i <= n; i++) html += '<i>' + (i % 10) + '</i>';
       var c = document.createElement('span'); c.className = 'pq-odo__c';
       var strip = document.createElement('span'); strip.className = 'pq-odo__s'; strip.innerHTML = html;
@@ -133,14 +148,10 @@
     });
     b.appendChild(sr); b.appendChild(odo);
     old.parentNode.replaceChild(b, old);
-    var probe = document.createElement('span'); probe.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;letter-spacing:0';
-    b.appendChild(probe);
-    var fs = parseFloat(getComputedStyle(b).fontSize);
-    Array.prototype.forEach.call(odo.querySelectorAll('.pq-odo__c'), function (c, k) {
-      probe.textContent = String(drums[k].to % 10);
-      c.style.width = probe.getBoundingClientRect().width / fs + 'em';
-    });
-    b.removeChild(probe);
+    // no measured width on the drums: the figures are tabular (pq2.css), so every
+    // drum is one figure wide by itself. Setting a measured em width on them crashed
+    // WebKit's page at DPR 2-3 with the figures this size (Playwright WebKit,
+    // every phone width tried; bisected to this one line).
     drums.forEach(function (dr) { dr.el.style.transform = 'translateY(0)'; });
     return { b: b, odo: odo, li: b.closest('li'), drums: drums };
   }

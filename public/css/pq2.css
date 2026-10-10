@@ -9,8 +9,21 @@
              the picture fills the plate anchored at its foot, so the whole
              photograph sits exactly in the window and the wall runs on above it.
      frame   (1000 px and up, or any landscape screen)  .pq-win is the window
-             (--ar-d), the words absolutely placed on the wall, sized in cqi;
-             --cut lowers the picture past its foot (trims asphalt, adds wall).
+             (--ar-d), the words absolutely placed on the wall, sized in cqi.
+             The picture there is pq2/dk-NN.jpg: that window cut out of the tall
+             picture (--cut of asphalt already trimmed), under 4 MP, so WebKit
+             never subsamples it and nothing is drawn soft.
+
+   PACING. Two picture scales on a phone, never a third: the whole width (a
+   spread: plates, the leather, the vRS, the portrait, the doors, the welcome)
+   or the quiet one (a detail stepped in to the 38% line, or two side by side).
+   Between them, type and air.
+
+   SPACING. Four steps and no others (phone / from 1000 px):
+     --pq-tight  16 / 16   a caption under its picture
+     --pq-near   24 / 32   a word or heading and what it heads
+     --pq-beat   48 / 96   one block to the next inside a scene
+     --pq-sec    96 / 160  one scene to the next
 
    THE GRID. One left edge for every word on a phone: the margin (--pq-m). From
    1000 px a 12-column grid; every column of reading text starts on column 8, every
@@ -19,10 +32,23 @@
    THE TYPE. Five sizes, no others:
      d1  one or two words that ARE the scene (on the wall, or above a detail)
      d2  a heading (h2, a plate's sentence)
-     d3  a line a picture answers (captions, the gallery's words)
+     d3  a line a picture answers (captions, the pull quote, the gallery's words)
      l   the lede: one sentence between a heading and the prose, set in 500
-     prose  the reading text
+     prose  the reading text: ink, not grey; 19 px on a phone, 20 from 1000 px,
+            paragraphs indented like a printed page instead of spaced
+   and one face for the figures: the same DM Sans file, drawn light (below).
    ========================================================================== */
+
+/* the record's figures: the page's own DM Sans file (already loaded, so no new
+   bytes) declared once more with its whole weight axis. The site's @font-face
+   stops at 400; a magazine sets big figures light. Digits, plus, point and the
+   opening quote mark that hangs over their letters. */
+@font-face{
+  font-family: "PQ Figures";
+  src: url(/fonts/dm-sans/dm-sans-latin-normal.woff2) format("woff2");
+  font-weight: 100 1000; font-style: normal; font-display: swap;
+  unicode-range: U+0030-0039, U+002B, U+002E, U+201C;
+}
 
 .pq{
   /* the magazine's margin: 20 px on a phone, opening to 80 px */
@@ -30,38 +56,57 @@
   /* wider than --mc-container (1200): photographs want the room; text keeps its own measure */
   --pq-max: 1600px;
   --pq-gap: clamp(var(--s-4), 2.4vw, var(--s-7));
-  --pq-sec: var(--s-9);                    /* the air between scenes: 96 */
-  --pq-d1: clamp(2.5rem, 12.6vw, 6.5rem);
-  --pq-d2: clamp(1.75rem, 9vw, 4.25rem);
-  --pq-d3: clamp(1.5rem, 6.4vw, 2.375rem);
-  --pq-l:  clamp(1.25rem, 5.1vw, 1.625rem);
+  --pq-tight: var(--s-4);
+  --pq-near:  var(--s-5);
+  --pq-beat:  var(--s-7);
+  --pq-sec:   var(--s-9);
+  --pq-d1: clamp(2.5rem, 12.8vw, 7rem);
+  --pq-d2: clamp(1.875rem, 9.2vw, 4.5rem);
+  --pq-d3: clamp(1.375rem, 6vw, 2.375rem);
+  --pq-l:  clamp(1.25rem, 5.4vw, 1.75rem);
+  --pq-p:  clamp(1.125rem, 4.9vw, 1.1875rem);
   /* the slow curve of every arrival: out, long tail (--e-out is the 420 ms UI curve) */
   --pq-e: cubic-bezier(.16, .84, .3, 1);
+  /* the site header's real height: its nav row wraps under the logo below 1000 px
+     (measured: main starts at 100 px there, 72 above). pq2.js writes the measured
+     value; this is the same number for a page without JS. */
+  --pq-head: 100px;
   background: var(--mc-surface); color: var(--mc-ink);
 }
-@media (min-width: 1000px){ .pq{ --pq-sec: var(--s-10); } }
+@media (min-width: 1000px){
+  .pq{ --pq-head: var(--mc-head-h); --pq-near: var(--s-6); --pq-beat: var(--s-9);
+       --pq-sec: calc(var(--s-10) * 1.25);            /* 160 */
+       --pq-p: 1.25rem; }
+}
 .pq-wrap{ max-width: var(--pq-max); margin-inline: auto; padding-inline: var(--pq-m); box-sizing: border-box; }
-/* :where() keeps this at zero specificity: the figures' own bleeds below must win
-   (`.pq figure{margin:0}` used to beat every one of them — no figure ever bled) */
+/* :where() keeps this at zero specificity: the figures' own bleeds below must win */
 :where(.pq) figure{ margin: 0; }
 .pq > section + section{ margin-top: var(--pq-sec); }
 
 /* ---- type ----------------------------------------------------------------- */
 .pq-w, .pq-h, .pq-line, .pq-word, .pq-cap figcaption{ margin: 0; color: var(--mc-ink); text-wrap: balance; }
 .pq-w > span, .pq-h > span, .pq-line > span{ display: block; }
-.pq-w   { font-weight: 700; line-height: .96; letter-spacing: -.05em; }
-.pq-word{ font-weight: 700; line-height: .96; letter-spacing: -.05em; font-size: var(--pq-d1); }
-.pq-h   { font-weight: 700; line-height: 1;   letter-spacing: -.042em; font-size: var(--pq-d2); max-width: 15ch; }
-.pq-line{ font-weight: 700; line-height: 1;   letter-spacing: -.042em; font-size: var(--pq-d2); }
-.pq-lede{ margin: 0; font-size: var(--pq-l); line-height: 1.32; letter-spacing: -.018em;
-  font-weight: 500; color: var(--mc-ink); max-width: 26ch; text-wrap: balance; }
-.pq-read{ max-width: 34rem; }
-.pq-read p{ margin: 0 0 1.25em; font-size: var(--t-prose); line-height: 1.68; color: var(--mc-ink-2); text-wrap: pretty; }
-.pq-read p:last-child{ margin-bottom: 0; }
-.pq-read .pq-lead{ color: var(--mc-ink); }
-.pq-read .pq-k{ margin-top: var(--s-7); font-size: var(--pq-l); line-height: 1.32; letter-spacing: -.018em;
-  font-weight: 500; color: var(--mc-ink); text-wrap: balance; }
-@media (min-width: 1000px){ .pq-read p{ font-size: 1.1875rem; } }
+.pq-w   { font-weight: 700; line-height: .95; letter-spacing: -.05em; }
+.pq-word{ font-weight: 700; line-height: .95; letter-spacing: -.05em; font-size: var(--pq-d1); }
+.pq-h   { font-weight: 700; line-height: 1;   letter-spacing: -.045em; font-size: var(--pq-d2); max-width: 14ch; }
+.pq-line{ font-weight: 700; line-height: 1;   letter-spacing: -.045em; font-size: var(--pq-d2); }
+.pq-lede{ margin: 0; font-size: var(--pq-l); line-height: 1.3; letter-spacing: -.02em;
+  font-weight: 500; color: var(--mc-ink); max-width: 24ch; text-wrap: balance; }
+
+/* reading: ink on paper, a book's measure, a book's paragraphs */
+.pq-read{ max-width: 33rem; }
+.pq-read p{ margin: 0; font-size: var(--pq-p); line-height: 1.6; letter-spacing: -.004em; font-weight: 420;
+  color: var(--mc-ink); text-wrap: pretty; hanging-punctuation: first; }
+.pq-read p + p{ text-indent: 1.5em; }
+/* the first paragraph of a text opens it a size up */
+.pq-read .pq-lead{ font-size: var(--pq-l); line-height: 1.42; letter-spacing: -.018em; margin-bottom: var(--pq-near); }
+.pq-read .pq-lead + p{ text-indent: 0; }
+/* a text's last sentence, where it concludes: the lede's voice, after a beat */
+.pq-read .pq-k{ margin-top: var(--pq-beat); text-indent: 0; font-size: var(--pq-l); line-height: 1.3;
+  letter-spacing: -.02em; font-weight: 500; text-wrap: balance; max-width: 24ch; }
+/* the pull quote: one of his sentences, in place, set large */
+.pq-read .pq-pull{ margin: var(--pq-beat) 0 0; text-indent: 0; font-size: var(--pq-d3); line-height: 1.16;
+  letter-spacing: -.03em; font-weight: 500; text-wrap: balance; max-width: 19ch; }
 
 /* ---- a frame: the photograph inside its window ------------------------------ */
 .pq-f{ position: relative; overflow: hidden; aspect-ratio: var(--ar, 4 / 3); background: var(--mc-band); }
@@ -80,10 +125,6 @@
 .pq-plate .pq-f{ position: absolute; inset: 0; aspect-ratio: auto; background: var(--mc-band); }
 .pq-plate .pq-f img{ object-position: 50% 100%; }
 
-/* the cover is one screen: the wall grows, the car stands at the foot */
-.pq-plate--cover .pq-plate__in{ min-height: calc(100svh - var(--mc-head-h)); }
-.pq-plate--cover .pq-w{ flex: 1; }
-.pq-plate--cover .pq-win{ margin-top: 0; }
 /* --roof: where the car's roof line is, as a share of the photograph's height
    (measured on pq2/NN.jpg: the first row where 4% of the pixels leave the wall's
    tone). It places the words: on a phone the window slides up under them until
@@ -97,64 +138,89 @@
 .pq-plate--end  { --roof: .28;  --fs: var(--pq-d2); }
 .pq-plate:not(.pq-plate--cover){ --pull: calc(var(--roof) - .13); }
 
+/* ---- the cover --------------------------------------------------------------
+   One screen, edge to edge. Upright: the Cabrio from three quarters (pq2/tall-20:
+   its roof at .213, the body 5%-92.5% of the width, the tyres at 94%), drawn at
+   106% of the width and centred on the car, so the whole car spans 93% of the
+   screen and stands at its foot; the words stand on the wall just above the
+   windscreen, so car and words read as one group. */
+.pq-cover .pq-plate{ margin-inline: 0; }
+.pq-plate--cover .pq-plate__in{ height: calc(100svh - var(--pq-head)); min-height: 132cqi; max-height: 230cqi; }
+.pq-plate--cover .pq-win{ display: none; }
+.pq-plate--cover .pq-f img{ top: auto; right: auto; bottom: 0; left: -1.7%; width: 106%; height: auto; min-height: 100%; }
+.pq-plate--cover .pq-w{ position: absolute; left: 0; right: 0; padding: 0 var(--pq-m);
+  /* photo height 79.5cqi (106% x 3/4); its roof .213 down; then the gap */
+  bottom: calc(79.5cqi * (1 - .213) + 11cqi); font-size: min(var(--pq-d1), 8.6svh); }
+
 /* frame mode */
 @media (min-width: 1000px), (min-aspect-ratio: 1 / 1){
   .pq-plate{ margin-inline: 0; }
   .pq-plate__in{ display: block; }
   .pq-win{ width: 100%; margin: 0; aspect-ratio: var(--ar-d, 16 / 9);
-    max-height: calc(100svh - var(--mc-head-h) - var(--s-6)); }
-  .pq-plate .pq-f img{ object-position: 50% calc(100% + var(--cut, 0cqi)); }
+    max-height: calc(100svh - var(--pq-head) - var(--s-6)); }
+  /* dk-NN.jpg is the window itself: anchored at its foot, nothing to cut */
+  .pq-plate .pq-f img{ object-position: 50% 100%; }
   .pq-plate .pq-w{ position: absolute; left: var(--wl, 5cqi); top: var(--wt, 4.6cqi); padding: 0;
     max-width: var(--wm, 80%); font-size: var(--fs-d, 6.4cqi); }
-  .pq-plate--cover .pq-plate__in{ min-height: 0; }
+  /* the cover: the whole width of the screen, one screen tall (never taller than
+     the 3:2 its picture is cut to), the words on the page's own left edge */
+  .pq-plate--cover .pq-plate__in{ height: auto; min-height: 0; max-height: none; }
+  .pq-plate--cover .pq-win{ display: block; aspect-ratio: auto; }
+  .pq-plate--cover .pq-f img{ inset: 0; width: 100%; height: 100%; min-height: 0; }
+  .pq-plate--cover .pq-w{ left: max(var(--pq-m), calc((100cqi - var(--pq-max)) / 2 + var(--pq-m))); right: auto; }
 }
-/* per plate, in frame mode: window, cut, size. A full-width window is shorter than
-   the 4:3 photograph (75cqi), so --cut decides which band of it shows: about 3cqi
-   of asphalt under the tyres, and the rest of the height goes to the wall above
-   the roof. There the words stand on the roof line (bottom = the photo's height
-   under the roof, less the cut, plus --gap), not on the window's top edge. */
-.pq-plate--cover{ --ar-d: 16 / 9;  --cut: 13cqi;  --fs-d: min(7.2cqi, 9svh); }
+/* per plate, in frame mode: window, cut, size. --cut is the asphalt dk-NN.jpg had
+   trimmed under the photograph; the words stand on the roof line (bottom = the
+   photo's height under the roof, less the cut, plus --gap), not on the window's top. */
+.pq-plate--cover{ --ar-d: 3 / 2;   --cut: 13cqi;  --fs-d: min(7.6cqi, 11svh); }
 .pq-plate--sel  { --ar-d: 1;       --cut: 3cqi;   --fs-d: 10.6cqi; --wt: 6.5cqi; --wl: 6.5cqi; }
 .pq-plate--pre  { --ar-d: 1;       --cut: 2cqi;   --fs-d: 10.6cqi; --wt: 6.5cqi; --wl: 6.5cqi; }
-.pq-plate--show { --ar-d: 3 / 2;   --cut: 12cqi;  --fs-d: min(5.2cqi, 7.4svh); }
-.pq-plate--after{ --ar-d: 3 / 2;   --cut: 11cqi;  --fs-d: min(5.2cqi, 7.4svh); }
-.pq-plate--end  { --ar-d: 3 / 2;   --cut: 11cqi;  --fs-d: min(5.2cqi, 7.4svh); --wm: 56%; }
+.pq-plate--show { --ar-d: 3 / 2;   --cut: 12cqi;  --fs-d: min(5.6cqi, 7.8svh); }
+.pq-plate--after{ --ar-d: 3 / 2;   --cut: 11cqi;  --fs-d: min(5.6cqi, 7.8svh); }
+.pq-plate--end  { --ar-d: 3 / 2;   --cut: 11cqi;  --fs-d: min(5.6cqi, 7.8svh); --wm: 56%; }
 @media (min-width: 1000px), (min-aspect-ratio: 1 / 1){
   .pq-plate--cover .pq-w, .pq-plate--show .pq-w, .pq-plate--after .pq-w, .pq-plate--end .pq-w{
     top: auto; bottom: calc(75cqi * (1 - var(--roof)) - var(--cut) + var(--gap, 3.6cqi)); }
-  /* on a short screen (1280x720) the window clamped to it cut the words' first line
-     off: it may never be shorter than the photo under the roof, the gap, two lines
-     and a margin above them — then the plate is simply a little taller than the screen */
-  .pq-plate--cover .pq-win, .pq-plate--show .pq-win, .pq-plate--after .pq-win, .pq-plate--end .pq-win{
-    max-height: max(calc(100svh - var(--mc-head-h) - var(--s-6)),
+  /* the window may never be shorter than the photo under the roof, the gap, two
+     lines and a margin above them — then the plate is a little taller than the screen */
+  .pq-plate--show .pq-win, .pq-plate--after .pq-win, .pq-plate--end .pq-win{
+    max-height: max(calc(100svh - var(--pq-head) - var(--s-6)),
       calc(75cqi * (1 - var(--roof)) - var(--cut) + var(--gap, 3.6cqi) + 2 * var(--fs-d) + 4cqi)); }
+  /* the cover's picture (dk-22) is 2455 x 1589: the photograph is 97.1% of its width
+     (72 px of wall and asphalt set on before the nose), so the photo stands 72.8cqi
+     tall and its cut is 12.6cqi. The box is one screen, never taller than the
+     picture (64.7cqi), never shorter than the photo under the roof, the gap and
+     two lines. */
+  .pq-plate--cover .pq-w{ bottom: calc(72.8cqi * (1 - var(--roof)) - 12.6cqi + 4.2cqi); }
+  .pq-plate--cover .pq-win{
+    height: max(min(calc(100svh - var(--pq-head)), 64.7cqi),
+      calc(72.8cqi * (1 - var(--roof)) - 12.6cqi + 4.2cqi + 2 * var(--fs-d) + 4cqi)); }
 }
 
 /* ---- a picture with its words beside, under or above it ----------------------- */
-.pq-pic .pq-line{ margin-top: var(--s-5); }
-/* "para que disfrutes…" closes the three words as the leather's caption: d3, so it
-   does not stand as a second heading beside the next section's h2 */
+.pq-pic .pq-line{ margin-top: var(--pq-near); }
+.pq-pic .pq-word{ margin-bottom: var(--pq-near); }
+/* "para que disfrutes…" closes the three words as the leather's caption: d3 */
 .pq-pic--joy .pq-line{ font-size: var(--pq-d3); font-weight: 600; letter-spacing: -.032em; line-height: 1.1; }
-.pq-pic .pq-word{ margin-bottom: var(--s-5); }
 
 /* ---- seleccionados · revisados · preparados · para que disfrutes -------------- */
-.pq-three{ display: grid; gap: var(--s-9); }
+.pq-three{ display: grid; gap: var(--pq-beat); }
 .pq-pic--rev .pq-f{ --ar: 1; --op: 46% 62%; }
 .pq-pic--joy .pq-f{ --ar: 4 / 5; --op: 62% 55%; }
 @media (max-width: 999px){
-  /* the caliper steps in from the left and runs off the right edge: the stagger
-     that breaks three full-width pictures in a row */
-  .pq-pic--rev .pq-f{ margin-left: 14%; margin-right: calc(var(--pq-m) * -1); }
+  /* the quiet scale: the caliper steps in to the 38% line and runs off the right
+     edge, between two plates that take the whole width */
+  .pq-pic--rev .pq-f{ margin-left: 38%; margin-right: calc(var(--pq-m) * -1); }
   .pq-pic--joy .pq-f{ margin-inline: calc(var(--pq-m) * -1); }
 }
 @media (min-width: 600px) and (max-width: 999px){
-  .pq-pic--rev .pq-f{ margin-left: 38%; }
+  .pq-pic--rev .pq-f{ margin-left: 50%; }
   .pq-pic--joy .pq-f{ --ar: 4 / 3; --op: 50% 55%; }
 }
 @media (min-aspect-ratio: 1 / 1) and (max-width: 999px){ .pq-pic--rev .pq-f{ margin-left: 50%; } }
 @media (min-width: 1000px){
   /* two rows that answer each other: big left + small right, small left + big right */
-  .pq-three{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); row-gap: var(--s-10); }
+  .pq-three{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); row-gap: var(--pq-beat); }
   .pq-plate--sel{ grid-column: 1 / 9; grid-row: 1; }
   .pq-pic--rev{ grid-column: 9 / 13; grid-row: 1; align-self: end; }
   .pq-pic--rev .pq-word{ font-size: min(5rem, 5.4vw); }
@@ -163,71 +229,71 @@
 }
 
 /* ---- his words, I: three details and his sentences as their captions ---------- */
-.pq-love{ display: grid; gap: var(--s-6); }
-.pq-love > .pq-read{ margin-top: var(--s-4); }
-.pq-caps{ display: grid; gap: var(--s-9); margin-block: var(--s-6) var(--s-4); }
-.pq-cap figcaption{ margin-top: var(--s-4); font-size: var(--pq-d3); line-height: 1.1; letter-spacing: -.032em;
+.pq-love{ display: grid; }
+.pq-love > .pq-lede{ margin-top: var(--pq-near); }
+.pq-caps{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--s-1);
+  row-gap: var(--pq-beat); margin-block: var(--pq-beat); }
+.pq-cap figcaption{ margin-top: var(--pq-tight); font-size: var(--pq-d3); line-height: 1.1; letter-spacing: -.032em;
   font-weight: 600; max-width: 20ch; }
+.pq-cap--a{ grid-column: 1 / -1; }
 .pq-cap--a .pq-f{ --ar: 4 / 5; --op: 6% 70%; }
-.pq-cap--b .pq-f{ --ar: 1;     --op: 50% 45%; }
-.pq-cap--c .pq-f{ --ar: 4 / 5; --op: 22% 50%; }
-@media (max-width: 599px){
-  /* an editorial stagger: the first leaves the left margin, the second the right,
-     the third is the whole width; every caption stays on the one left edge */
-  .pq-cap--a{ margin-left: calc(var(--pq-m) * -1); margin-right: 12%; }
-  .pq-cap--a figcaption{ padding-left: var(--pq-m); }
-  .pq-cap--b{ margin-left: 22%; margin-right: calc(var(--pq-m) * -1); }
-  .pq-cap--c{ margin-inline: calc(var(--pq-m) * -1); }
-  .pq-cap--c figcaption{ padding-inline: var(--pq-m); }
+.pq-cap--b .pq-f{ --ar: 4 / 5; --op: 50% 40%; }
+.pq-cap--c .pq-f{ --ar: 4 / 5; --op: 30% 50%; }
+@media (max-width: 999px){
+  /* a spread, then a diptych: the vRS the whole width, the bonnet and the door
+     side by side, edge to edge, a hairline of paper between them */
+  .pq-caps{ margin-inline: calc(var(--pq-m) * -1); }
+  .pq-cap--a figcaption, .pq-cap--b figcaption{ padding-inline: var(--pq-m) var(--s-3); }
+  .pq-cap--c figcaption{ padding-inline: var(--s-3) var(--pq-m); }
+  .pq-cap--b figcaption, .pq-cap--c figcaption{ font-size: clamp(1.125rem, 4.8vw, 1.75rem); line-height: 1.16; letter-spacing: -.024em; }
 }
-@media (min-width: 600px){
-  .pq-caps{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); row-gap: var(--s-9); }
-  .pq-cap--a{ grid-column: 1 / 8; }
-  .pq-cap--b{ grid-column: 9 / 13; align-self: start; margin-top: var(--s-10); }
-  .pq-cap--c{ grid-column: 3 / 10; }
-  .pq-cap--a .pq-f{ --ar: 4 / 3; --op: 50% 55%; }
-  .pq-cap--b .pq-f{ --ar: 4 / 5; --op: 50% 40%; }
-  .pq-cap--c .pq-f{ --ar: 3 / 2; --op: 50% 60%; }
+@media (min-width: 600px) and (max-width: 999px){
+  .pq-cap--a .pq-f{ --ar: 3 / 2; --op: 50% 60%; }
 }
 @media (min-width: 1000px){
   /* the details join the section's own grid, so the third one and the questions
      can share a row: picture 1-6, text from 8 */
-  .pq-love{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); row-gap: var(--s-6); }
+  .pq-love{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); }
   .pq-caps{ display: contents; }
+  /* a spread: the vRS whole on seven columns, the bonnet and the door stacked on
+     the five beside it, each with its sentence; the questions under them */
   .pq-love > .pq-h{ grid-column: 1 / 9; grid-row: 1; max-width: none; }
   .pq-love > .pq-lede{ grid-column: 1 / 6; grid-row: 2; }
-  .pq-cap--a{ grid-column: 1 / 8; grid-row: 3; margin-top: var(--s-8); }
-  .pq-cap--b{ grid-column: 9 / 13; grid-row: 3; margin-top: var(--s-10); }
-  .pq-cap--c{ grid-column: 1 / 7; grid-row: 4; margin-top: var(--s-9); }
-  .pq-cap--c .pq-f{ --ar: 4 / 3; }
-  .pq-love > .pq-read{ grid-column: 8 / 13; grid-row: 4; align-self: end; margin: 0; }
+  .pq-cap--a{ grid-column: 1 / 8; grid-row: 3 / 5; margin-top: var(--pq-beat); }
+  .pq-cap--b{ grid-column: 8 / 13; grid-row: 3; margin-top: var(--pq-beat); }
+  .pq-cap--c{ grid-column: 8 / 13; grid-row: 4; margin-top: var(--pq-near); align-self: end; }
+  .pq-cap--a .pq-f{ --ar: 4 / 3; --op: 50% 60%; }
+  .pq-cap--b .pq-f, .pq-cap--c .pq-f{ --ar: 16 / 9; }
+  .pq-cap--b .pq-f{ --op: 50% 55%; }
+  .pq-cap--c .pq-f{ --op: 40% 55%; }
+  .pq-love > .pq-read{ grid-column: 8 / 13; grid-row: 5; margin-top: var(--pq-beat); }
 }
 
 /* ---- the portrait and his story ------------------------------------------------ */
-.pq-me{ display: grid; gap: var(--s-6); }
+.pq-me{ display: grid; gap: var(--pq-near); }
+.pq-me__ph{ margin-block: var(--s-3) var(--pq-near); }
 .pq-me__ph .pq-f{ --ar: 4 / 5; --op: 56% 50%; }
-@media (max-width: 599px){ .pq-me__ph{ margin-inline: calc(var(--pq-m) * -1); } }
-@media (min-width: 600px){ .pq-me__ph .pq-f{ --ar: 4 / 3; --op: 50% 50%; } }
-.pq-act{ margin: var(--s-7) 0 0; }
-.pq-act .mc-btn{ min-height: 48px; padding-inline: 1.4rem; white-space: nowrap; }
+@media (max-width: 999px){ .pq-me__ph{ margin-inline: calc(var(--pq-m) * -1); } }
+@media (min-width: 600px) and (max-width: 999px){ .pq-me__ph .pq-f{ --ar: 4 / 3; --op: 50% 50%; } }
+.pq-read .pq-act{ margin: var(--pq-beat) 0 0; text-indent: 0; }
 @media (min-width: 1000px){
-  .pq-me{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); row-gap: var(--s-7); align-items: start; }
-  .pq-me__ph{ grid-column: 1 / 7; grid-row: 1 / 3; position: sticky; top: calc(var(--mc-head-h) + var(--s-6)); }
+  .pq-me{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); row-gap: var(--pq-near); align-items: start; }
+  .pq-me__ph{ margin: 0; grid-column: 1 / 7; grid-row: 1 / 3; position: sticky; top: calc(var(--mc-head-h) + var(--s-6)); }
   .pq-me__ph .pq-f{ --ar: 4 / 5; --op: 58% 50%; }
   .pq-me__h{ grid-column: 8 / 13; grid-row: 1; }
-  .pq-me__t{ grid-column: 8 / 13; grid-row: 2; }
+  .pq-me__t{ grid-column: 8 / 13; grid-row: 2; margin-top: var(--pq-near); }
 }
 
 /* ---- te lo enseño: the grey C-Class walked round ---------------------------------- */
-.pq-gal{ list-style: none; margin: var(--s-5) 0 0; padding: 0; }
+.pq-gal{ list-style: none; margin: var(--pq-near) 0 0; padding: 0; }
 .pq-slide figure{ height: 100%; }
-.pq-slide .pq-word{ margin-top: var(--s-4); font-size: var(--pq-d3); letter-spacing: -.035em; }
+.pq-slide .pq-word{ margin-top: var(--pq-tight); font-size: var(--pq-d3); letter-spacing: -.035em; }
 .pq-slide--ext .pq-f{ --op: 66% 60%; }
 .pq-slide--int .pq-f{ --op: 52% 55%; }
 .pq-slide--det .pq-f{ --op: 40% 62%; }
 @media (max-width: 999px){
   /* a swipe that fits the thumb: one picture and the edge of the next */
-  .pq-gal{ display: flex; gap: var(--s-2); overflow-x: auto; overscroll-behavior-x: contain;
+  .pq-gal{ display: flex; gap: var(--s-1); overflow-x: auto; overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory; scroll-padding-inline: var(--pq-m); padding-inline: var(--pq-m);
     scrollbar-width: none; -webkit-overflow-scrolling: touch; }
   .pq-gal::-webkit-scrollbar{ display: none; }
@@ -241,7 +307,6 @@
 }
 @media (min-width: 600px) and (max-width: 999px){
   .pq-slide{ flex-basis: 46%; }
-  .pq-cap figcaption{ font-size: clamp(1.375rem, 3.4vw, 2rem); }
 }
 @media (min-width: 1000px){
   .pq-gal{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--pq-gap);
@@ -249,20 +314,20 @@
   .pq-slide .pq-f{ --ar: 4 / 5; }
   .pq-slide .pq-word{ font-size: min(2.375rem, 2.6vw); }
 }
-.pq-show__end{ margin-top: var(--s-8); }
-@media (min-width: 1000px){ .pq-show__end{ margin-top: var(--s-9); } }
+.pq-show__end{ margin-top: var(--pq-beat); }
 
 /* ---- what you don't see ---------------------------------------------------------- */
-.pq-paint{ display: grid; gap: var(--s-6); }
+.pq-paint{ display: grid; gap: var(--pq-near); }
+.pq-paint__ph{ margin-block: var(--s-3) var(--pq-near); }
 .pq-paint__ph .pq-f{ --ar: 4 / 5; --op: 30% 50%; }
-@media (max-width: 599px){ .pq-paint__ph{ margin-inline: calc(var(--pq-m) * -1); } }
-@media (min-width: 600px){ .pq-paint__ph .pq-f{ --ar: 4 / 3; --op: 50% 50%; } }
+@media (max-width: 999px){ .pq-paint__ph{ margin-inline: calc(var(--pq-m) * -1); } }
+@media (min-width: 600px) and (max-width: 999px){ .pq-paint__ph .pq-f{ --ar: 4 / 3; --op: 50% 50%; } }
 @media (min-width: 1000px){
-  .pq-paint{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); row-gap: var(--s-7); align-items: start; }
-  .pq-paint__ph{ grid-column: 1 / 7; grid-row: 1 / 3; position: sticky; top: calc(var(--mc-head-h) + var(--s-6)); }
+  .pq-paint{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); row-gap: var(--pq-near); align-items: start; }
+  .pq-paint__ph{ margin: 0; grid-column: 1 / 7; grid-row: 1 / 3; position: sticky; top: calc(var(--mc-head-h) + var(--s-6)); }
   .pq-paint__ph .pq-f{ --ar: 4 / 5; --op: 30% 50%; }
   .pq-paint__h{ grid-column: 8 / 13; grid-row: 1; }
-  .pq-paint__t{ grid-column: 8 / 13; grid-row: 2; }
+  .pq-paint__t{ grid-column: 8 / 13; grid-row: 2; margin-top: var(--pq-near); }
 }
 
 /* ---- the welcome: edge to edge, the one bold moment ------------------------------- */
@@ -272,10 +337,10 @@
 .pq-welcome .pq-w{ position: absolute; z-index: 1; left: 0; right: 0; top: 0; text-align: center;
   padding: var(--s-8) var(--pq-m) 0; font-size: var(--pq-d2); }
 .pq-welcome .pq-w > span{ max-width: 16ch; margin-inline: auto; }
-.pq-welcome__sub{ margin: var(--s-7) auto 0; font-size: var(--pq-l); line-height: 1.38; font-weight: 500;
-  letter-spacing: -.018em; color: var(--mc-ink); text-align: center; max-width: 40rem; text-wrap: balance; }
+.pq-welcome__sub{ margin: var(--pq-beat) auto 0; font-size: var(--pq-l); line-height: 1.34; font-weight: 500;
+  letter-spacing: -.02em; color: var(--mc-ink); text-align: center; max-width: 40rem; text-wrap: balance; }
 .pq-welcome__sub > span{ display: block; }
-.pq-welcome__sub > span + span{ margin-top: .35em; }
+.pq-welcome__sub > span + span{ margin-top: .5em; }
 @media (min-aspect-ratio: 1 / 1){
   .pq-open{ height: min(100svh, 75vw); }
   .pq-open img{ object-position: 49% 8%; }
@@ -284,78 +349,114 @@
 }
 
 /* ---- after the delivery ------------------------------------------------------------ */
-.pq-after__t{ display: grid; gap: var(--s-6); margin-top: var(--s-7); }
+.pq-after__t{ display: grid; gap: var(--pq-near); margin-top: var(--pq-beat); }
 @media (min-width: 1000px){
-  .pq-after__t{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); margin-top: var(--s-9); }
+  .pq-after__t{ grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); }
   .pq-after__lede{ grid-column: 1 / 6; position: sticky; top: calc(var(--mc-head-h) + var(--s-6)); align-self: start; }
   .pq-after__t .pq-read{ grid-column: 8 / 13; }
 }
 
-/* ---- the record: on the paper, between rules ---------------------------------------- */
-/* was a blue-grey band (--mc-band): the one cold colour on a page whose every wall is
-   now neutral. The figures stand on the paper, held by ink rules. */
+/* ---- the record: three figures, set like a magazine's numbers page ------------------
+   Big and light (PQ Figures at 250: the same file, its own light end), each on an
+   ink rule, its line beneath in the reading voice. */
 .pq-proof__l{ list-style: none; margin-block: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 var(--pq-gap); }
-.pq-proof__l li{ display: flex; flex-direction: column; gap: var(--s-2); min-width: 0;
-  padding-block: var(--s-5) var(--s-6); border-top: 1px solid var(--mc-ink); }
-.pq-proof__l b{ font-size: clamp(3.25rem, 17vw, 6rem); line-height: .92; letter-spacing: -.05em; color: var(--mc-ink); font-weight: 700; }
-.pq-proof__l li > span{ font-size: var(--t-prose); line-height: 1.4; color: var(--mc-ink-2); max-width: 22ch; }
-@media (min-width: 600px){
+.pq-proof__l li{ display: flex; flex-direction: column; gap: var(--s-3); min-width: 0;
+  padding-block: var(--pq-near) var(--pq-beat); border-top: 1px solid var(--mc-ink); }
+.pq-proof__l li:last-child{ padding-bottom: 0; }
+.pq-proof__l b{ font-family: "PQ Figures", var(--f-ui); font-weight: 250; font-size: clamp(3.75rem, 22vw, 7rem);
+  line-height: .9; letter-spacing: -.045em; color: var(--mc-ink); font-variant-numeric: lining-nums tabular-nums; }
+.pq-proof__l li > span{ font-size: var(--pq-p); line-height: 1.4; color: var(--mc-ink); max-width: 20ch; text-wrap: balance; }
+@media (min-width: 600px) and (max-width: 999px){
   .pq-proof__l{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .pq-proof__l li{ padding-block: var(--s-5) 0; }
-  .pq-proof__l b{ font-size: min(6.5rem, 7.4vw); }
+  .pq-proof__l li{ padding-block: var(--pq-near) 0; }
+  .pq-proof__l b{ font-size: 7.6vw; }
+}
+/* from 1000 px a numbers page: each figure a row, huge on seven columns, its line
+   on the reading column, on the figure's baseline */
+@media (min-width: 1000px){
+  .pq-proof__l li{ display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap);
+    align-items: last baseline; padding-block: var(--pq-near); }
+  .pq-proof__l li:last-child{ padding-bottom: 0; }
+  .pq-proof__l b{ grid-column: 1 / 8; font-size: min(11rem, 11.5vw); }
+  .pq-proof__l li > span{ grid-column: 8 / 13; font-size: var(--pq-l); line-height: 1.3; letter-spacing: -.02em; max-width: 18ch; }
 }
 /* the odometer (pq2.js builds the drums; without it the plain numbers stay) */
 .pq-odo{ display: inline-flex; align-items: flex-start; line-height: 1; }
-.pq-odo__c{ position: relative; display: flex; justify-content: center; height: 1em; overflow: hidden; margin-inline-end: -.05em;
+.pq-odo__c{ position: relative; display: flex; justify-content: center; height: 1em; overflow: hidden; margin-inline-end: -.045em;
   -webkit-mask-image: linear-gradient(transparent, #000 10%, #000 90%, transparent);
           mask-image: linear-gradient(transparent, #000 10%, #000 90%, transparent); }
 .pq-odo__s{ display: block; flex: none; letter-spacing: 0; }
 .pq-odo__s > i{ display: block; height: 1em; font-style: normal; text-align: center; }
-.pq-odo__sep{ display: inline-block; margin-inline-end: -.05em; }
+.pq-odo__sep{ display: inline-block; margin-inline: .01em .02em; }
 .pq-odo.is-rolling .pq-odo__s{ will-change: transform; }
 .pq-sr{ position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .pq-odo-on .pq-proof__l li > span{ opacity: 0; transform: translateY(.5em);
   transition: opacity var(--m-reveal) var(--e-out), transform var(--m-reveal) var(--e-out); }
 .pq-odo-on .pq-proof__l li.is-landed > span{ opacity: 1; transform: none; }
 
-/* ---- their words (a customer's photograph is never cropped) ---------------------------- */
-/* no cards: the photograph, the words in the system's voice for customers (italic),
-   the name. Like the letters page of a magazine. */
-.pq-say .pq-h{ margin-bottom: var(--s-7); }
-.pq-say__l{ list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-6); }
+/* ---- their words: the letters page (a customer's photograph is never cropped) ---------- */
+.pq-say .pq-h{ margin-bottom: var(--pq-beat); }
+.pq-say__l{ list-style: none; margin: 0; padding: 0; display: grid; gap: var(--pq-near); }
 .pq-q figure{ height: 100%; }
 .pq-q__ph{ aspect-ratio: var(--r, .75); overflow: hidden; background: var(--mc-band); }
 .pq-q__ph img{ width: 100%; height: 100%; object-fit: contain; display: block; }
-.pq-q__t{ margin: 0; padding-top: var(--s-4); font-family: var(--f-voice); font-style: italic;
-  font-size: 1.0625rem; line-height: 1.55; color: var(--mc-ink); text-wrap: pretty; }
-.pq-q__by{ padding-top: var(--s-3); font-size: var(--t-body); font-weight: 600; color: var(--mc-ink); }
-.pq-say__all{ display: inline-flex; align-items: center; min-height: 44px; margin-top: var(--s-6); font-weight: 600; }
+/* the letter: a big opening quote mark hung above it, the words in the reading voice */
+.pq-q__t{ margin: 0; padding-top: var(--pq-near); font-family: var(--f-voice); font-style: italic;
+  font-size: var(--pq-p); line-height: 1.5; color: var(--mc-ink); text-wrap: pretty; }
+.pq-q__t::before{ content: "\201C"; content: "\201C" / ""; display: block; height: .42em; margin: 0 0 .06em -.04em;
+  font-family: "PQ Figures", var(--f-ui); font-style: normal; font-weight: 300; font-size: 4.5em; line-height: .86;
+  letter-spacing: 0; color: var(--mc-ink); }
+.pq-q__by{ padding-top: var(--s-3); font-size: var(--t-ui); font-weight: 600; color: var(--mc-ink); }
+.pq-say__all{ display: inline-flex; align-items: center; min-height: 44px; margin-top: var(--pq-near); font-weight: 600;
+  color: var(--mc-ink); text-decoration-thickness: 1px; text-underline-offset: .3em; }
 @media (max-width: 599px){
-  .pq-say__l{ grid-auto-flow: column; grid-auto-columns: 82%; gap: var(--s-4); overflow-x: auto; scroll-snap-type: x mandatory;
+  .pq-say__l{ grid-auto-flow: column; grid-auto-columns: 84%; gap: var(--s-4); overflow-x: auto; scroll-snap-type: x mandatory;
     overscroll-behavior-x: contain; scrollbar-width: none; margin-inline: calc(var(--pq-m) * -1);
     padding-inline: var(--pq-m); scroll-padding-inline: var(--pq-m); align-items: start; }
   .pq-say__l::-webkit-scrollbar{ display: none; }
   .pq-q{ scroll-snap-align: start; }
 }
-@media (min-width: 600px){ .pq-say__l{ grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--pq-gap); align-items: start; } }
+@media (min-width: 600px){
+  .pq-say__l{ grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--pq-gap); align-items: start; }
+  /* the middle letter set a beat lower: a page of letters, not a row of cards */
+  .pq-q:nth-child(3n + 2){ margin-top: var(--pq-beat); }
+}
 
-/* ---- the way in ------------------------------------------------------------------------ */
+/* ---- the way in: the closing spread ---------------------------------------------------- */
 .pq-end{ padding-bottom: var(--pq-sec); }
-.pq-end__t{ margin-top: var(--s-7); }
-.pq-end__p{ margin: 0 0 1.1em; max-width: 34rem; font-size: var(--t-prose); line-height: 1.68; color: var(--mc-ink-2); text-wrap: pretty; }
-.pq-end__p + .pq-end__p{ color: var(--mc-ink); font-size: var(--pq-l); line-height: 1.32; letter-spacing: -.018em; font-weight: 500; max-width: 26ch; text-wrap: balance; }
-.pq-end__act{ display: flex; flex-wrap: wrap; gap: var(--s-2); max-width: 34rem; margin-top: var(--s-6); }
-.pq-end__act .mc-btn{ flex: 1 1 14rem; justify-content: center; min-height: 48px; white-space: nowrap; }
-.pq-end__sign{ margin: var(--s-9) 0 0; padding-top: var(--s-5); border-top: 1px solid var(--mc-ink);
-  display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-3); align-items: baseline; }
-.pq-end__sign b{ font-size: var(--t-h3); letter-spacing: -.01em; color: var(--mc-ink); }
-.pq-end__sign span{ font-size: var(--t-sub); color: var(--mc-ink-2); }
+.pq-end__t{ margin-top: var(--pq-beat); }
+.pq-end__p{ margin: 0; max-width: 33rem; font-size: var(--pq-p); line-height: 1.6; color: var(--mc-ink); text-wrap: pretty; }
+.pq-end__p + .pq-end__p{ margin-top: var(--pq-beat); font-size: var(--pq-d3); line-height: 1.16; letter-spacing: -.03em;
+  font-weight: 500; max-width: 19ch; text-wrap: balance; }
+.pq-end__act{ display: flex; flex-direction: column; gap: var(--s-3); max-width: 33rem; margin-top: var(--pq-near); }
+/* the signature: his line, the page's last words, at heading size under an ink rule */
+.pq-end__sign{ margin: var(--pq-sec) 0 0; padding-top: var(--pq-near); border-top: 1px solid var(--mc-ink);
+  display: flex; flex-direction: column; gap: var(--pq-tight); }
+.pq-end__sign b{ flex: none; white-space: nowrap; font-size: var(--t-h3); letter-spacing: -.01em; color: var(--mc-ink); }
+.pq-end__sign span{ font-size: var(--pq-d2); font-weight: 700; line-height: 1; letter-spacing: -.045em;
+  color: var(--mc-ink); max-width: 14ch; text-wrap: balance; }
+@media (min-width: 600px){
+  .pq-end__act{ flex-direction: row; }
+  .pq-end__act .mc-btn{ flex: 1 1 0; }
+}
 @media (min-width: 1000px){
-  .pq-end__t{ display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); margin-top: var(--s-9); }
+  .pq-end__t{ display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--pq-gap); align-items: start; }
   .pq-end__t > *{ grid-column: 8 / 13; }
   .pq-end__t > .pq-end__p:first-child{ grid-column: 1 / 6; grid-row: 1 / 3; }
-  .pq-end__sign{ grid-column: 1 / 13; }
+  .pq-end__p + .pq-end__p{ margin-top: 0; }
+  .pq-end__sign{ grid-column: 1 / 13; flex-direction: row; align-items: baseline; justify-content: space-between; gap: var(--pq-gap); }
+  .pq-end__sign span{ max-width: none; text-align: right; }
 }
+
+/* ---- the buttons: the page's ink, square like the cards; WhatsApp stays in the mark ---- */
+.pq .mc-btn{ border-radius: 0; min-height: 56px; padding-inline: var(--s-6); font-size: 1.0625rem; font-weight: 600;
+  letter-spacing: -.01em; white-space: nowrap; }
+.pq .mc-btn--cta{ --btn-bg: var(--mc-ink); --btn-bd: var(--mc-ink); --btn-fg: var(--mc-surface); }
+.pq .mc-btn--cta:hover{ --btn-bg: var(--mc-navy); --btn-bd: var(--mc-navy); }
+.pq .mc-btn--outline{ --btn-bg: transparent; --btn-fg: var(--mc-ink); --btn-bd: var(--mc-ink); }
+.pq .mc-btn--outline:hover{ --btn-bg: var(--mc-ink); --btn-fg: var(--mc-surface); --btn-bd: var(--mc-ink); }
+.pq .mc-btn:active{ --btn-bg: var(--mc-navy); --btn-bd: var(--mc-navy); --btn-fg: var(--mc-surface); }
+.pq-act .mc-btn{ min-width: min(100%, 18rem); }
 
 /* ---- motion (only with .pq-on: JS present, motion allowed) ------------------------------
    A picture arrives through its own frame: the frame clips, the picture rises 8%
@@ -369,8 +470,8 @@
 .pq-on .pq-px img{ transform: scale(1.1); transition: transform 2.2s var(--pq-e); }
 .pq-on .is-in .pq-px img{ transform: scale(1.05); }
 .pq-on .pq-px{ will-change: transform; }
-/* a plate: the picture grows from its foot (the car stays standing), words after it */
-.pq-on .pq-plate .pq-px img{ transform-origin: 50% 100%; }
+/* a plate's picture settles about its middle: the 2.5% it overhangs at the foot is
+   the room its ±2% drift moves in, so the window never shows an edge */
 .pq-on .pq-plate[data-r] .pq-f{ opacity: 0; transition: opacity 1.1s var(--pq-e); }
 .pq-on .pq-plate[data-r].is-in .pq-f{ opacity: 1; }
 .pq-on .pq-plate[data-r] .pq-w{ opacity: 0; transform: translate3d(0, .3em, 0);
@@ -397,9 +498,13 @@
 @media (min-aspect-ratio: 1 / 1) and (max-height: 500px){
   .pq-word{ font-size: min(4.4rem, 15vh); }
   .pq-h, .pq-line{ font-size: min(3.4rem, 11vh); }
-  .pq-lede{ font-size: min(1.6rem, 6.4vh); }
-  .pq-cap figcaption, .pq-slide .pq-word{ font-size: min(2rem, 8vh); }
+  .pq-lede, .pq-read .pq-k, .pq-read .pq-lead{ font-size: min(1.6rem, 6.4vh); }
+  .pq-cap figcaption, .pq-slide .pq-word, .pq-read .pq-pull, .pq-end__p + .pq-end__p{ font-size: min(2rem, 8vh); }
   .pq-pic--joy .pq-f, .pq-cap .pq-f, .pq-me__ph .pq-f, .pq-paint__ph .pq-f, .pq-slide .pq-f{ max-height: 86vh; }
+  .pq-caps{ grid-template-columns: repeat(3, minmax(0, 1fr)); margin-inline: 0; column-gap: var(--pq-gap); }
+  .pq-cap--a{ grid-column: auto; }
+  .pq-cap--a .pq-f{ --ar: 4 / 5; }
+  .pq-cap figcaption{ padding-inline: 0; }
   /* a window clamped to the screen's height leaves no wall: there the plate keeps
      its proportion and is simply taller than the screen */
   .pq-win{ max-height: none; }
