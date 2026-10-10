@@ -53,6 +53,7 @@ Timpul tău de gândire și de verificare între prompturi, peste 15 minute, **n
 | 09.10 (2) | — | — | 57 de poze noi (HEIC convertite); 3 propuneri ale paginii /por-que-nosotros fără filme, doar cu poze: Cine (text pe perete, după mașină), Galería (revistă luminoasă), Inmersiva (zoom continuu prin poze); /muestras/* protejat cu cod de 4 cifre; test Chrome/Safari/Firefox |
 | 09.10 (3) | — | — | Cele 3 propuneri rafinate: Cine (treceri lente, un singur sistem de text, mașini întregi pe telefon, 3,0 MB); Galería (poze corectate ca un set, perete fără îmbinări, grilă unică); Inmersiva (cu 40% mai scurtă, poze din originale, fluidă pe telefon, 3,0 MB) |
 | 10.10 | — | — | A treia rundă pe cele 3 propuneri: Cine (cifre și recenzii ca scene de film, final ca un generic, culori unificate); Galería (copertă pe tot ecranul, ritm de revistă, text de lectură mare, 2,65 MB; reparat blocaj în Safari); Inmersiva (o singură scară de text, fără opriri pe aceeași poză, ieșiri lente în negru, fără imagini duble) |
+| 10.10 (2) | — | — | Varianta 2 aleasă de client: versiuni în pagina de probă (2.0 înghețată, tag por-que-v2.0; 2.1 nouă), lista și bara de versiuni în engleză; 2.1: monitor ultra-lat (copertă și poza de bun venit întregi și clare, poze mari doar pentru ecrane ≥2200 px), text aliniat cu logo-ul, vRS, recenzii aliniate, cifre fără „+0” |
 | **Total** | **53,1 h** | **190** | **19 zile** |
 
 
