@@ -1,84 +1,117 @@
 /* =============================================================================
-   /muestras/por-que/3 · Inmersiva — the reels (pq3.js moves them).
-   Everything else on the page (his text, the portrait, the welcome, the record,
-   the reviews, the end) is styled by the live page's own why*.css.
+   /muestras/por-que/3 · Inmersiva — one night, from the first photograph to the end.
+   The reels are moved by pq3.js (transform and opacity); this file sets the words,
+   their one type scale, the places they sit, the opening, and dresses the rest
+   of the page (his text, the record, their words, the end) in the reels' own
+   black and scale. The portrait and the welcome are the live page's stills
+   (why*.css); the welcome is untouched.
 
-   A reel is a tall section with one sticky screen (.pq-stage). Every photograph
-   in it is one or two absolutely placed cuts of it (see pq3.js), moved by
-   transform only (translate · rotate · scale, origin top-left) and shown by
-   opacity only. Nothing is masked: a zoom-through dissolves whole photographs
-   that the match has locked together.
-   Without .pq-on (no JavaScript, reduced motion) the reels are a photo essay.
+   ONE TYPE SCALE, a major third (1.25). W is measured by pq3.js: the largest
+   size at which the longest single word fills the measure. Every statement is
+   one step below (S), the closing line of a reading a step or two below that
+   (K), the reading itself at prose size. The fallbacks are what W measures to
+   in DM Sans, for the first paint and for the essay.
+
+   ONE FRAME. A line sits in one of two places on every screen: the top or the
+   bottom, at the same margin (--pq-mt, --pq-mb) and the same gutter (--pq-g),
+   chosen per photograph on its calmest ground (luminance and gradient under the
+   line along its whole span; pq3v3/probe in the session notes).
    ========================================================================== */
 .pq{
   /* the story's black, the same as why-dark.css (#05080F): no token carries it */
   --pq-night:#05080F;
   --pq-ink:#111C2E;      /* = --mc-ink; literal because why-dark.css redefines the token to white in the story */
+  --pq-grey:#A9B5C6;     /* = why-dark's --mc-ink-2 on the night: 9.6:1 */
   --pq-g:var(--mc-gutter-m, 1.25rem);
+  --pq-mw:calc(100vw - 2 * var(--pq-g));
+  --pq-W:clamp(2.5rem, calc(var(--pq-mw) / 6.3), 5.4rem);
+  --pq-S:calc(var(--pq-W) * .8);
+  --pq-K:calc(var(--pq-S) * .64);
+  --pq-mt:8svh;
+  --pq-mb:calc(8svh + env(safe-area-inset-bottom));
+  background:var(--pq-night);
 }
 .pq-reel{ position:relative; background:var(--pq-night); color:#FFFFFF; }
 .pq-l{ display:block; }
 
-/* ---- the reels ------------------------------------------------------------- */
+/* ---- the opening: the header lies on his wall ---------------------------------
+   The first photograph fills the first screen; the header is laid over it, in
+   ink on the light wall of photograph 14 (both its framings start on the wall),
+   so the first screen is one picture, not a bar and a picture. It rises from
+   night with the photograph. Without the reels it is the site's own header. */
+.pq-on .mc-head{ position:absolute; top:0; left:0; right:0; z-index:5; background:transparent; box-shadow:none; }
+.pq-on .mc-head .mc-nav__i.is-current{ color:var(--pq-ink); text-decoration:underline; text-decoration-thickness:1.5px; text-underline-offset:.3em; }
+
+/* ---- the reels ----------------------------------------------------------------- */
+/* the opening's ground until the camera is in (pq3.js): the grey of his wall in
+   photograph 14 (median of its light pixels behind the header, measured), so the
+   header and the first words lie on what they will lie on, before and while the
+   photograph fades up */
+.pq-on .pq-reel--a .pq-stage{ background-color:#C6D1D3; }
 .pq-on .pq-reel{ height:calc((var(--u, 6) + 1) * 100vh); height:calc((var(--u, 6) + 1) * 100svh); }
 .pq-on .pq-stage{ position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; background:var(--pq-night);
   contain:layout paint; }
 .pq-on .pq-beat{ display:contents; }
-/* a shot is its cuts (img.pq-i: level 0, and level 1 for the deepest zoom), each
-   a layer sized to its cut and placed by pq3.js */
-.pq-on .pq-shot{ display:none; }
-.pq-on .pq-shot.is-live{ display:block; }
-.pq-on .pq-i{ position:absolute; left:0; top:0; max-width:none; transform-origin:0 0; opacity:0;
-  will-change:transform, opacity; backface-visibility:hidden; }
+/* a photograph is one or two cuts (img.pq-i), placed by pq3.js; only the cuts on
+   screen, or about to be, are displayed (.is-on) and get a layer */
+.pq-on .pq-shot{ display:contents; }
+.pq-on .pq-i{ position:absolute; left:0; top:0; max-width:none; transform-origin:0 0; opacity:0; display:none; }
+.pq-on .pq-i.is-on{ display:block; will-change:transform, opacity; backface-visibility:hidden; }
 .pq-shot img{ display:block; width:100%; height:100%; object-fit:cover; }
-.pq-i--1{ display:none; }
-.pq-on .pq-i--1{ display:block; }
 
-/* the words: each line arrives on time (pq3.js), the block drifts with the camera */
+/* ---- the words ------------------------------------------------------------------- */
 .pq-w{ margin:0; font-weight:700; color:#FFFFFF; }
 .pq-on .pq-w{ position:absolute; z-index:2; pointer-events:none; will-change:transform; }
+.pq-on:not(.pq-typed) .pq-w{ visibility:hidden; }
 .pq-on .pq-w .pq-l{ opacity:0; will-change:transform, opacity; }
 .pq-w--ink{ color:var(--pq-ink); }
-.pq-on .pq-w:not(.pq-w--ink){ text-shadow:0 2px 30px rgba(5,8,15,.45); }
-.pq-w--h1{ font-size:clamp(1.9rem, min(10.6vw, 5.6svh), 6.4rem); line-height:.98; letter-spacing:-.04em; max-width:11ch; }
-.pq-w--line{ font-size:clamp(2.1rem, 9.2vw, 5.6rem); line-height:1; letter-spacing:-.035em; max-width:13ch; }
-/* a single word fills its measure (pq3.js fits it: --fit-w wide, never above --fit-max) */
-.pq-w--word{ font-size:clamp(3rem, 15vw, 10rem); line-height:.95; letter-spacing:-.05em; white-space:nowrap; }
-.pq-on .pq-w--word{ width:var(--fit-w); }
+.pq-on .pq-w:not(.pq-w--ink){ text-shadow:0 2px 28px rgba(5,8,15,.4); }
+/* statements (S): the opening, the two closing lines, "Te lo enseño…" */
+.pq-w--h1, .pq-w--line{ font-size:var(--pq-S); line-height:1.02; letter-spacing:-.035em; }
+.pq-w .pq-l{ text-wrap:balance; }
+/* single words (W) */
+.pq-w--word{ font-size:var(--pq-W); line-height:.96; letter-spacing:-.045em; }
+.pq-w--word:not(.pq-w--wrap) .pq-l{ white-space:nowrap; }
+.pq-w--wrap{ max-width:8em; }
 
-/* ---- where each line sits: upright screens (phone first) -------------------
-   Every place below was read off the photograph under it (luminance and
-   gradient per cell, then the frames themselves): his white wall for the ink
-   words, the darkest paint for the white ones. */
-.pq-on [data-b]{ left:var(--pq-g); right:var(--pq-g); --fit-w:calc(100vw - 2 * var(--pq-g)); --fit-max:200; }
-.pq-on [data-b="a1"]{ top:5.5svh; }
-.pq-on [data-b="a2"]{ top:7svh; }
-.pq-on [data-b="a3"]{ top:9.5svh; left:auto; text-align:right; --fit-w:calc((100vw - 2 * var(--pq-g)) * .62); }
-.pq-on [data-b="a4"]{ bottom:calc(4svh + env(safe-area-inset-bottom)); }
-.pq-on [data-b="a5"]{ top:38svh; }
-.pq-on [data-b="b1"]{ top:8svh; }
-.pq-on [data-b="b2"]{ top:7svh; }
-.pq-on [data-b="b3"]{ bottom:calc(10svh + env(safe-area-inset-bottom)); --fit-w:calc((100vw - 2 * var(--pq-g)) * .65); }
-.pq-on [data-b="b4"]{ top:35svh; }
-.pq-on [data-b="b5"]{ bottom:calc(2svh + env(safe-area-inset-bottom)); font-size:clamp(1.4rem, min(7.6vw, 4.6svh), 5.4rem); }
-.pq-on [data-b="b5"] .pq-l{ white-space:nowrap; }
+/* ---- where each line sits: upright screens (phone first) -------------------------
+   top: the margin below the top (a1: below the header); bottom: the same margin
+   above the bottom. Left on the gutter unless the photograph's calm side is the
+   right. */
+.pq-on [data-b]{ left:var(--pq-g); right:var(--pq-g); }
+.pq-on [data-b="a1"]{ top:calc(var(--pq-head, 56px) + var(--pq-mt) * .3); }
+/* the opening shares the first screen with the header and the car: on a short
+   phone it is held to the height left above the car */
+.pq-w--h1{ line-height:.97; font-size:min(var(--pq-S), 5.2svh); }
+@media (min-aspect-ratio: 1/1){ .pq-w--h1{ font-size:var(--pq-S); } }
+/* a phone on its side: the car takes most of the height */
+@media (min-aspect-ratio: 1/1) and (max-height: 500px){
+  .pq-w--h1{ font-size:min(var(--pq-S), 8.5vh); }
+  /* and the wall is to the right of its roof */
+  .pq-on [data-b="a1"]{ left:auto; right:var(--pq-g); text-align:right; }
+}
+.pq-on [data-b="a2"], .pq-on [data-b="a3"], .pq-on [data-b="a4"], .pq-on [data-b="a5"], .pq-on [data-b="b1"],
+.pq-on [data-b="b2"], .pq-on [data-b="b4"], .pq-on [data-b="b5"]{ top:var(--pq-mt); }
+.pq-on [data-b="b3"]{ bottom:var(--pq-mb); }
+.pq-on [data-b="a3"], .pq-on [data-b="b4"]{ left:auto; text-align:right; }
+/* "Preparados." on the dark windscreen and bonnet of 43, which are its middle */
+.pq-on [data-b="a4"]{ text-align:center; }
 
-/* ---- wide screens ------------------------------------------------------------ */
+/* ---- wide screens --------------------------------------------------------------- */
 @media (min-aspect-ratio: 1/1){
-  .pq{ --pq-g:max(var(--mc-gutter-d, 2rem), calc((100vw - 1280px) / 2)); }
-  .pq-on [data-b]{ right:auto; --fit-w:46vw; --fit-max:176; }
-  .pq-w--h1{ font-size:clamp(2.4rem, min(5.2vw, 9.4vh), 6.4rem); max-width:none; }
-  .pq-w--h1 .pq-l, .pq-w--line .pq-l{ white-space:nowrap; }
-  .pq-w--line{ font-size:clamp(2rem, min(4.6vw, 8.6vh), 5.4rem); max-width:none; }
-  .pq-on [data-b="a1"]{ top:7vh; }
-  .pq-on [data-b="a2"]{ left:auto; right:var(--pq-g); text-align:right; }
-  .pq-on [data-b="a3"]{ top:4vh; left:auto; right:var(--pq-g); text-align:right; --fit-w:34vw; }
-  .pq-on [data-b="a4"]{ --fit-w:34vw; left:33vw; text-align:center; top:38vh; bottom:auto; }
-  .pq-on [data-b="a5"]{ width:60vw; left:20vw; text-align:center; top:40vh; }
-  .pq-on [data-b="b2"]{ left:auto; right:var(--pq-g); text-align:right; }
-  .pq-on [data-b="b3"]{ bottom:14vh; --fit-w:30vw; left:var(--mc-gutter-d, 2rem); }
-  .pq-on [data-b="b4"]{ top:34vh; --fit-w:40vw; }
-  .pq-on [data-b="b5"]{ bottom:3vh; font-size:clamp(1.6rem, min(4.6vw, 8.6vh), 5.4rem); }
+  .pq{ --pq-g:max(var(--mc-gutter-d, 2rem), calc((100vw - 1280px) / 2));
+       --pq-mw:min(46vw, 46rem); --pq-K:calc(var(--pq-S) * .41);
+       --pq-W:clamp(2.5rem, min(calc(var(--pq-mw) / 6.3), 12.5vh), 9rem);
+       --pq-mt:10vh; --pq-mb:10vh; }
+  .pq-on [data-b]{ right:auto; }
+  .pq-w .pq-l{ white-space:nowrap; }
+  .pq-on [data-b="a1"]{ top:calc(var(--pq-head, 72px) + var(--pq-mt) * .25); }
+  .pq-on [data-b="a2"], .pq-on [data-b="a3"], .pq-on [data-b="b2"], .pq-on [data-b="b4"]{ left:auto; right:var(--pq-g); text-align:right; }
+  /* a wide screen sees 44 with the star to the right: "Preparados." on the black
+     bumper beside the plate; 30 from its window down, the words in two lines on it */
+  .pq-on [data-b="a4"]{ top:auto; bottom:var(--pq-mb); text-align:left; }
+  .pq-w--wrap{ max-width:7em; }
+  .pq-w--wrap .pq-l{ white-space:normal; }
 }
 
 /* ---- the essay: no JavaScript, or reduced motion ------------------------------
@@ -90,6 +123,65 @@ html:not(.pq-on) .pq-shot--key{ display:block; aspect-ratio:4 / 3; max-height:86
 html:not(.pq-on) .pq-i:not([src]){ display:none; }
 html:not(.pq-on) .pq-w{ padding:var(--s-8) var(--pq-g) var(--s-5); }
 html:not(.pq-on) .pq-w--ink{ color:#FFFFFF; }
-html:not(.pq-on) .pq-w--word{ white-space:normal; font-size:clamp(2.6rem, 12vw, 7rem); }
+html:not(.pq-on) .pq-w--word .pq-l{ white-space:normal; }
 html:not(.pq-on) .pq-beat[data-beat="a2"] .pq-w{ padding-top:var(--s-6); }
 @media (min-aspect-ratio: 1/1){ html:not(.pq-on) .pq-shot--key{ width:min(100%, 1280px); } }
+
+/* =============================================================================
+   THE REST OF THE STORY, in the reels' language: the same night, the same
+   scale, the same gutter, and air — every block a scene of its own.
+   ========================================================================== */
+/* his words: the heading a statement (S), the reading at prose size in grey,
+   his lead lines in white, the closing line a step up (K) */
+.pq .wy-txt__in{ padding-block:max(22svh, 8rem) max(18svh, 6rem); gap:var(--s-7); }
+.pq .wy-txt__h{ font-size:var(--pq-S); line-height:1.02; letter-spacing:-.035em; max-width:none; }
+.pq .wy-txt__h > span{ text-wrap:balance; }
+.pq .wy-txt__b{ max-width:38rem; }
+.pq .wy-txt__b p{ font-size:1.125rem; line-height:1.7; color:var(--pq-grey); margin-bottom:var(--s-6); }
+.pq .wy-txt__b .wy-txt__lead{ color:#FFFFFF; }
+.pq .wy-txt__b .wy-txt__k{ margin-top:var(--s-7); font-size:var(--pq-K); line-height:1.3; letter-spacing:-.02em; font-weight:600; color:#FFFFFF; }
+@media (min-width:900px){
+  .pq .wy-txt__in{ grid-template-columns:minmax(0,5fr) minmax(0,7fr); column-gap:var(--s-8); row-gap:var(--s-8); }
+  .pq .wy-txt__h{ grid-column:1 / -1; position:static; font-size:var(--pq-S); max-width:18ch; }
+  .pq .wy-txt__h > span{ white-space:nowrap; }
+  .pq .wy-txt__b, .pq .wy-txt--me .wy-txt__b{ grid-column:2; }
+  .pq .wy-txt__b p{ font-size:1.3125rem; }
+}
+/* straight out of a reel: the reel has already left a screen of black */
+.pq .pq-reel + .wy-txt .wy-txt__in{ padding-top:max(6svh, 2.5rem); }
+/* the portrait's line: a statement too */
+.pq .wy-still--portrait .wy-beat--line{ font-size:var(--pq-S); line-height:1.02; letter-spacing:-.035em; }
+@media (min-aspect-ratio: 1/1) and (min-width: 900px){ .pq .wy-still--portrait .wy-beat--line{ font-size:min(var(--pq-S), 4.8vw); } }
+@media (min-aspect-ratio: 1/1) and (max-height: 500px){ .pq .wy-still--portrait .wy-beat--line{ font-size:min(var(--pq-S), 9vh); } }
+
+/* the record: each figure a word of its own (W on a phone, one under the other;
+   S across on wide screens), its words under it in the reading's grey */
+.pq .wy-proof{ border-top:0; }
+.pq .wy-proof__l{ padding-block:max(16svh, 6rem); row-gap:max(10svh, 4rem); column-gap:var(--s-7); padding-inline:var(--pq-g); max-width:none; }
+.pq .wy-proof__l li{ gap:var(--s-3); }
+.pq .wy-proof__l b{ font-size:var(--pq-W); letter-spacing:-.045em; color:#FFFFFF; }
+.pq .wy-proof__l li > span{ font-size:1.125rem; line-height:1.5; color:var(--pq-grey); max-width:24ch; }
+@media (min-width:600px){ .pq .wy-proof__l b{ font-size:min(var(--pq-S), 9vw); } }
+@media (min-width:900px){ .pq .wy-proof__l b{ font-size:min(var(--pq-S), 5.6rem); } .pq .wy-proof__l li > span{ font-size:1.25rem; } }
+
+/* their words: on the night, no cards — the photograph whole on a deeper black,
+   the quote in white under it, the name in grey */
+.pq .wy-say{ padding-block:max(16svh, 6rem); }
+.pq .wy-say__h{ font-size:var(--pq-S); line-height:1.02; letter-spacing:-.035em; color:#FFFFFF; margin-bottom:var(--s-7); }
+.pq .wy-q figure{ background:transparent; border:0; }
+.pq .wy-q__ph{ background:#0B1322; }
+.pq .wy-q__t{ padding:var(--s-5) 0 var(--s-3); font-size:1.125rem; line-height:1.6; color:#FFFFFF; }
+.pq .wy-q__by{ padding:0; font-size:1rem; color:var(--pq-grey); }
+.pq .wy-say__l{ gap:var(--s-6); }
+.pq .wy-say__all{ margin-top:var(--s-6); color:#FFFFFF; }
+.pq .wy-say :focus-visible{ outline-color:#FFFFFF; }
+
+/* the end: the same night; the heading a statement */
+.pq .wy-end{ background:var(--pq-night); }
+.pq .wy-end__in{ padding-block:max(18svh, 7rem) max(14svh, 5rem); }
+.pq .wy-end__h{ font-size:var(--pq-S); line-height:1.02; letter-spacing:-.035em; max-width:14ch; text-wrap:balance; margin-bottom:var(--s-6); }
+.pq .wy-end__p{ font-size:1.125rem; line-height:1.7; color:var(--pq-grey); }
+.pq .wy-end__act{ margin-top:var(--s-7); }
+.pq .wy-end__sign{ margin-top:max(12svh, var(--s-9)); border-top-color:rgba(255,255,255,.14); }
+.pq .wy-end__sign span{ color:var(--pq-grey); }
+@media (min-width:900px){ .pq .wy-end__p{ font-size:1.3125rem; } .pq .wy-end__h{ max-width:none; } }

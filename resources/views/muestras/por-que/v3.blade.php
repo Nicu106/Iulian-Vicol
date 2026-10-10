@@ -19,9 +19,17 @@
      originals, on what each screen shape sees at the handover (tools/media/
      pq3-media.py; table in public/js/pq3.js). The two are locked together and
      the next one dissolves in whole, in time (a pause never freezes a double
-     image). Between cars, a cut through the story's black, also in time. Words
-     sit on his white wall in ink, or white on the darkest paint, and drift a
-     little with the camera.
+     image); where the two camera positions disagree on screen, the same handover
+     dips through black. Between cars, a cut through the story's black, also in
+     time. A reel's first photograph rises from black, its last one goes down to
+     black under its last words, and the reading after it rises on that black.
+     Words: one type scale (single words W, every statement a major third below),
+     two places (top or bottom, the same margins), on the calmest ground of their
+     photograph: ink on his white wall, white on the darkest paint.
+
+     The third pass (2026-10-10) also dresses his text, the record, their words and
+     the end in the reels' night and scale (pq3.css), and lays the header over
+     the first photograph. The welcome is untouched.
 
      reel A  14 grey C-Class whole  →  15 its front           (headlight, star)
              40 black C-Class 3/4   →  41 its front quarter   (headlight, wheel)
@@ -87,7 +95,7 @@
     'b1' => '<h2 class="pq-w pq-w--line pq-w--ink" data-b="b1"><span class="pq-l">Te lo enseño</span> <span class="pq-l">antes de que vengas.</span></h2>',
     'b2' => '<p class="pq-w pq-w--word pq-w--ink" data-b="b2"><span class="pq-l">El exterior.</span></p>',
     'b3' => '<p class="pq-w pq-w--word" data-b="b3"><span class="pq-l">El interior.</span></p>',
-    'b4' => '<p class="pq-w pq-w--word" data-b="b4"><span class="pq-l">Y sus desperfectos.</span></p>',
+    'b4' => '<p class="pq-w pq-w--word pq-w--wrap pq-w--ink" data-b="b4"><span class="pq-l">Y sus desperfectos.</span></p>',
     'b5' => '<p class="pq-w pq-w--line" data-b="b5"><span class="pq-l">Para que sepas</span> <span class="pq-l">qué te vas a encontrar.</span></p>',
   ];
 @endphp

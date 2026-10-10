@@ -93,6 +93,9 @@ OLD_PAIRS = {   # the first fits (SIFT + RANSAC at 1200px, checked by eye): the 
 }
 
 
+KEEP = {('43>44', 'L'): [1.35449, 0.00296, -0.18465, -0.27182]}
+
+
 def pairs():
     """refine each match on what will be seen: the similarity that best overlays the
     EDGES of B on those of A (normalised cross-correlation of blurred gradient
@@ -144,6 +147,10 @@ def pairs():
                 p = minimize(f, p, method='Nelder-Mead', options=dict(xatol=1e-5, fatol=1e-6, maxiter=600,
                              initial_simplex=[p] + [p + np.eye(4)[i] * [0.01, 0.005, 0.004, 0.004][i] for i in range(4)])).x
             first, last = ncc(p0, A, B, m, W, wt), ncc(p, A, B, m, W, wt)
+            if (key, mode) in KEEP:
+                # the refit is ambiguous here (same score with a 2 degree roll that the
+                # camera would then unwind on screen): keep the fit that does not roll
+                p = np.array(KEEP[(key, mode)], float)
             res[mode] = [round(float(p[0]), 5), round(float(p[1]), 5), round(float(p[2]), 5), round(float(p[3]), 5)]
             print('%s %s roi %s  first fit ncc %.3f -> %.3f   k %.4f phi %.2f deg t %.4f %.4f' % (
                 key, mode, [round(v, 2) for v in (x0, y0, x1, y1)], first, last, p[0], np.degrees(p[1]), p[2], p[3]))
