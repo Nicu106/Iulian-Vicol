@@ -186,7 +186,8 @@
         <div class="pq-f pq-whole" data-r><div class="pq-f__in"><div class="pq-px">
           {{-- 2.3 (2): photo 27 from the HEIC (P3 -> sRGB, the c27 grade), the WHOLE car on every
                screen: the frame carried on 260 px before the front wheel and 160 px past the
-               bumper (his wall and asphalt), so wheels and tail have air. 3:2 on a phone, the
+               bumper, so wheels and tail have air: his wall mirrored row by row, his asphalt as
+               2-D blocks moved 1:1 from the same rows (the drain grate runs on), never stretched. 3:2 on a phone, the
                page's whole width (pq23/27w); 16:9 on a desk (pq23/dk-27w). The car is the subject:
                it is never scaled past its frame (no settle overhang, no drift) --}}
           <picture>
