@@ -80,8 +80,8 @@
      record as a numbers page; their words as a letters page; the end signed
      with his line, the buttons in the page's ink.
 
-     Scenes: cover (20 upright / 22 wide) · Seleccionados (40) / Revisados (35) / Preparados (51)
-     · Para que disfrutes (24) · his first text with three details (36, 19, 30)
+     Scenes: cover (2.3: 40 everywhere) · Seleccionados (2.3: 12) / Revisados (35) / Preparados (51)
+     · Para que disfrutes (24) · his first text with three details (36, 21 in 2.3, 30)
      · the portrait and his own story · Te lo enseño (14) and the grey C-Class
      walked round (17, 18, 16): a swipe on phones, a spread on desks · what you
      don't see (46) · the welcome, edge to edge: the one bold moment · after
@@ -104,16 +104,16 @@
       <div class="pq-plate__in">
         <h1 class="pq-w" id="pq-h1"><span>Un coche bien elegido.</span> <span>Y alguien que responde.</span></h1>
         <div class="pq-win" aria-hidden="true"></div>
-        {{-- 2.2: one photograph for every screen, photo 20 (IMG_1273) retouched from the
-             HEIC: the Cabrio from three quarters. Upright: pq22/tall-20 (the car at 118%
-             of the width, its nose on the right edge, the wall carried on above); every
-             other screen: pq22/dk-20, the same car with its wall and ground carried on
-             either side, drawn from the screen's height (pq22.css) --}}
-        @php $dk20 = '/storage/why/pq22/dk-20.jpg'; $lq20 = \App\Support\Img::lqip($dk20); @endphp
-        <div class="pq-f"@if($lq20) style="--lq:url('{{ $lq20 }}')"@endif><div class="pq-px"><picture>
-          {{-- drawn 2.44 x the cover's height wide (pq22.css: car at 55% of it) --}}
-          <source media="{{ $frame }}" srcset="{{ \App\Support\Img::wideSrcset($dk20) }}" sizes="calc(244vh - 176px)">
-          <x-img src="/storage/why/pq22/tall-20.jpg" alt="BMW Serie 4 Cabrio azul con la capota abierta, ante una pared blanca"
+        {{-- 2.3: one photograph for every screen, photo 40 (IMG_1862) retouched from the
+             HEIC: the black C-Class from three quarters. Upright: pq23/tall-40 (the car at
+             115% of the width, its nose on the left edge, the wall carried on above); every
+             other screen: pq23/dk-40, the same car with his wall and asphalt carried on
+             either side, drawn from the screen's height (pq23.css) --}}
+        @php $dk40 = '/storage/why/pq23/dk-40.jpg'; $lq40 = \App\Support\Img::lqip($dk40); @endphp
+        <div class="pq-f"@if($lq40) style="--lq:url('{{ $lq40 }}')"@endif><div class="pq-px"><picture>
+          {{-- drawn 2.54 x the cover's height wide (pq23.css: car at 55% of it) --}}
+          <source media="{{ $frame }}" srcset="{{ \App\Support\Img::wideSrcset($dk40) }}" sizes="calc(254vh - 183px)">
+          <x-img src="/storage/why/pq23/tall-40.jpg" alt="Mercedes-Benz Clase C negro con llantas AMG, de tres cuartos, ante una pared blanca"
                  sizes="100vw" :max="1600" :fallback="1080" :priority="true" />
         </picture></div></div>
       </div>
@@ -127,8 +127,10 @@
         <p class="pq-w">Seleccionados.</p>
         <div class="pq-win" aria-hidden="true"></div>
         <div class="pq-f"><div class="pq-px"><picture>
-          <source media="{{ $frame }}" srcset="{{ $src(40) }}" sizes="(min-width: 1000px) min(62vw, 960px), 100vw">
-          <x-img :src="$tall(40)" alt="Mercedes-Benz Clase C negro con llantas AMG, de tres cuartos"
+          {{-- 2.3: photo 40 is the cover now; this plate is photo 12, the grey C-Class
+               from three quarters (pq23/tall-12, dk-12: the set's grade and cut) --}}
+          <source media="{{ $frame }}" srcset="{{ \App\Support\Img::srcset('/storage/why/pq23/dk-12.jpg', 2000) }}" sizes="(min-width: 1000px) min(62vw, 960px), 100vw">
+          <x-img src="/storage/why/pq23/tall-12.jpg" alt="Mercedes-Benz Clase C gris, de tres cuartos"
                  sizes="100vw" :max="1600" />
         </picture></div></div>
       </div>
@@ -176,8 +178,13 @@
       </figure>
       <figure class="pq-cap pq-cap--b">
         <div class="pq-f" data-r><div class="pq-f__in"><div class="pq-px">
-          <x-img :src="$ph(19)" alt="El capó azul del BMW Serie 4 Cabrio, de frente"
-                 sizes="(min-width: 1000px) min(36vw, 560px), 84vw" :max="1080" />
+          {{-- 2.3: photo 21 from the HEIC (P3 -> sRGB), the navy given its depth: 4:5 on a
+               phone (bonnet, grille, the white leather behind the glass), 16:9 on a desk --}}
+          <picture>
+            <source media="(min-width: 1000px)" srcset="{{ \App\Support\Img::srcset('/storage/why/pq23/dk-21.jpg', 2000) }}" sizes="min(36vw, 560px)">
+            <x-img src="/storage/why/pq23/21.jpg" alt="El capó azul marino del BMW Serie 4 Cabrio y su cuero blanco, de frente"
+                   sizes="84vw" :max="1080" />
+          </picture>
         </div></div></div>
         <figcaption>El color que te hace volver a mirarlo.</figcaption>
       </figure>

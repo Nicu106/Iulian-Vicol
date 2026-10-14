@@ -161,7 +161,7 @@
    the roof is 13% of the photo's height below them; on a wide screen their foot
    is set --gap above the roof, whatever the window's height. */
 .pq-plate--cover{ --roof: .398; }
-.pq-plate--sel  { --roof: .207; }
+.pq-plate--sel  { --roof: .173; }   /* 2.3: photo 12 (pq23/tall-12), roof measured 17.1% + the .002 the 40 had */
 .pq-plate--pre  { --roof: .253; }
 .pq-plate--show { --roof: .258; --fs: var(--pq-d2); }
 .pq-plate--after{ --roof: .238; --fs: var(--pq-d2); }
@@ -252,45 +252,46 @@
   .pq-cover .pq-plate{ max-width: min(100%, 2560px, calc((100svh - var(--pq-head)) * 1.95)); margin-inline: auto; }
 }
 
-/* ---- 2.2: the cover is photo 20 everywhere ------------------------------------
-   One photograph (IMG_1273, retouched from the HEIC: verticals made vertical, the
-   asphalt dry and even, drains and stains gone, the car's own shadow kept soft, the
-   navy given depth and the chrome and leather held under clipping).
-   Upright, pq22/tall-20.jpg (2000 x 4099): the screen's width IS the car at 118%,
-   nose 1.5% from the right edge, the rear running off the left; the picture stands
-   on the plate's foot, its roof (windscreen frame) 79.0cqi above it. The words
-   stand 7cqi above the roof, on the wall. Where a screen is taller than the file
-   (over 2.05:1) the wall's own tone carries on above it.
-   Frame, pq22/dk-20.jpg (4600 x 1891, 2.433:1): drawn from the cover's height.
-   The car (its box: x .409-.791, y .377-.926 of the file) is 55% of the cover's
-   height, never wider than 90% of it; the file stands on the cover's foot (the car's
-   foot 7.4% of the file above it), its
-   centre on 60% of the width, so the line starts on the logo's x over its tail and
-   the eye runs down the bonnet to the grille. The words' foot .45em above the roof. */
-.pq-plate--cover .pq-f{ background-color: #CECDCE; }   /* the wall's own tone, measured on tall-20's top rows */
+/* ---- 2.3: the cover is photo 40 everywhere ------------------------------------
+   One photograph (IMG_1862, retouched from the HEIC, Display P3 -> sRGB: verticals made
+   vertical, the wall the set's neutral, the asphalt HIS: four spots cloned away from the
+   same rows, nothing re-laid; the paint deep with its reflections, chrome held).
+   Where the frame needs more wall or ground than he shot, it is carried on from his own
+   pixels: the wall's tone per row with his wall's grain and its joints at their own
+   spacing; the ground moved 1:1 from his clean asphalt (its grain is the sensor's, the
+   same 3.1-3.5 px at every depth, measured), softened row by row to his focus fall-off.
+   Upright, pq23/tall-40.jpg (2000 x 4100): the screen's width is the car at 115%,
+   its nose 2% from the left edge, the tail running off the right; the picture stands on
+   the plate's foot, its roof 59.77cqi above it. The words stand 7cqi above the roof, on
+   the wall. Over 2.05:1 the wall's own tone carries on above the file.
+   Frame, pq23/dk-40.jpg (4600 x 2373, 1.9385:1): drawn from the cover's height. The car
+   (its box: x .352-.848, y .5065-.9265 of the file, 2.2885:1) is 55% of the cover's
+   height, never wider than 90% of it; the file stands on the cover's foot, the car's
+   centre on 55% of the width (the 40A mock-up; this car is 2.29:1, so 60% put its tail
+   on the edge), its tail at least 5% inside: the words on the logo's x,
+   on the wall, their foot .45em above the roof. */
+.pq-plate--cover .pq-f{ background-color: #CCCCCC; }   /* the wall's own tone, measured on the top rows of both files (203.5) */
 .pq-plate--cover .pq-f img{ left: 0; width: 100%; height: auto; min-height: 0; bottom: 0; top: auto; right: auto; }
-.pq-plate--cover .pq-w{ bottom: calc(100cqi * 1580.3 / 2000 + 7cqi); }
+.pq-plate--cover .pq-w{ bottom: calc(100cqi * 1195.4 / 2000 + 7cqi); }
 @media (min-width: 1000px), (min-aspect-ratio: 1 / 1){
   .pq-plate--cover{
     --bh: calc(100svh - var(--pq-head));
-    --ch: min(calc(var(--bh) * .55), calc(100cqi * .9 / 1.694));
-    --ih: calc(var(--ch) / .5483);
-    --iw: calc(var(--ih) * 2.4326);
-    --oh: 0px;                         /* the cover holds still (pq22.js): no overhang needed */
-    --ct: calc(var(--bh) + var(--oh) - var(--ih) * .6226); }   /* the roof, from the cover's top */
+    --ch: min(calc(var(--bh) * .55), calc(100cqi * .9 / 2.2885));
+    --ih: calc(var(--ch) / .4201);
+    --iw: calc(var(--ih) * 1.9385);
+    --cx: min(55cqi, calc(95cqi - var(--ch) * 1.1443));   /* the car's centre: 55%, its tail never nearer than 5% to the right edge */
+    --oh: 0px;                         /* the cover holds still (pq23.js): no overhang needed */
+    --ct: calc(var(--bh) + var(--oh) - var(--ih) * .4935); }   /* the roof, from the cover's top */
   .pq-plate--cover .pq-win{ height: var(--bh); min-height: 0; max-height: none; }
-  .pq-plate--cover .pq-f{ background: var(--lq, none) no-repeat #CECDCE;
+  .pq-plate--cover .pq-f{ background: var(--lq, none) no-repeat #CCCCCC;
     background-size: var(--iw) var(--ih);
-    background-position: clamp(calc(100cqi - var(--iw)), calc(60cqi - var(--iw) * .6), 0px) calc(100% + var(--oh)); }
+    background-position: clamp(calc(100cqi - var(--iw)), calc(var(--cx) - var(--iw) * .6), 0px) calc(100% + var(--oh)); }
   .pq-plate--cover .pq-f img{ inset: auto; top: auto; bottom: calc(var(--oh) * -1); right: auto;
-    left: clamp(calc(100cqi - var(--iw)), calc(60cqi - var(--iw) * .6), 0px);
+    left: clamp(calc(100cqi - var(--iw)), calc(var(--cx) - var(--iw) * .6), 0px);
     width: var(--iw); height: var(--ih); max-width: none; object-fit: fill; background: none !important;
-    transform-origin: 60% 37.74%; }
+    transform-origin: 60% 50.65%; }
   .pq-plate--cover .pq-w{ top: auto; bottom: calc(var(--bh) - var(--ct) + .45em); }
-  /* two lines, always: WebKit set this h1 a little wider than Chromium and broke it into
-     four inside the 80% measure (2.1 too: its top at 14 px instead of 78 at 1440); four
-     lines no longer fit above the roof. Each sentence is one line (measured: the longer
-     is 67% of the cover at 1440 in Chromium) */
+  /* two lines, always (2.2: WebKit set this h1 a little wider and broke it into four) */
   .pq-plate--cover .pq-w{ max-width: none; }
   .pq-plate--cover .pq-w > span{ white-space: nowrap; }
 }
@@ -346,7 +347,7 @@
    the tree's green in it, and the badge sat in the bottom 15%. */
 .pq-cap--a .pq-f{ --ar: 5 / 4; }
 .pq-cap--a .pq-f img{ top: auto; right: auto; bottom: 0; left: 0; width: 150%; height: auto; transform-origin: 33% 64%; }
-.pq-cap--b .pq-f{ --ar: 4 / 5; --op: 50% 40%; }
+.pq-cap--b .pq-f{ --ar: 4 / 5; --op: 50% 50%; }   /* 2.3: pq23/21.jpg is cut 4:5 */
 .pq-cap--c .pq-f{ --ar: 4 / 5; --op: 30% 50%; }
 @media (max-width: 999px){
   /* a spread, then a diptych: the vRS the whole width, the bonnet and the door
@@ -384,7 +385,7 @@
   .pq-cap--c{ grid-column: 8 / 13; grid-row: 4; margin-top: var(--pq-near); align-self: end; }
   .pq-cap--a .pq-f{ --ar: 4 / 3; --op: 50% 60%; }
   .pq-cap--b .pq-f, .pq-cap--c .pq-f{ --ar: 16 / 9; }
-  .pq-cap--b .pq-f{ --op: 50% 55%; }
+  .pq-cap--b .pq-f{ --op: 50% 50%; }   /* 2.3: pq23/dk-21.jpg is cut 16:9 */
   .pq-cap--c .pq-f{ --op: 40% 55%; }
   .pq-love > .pq-read{ grid-column: 8 / 13; grid-row: 5; margin-top: var(--pq-beat); }
 }
