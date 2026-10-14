@@ -178,11 +178,12 @@
       </figure>
       <figure class="pq-cap pq-cap--b">
         <div class="pq-f" data-r><div class="pq-f__in"><div class="pq-px">
-          {{-- 2.3: photo 21 from the HEIC (P3 -> sRGB), the navy given its depth: 4:5 on a
-               phone (bonnet, grille, the white leather behind the glass), 16:9 on a desk --}}
+          {{-- 2.3: photo 27 from the HEIC (P3 -> sRGB), the navy given its depth: the car seen
+               from behind, the look back. 4:5 on a phone (haunch, tail-light, white leather),
+               16:9 on a desk (the whole car) --}}
           <picture>
-            <source media="(min-width: 1000px)" srcset="{{ \App\Support\Img::srcset('/storage/why/pq23/dk-21.jpg', 2000) }}" sizes="min(36vw, 560px)">
-            <x-img src="/storage/why/pq23/21.jpg" alt="El capó azul marino del BMW Serie 4 Cabrio y su cuero blanco, de frente"
+            <source media="(min-width: 1000px)" srcset="{{ \App\Support\Img::srcset('/storage/why/pq23/dk-27.jpg', 2000) }}" sizes="min(36vw, 560px)">
+            <x-img src="/storage/why/pq23/27.jpg" alt="El BMW Serie 4 Cabrio azul marino visto desde atrás, con su cuero blanco"
                    sizes="84vw" :max="1080" />
           </picture>
         </div></div></div>

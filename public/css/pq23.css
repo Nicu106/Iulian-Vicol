@@ -347,7 +347,7 @@
    the tree's green in it, and the badge sat in the bottom 15%. */
 .pq-cap--a .pq-f{ --ar: 5 / 4; }
 .pq-cap--a .pq-f img{ top: auto; right: auto; bottom: 0; left: 0; width: 150%; height: auto; transform-origin: 33% 64%; }
-.pq-cap--b .pq-f{ --ar: 4 / 5; --op: 50% 50%; }   /* 2.3: pq23/21.jpg is cut 4:5 */
+.pq-cap--b .pq-f{ --ar: 4 / 5; --op: 50% 50%; }   /* 2.3: pq23/27.jpg is cut 4:5 */
 .pq-cap--c .pq-f{ --ar: 4 / 5; --op: 30% 50%; }
 @media (max-width: 999px){
   /* a spread, then a diptych: the vRS the whole width, the bonnet and the door
@@ -385,7 +385,7 @@
   .pq-cap--c{ grid-column: 8 / 13; grid-row: 4; margin-top: var(--pq-near); align-self: end; }
   .pq-cap--a .pq-f{ --ar: 4 / 3; --op: 50% 60%; }
   .pq-cap--b .pq-f, .pq-cap--c .pq-f{ --ar: 16 / 9; }
-  .pq-cap--b .pq-f{ --op: 50% 50%; }   /* 2.3: pq23/dk-21.jpg is cut 16:9 */
+  .pq-cap--b .pq-f{ --op: 50% 50%; }   /* 2.3: pq23/dk-27.jpg is cut 16:9 */
   .pq-cap--c .pq-f{ --op: 40% 55%; }
   .pq-love > .pq-read{ grid-column: 8 / 13; grid-row: 5; margin-top: var(--pq-beat); }
 }
