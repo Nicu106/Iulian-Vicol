@@ -56,6 +56,7 @@ Timpul tău de gândire și de verificare între prompturi, peste 15 minute, **n
 | 10.10 (2) | — | — | Varianta 2 aleasă de client: versiuni în pagina de probă (2.0 înghețată, tag por-que-v2.0; 2.1 nouă), lista și bara de versiuni în engleză; 2.1: monitor ultra-lat (copertă și poza de bun venit întregi și clare, poze mari doar pentru ecrane ≥2200 px), text aliniat cu logo-ul, vRS, recenzii aliniate, cifre fără „+0” |
 | 14.10 | — | — | Galería 2.2 (copertă Cabrio 20, retuș din HEIC; asfaltul refăcut a ieșit artificial pe desktop) și 2.3 (copertă Mercedes C-Class negru, asfalt real; „Seleccionados.” pe C-Class gri; „El color…” pe Cabrio bleumarin cu albastru mai bogat); tag-uri por-que-v2.1, v2.2 |
 | 14.10 (2) | — | — | Galería 2.3: „El color que te hace volver a mirarlo.” pe poza 27 (Cabrio bleumarin din spate, din HEIC, aceeași corecție de culoare), în loc de botul mașinii |
+| 14.10 (3) | — | — | Galería 2.3: toate mașinile întregi pe 19 formate de ecran (320 → 3440, plus ecran vertical 1080x1920); layout gândit separat pentru telefon (poze pe toată lățimea, poze mici ieșite din rând, detalii suprapuse); poza 27 pe toată lățimea; finalul cu poza 20; poza de bun venit fără efectul de deschidere pe telefon; prelungirile de asfalt și perete refăcute din blocuri reale (fără dungi) |
 | **Total** | **53,1 h** | **190** | **19 zile** |
 
 
