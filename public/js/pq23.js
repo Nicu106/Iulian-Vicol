@@ -81,7 +81,9 @@
       var f = it.frame.closest('figure');
       it.hold = !!(f && getComputedStyle(f).position === 'sticky') ||
         // 2.2: the cover never drifts — its picture is placed to the pixel under its words
-        (!!cover && cover.contains(it.el));
+        (!!cover && cover.contains(it.el)) ||
+        // 2.3 (2): a whole car never drifts: it has no overhang to move in (pq23.css)
+        it.frame.classList.contains('pq-whole');
     });
   }
   still(); addEventListener('resize', function () { still(); kick(); });

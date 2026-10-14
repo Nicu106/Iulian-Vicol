@@ -33,6 +33,10 @@
   // frame mode: the media query pq2.css uses for it, word for word
   $frame = '(min-width: 1000px), (min-aspect-ratio: 1/1)';
   $src = fn ($k) => \App\Support\Img::srcset($dk($k), 2000);
+  // 2.3 (2): the three plates as wide as the grid (show, after, end) draw 1296 css px at
+  // 1440 x 900 @2 = 2592 device px; the 2000 ladder top was upscaled 1.3x. Their dk files are
+  // 2400 wide: wideSrcset offers them whole (1600, 2000, then the file itself)
+  $srcw = fn ($k) => \App\Support\Img::wideSrcset($dk($k));
   // 2.1, screens 2200 px and wider only: the two full-bleed pictures from files
   // wide enough for them (Img::wideSrcset, why/ files only, up to 3840 w). The
   // cover is pq21/dkw-22.jpg, dk-22 rebuilt from the original HEIC at 4153 px
@@ -112,8 +116,10 @@
         @php $dk40 = '/storage/why/pq23/dk-40.jpg'; $lq40 = \App\Support\Img::lqip($dk40); @endphp
         <div class="pq-f"@if($lq40) style="--lq:url('{{ $lq40 }}')"@endif><div class="pq-px"><picture>
           {{-- drawn 2.54 x the cover's height wide (pq23.css: car at 55% of it) --}}
-          <source media="{{ $frame }}" srcset="{{ \App\Support\Img::wideSrcset($dk40) }}" sizes="calc(254vh - 183px)">
-          <x-img src="/storage/why/pq23/tall-40.jpg" alt="Mercedes-Benz Clase C negro con llantas AMG, de tres cuartos, ante una pared blanca"
+          <source media="{{ $frame }}" srcset="{{ \App\Support\Img::wideSrcset($dk40) }}" sizes="(max-aspect-ratio: 4/5) 182vw, calc(254vh - 183px)">
+          {{-- 2.3 (2): upright, the WHOLE car: pq23/tall-40w, cut from dk-40 with the car at 90%
+               of the width and centred, his wall carried on above (2000 x 4600) --}}
+          <x-img src="/storage/why/pq23/tall-40w.jpg" alt="Mercedes-Benz Clase C negro con llantas AMG, de tres cuartos, ante una pared blanca"
                  sizes="100vw" :max="1600" :fallback="1080" :priority="true" />
         </picture></div></div>
       </div>
@@ -126,7 +132,7 @@
       <div class="pq-plate__in">
         <p class="pq-w">Seleccionados.</p>
         <div class="pq-win" aria-hidden="true"></div>
-        <div class="pq-f"><div class="pq-px"><picture>
+        <div class="pq-f pq-whole"><div class="pq-px"><picture>
           {{-- 2.3: photo 40 is the cover now; this plate is photo 12, the grey C-Class
                from three quarters (pq23/tall-12, dk-12: the set's grade and cut) --}}
           <source media="{{ $frame }}" srcset="{{ \App\Support\Img::srcset('/storage/why/pq23/dk-12.jpg', 2000) }}" sizes="(min-width: 1000px) min(62vw, 960px), 100vw">
@@ -141,14 +147,14 @@
       <figcaption class="pq-word">Revisados.</figcaption>
       <div class="pq-f" data-r><div class="pq-f__in"><div class="pq-px">
         <x-img :src="$ph(35)" alt="Rueda del Škoda Octavia RS con la pinza de freno roja"
-               sizes="(min-width: 1000px) 28vw, 82vw" :max="1080" />
+               sizes="(min-width: 1000px) 37vw, 88vw" :max="1600" />
       </div></div></div>
     </figure>
     <div class="pq-plate pq-plate--pre" data-r>
       <div class="pq-plate__in">
         <p class="pq-w">Preparados.</p>
         <div class="pq-win" aria-hidden="true"></div>
-        <div class="pq-f"><div class="pq-px"><picture>
+        <div class="pq-f pq-whole"><div class="pq-px"><picture>
           <source media="{{ $frame }}" srcset="{{ $src(51) }}" sizes="(min-width: 1000px) min(62vw, 960px), 100vw">
           <x-img :src="$tall(51)" alt="Mercedes-Benz Clase C plata AMG, de tres cuartos"
                  sizes="100vw" :max="1600" />
@@ -172,19 +178,21 @@
       <figure class="pq-cap pq-cap--a">
         <div class="pq-f" data-r><div class="pq-f__in"><div class="pq-px">
           <x-img :src="$ph(36)" alt="La parrilla negra y el faro del Škoda Octavia RS"
-                 sizes="(min-width: 1000px) min(52vw, 830px), (min-width: 600px) 100vw, 167vw" :max="1600" />
+                 sizes="(min-width: 1000px) min(52vw, 830px), (min-width: 600px) 100vw, 167vw" :max="2000" />
         </div></div></div>
         <figcaption>La motorización que querías.</figcaption>
       </figure>
       <figure class="pq-cap pq-cap--b">
-        <div class="pq-f" data-r><div class="pq-f__in"><div class="pq-px">
-          {{-- 2.3: photo 27 from the HEIC (P3 -> sRGB), the navy given its depth: the car seen
-               from behind, the look back. 4:5 on a phone (haunch, tail-light, white leather),
-               16:9 on a desk (the whole car) --}}
+        <div class="pq-f pq-whole" data-r><div class="pq-f__in"><div class="pq-px">
+          {{-- 2.3 (2): photo 27 from the HEIC (P3 -> sRGB, the c27 grade), the WHOLE car on every
+               screen: the frame carried on 260 px before the front wheel and 160 px past the
+               bumper (his wall and asphalt), so wheels and tail have air. 3:2 on a phone, the
+               page's whole width (pq23/27w); 16:9 on a desk (pq23/dk-27w). The car is the subject:
+               it is never scaled past its frame (no settle overhang, no drift) --}}
           <picture>
-            <source media="(min-width: 1000px)" srcset="{{ \App\Support\Img::srcset('/storage/why/pq23/dk-27.jpg', 2000) }}" sizes="min(36vw, 560px)">
-            <x-img src="/storage/why/pq23/27.jpg" alt="El BMW Serie 4 Cabrio azul marino visto desde atrás, con su cuero blanco"
-                   sizes="84vw" :max="1080" />
+            <source media="(min-width: 1000px)" srcset="{{ \App\Support\Img::srcset('/storage/why/pq23/dk-27w.jpg', 2000) }}" sizes="min(36vw, 560px)">
+            <x-img src="/storage/why/pq23/27w.jpg" alt="El BMW Serie 4 Cabrio azul marino visto desde atrás, con su cuero blanco"
+                   sizes="100vw" :max="1600" />
           </picture>
         </div></div></div>
         <figcaption>El color que te hace volver a mirarlo.</figcaption>
@@ -192,7 +200,7 @@
       <figure class="pq-cap pq-cap--c">
         <div class="pq-f" data-r><div class="pq-f__in"><div class="pq-px">
           <x-img :src="$ph(30)" alt="Puerta del BMW Serie 4 Cabrio: cuero blanco y altavoz harman/kardon"
-                 sizes="(min-width: 1000px) min(36vw, 560px), 84vw" :max="1080" />
+                 sizes="(min-width: 1000px) min(36vw, 560px), 90vw" :max="1600" />
         </div></div></div>
         <figcaption>Ese equipamiento al que no quieres renunciar.</figcaption>
       </figure>
@@ -209,7 +217,7 @@
     <figure class="pq-pic pq-me__ph">
       <div class="pq-f" data-r><div class="pq-f__in"><div class="pq-px">
         <x-img src="/storage/why/portrait.jpg" alt="Iulian, fundador de IV Motorclass, con dos Mercedes-Benz descapotables"
-               sizes="(min-width: 1000px) 55vw, (min-width: 600px) 92vw, 167vw" :max="2000" />
+               sizes="(min-width: 1000px) min(73vw, calc((100vh - 120px) * 1.33)), (min-width: 600px) 92vw, 167vw" :max="2000" />
       </div></div></div>
     </figure>
     <div class="pq-read pq-me__t">
@@ -229,8 +237,8 @@
         <div class="pq-plate__in">
           <h2 class="pq-w" id="pq-show"><span>Te lo enseño</span> <span>antes de que vengas.</span></h2>
           <div class="pq-win" aria-hidden="true"></div>
-          <div class="pq-f"><div class="pq-px"><picture>
-            <source media="{{ $frame }}" srcset="{{ $src(14) }}" sizes="(min-width: 1000px) min(90vw, 1440px), 100vw">
+          <div class="pq-f pq-whole"><div class="pq-px"><picture>
+            <source media="{{ $frame }}" srcset="{{ $srcw(14) }}" sizes="(min-width: 1000px) min(90vw, 1440px), 100vw">
             <x-img :src="$tall(14)" alt="Mercedes-Benz Clase C gris, de tres cuartos"
                    sizes="100vw" :max="1600" />
           </picture></div></div>
@@ -240,9 +248,9 @@
     <ul class="pq-gal" tabindex="0" aria-label="El exterior, el interior y sus desperfectos">
       <li class="pq-slide pq-slide--ext">
         <figure>
-          <div class="pq-f" data-r><div class="pq-f__in"><div class="pq-px">
+          <div class="pq-f pq-whole" data-r><div class="pq-f__in"><div class="pq-px">
             <x-img :src="$ph(17)" alt="El mismo Clase C gris por detrás, de tres cuartos"
-                   sizes="(min-width: 1000px) min(50vw, 800px), (min-width: 600px) 77vw, 140vw" :max="1080" />
+                   sizes="(min-width: 1000px) min(50vw, 800px), 86vw" :max="1600" />
           </div></div></div>
           <figcaption class="pq-word">El exterior.</figcaption>
         </figure>
@@ -251,7 +259,7 @@
         <figure>
           <div class="pq-f" data-r><div class="pq-f__in"><div class="pq-px">
             <x-img :src="$ph(18)" alt="El interior del mismo Clase C: volante, pantalla y consola"
-                   sizes="(min-width: 1000px) min(50vw, 800px), (min-width: 600px) 77vw, 140vw" :max="1080" />
+                   sizes="(min-width: 1000px) min(50vw, 800px), 86vw" :max="1600" />
           </div></div></div>
           <figcaption class="pq-word">El interior.</figcaption>
         </figure>
@@ -260,7 +268,7 @@
         <figure>
           <div class="pq-f" data-r><div class="pq-f__in"><div class="pq-px">
             <x-img :src="$ph(16)" alt="El lateral del mismo Clase C de cerca: puertas, pintura y llanta"
-                   sizes="(min-width: 1000px) min(50vw, 800px), (min-width: 600px) 77vw, 140vw" :max="1080" />
+                   sizes="(min-width: 1000px) min(50vw, 800px), 86vw" :max="1600" />
           </div></div></div>
           <figcaption class="pq-word">Y sus desperfectos.</figcaption>
         </figure>
@@ -275,7 +283,7 @@
     <figure class="pq-pic pq-paint__ph">
       <div class="pq-f" data-r><div class="pq-f__in"><div class="pq-px">
         <x-img :src="$ph(46)" alt="Las puertas del Mercedes-Benz Clase C negro reflejan la pared como un espejo"
-               sizes="(min-width: 1000px) 78vw, (min-width: 600px) 92vw, 167vw" :max="1600" />
+               sizes="(min-width: 1000px) 78vw, (min-width: 600px) 92vw, 167vw" :max="2000" />
       </div></div></div>
     </figure>
     <div class="pq-read pq-paint__t">
@@ -296,6 +304,16 @@
           {{-- its width on these screens (pq21.css): min(100vw, 2560px, 2.4 x 100vh) --}}
           <source media="{{ $wide }}" srcset="{{ \App\Support\Img::wideSrcset('/storage/why/welcome-graded.jpg') }}"
                   sizes="(max-height: 1066px) 240vh, (min-width: 2560px) 2560px, 100vw">
+          {{-- 2.3 (2): desks under 2200 px drew it 1.44x upscaled at 1440 x 900 @2 (2880 device px
+               from the 2000 file), a phone on its side 1.27x; the same file, whole --}}
+          <source media="(min-width: 1000px), (min-aspect-ratio: 1/1)" srcset="{{ \App\Support\Img::wideSrcset('/storage/why/welcome-graded.jpg') }}"
+                  sizes="(max-aspect-ratio: 4/3) 134vh, 100vw">
+          {{-- an upright phone shows only the middle of it (x .32-.67 at 390 x 844), drawn 1.7x
+               upscaled from the 2000 file. pq23/welcome-ph.jpg is the same file's columns
+               784-3215 (60.3%, the original's own JPEG tables: mean difference 0.1/255), cut so
+               that the same object-position (49%) frames exactly the same window on every
+               upright screen: (0.49 - 784/4031) / 0.6031 = 0.49 --}}
+          <source media="(max-aspect-ratio: 4/5)" srcset="{{ \App\Support\Img::srcset('/storage/why/pq23/welcome-ph.jpg', 2000) }}" sizes="81vh">
           <x-img src="/storage/why/welcome-graded.jpg" alt="Iulian, con los brazos abiertos, delante de cuatro coches preparados para entregar"
                  sizes="(max-aspect-ratio: 4/3) 134vh, 100vw" :max="2000" />
         </picture>
@@ -311,9 +329,10 @@
       <div class="pq-plate__in">
         <h2 class="pq-w" id="pq-t4"><span>La confianza se demuestra</span> <span>después de la entrega.</span></h2>
         <div class="pq-win" aria-hidden="true"></div>
-        <div class="pq-f"><div class="pq-px"><picture>
-          <source media="{{ $frame }}" srcset="{{ $src(48) }}" sizes="(min-width: 1000px) min(90vw, 1440px), 100vw">
-          <x-img :src="$tall(48)" alt="Mercedes-Benz Clase C negro, de tres cuartos trasero"
+        <div class="pq-f pq-whole"><div class="pq-px"><picture>
+          <source media="{{ $frame }}" srcset="{{ \App\Support\Img::wideSrcset('/storage/why/pq23/dk-48w.jpg') }}" sizes="(min-width: 1000px) min(90vw, 1440px), 100vw">
+          {{-- 2.3 (2): upright, pq23/tall-48w: pq2/tall-48 with his wall and asphalt carried on before the front wheel, so the car has air --}}
+          <x-img src="/storage/why/pq23/tall-48w.jpg" alt="Mercedes-Benz Clase C negro, de tres cuartos trasero"
                  sizes="100vw" :max="1600" />
         </picture></div></div>
       </div>
@@ -373,9 +392,10 @@
       <div class="pq-plate__in">
         <h2 class="pq-w" id="pq-end">Hay coches que llevas tiempo imaginando.</h2>
         <div class="pq-win" aria-hidden="true"></div>
-        <div class="pq-f"><div class="pq-px"><picture>
-          <source media="{{ $frame }}" srcset="{{ $src(27) }}" sizes="(min-width: 1000px) min(90vw, 1440px), 100vw">
-          <x-img :src="$tall(27)" alt="BMW Serie 4 Cabrio azul con la capota abierta, de tres cuartos trasero"
+        <div class="pq-f pq-whole"><div class="pq-px"><picture>
+          <source media="{{ $frame }}" srcset="{{ \App\Support\Img::wideSrcset('/storage/why/pq23/dk-27e.jpg') }}" sizes="(min-width: 1000px) min(90vw, 1440px), 100vw">
+          {{-- 2.3 (2): upright, pq23/tall-27w: pq2/tall-27 with his wall and asphalt carried on either side, so the car has air --}}
+          <x-img src="/storage/why/pq23/tall-27w.jpg" alt="BMW Serie 4 Cabrio azul con la capota abierta, de tres cuartos trasero"
                  sizes="100vw" :max="1600" />
         </picture></div></div>
       </div>

@@ -273,6 +273,9 @@
 .pq-plate--cover .pq-f{ background-color: #CCCCCC; }   /* the wall's own tone, measured on the top rows of both files (203.5) */
 .pq-plate--cover .pq-f img{ left: 0; width: 100%; height: auto; min-height: 0; bottom: 0; top: auto; right: auto; }
 .pq-plate--cover .pq-w{ bottom: calc(100cqi * 1195.4 / 2000 + 7cqi); }
+/* 2.3 (2): upright, pq23/tall-40w.jpg (2000 x 4600): the WHOLE car at 90% of the width,
+   centred (nose 5% in, tail 5% in), its roof 46.15cqi above the foot; the words 7cqi above it */
+.pq-plate--cover .pq-w{ bottom: calc(46.15cqi + 7cqi); }
 @media (min-width: 1000px), (min-aspect-ratio: 1 / 1){
   .pq-plate--cover{
     --bh: calc(100svh - var(--pq-head));
@@ -675,4 +678,118 @@
    so a square window would be a screen and a half of bare wall */
 @media (min-aspect-ratio: 1 / 1) and (max-width: 999px){
   .pq-plate--sel, .pq-plate--pre{ --ar-d: 4 / 3; --fs-d: 9cqi; --wt: 5cqi; --wl: 5cqi; }
+}
+
+/* ==== 2.3 (2): a phone composed, not the desk reflowed ===================================
+   Upright screens under 1000 px only (a phone on its side keeps the rules above). The
+   client: "the whole car, not cut", and every section composed for the phone. One scene
+   at a time, the frames vary on purpose and the words keep the page's one left edge:
+     cover        one screen: the words on his wall, the WHOLE car standing at the foot
+     three words  Seleccionados: the plate, edge to edge (the whole car)
+                  Revisados: the caliper stepped in to the 38% line, running off the right
+                    edge and laid over the top of the next plate's wall
+                  Preparados: the plate, edge to edge; its word steps down under the caliper
+                  the leather: held to the left edge, open on the right; its line under it
+     details      the vRS edge to edge; the navy Cabrio WHOLE, edge to edge, 3:2; the door
+                    stepped in on the right with its sentence set beside it, at its foot
+     his story    the portrait edge to edge
+     te lo enseño the plate; then the walk-round as a strip of one height: the car whole
+                    (4:3), then the interior and the side, upright
+     no ves       the doors from the text's edge, running off the right
+   Spacing keeps the four steps; sizes keep the five. */
+@media (max-width: 999px) and (max-aspect-ratio: 1 / 1){
+  .pq{ --pq-ov: 20vw; }   /* how far a detail lies over the frame after it */
+  /* Revisados over the top of Preparados' wall */
+  .pq-pic--rev{ position: relative; z-index: 2; margin-bottom: calc(-1 * (var(--pq-beat) + var(--pq-ov))); }
+  .pq-plate--pre{ --pq-wt: calc(var(--pq-ov) + var(--pq-near)); }
+  /* the leather: from the left edge to 88% */
+  .pq-pic--joy .pq-f{ margin-inline: calc(var(--pq-m) * -1) 12%; }
+  /* the details */
+  .pq-cap--b .pq-f{ --ar: 3 / 2; }
+  .pq-cap--b .pq-f img{ object-position: 50% 50%; }
+  .pq-cap--b figcaption{ font-size: var(--pq-d3); line-height: 1.1; letter-spacing: -.032em; padding-inline: var(--pq-m); max-width: 20ch; }
+  .pq-cap--b, .pq-cap--c{ grid-column: 1 / -1; }
+  .pq-cap--c{ display: grid; grid-template-columns: minmax(0, 46fr) minmax(0, 54fr); align-items: end; }
+  .pq-cap--c .pq-f{ grid-column: 2; grid-row: 1; --ar: 4 / 5; --op: 30% 50%; }
+  .pq-cap--c figcaption{ grid-column: 1; grid-row: 1; margin: 0; padding: 0 var(--s-3) 0 var(--pq-m);
+    hyphens: manual; overflow-wrap: break-word; }
+  /* the doors from the text's edge */
+  .pq-paint__ph{ margin-inline: 0 calc(var(--pq-m) * -1); }
+}
+
+/* 2.3 (2): a picture whose subject is the whole car never overhangs its frame. Elsewhere a
+   picture settles to 105% and drifts ±2% inside the overhang; on these the 2.5% a side
+   would take a wheel or the tail. They settle 1.04 -> 1 like the cover and hold still
+   (pq23.js: no drift on .pq-whole). */
+.pq-on .pq-whole .pq-px img{ transform: scale(1.04); }
+.pq-on .pq-whole.is-in .pq-px img, .pq-on .is-in .pq-whole .pq-px img{ transform: none; }
+/* a phone's plates never scale at all (the bitmap cost, above) */
+@media (max-width: 999px) and (max-aspect-ratio: 1 / 1){
+  .pq-on .pq-plate .pq-whole .pq-px img{ transform: none; }
+}
+/* 2.3 (2): upright, the after and end plates draw pq23/tall-48w (2484 wide) and tall-27w
+   (2556): the 4:3 window grows with the width, so the roof is a smaller share of it:
+   1 - (1 - roof) x 2400 / width (.238 -> .264, .28 -> .324) */
+@media (max-width: 999px) and (max-aspect-ratio: 1 / 1){
+  .pq-plate--after{ --roof: .264; }
+  .pq-plate--end  { --roof: .324; }
+}
+
+/* 2.3 (2): the walk-round, every screen. Its first picture is the car, so it is shown
+   whole (4:3, the file's own shape); the interior and the side stay upright (4:5).
+   Under 1000 px a strip of ONE height (on a phone on its side, no taller than 76% of the
+   screen), each picture as wide as its shape makes it; from 1000 px three columns as wide
+   as their shapes (4/3 : 4/5 : 4/5), so the three stand the same height. */
+.pq-slide--ext .pq-f{ --ar: 4 / 3; --op: 50% 50%; }
+@media (max-width: 999px){
+  .pq-gal{ --gh: min(64vw, 76svh); }
+  .pq-slide{ flex-basis: calc(var(--gh) * 4 / 5); }
+  .pq-slide--ext{ flex-basis: calc(var(--gh) * 4 / 3); }
+  .pq-slide .pq-f, .pq-slide--ext .pq-f{ --ar: auto; height: var(--gh); max-height: none; aspect-ratio: auto; }
+}
+@media (min-width: 1000px){
+  .pq-gal{ grid-template-columns: minmax(0, 4fr) minmax(0, 2.4fr) minmax(0, 2.4fr); }
+  .pq-slide--ext .pq-f{ --ar: 4 / 3; }
+}
+
+/* 2.3 (2): a phone on its side: the three details in one row as wide as their shapes
+   (4/5 : 3/2 : 4/5), so the navy Cabrio stands whole between the grille and the door at
+   the same height */
+@media (min-aspect-ratio: 1 / 1) and (max-height: 500px){
+  .pq-caps{ grid-template-columns: minmax(0, .8fr) minmax(0, 1.5fr) minmax(0, .8fr); }
+  .pq-cap--b .pq-f{ --ar: 3 / 2; }
+}
+
+/* 2.3 (2): a desk screen standing upright (1024 x 1366, 1080 x 1920): the cover drawn from
+   the screen's height left the car 22% of the width at the foot of 1300-1850 px of flat
+   wall (26-45% of it past the file, in its flat tone). There the cover is as tall as the
+   picture drawn at the car's width cap (car 90% of the width: the file 93.6cqi tall), so
+   the picture fills it to the top and the words keep their place over the roof. */
+@media (min-width: 1000px) and (max-aspect-ratio: 4 / 5){
+  .pq-plate--cover{ --bh: min(calc(100svh - var(--pq-head)), 93.6cqi); }
+}
+
+/* 2.3 (2): a phone on its side: a plate there was the full width (760 px) and 445-570 px
+   tall in a 390 px screen, so its car was never seen whole at once. Each plate is held to
+   one screen under the header (its window's own shape x that height) and centred on the
+   paper, like the cover's cap; its words are sized in its own cqi, so they follow. */
+@media (min-aspect-ratio: 1 / 1) and (max-height: 500px){
+  .pq-plate:not(.pq-plate--cover){ --cap-ar: 3 / 2; width: min(100%, calc((100svh - var(--pq-head) - var(--s-4)) * var(--cap-ar))); margin-inline: auto; }
+  .pq-plate--sel, .pq-plate--pre{ --cap-ar: 4 / 3; }
+}
+
+/* 2.3 (2): on every other screen the after and end plates are pq23/dk-48w (2484 x 1656) and
+   dk-27e (2556 x 1704): the same windows cut from tall-48w / tall-27w (pq2's dk files are
+   rows 1976-3576 of their tall pictures, matched to the pixel), 3:2 kept by taking a little
+   more of the wall above. The photograph is drawn smaller by 2400 / width (--k), so the
+   words' foot over the roof is scaled by it; their size is not. */
+@media (min-width: 1000px), (min-aspect-ratio: 1 / 1){
+  .pq-plate--after{ --k: .9662; }
+  .pq-plate--end  { --k: .939; }
+  .pq-plate--after .pq-w, .pq-plate--end .pq-w{
+    bottom: calc((75cqi * (1 - var(--roof)) - var(--cut)) * var(--k) + var(--gap, 3.6cqi)); }
+}
+/* a phone on its side: Seleccionados / Preparados a little higher on their wall */
+@media (min-aspect-ratio: 1 / 1) and (max-width: 999px){
+  .pq-plate--sel, .pq-plate--pre{ --wt: 3.5cqi; }
 }
