@@ -110,6 +110,9 @@
       var p = (vh - r.top) / (vh * 0.85);
       p = p < 0 ? 0 : p > 1 ? 1 : p;
       var s = Math.round((0.9 + 0.1 * p) * 10000) / 10000;
+      // 2.3 (2): an upright phone keeps the welcome edge to edge from the first pixel: its
+      // frame opening from 90% read there as a box laid on the photograph
+      if (still) s = 1;
       if (s !== openItem.last) {
         open.style.transform = s === 1 ? '' : 'scale(' + s + ')';
         openIn.style.transform = s === 1 ? '' : 'scale(' + (1 / s) + ')';

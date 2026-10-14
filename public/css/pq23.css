@@ -691,7 +691,7 @@
                   Preparados: the plate, edge to edge; its word steps down under the caliper
                   the leather: held to the left edge, open on the right; its line under it
      details      the vRS edge to edge; the navy Cabrio WHOLE, edge to edge, 3:2; the door
-                    stepped in on the right with its sentence set beside it, at its foot
+                    stepped in to the 38% line, off the right edge, its sentence under it
      his story    the portrait edge to edge
      te lo enseño the plate; then the walk-round as a strip of one height: the car whole
                     (4:3), then the interior and the side, upright
@@ -707,12 +707,12 @@
   /* the details */
   .pq-cap--b .pq-f{ --ar: 3 / 2; }
   .pq-cap--b .pq-f img{ object-position: 50% 50%; }
-  .pq-cap--b figcaption{ font-size: var(--pq-d3); line-height: 1.1; letter-spacing: -.032em; padding-inline: var(--pq-m); max-width: 20ch; }
   .pq-cap--b, .pq-cap--c{ grid-column: 1 / -1; }
-  .pq-cap--c{ display: grid; grid-template-columns: minmax(0, 46fr) minmax(0, 54fr); align-items: end; }
-  .pq-cap--c .pq-f{ grid-column: 2; grid-row: 1; --ar: 4 / 5; --op: 30% 50%; }
-  .pq-cap--c figcaption{ grid-column: 1; grid-row: 1; margin: 0; padding: 0 var(--s-3) 0 var(--pq-m);
-    hyphens: manual; overflow-wrap: break-word; }
+  /* 2.3 (3): the door steps in to the 38% line (the caliper's) and runs off the right edge;
+     its sentence under it on the page's margin, at the caption size of "El color…" */
+  .pq-cap--c .pq-f{ margin-left: 38%; --ar: 4 / 5; --op: 30% 50%; }
+  .pq-cap--b figcaption, .pq-cap--c figcaption{ font-size: var(--pq-d3); line-height: 1.1; letter-spacing: -.032em;
+    padding-inline: var(--pq-m); max-width: 20ch; box-sizing: content-box; }
   /* the doors from the text's edge */
   .pq-paint__ph{ margin-inline: 0 calc(var(--pq-m) * -1); }
 }
@@ -727,12 +727,10 @@
 @media (max-width: 999px) and (max-aspect-ratio: 1 / 1){
   .pq-on .pq-plate .pq-whole .pq-px img{ transform: none; }
 }
-/* 2.3 (2): upright, the after and end plates draw pq23/tall-48w (2484 wide) and tall-27w
-   (2556): the 4:3 window grows with the width, so the roof is a smaller share of it:
-   1 - (1 - roof) x 2400 / width (.238 -> .264, .28 -> .324) */
+/* 2.3 (2): upright, the after plate draws pq23/tall-48w (2484 wide): the 4:3 window grows
+   with the width, so the roof is a smaller share of it: 1 - (1 - .238) x 2400 / 2484 = .264 */
 @media (max-width: 999px) and (max-aspect-ratio: 1 / 1){
   .pq-plate--after{ --roof: .264; }
-  .pq-plate--end  { --roof: .324; }
 }
 
 /* 2.3 (2): the walk-round, every screen. Its first picture is the car, so it is shown
@@ -778,14 +776,13 @@
   .pq-plate--sel, .pq-plate--pre{ --cap-ar: 4 / 3; }
 }
 
-/* 2.3 (2): on every other screen the after and end plates are pq23/dk-48w (2484 x 1656) and
-   dk-27e (2556 x 1704): the same windows cut from tall-48w / tall-27w (pq2's dk files are
+/* 2.3 (2): on every other screen the after plate is pq23/dk-48w (2484 x 1656): the same
+   window cut from tall-48w (pq2's dk files are
    rows 1976-3576 of their tall pictures, matched to the pixel), 3:2 kept by taking a little
    more of the wall above. The photograph is drawn smaller by 2400 / width (--k), so the
    words' foot over the roof is scaled by it; their size is not. */
 @media (min-width: 1000px), (min-aspect-ratio: 1 / 1){
   .pq-plate--after{ --k: .9662; }
-  .pq-plate--end  { --k: .939; }
   .pq-plate--after .pq-w, .pq-plate--end .pq-w{
     bottom: calc((75cqi * (1 - var(--roof)) - var(--cut)) * var(--k) + var(--gap, 3.6cqi)); }
 }
@@ -793,3 +790,10 @@
 @media (min-aspect-ratio: 1 / 1) and (max-width: 999px){
   .pq-plate--sel, .pq-plate--pre{ --wt: 3.5cqi; }
 }
+
+/* 2.3 (3): the way in is photo 20 (pq23/tall-20e, dk-20e: one width, so no --k). Its roof is
+   28.96% down the 4:3 window; the desk window is 10:7 with 2cqi of asphalt trimmed, the
+   shape in which the photograph under the roof, the gap and two lines fit (69.5 of 70cqi) */
+.pq-plate--end{ --roof: .29; }
+.pq .pq-plate--end{ --ar-d: 10 / 7; --cut: 2cqi; --k: 1; }
+@media (min-aspect-ratio: 1 / 1) and (max-height: 500px){ .pq .pq-plate--end{ --cap-ar: 10 / 7; } }

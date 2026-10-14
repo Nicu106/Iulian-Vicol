@@ -200,7 +200,7 @@
       <figure class="pq-cap pq-cap--c">
         <div class="pq-f" data-r><div class="pq-f__in"><div class="pq-px">
           <x-img :src="$ph(30)" alt="Puerta del BMW Serie 4 Cabrio: cuero blanco y altavoz harman/kardon"
-                 sizes="(min-width: 1000px) min(36vw, 560px), 90vw" :max="1600" />
+                 sizes="(min-width: 1000px) min(36vw, 560px), 104vw" :max="2000" />
         </div></div></div>
         <figcaption>Ese equipamiento al que no quieres renunciar.</figcaption>
       </figure>
@@ -393,9 +393,14 @@
         <h2 class="pq-w" id="pq-end">Hay coches que llevas tiempo imaginando.</h2>
         <div class="pq-win" aria-hidden="true"></div>
         <div class="pq-f pq-whole"><div class="pq-px"><picture>
-          <source media="{{ $frame }}" srcset="{{ \App\Support\Img::wideSrcset('/storage/why/pq23/dk-27e.jpg') }}" sizes="(min-width: 1000px) min(90vw, 1440px), 100vw">
-          {{-- 2.3 (2): upright, pq23/tall-27w: pq2/tall-27 with his wall and asphalt carried on either side, so the car has air --}}
-          <x-img src="/storage/why/pq23/tall-27w.jpg" alt="BMW Serie 4 Cabrio azul con la capota abierta, de tres cuartos trasero"
+          {{-- 2.3 (3): photo 27 is "El color…" now, so the way in is photo 20 (IMG_1273.HEIC, P3 ->
+               sRGB, verticals from 2.2's upright, the c27 grade): the same navy Cabrio from the
+               front three quarters, whole. His asphalt is his own, nothing re-laid: carried on 200 px
+               before the tail and 260 px past the nose with blocks of it moved 1:1 from the same rows.
+               Upright pq23/tall-20e (2400 x 3840, his wall carried on above); every other screen
+               pq23/dk-20e (2400 x 1680, 10:7: the window cut from it) --}}
+          <source media="{{ $frame }}" srcset="{{ \App\Support\Img::wideSrcset('/storage/why/pq23/dk-20e.jpg') }}" sizes="(min-width: 1000px) min(90vw, 1440px), 100vw">
+          <x-img src="/storage/why/pq23/tall-20e.jpg" alt="BMW Serie 4 Cabrio azul con la capota abierta, de tres cuartos delantero"
                  sizes="100vw" :max="1600" />
         </picture></div></div>
       </div>
