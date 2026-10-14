@@ -252,6 +252,54 @@
   .pq-cover .pq-plate{ max-width: min(100%, 2560px, calc((100svh - var(--pq-head)) * 1.95)); margin-inline: auto; }
 }
 
+/* ---- 2.2: the cover is photo 20 everywhere ------------------------------------
+   One photograph (IMG_1273, retouched from the HEIC: verticals made vertical, the
+   asphalt dry and even, drains and stains gone, the car's own shadow kept soft, the
+   navy given depth and the chrome and leather held under clipping).
+   Upright, pq22/tall-20.jpg (2000 x 4099): the screen's width IS the car at 118%,
+   nose 1.5% from the right edge, the rear running off the left; the picture stands
+   on the plate's foot, its roof (windscreen frame) 79.0cqi above it. The words
+   stand 7cqi above the roof, on the wall. Where a screen is taller than the file
+   (over 2.05:1) the wall's own tone carries on above it.
+   Frame, pq22/dk-20.jpg (4600 x 1891, 2.433:1): drawn from the cover's height.
+   The car (its box: x .409-.791, y .377-.926 of the file) is 55% of the cover's
+   height, never wider than 90% of it; the file stands on the cover's foot (the car's
+   foot 7.4% of the file above it), its
+   centre on 60% of the width, so the line starts on the logo's x over its tail and
+   the eye runs down the bonnet to the grille. The words' foot .45em above the roof. */
+.pq-plate--cover .pq-f{ background-color: #CECDCE; }   /* the wall's own tone, measured on tall-20's top rows */
+.pq-plate--cover .pq-f img{ left: 0; width: 100%; height: auto; min-height: 0; bottom: 0; top: auto; right: auto; }
+.pq-plate--cover .pq-w{ bottom: calc(100cqi * 1580.3 / 2000 + 7cqi); }
+@media (min-width: 1000px), (min-aspect-ratio: 1 / 1){
+  .pq-plate--cover{
+    --bh: calc(100svh - var(--pq-head));
+    --ch: min(calc(var(--bh) * .55), calc(100cqi * .9 / 1.694));
+    --ih: calc(var(--ch) / .5483);
+    --iw: calc(var(--ih) * 2.4326);
+    --oh: 0px;                         /* the cover holds still (pq22.js): no overhang needed */
+    --ct: calc(var(--bh) + var(--oh) - var(--ih) * .6226); }   /* the roof, from the cover's top */
+  .pq-plate--cover .pq-win{ height: var(--bh); min-height: 0; max-height: none; }
+  .pq-plate--cover .pq-f{ background: var(--lq, none) no-repeat #CECDCE;
+    background-size: var(--iw) var(--ih);
+    background-position: clamp(calc(100cqi - var(--iw)), calc(60cqi - var(--iw) * .6), 0px) calc(100% + var(--oh)); }
+  .pq-plate--cover .pq-f img{ inset: auto; top: auto; bottom: calc(var(--oh) * -1); right: auto;
+    left: clamp(calc(100cqi - var(--iw)), calc(60cqi - var(--iw) * .6), 0px);
+    width: var(--iw); height: var(--ih); max-width: none; object-fit: fill; background: none !important;
+    transform-origin: 60% 37.74%; }
+  .pq-plate--cover .pq-w{ top: auto; bottom: calc(var(--bh) - var(--ct) + .45em); }
+  /* two lines, always: WebKit set this h1 a little wider than Chromium and broke it into
+     four inside the 80% measure (2.1 too: its top at 14 px instead of 78 at 1440); four
+     lines no longer fit above the roof. Each sentence is one line (measured: the longer
+     is 67% of the cover at 1440 in Chromium) */
+  .pq-plate--cover .pq-w{ max-width: none; }
+  .pq-plate--cover .pq-w > span{ white-space: nowrap; }
+}
+/* a phone on its side is wider than the file (844 x 390: 2.9:1 under the header):
+   the cover is held to 2.4 x its height and centred, like the ultrawide cap */
+@media (max-width: 999px) and (min-aspect-ratio: 1 / 1){
+  .pq-cover .pq-plate{ max-width: min(100%, calc((100svh - var(--pq-head)) * 2.4)); margin-inline: auto; }
+}
+
 /* ---- a picture with its words beside, under or above it ----------------------- */
 .pq-pic .pq-line{ margin-top: var(--pq-near); }
 .pq-pic .pq-word{ margin-bottom: var(--pq-near); }
@@ -589,6 +637,10 @@
 .pq-on .pq-plate--cover .pq-px img{ animation: pq-settle 2.4s var(--pq-e) both; transform: scale(1.05); }
 .pq-on .pq-plate--cover .pq-w{ animation: pq-rise 1.6s var(--pq-e) .3s both; }
 @keyframes pq-settle{ from{ transform: scale(1.1); } to{ transform: scale(1.05); } }
+/* 2.2: the cover's picture is placed to the pixel against its words, so it settles
+   onto its drawn size (1.04 -> 1, same 2.4 s), about the car's roof */
+.pq-on .pq-plate--cover .pq-px img{ animation-name: pq-settle22; transform: none; }
+@keyframes pq-settle22{ from{ transform: scale(1.04); } to{ transform: none; } }
 @keyframes pq-rise{ from{ opacity: 0; transform: translate3d(0, .3em, 0); } to{ opacity: 1; transform: none; } }
 /* on a phone a plate's picture does not settle: a 1170 x 2700 px bitmap scaling for
    2.2 s took the frames over 20 ms from 12% to 29% (390 DPR3, CPU x4, A/B). It

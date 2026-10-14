@@ -104,15 +104,17 @@
       <div class="pq-plate__in">
         <h1 class="pq-w" id="pq-h1"><span>Un coche bien elegido.</span> <span>Y alguien que responde.</span></h1>
         <div class="pq-win" aria-hidden="true"></div>
-        {{-- art-directed: on an upright screen the Cabrio from three quarters (20), whose
-             body fills the frame; on a wide one, the same car in profile (22) --}}
-        <div class="pq-f"><div class="pq-px"><picture>
-          {{-- the cover's width (pq21.css): min(100vw, 2560px, 1.95 x (100svh - 72px)), the last only from 2.1:1 --}}
-          <source media="{{ $wide }}" srcset="{{ \App\Support\Img::wideSrcset('/storage/why/pq21/dkw-22.jpg') }}"
-                  sizes="(min-width: 2720px) and (min-height: 1385px) 2560px, (min-aspect-ratio: 21/10) calc(195vh - 140px), (min-width: 2560px) 2560px, 100vw">
-          <source media="{{ $frame }}" srcset="{{ $src(22) }}" sizes="100vw">
-          <x-img :src="$tall(20)" alt="BMW Serie 4 Cabrio azul con la capota abierta, ante una pared blanca"
-                 sizes="106vw" :max="1600" :fallback="1080" :priority="true" />
+        {{-- 2.2: one photograph for every screen, photo 20 (IMG_1273) retouched from the
+             HEIC: the Cabrio from three quarters. Upright: pq22/tall-20 (the car at 118%
+             of the width, its nose on the right edge, the wall carried on above); every
+             other screen: pq22/dk-20, the same car with its wall and ground carried on
+             either side, drawn from the screen's height (pq22.css) --}}
+        @php $dk20 = '/storage/why/pq22/dk-20.jpg'; $lq20 = \App\Support\Img::lqip($dk20); @endphp
+        <div class="pq-f"@if($lq20) style="--lq:url('{{ $lq20 }}')"@endif><div class="pq-px"><picture>
+          {{-- drawn 2.44 x the cover's height wide (pq22.css: car at 55% of it) --}}
+          <source media="{{ $frame }}" srcset="{{ \App\Support\Img::wideSrcset($dk20) }}" sizes="calc(244vh - 176px)">
+          <x-img src="/storage/why/pq22/tall-20.jpg" alt="BMW Serie 4 Cabrio azul con la capota abierta, ante una pared blanca"
+                 sizes="100vw" :max="1600" :fallback="1080" :priority="true" />
         </picture></div></div>
       </div>
     </div>

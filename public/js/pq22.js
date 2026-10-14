@@ -74,13 +74,14 @@
   }, { rootMargin: '10% 0px 10% 0px' });
   items.forEach(function (it) { it.frame.__pq = it; seen.observe(it.frame); });
   // no drift on a picture that holds still on purpose: a sticky one (it would swim
-  // while pinned) and the cover when it is a centred plate on the paper (2.1:1+)
+  // while pinned) and the cover
   var cover = document.querySelector('.pq-plate--cover');
   function still() {
     items.forEach(function (it) {
       var f = it.frame.closest('figure');
       it.hold = !!(f && getComputedStyle(f).position === 'sticky') ||
-        (!!cover && cover.contains(it.el) && cover.getBoundingClientRect().width < document.documentElement.clientWidth - 1);
+        // 2.2: the cover never drifts — its picture is placed to the pixel under its words
+        (!!cover && cover.contains(it.el));
     });
   }
   still(); addEventListener('resize', function () { still(); kick(); });
