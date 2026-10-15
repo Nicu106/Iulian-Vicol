@@ -221,7 +221,7 @@
   odos.forEach(function (it) { oio.observe(it.b); });
 })();
 
-/* 2.4: a long letter in "Lo cuentan ellos" shows its first eight lines, fading, and "Ver más"
+/* 2.4: a long letter in "Lo cuentan ellos" shows its first two lines, fading, and "Ver más"
    opens it (the home page's pattern and words). Clamped only when it overflows; measured
    again when the fonts arrive, and on resize while it is still closed. */
 (function () {

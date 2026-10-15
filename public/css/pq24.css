@@ -817,12 +817,15 @@
   .pq-pic--joy{ order: 2; }
 }
 
-/* 2.4: the latest three letters. A long one is held to eight lines (under its hung quote
-   mark: 4.5em x (.42 + .06) = 2.16em), its last two fading into the paper; "Ver más" in the
+/* 2.4: the latest three letters. A long one is held to two lines, as long as the short
+   ones beside it (under its hung quote mark: 4.5em x (.42 + .06) = 2.16em), the end of
+   its second line fading into the paper; "Ver más" in the
    home page's words opens it (pq24.js). The photographs keep the row's one height. */
-.pq-q__t.is-clamped{ max-height: calc(2.16em + 8 * 1.5em); overflow: hidden;
-  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 3em), transparent);
-          mask-image: linear-gradient(to bottom, #000 calc(100% - 3em), transparent); }
+.pq-q__t.is-clamped{ max-height: calc(var(--pq-near) + 2.16em + 2 * 1.5em); overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 1.5em), transparent 100%), linear-gradient(to right, #000 55%, transparent);
+  -webkit-mask-composite: source-over;
+          mask-image: linear-gradient(to bottom, #000 calc(100% - 1.5em), transparent 100%), linear-gradient(to right, #000 55%, transparent);
+          mask-composite: add; }
 .pq-q__more{ display: inline-flex; align-items: center; min-height: 44px; padding: 0; margin-top: var(--s-2);
   background: none; border: 0; font: inherit; font-size: var(--t-ui); font-weight: 600; color: var(--mc-ink); cursor: pointer;
   text-decoration-thickness: 1px; text-underline-offset: .3em; }
