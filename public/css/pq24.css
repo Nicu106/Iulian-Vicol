@@ -797,3 +797,33 @@
 .pq-plate--end{ --roof: .29; }
 .pq .pq-plate--end{ --ar-d: 10 / 7; --cut: 2cqi; --k: 1; }
 @media (min-aspect-ratio: 1 / 1) and (max-height: 500px){ .pq .pq-plate--end{ --cap-ar: 10 / 7; } }
+
+/* ==== 2.4: ONLY the two texts swapped (the client) ========================================
+   Every frame stays where 2.3 had it. "Preparados." takes the leather's line's place: under
+   the photograph, --pq-near below it, at the big-word size ("Revisados."'s on a desk). "Para
+   que disfrutes / de algo especial." takes "Preparados."'s place on the silver C-Class's
+   wall, same anchor, at the size it had as the leather's caption (d3, 600). The leather is
+   first in the source (reading order); upright, where the column is one track, the plate is
+   ordered back before it so the phone shows the 2.3 sequence. */
+.pq-pic--joy .pq-word{ margin: var(--pq-near) 0 0; }
+.pq-plate--pre .pq-w{ font-weight: 600; letter-spacing: -.032em; line-height: 1.1; }
+.pq-plate--pre .pq-w > span{ white-space: nowrap; }
+.pq-plate--pre{ --fs: var(--pq-d3); --fs-d: min(2.375rem, 4.5cqi); }
+@media (min-width: 1000px){
+  .pq-pic--joy .pq-word{ font-size: min(5rem, 5.4vw); }
+}
+@media (max-width: 999px){
+  .pq-plate--pre{ order: 1; }
+  .pq-pic--joy{ order: 2; }
+}
+
+/* 2.4: the latest three letters. A long one is held to eight lines (under its hung quote
+   mark: 4.5em x (.42 + .06) = 2.16em), its last two fading into the paper; "Ver más" in the
+   home page's words opens it (pq24.js). The photographs keep the row's one height. */
+.pq-q__t.is-clamped{ max-height: calc(2.16em + 8 * 1.5em); overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 3em), transparent);
+          mask-image: linear-gradient(to bottom, #000 calc(100% - 3em), transparent); }
+.pq-q__more{ display: inline-flex; align-items: center; min-height: 44px; padding: 0; margin-top: var(--s-2);
+  background: none; border: 0; font: inherit; font-size: var(--t-ui); font-weight: 600; color: var(--mc-ink); cursor: pointer;
+  text-decoration-thickness: 1px; text-underline-offset: .3em; }
+.pq-q__more[hidden]{ display: none; }

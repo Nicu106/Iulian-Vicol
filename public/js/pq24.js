@@ -220,3 +220,37 @@
   }, { threshold: [0, 0.6] });
   odos.forEach(function (it) { oio.observe(it.b); });
 })();
+
+/* 2.4: a long letter in "Lo cuentan ellos" shows its first eight lines, fading, and "Ver más"
+   opens it (the home page's pattern and words). Clamped only when it overflows; measured
+   again when the fonts arrive, and on resize while it is still closed. */
+(function () {
+  var qs = [].slice.call(document.querySelectorAll('.pq-q__t'));
+  if (!qs.length) return;
+  function fit(q) {
+    var b = q.nextElementSibling;
+    if (!b || !b.classList.contains('pq-q__more') || b.getAttribute('aria-expanded') === 'true') return;
+    // the letter's own height against the clamp's (scrollHeight would count the hung
+    // quote mark's glyph, which rises past its line box, as overflow on a 42-letter quote)
+    q.classList.remove('is-clamped');
+    var full = q.getBoundingClientRect().height;
+    q.classList.add('is-clamped');
+    var over = full > q.getBoundingClientRect().height + 2;
+    q.classList.toggle('is-clamped', over);
+    b.hidden = !over;
+    if (over) b.setAttribute('aria-expanded', 'false');
+  }
+  qs.forEach(function (q) {
+    var b = q.nextElementSibling;
+    if (!b || !b.classList.contains('pq-q__more')) return;
+    b.addEventListener('click', function () {
+      var open = q.classList.toggle('is-clamped') === false;
+      b.textContent = open ? b.dataset.less : b.dataset.more;
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    fit(q);
+  });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { qs.forEach(fit); });
+  var t = 0;
+  addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { qs.forEach(fit); }, 150); });
+})();

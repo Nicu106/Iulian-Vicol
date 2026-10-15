@@ -150,9 +150,21 @@
                sizes="(min-width: 1000px) 37vw, 88vw" :max="1600" />
       </div></div></div>
     </figure>
+    {{-- 2.4: ONLY the two texts swapped (the client), every frame where it was: "Preparados."
+         now stands under the leather, where its line was; "Para que disfrutes de algo
+         especial." on the silver C-Class's wall, where "Preparados." was. The leather comes
+         first in the source so "Preparados." is read first; on a phone pq24.css keeps the
+         plate shown before it, as in 2.3 --}}
+    <figure class="pq-pic pq-pic--joy">
+      <div class="pq-f" data-r><div class="pq-f__in"><div class="pq-px">
+        <x-img :src="$ph(24)" alt="El interior de cuero blanco del BMW Serie 4 Cabrio, visto desde arriba"
+               sizes="(min-width: 1000px) 56vw, (min-width: 600px) 92vw, 167vw" :max="2000" />
+      </div></div></div>
+      <figcaption class="pq-word">Preparados.</figcaption>
+    </figure>
     <div class="pq-plate pq-plate--pre" data-r>
       <div class="pq-plate__in">
-        <p class="pq-w">Preparados.</p>
+        <p class="pq-w"><span>Para que disfrutes</span> <span>de algo especial.</span></p>
         <div class="pq-win" aria-hidden="true"></div>
         <div class="pq-f pq-whole"><div class="pq-px"><picture>
           <source media="{{ $frame }}" srcset="{{ $src(51) }}" sizes="(min-width: 1000px) min(62vw, 960px), 100vw">
@@ -161,13 +173,6 @@
         </picture></div></div>
       </div>
     </div>
-    <figure class="pq-pic pq-pic--joy">
-      <div class="pq-f" data-r><div class="pq-f__in"><div class="pq-px">
-        <x-img :src="$ph(24)" alt="El interior de cuero blanco del BMW Serie 4 Cabrio, visto desde arriba"
-               sizes="(min-width: 1000px) 56vw, (min-width: 600px) 92vw, 167vw" :max="2000" />
-      </div></div></div>
-      <figcaption class="pq-line"><span>Para que disfrutes</span> <span>de algo especial.</span></figcaption>
-    </figure>
   </section>
 
   {{-- ---- his words, I: three details, his own sentences as their captions ------- --}}
@@ -358,7 +363,15 @@
   </section>
 
   {{-- ---- in their words ------------------------------------------------------ --}}
-  @if($reviews->count())
+  {{-- 2.4: the latest three letters (the client), built here so the controller that feeds the
+       live page stays as it is: active, with a photograph, newest first. A long letter shows
+       its first eight lines, fading, and the home page's "Ver más" opens it (pq24.js); without
+       the script every letter is all there --}}
+  @php
+    $say = \App\Models\Testimonial::where('is_active', true)->whereNotNull('image_path')
+      ->orderByDesc('created_at')->orderByDesc('id')->take(3)->get();
+  @endphp
+  @if($say->count())
   <section class="pq-say pq-wrap" aria-labelledby="pq-say-h">
     <h2 class="pq-h" id="pq-say-h">Lo cuentan ellos</h2>
     @php
@@ -366,10 +379,10 @@
       // row takes one photo height, the one at which the widest fills its column
       $ratio = function ($t) { $d = \App\Support\Img::size($t->image_path);
         return $d && $d[1] ? round(max(.6, min(1.6, $d[0] / $d[1])), 4) : .75; };
-      $rmax = $reviews->take(3)->map($ratio)->max() ?: .75;
+      $rmax = $say->map($ratio)->max() ?: .75;
     @endphp
     <ul class="pq-say__l" style="--rmax: {{ $rmax }}">
-      @foreach($reviews->take(3) as $t)
+      @foreach($say as $t)
         <li class="pq-q">
           <figure>
             {{-- a customer's photograph is never cropped: the box takes the file's own ratio --}}
@@ -378,6 +391,7 @@
                      sizes="(min-width: 1000px) min(30vw, 480px), (min-width: 600px) 30vw, 82vw" :max="1080" :fallback="720" />
             </div>
             <blockquote class="pq-q__t">{{ trim($t->quote) }}</blockquote>
+            <button type="button" class="pq-q__more mc-link" hidden data-more="Ver más" data-less="Ver menos">Ver más</button>
             <figcaption class="pq-q__by">{{ $t->author_name }}</figcaption>
           </figure>
         </li>
