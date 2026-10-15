@@ -24,9 +24,5 @@
     </label>
 
     <button class="ad-btn" type="submit" style="width:100%">Entrar</button>
-
-    @if (Route::has('password.request'))
-      <a class="ad-gate__lost" href="{{ route('password.request') }}">He olvidado la contraseña</a>
-    @endif
   </form>
 </x-guest-layout>
