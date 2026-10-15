@@ -1,0 +1,306 @@
+/* ============================================================
+   /muestras/opiniones/4.4 — Pares, editorial (2026-10-16)
+   A copy of the parts of muestras-opiniones.css that 4 (Pares) uses, then
+   this version's own look at the end. 4.0 and the file 1–3 share are never
+   touched from here.
+   ============================================================ */
+@font-face{ font-family:'Fraunces'; font-style:normal; font-weight:100 900; font-display:swap;
+  src:url(/fonts/fraunces/fraunces-latin-opsz-normal.woff2) format('woff2');
+  unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD; }
+@font-face{ font-family:'Fraunces'; font-style:italic; font-weight:100 900; font-display:swap;
+  src:url(/fonts/fraunces/fraunces-latin-opsz-italic.woff2) format('woff2');
+  unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD; }
+
+:root{ --vh:1vh; --vis-top:0px; --night:#05080F; --night-2:#0B1322; }
+@supports (height:1svh){ :root{ --vh:1svh; } }
+
+body.ms-body{ background:var(--mc-band); color:var(--mc-ink-2); }
+.ms-sr{ position:absolute !important; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden;
+  clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; border:0; }
+.ms-wrap{ max-width:var(--mc-container); margin-inline:auto; padding-inline:var(--mc-gutter-m); }
+@media (min-width:768px){ .ms-wrap{ padding-inline:var(--mc-gutter-d); } }
+[tabindex="-1"]:focus{ outline:none; }
+
+/* the section, as it would sit on a page: the heading, the paragraph */
+.ms-sec{ padding-block:var(--s-8) var(--s-9); }
+@media (min-width:1000px){ .ms-sec{ padding-block:var(--s-9); } }
+.ms-head{ margin-bottom:var(--s-6); }
+@media (min-width:1000px){ .ms-head{ margin-bottom:var(--s-7); } }
+.ms-h2{ margin:0 0 var(--s-3); max-width:18ch; font-size:var(--t-h2); font-weight:700; line-height:1.08;
+  letter-spacing:-.025em; color:var(--mc-ink); }
+.ms-lede{ margin:0; max-width:56ch; font-size:var(--t-prose); line-height:1.55; color:var(--mc-ink-2); }
+
+/* the round control: arrows, close. 52px: past the 48 preferred target */
+.ms-rnd{ display:inline-grid; place-items:center; flex:0 0 auto; width:52px; height:52px; padding:0; margin:0;
+  border-radius:var(--mc-r-pill); cursor:pointer; color:var(--mc-ink);
+  background:var(--mc-surface); border:1px solid var(--mc-rule);
+  transition:background var(--m-quick) var(--e-out), color var(--m-quick) var(--e-out), border-color var(--m-quick) var(--e-out), opacity var(--m-state) var(--e-out); }
+/* hover only where there is a pointer that hovers: on a touch screen a tapped
+   control would otherwise stay "hovered" (and, on the night, white on white) */
+@media (hover:hover){ .ms-rnd:hover{ background:var(--mc-ink); border-color:var(--mc-ink); color:var(--mc-surface); } }
+.ms-rnd:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:3px; }
+.ms-rnd[aria-disabled="true"]{ opacity:.38; cursor:default; }
+@media (hover:hover){ .ms-rnd[aria-disabled="true"]:hover{ background:var(--mc-surface); color:var(--mc-ink); border-color:var(--mc-rule); } }
+/* frosted, over a photograph or the dimmed page */
+.ms-rnd--glass{ color:#FFFFFF; background:rgba(255,255,255,.14); border-color:rgba(255,255,255,.34);
+  -webkit-backdrop-filter:blur(12px) saturate(1.2); backdrop-filter:blur(12px) saturate(1.2); }
+@media (hover:hover){ .ms-rnd--glass:hover{ background:#FFFFFF; border-color:#FFFFFF; color:#111C2E; } }
+.ms-rnd--glass:focus-visible{ outline-color:#FFFFFF; }
+html:not(.js) .ms-rnd{ display:none; }
+
+/* a modal over the page. In a content-height showroom frame it is drawn over
+   the slice of the frame that is on screen (--vis-top, --vh). */
+html:has(dialog[open]){ overflow:hidden; }
+
+/* ---- the photograph, lifted out of the page (4 · Pares, 2 · El muro) ----
+   A transparent full-window dialog: the ::backdrop dims, the picture is
+   placed by the script (its whole shape, as large as the window allows) and
+   flown there from its place on the page with one transform. */
+.zm{ position:fixed; inset:0; width:100%; height:100%; max-width:none; max-height:none; margin:0; padding:0;
+  border:0; background:transparent; overflow:hidden; color:#FFFFFF; }
+.is-embed .zm{ inset:var(--vis-top) 0 auto 0; height:calc(var(--vh) * 100); }
+
+.zm__img{ position:absolute; left:0; top:0; display:block; max-width:none; transform-origin:0 0;
+  background-size:cover; background-repeat:no-repeat;
+  box-shadow:0 30px 80px -30px rgba(0,0,0,.7); will-change:transform; }
+.zm__by{ position:absolute; left:var(--mc-gutter-m); right:var(--mc-gutter-m); bottom:calc(var(--s-5) + env(safe-area-inset-bottom));
+  margin:0; text-align:center; font-size:var(--t-ui); font-weight:600; line-height:1.4; color:#FFFFFF; }
+.zm__x{ position:absolute; top:calc(var(--s-4) + env(safe-area-inset-top)); right:var(--s-4); }
+@media (min-width:768px){ .zm__x{ top:var(--s-6); right:var(--s-6); } }
+
+/* ============================================================
+   4 · Pares — the client's sketch
+   A pair is a container: everything in it is sized from its own width
+   (cqi), so the diagonal holds at any width and with any words.
+     the photograph  --pw wide (58cqi), a 3:4 print → --pw*4/3 tall, in front
+     the words       from half the photograph's width to the pair's right
+                     edge, from half its height to the bottom
+   ============================================================ */
+.ms-v4{ --gap:var(--s-3); --peek:2.25rem; --row-max:1640px; overflow:hidden; }
+@media (min-width:1000px){ .ms-v4 .ms-wrap{ max-width:var(--row-max); } }
+.pr{ position:relative; }
+.pr__row{ display:flex; gap:var(--gap); margin:0; list-style:none;
+  padding:var(--s-2) var(--mc-gutter-m) var(--s-6);
+  overflow-x:auto; overscroll-behavior-x:contain; scroll-snap-type:x mandatory;
+  scroll-padding-inline:var(--mc-gutter-m); scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+.pr__row::-webkit-scrollbar{ display:none; }
+/* the row is as tall as the pairs in view (set by the script), not as the
+   tallest pair anywhere in it: the arrows stay close under what is seen */
+.js .pr__row{ overflow-y:hidden; transition:height var(--m-move) var(--e-out); }
+@media (prefers-reduced-motion:reduce){ .js .pr__row{ transition:none; } }
+.pr__row.is-drag{ scroll-snap-type:none; cursor:grabbing; user-select:none; }
+/* fixed width, never shrinking: Safari lays a flex line out against the visible box */
+.pr__i{ flex-grow:0; flex-shrink:0; flex-basis:calc(100% - var(--peek)); scroll-snap-align:start; display:flex; }
+@media (min-width:700px){
+  .ms-v4{ --gap:var(--s-6); }
+  .pr__row{ padding-inline:var(--mc-gutter-d); scroll-padding-inline:var(--mc-gutter-d); }
+  .pr__i{ flex-basis:calc((100% - var(--gap)) / 2); }
+}
+@media (min-width:1000px){
+  .ms-v4{ --gap:var(--s-7); }
+  /* the row lines up with the page's container, and runs past it to the edge */
+  .pr__row{ --side:max(var(--mc-gutter-d), calc((100% - var(--row-max)) / 2 + var(--mc-gutter-d)));
+    padding-inline:var(--side); scroll-padding-inline:var(--side); }
+  .pr__i{ flex-basis:calc((min(100vw, var(--row-max)) - var(--mc-gutter-d) * 2 - var(--gap) * 2) / 3); }
+}
+
+.pr__i > .pr__pair{ --pw:58cqi; }
+.pr__pair{ container-type:inline-size; position:relative; display:flex; flex-direction:column; width:100%; }
+
+/* the photograph: a 3:4 card, the picture whole on its dark ground */
+.pr__ph{ position:relative; z-index:2; display:block; width:var(--pw); padding:0; margin:0; border:0; background:none;
+  cursor:zoom-in; transform-origin:30% 30%; }
+/* a print: the picture on white, whatever its shape, with a thin white edge
+   all round — so a 9:16 phone photo and a 3:4 one read as the same object */
+.pr__mat{ display:block; position:relative; width:100%; aspect-ratio:3 / 4; background:#FFFFFF;
+  box-shadow:0 1px 2px rgba(var(--mc-scrim), .12), 0 24px 44px -22px rgba(var(--mc-scrim), .5); }
+.pr__img{ position:absolute; inset:2.2cqi; display:block; width:calc(100% - 4.4cqi); height:calc(100% - 4.4cqi); object-fit:contain;
+  background-size:contain !important; background-position:center !important; background-repeat:no-repeat !important; }
+.pr__ph:focus-visible{ outline:3px solid var(--mc-focus); outline-offset:4px; }
+.pr__ph.is-out .pr__img{ visibility:hidden; }
+
+/* the words: a white card behind, on the diagonal */
+.pr__txt{ position:relative; z-index:1; flex:1 1 auto; margin:calc(var(--pw) * -2 / 3) 0 0 calc(var(--pw) / 2); width:calc(100cqi - var(--pw) / 2);
+  background:var(--mc-surface); color:var(--mc-ink);
+  box-shadow:0 1px 2px rgba(var(--mc-scrim), .06); transform-origin:60% 40%; }
+.pr__txt::after{ content:""; position:absolute; inset:0; pointer-events:none; opacity:0;
+  box-shadow:0 2px 4px rgba(var(--mc-scrim), .08), 0 16px 30px -14px rgba(var(--mc-scrim), .42);
+  transition:opacity var(--m-reveal) var(--e-out); }
+.pr__txt.is-front{ z-index:3; }
+.pr__txt.is-front::after{ opacity:1; }
+.pr__swap{ position:absolute; inset:0; z-index:1; width:100%; padding:0; margin:0; border:0; background:none; cursor:pointer; }
+.pr__swap:focus-visible{ outline:3px solid var(--mc-focus); outline-offset:3px; }
+.pr__rest{ position:relative; z-index:2; pointer-events:none; padding:0 var(--s-5) var(--s-5); display:flex; flex-direction:column; height:100%;
+  transition:opacity var(--m-state) var(--e-out); }
+/* beside the photograph: the name, standing on the photograph's bottom edge */
+.pr__by{ display:flex; align-items:flex-end; height:calc(var(--pw) * 2 / 3); margin:0;
+  padding:var(--s-4) 0 0 calc(var(--pw) / 2 + var(--s-4) - var(--s-5)); }
+.pr__by span{ font-size:var(--t-ui); font-weight:400; line-height:1.35; color:var(--mc-ink-2); overflow-wrap:break-word; min-width:0; }
+.pr__by b{ display:block; font-weight:600; color:var(--mc-ink); }
+.pr__q{ margin:var(--s-4) 0 0; font-size:var(--t-ui); line-height:1.55; color:var(--mc-ink); overflow-wrap:break-word; }
+.pr__more{ margin:auto 0 0; padding-top:var(--s-3); font-size:var(--t-small); font-weight:600; color:var(--mc-ink);
+  text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:.32em; text-decoration-color:var(--mc-control); }
+.pr__swap:hover ~ .pr__rest .pr__more{ text-decoration-color:currentColor; }
+
+/* in front: the whole review, scrolling inside the card if it is long */
+.pr__full{ position:absolute; inset:0; z-index:2; overflow-y:auto; overscroll-behavior:contain;
+  padding:var(--s-5); opacity:0; visibility:hidden; cursor:pointer;
+  transition:opacity var(--m-state) var(--e-out), visibility 0s linear var(--m-state);
+  scrollbar-width:thin; scrollbar-color:var(--mc-rule) transparent; }
+.pr__txt.is-front .pr__full{ opacity:1; visibility:visible; transition:opacity var(--m-reveal) var(--e-out) 60ms, visibility 0s; }
+.pr__txt.is-front .pr__rest{ opacity:0; }
+.pr__fq{ margin:0; font-size:var(--t-ui); line-height:1.55; color:var(--mc-ink); }
+.pr__fq p{ margin:0; } .pr__fq p + p{ margin-top:.7em; }
+.pr__fby{ margin:var(--s-3) 0 0; font-size:var(--t-ui); font-weight:600; color:var(--mc-ink); }
+@media (min-width:1000px){
+  .pr__q, .pr__fq{ font-size:var(--t-prose); }
+}
+
+/* a phone: the photograph larger; beside its lower half the card behind
+   simply shows (a column that narrow holds no words worth reading), and
+   the words start under the photograph, the name after them */
+@media (max-width:699px){
+  .pr__i > .pr__pair{ --pw:68cqi; }
+  /* one pair in view: each card as long as its own words, no empty white */
+  .pr__i{ align-items:flex-start; }
+  /* the card tucks only 28px under the photograph (client, 2026-10-09: half
+     a photograph of empty white beside it read as a hole), so its words
+     start just under the photograph and a short review makes a short card */
+  .pr__pair{ --ov:1.75rem; }
+  .pr__txt{ margin-top:calc(var(--ov) * -1); }
+  .pr__rest{ padding:calc(var(--ov) + var(--s-4)) var(--s-4) var(--s-4); }
+  html:not(.js) .pr__full{ padding-top:calc(var(--ov) + var(--s-4)); }
+  .pr__by{ order:2; height:auto; padding:var(--s-3) 0 0; }
+  .pr__by span{ font-size:var(--t-small); }
+  .pr__by b{ display:inline; }
+  .pr__q{ margin-top:0; }
+  .pr__more{ order:3; }
+  .pr__full{ padding:var(--s-4); }
+}
+
+/* the arrows, centred under the row, in the thumb's reach */
+.pr__nav{ display:flex; justify-content:center; gap:var(--s-4); margin-top:0; }
+
+/* without script: the row still scrolls natively; every card carries the
+   whole review (beside the photograph's corner), scrolling if it is long */
+html:not(.js) .pr__rest, html:not(.js) .pr__swap{ display:none; }
+html:not(.js) .pr__full{ position:relative; inset:auto; opacity:1; visibility:visible; max-height:26rem;
+  padding-top:calc(var(--pw) * 2 / 3 + var(--s-4)); }
+html:not(.js) .pr__ph{ cursor:default; }
+
+@media (prefers-reduced-motion:reduce){
+  .pr__rest, .pr__full, .pr__txt::after{ transition:none !important; }
+}
+.zm__dim{ position:absolute; inset:0; background:rgba(var(--mc-scrim), .9); }
+.zm::backdrop{ background:transparent; }
+/* the whole review scrolls inside the card: its lower edge fades (three
+   stops, the middle at 20%), so the words visibly go on */
+.pr__txt.is-front .pr__full.is-more{ -webkit-mask-image:linear-gradient(to bottom, #000 calc(100% - 3.5rem), rgba(0,0,0,.2) calc(100% - 1.25rem), transparent);
+  mask-image:linear-gradient(to bottom, #000 calc(100% - 3.5rem), rgba(0,0,0,.2) calc(100% - 1.25rem), transparent); }
+
+/* ============================================================
+   4.4 · Editorial
+   A magazine page: ink, paper, and one accent (--mc-price #C6352A, the
+   site's coral red, 4.6:1 on the paper; used large, or as a rule).
+     paper  #F6F4EF    ink #111C2E (15.6:1)    ink-2 #475467 (6.9:1)
+   The pull-quote is the review's first sentence, in Fraunces; it starts
+   beside the corner of the photograph and runs on beneath it (a float the
+   size of the overlap, as text wraps round a picture in print).
+   ============================================================ */
+.op44{ --paper:#F6F4EF; --white:#FFFFFF; --ink:#111C2E; --ink2:#475467; --red:var(--mc-price, #C6352A);
+  --serif:'Fraunces', 'Iowan Old Style', Georgia, serif; }
+body.op44{ background:var(--paper); color:var(--ink); }
+.op44 .ms-v4{ background:var(--paper); }
+
+/* the head: a rule, the heading at display size, the lede under a hairline */
+.op44 .ms-head{ border-top:2px solid var(--ink); padding-top:var(--s-5); }
+.op44 .ms-h2{ max-width:none; margin:0 0 var(--s-5); font-family:var(--serif); font-weight:600; font-size:clamp(2.75rem, 12.6vw, 7.25rem);
+  line-height:.94; letter-spacing:-.035em; color:var(--ink); font-variation-settings:"SOFT" 0, "WONK" 0; text-wrap:balance; }
+.op44 .ms-h2 span{ display:block; font-style:italic; font-weight:400; letter-spacing:-.03em; color:var(--red); }
+.op44 .ms-lede{ max-width:38ch; padding-top:var(--s-4); border-top:1px solid rgba(17,28,46,.18); color:var(--ink2); }
+@media (min-width:1000px){
+  .op44 .ms-head{ display:grid; grid-template-columns:minmax(0, 2fr) minmax(0, 1fr); column-gap:var(--s-7); align-items:end; }
+  .op44 .ms-h2{ margin:0; }
+  .op44 .ms-lede{ margin-bottom:.5em; }
+}
+
+/* two pairs in view on a computer, so the quotes can be large */
+@media (min-width:1000px){
+  .op44 .pr__i{ flex-basis:calc((min(100vw, var(--row-max)) - var(--mc-gutter-d) * 2 - var(--gap)) / 2); }
+  .op44 .pr__i > .pr__pair{ --pw:42cqi; }
+}
+@media (min-width:700px){
+  /* thin column rules between the pairs, as between the columns of a page */
+  .op44 .pr__i + .pr__i{ position:relative; }
+  .op44 .pr__i + .pr__i::before{ content:""; position:absolute; top:0; bottom:0; left:calc(var(--gap) / -2); width:1px; background:rgba(17,28,46,.14); }
+}
+
+/* the photograph: square, on white, a hairline round it; no rotation, no glow */
+.op44 .pr__mat{ background:var(--white); box-shadow:0 0 0 1px rgba(17,28,46,.10), 0 18px 34px -24px rgba(17,28,46,.45); }
+.op44 .pr__img{ inset:1.6cqi; width:calc(100% - 3.2cqi); height:calc(100% - 3.2cqi); }
+.op44 .pr__ph:focus-visible{ outline-color:var(--ink); }
+
+/* the card: white, a rule of ink at its head and a short red one on it */
+.op44 .pr__txt{ background:var(--white); color:var(--ink); border-top:1px solid var(--ink);
+  box-shadow:0 1px 2px rgba(17,28,46,.06); }
+.op44 .pr__txt::before{ content:""; position:absolute; z-index:3; top:-1px; right:0; width:3rem; height:3px; background:var(--red); }
+.op44 .pr__txt::after{ box-shadow:0 2px 4px rgba(17,28,46,.08), 0 18px 34px -16px rgba(17,28,46,.4); }
+.op44 .pr__rest{ display:block; }
+/* the overlap with the photograph, kept free: the words wrap round it */
+.op44 .pr__wrap{ float:left; width:calc(var(--pw) / 2 + var(--s-4) - var(--s-5)); height:calc(var(--pw) * 2 / 3 + var(--s-2)); }
+.op44 .pr__by{ display:block; height:auto; padding:0; margin:var(--s-4) 0 0; clear:none; }
+.op44 .pr__by span{ font-size:var(--t-ui); color:var(--ink2); }
+.op44 .pr__by b{ display:inline; color:var(--ink); }
+.op44 .pr__q{ margin:var(--s-5) 0 0; font-family:var(--serif); font-weight:400; font-size:1.75rem; line-height:1.1;
+  letter-spacing:-.018em; color:var(--ink); font-variation-settings:"SOFT" 30, "WONK" 0; text-wrap:pretty; }
+/* the opening quotation mark hangs in the margin, in the accent */
+.op44 .pr__q::before{ content:"\201C"; display:inline-block; width:.42em; margin-left:-.42em; color:var(--red); }
+.op44 .pr__more{ display:inline-block; margin:var(--s-3) 0 0; font-size:var(--t-ui); color:var(--ink);
+  text-decoration-color:var(--red); text-decoration-thickness:2px; }
+.op44 .pr__swap:hover ~ .pr__rest .pr__more{ text-decoration-color:var(--ink); }
+.op44 .pr__fq{ font-family:var(--serif); font-size:1.1875rem; line-height:1.45; color:var(--ink); font-variation-settings:"SOFT" 30, "WONK" 0; }
+.op44 .pr__fq p:first-child::before{ content:"\201C"; color:var(--red); }
+.op44 .pr__fby{ color:var(--ink); }
+.op44 .pr__swap:focus-visible{ outline-color:var(--ink); }
+.op44 .pr__full{ scrollbar-color:rgba(17,28,46,.3) transparent; }
+@media (min-width:700px){
+  .op44 .pr__rest{ padding:var(--s-5) var(--s-5) var(--s-6); }
+  .op44 .pr__q{ margin-top:0; font-size:1.625rem; }
+}
+@media (min-width:1000px){
+  .op44 .pr__q{ font-size:2.125rem; line-height:1.08; }
+  .op44 .pr__fq{ font-size:1.3125rem; }
+  .op44 .pr__rest{ padding:var(--s-6) var(--s-6) var(--s-7); }
+  .op44 .pr__wrap{ width:calc(var(--pw) / 2 + var(--s-5) - var(--s-6)); height:calc(var(--pw) * 2 / 3 - var(--s-6) + var(--s-3)); }
+  .op44 .pr__full{ padding:var(--s-6); }
+}
+@media (min-width:1600px){
+  .op44 .pr__q{ font-size:2.375rem; }
+}
+/* a phone: the words under the photograph, as in 4.0, but across most of the width */
+@media (max-width:699px){
+  .op44 .pr__wrap{ display:none; }
+  .op44 .pr__txt{ margin-left:12cqi; width:88cqi; }
+  .op44 .pr__rest{ padding:calc(var(--ov) + var(--s-5)) var(--s-5) var(--s-5); }
+  .op44 .pr__q{ margin-top:0; }
+  .op44 .pr__full{ padding:calc(var(--ov) + var(--s-4)) var(--s-5) var(--s-5); }
+}
+
+.op44 .ms-rnd{ background:transparent; border-color:var(--ink); color:var(--ink); }
+@media (hover:hover){ .op44 .ms-rnd:hover{ background:var(--ink); border-color:var(--ink); color:var(--paper); }
+  .op44 .ms-rnd[aria-disabled="true"]:hover{ background:transparent; color:var(--ink); border-color:var(--ink); } }
+.op44 .ms-rnd:focus-visible{ outline-color:var(--red); }
+.op44 .ms-rnd--glass{ color:#FFFFFF; background:rgba(255,255,255,.14); border-color:rgba(255,255,255,.34); }
+@media (hover:hover){ .op44 .ms-rnd--glass:hover{ background:#FFFFFF; border-color:#FFFFFF; color:var(--ink); } }
+.op44 .ms-rnd--glass:focus-visible{ outline-color:#FFFFFF; }
+.op44 .zm__by{ font-family:var(--serif); font-style:italic; font-weight:400; font-size:1.25rem; }
+
+/* every card as long as its own words, on a computer too: no blank white
+   (or night) under a short review; the row is as tall as its tallest */
+.op44 .pr__i{ align-items:flex-start; }
+/* a tablet: beside the photograph there is too little width for the serif
+   (it broke words at 768); the overlap is kept free across the whole card and
+   the pull-quote starts under the photograph */
+@media (min-width:700px) and (max-width:999px){
+  .op44 .pr__wrap{ float:none; display:block; width:auto; height:calc(var(--pw) * 2 / 3 - var(--s-5) + var(--s-3)); }
+}

@@ -45,17 +45,27 @@ use Illuminate\Http\Response;
  */
 class ReviewShowroomController extends Controller
 {
-    /** number => [name, what it is, where it fits]. The shell prints these;
-     *  nothing of it appears inside a proposal. */
+    /** version => [page name, review title, what it is, approach].
+     *  The page name is the page's own <title> (Spanish, as the page was made);
+     *  everything else is review chrome, in English (the index, the version bar).
+     *  Versions of one approach are kept side by side: 4 is Pares as first built
+     *  and is frozen (git tag opiniones-v4.0); 4.4, 4.5 … are copies with their
+     *  own view (v4-4.blade.php) and their own css/js (op44.css, op44.js), so an
+     *  iteration never touches an earlier one, nor the shared file of 1–3.
+     *  (4.1 warm paper, 4.2 night and 4.3 colour from the photo were shown on
+     *  2026-10-16 and dropped: the client chose 4.4.)
+     *  Keys "1".."4" are ints to PHP; "4.4" etc. stay strings. */
     public const VARIANTS = [
-        1 => ['La entrega', 'Un cliente cada vez, a pantalla completa: su foto entera sobre su propia luz, y sus palabras. Avanza con el scroll.',
-              'Para /por-que-nosotros, en la misma noche que la historia, o como página de opiniones.'],
-        2 => ['El muro', 'Todas las entregas juntas, en un muro de fotos enteras. Cualquiera se toca y pasa al frente con su opinión.',
-              'Para la home o /por-que-nosotros: la cantidad de clientes reales, de un solo vistazo.'],
-        3 => ['Sus palabras', 'La frase más fuerte de cada opinión, enorme, línea a línea. La foto acompaña; la opinión entera, a un toque.',
-              'Para la home: convence en segundos, con las palabras exactas de los clientes.'],
-        4 => ['Pares', 'Tu idea: foto y opinión en pareja, una sobre otra. Al tocar la opinión pasa delante; al tocar la foto se abre entera.',
-              'Para la home: ligera, en fila, hecha para el pulgar.'],
+        '4.4' => ['Pares · Editorial', 'Editorial',
+                  'A magazine page: the first sentence of each review as a large serif pull-quote (Fraunces) that wraps around the photo, the whole review on tap. Thin rules, brand ink and one red accent.', 'Pares'],
+        4     => ['Pares', 'Pares 4.0',
+                  "The client's own sketch as first built: photo card in front, quote card behind on the diagonal; tap the quote to bring it forward, tap the photo to open it.", 'Pares'],
+        1     => ['La entrega', 'La entrega',
+                  'One customer per screen, full screen: the whole photo over its own light, and the words. Moves with the scroll.', 'La entrega'],
+        2     => ['El muro', 'El muro',
+                  'Every delivery together in one wall of whole photos. Any of them comes to the front with its review.', 'El muro'],
+        3     => ['Sus palabras', 'Sus palabras',
+                  'The strongest phrase of each review, huge, line by line. The photo comes along; the whole review is a tap away.', 'Sus palabras'],
     ];
 
     /** Pinned scroll sequences: shown in a screen-tall frame that scrolls inside. */
@@ -82,6 +92,55 @@ class ReviewShowroomController extends Controller
         20 => 'una compra de 10 en todos los sentidos',
     ];
 
+    /** For review only (2026-10-16: the people judging the new versions do not
+     *  read Spanish). Versions 4.4 and later show these English renderings of
+     *  the reviews unless ?lang=es is asked for; the version bar switches. The
+     *  live site and the frozen versions (1–4) never use them. A review that has
+     *  no rendering here (a new one) is shown as written. Faithful, not
+     *  polished: the customer's tone and slips are kept where they carry meaning. */
+    public const EN = [
+        5  => ['We are delighted with the car!'],
+        6  => ['I found the car I wanted in unbeatable condition; my friend, who is a mechanic at Mercedes, tested it and it passed first time.'],
+        7  => ['I fell in love with the car and travelled from Valencia. Julián gave me confidence and peace of mind from the very first minute we spoke. The car was better in person than in the photos; I drove it home and it runs beautifully. You have a friend in Valencia! Thank you.'],
+        8  => ['I am a mechanical engineer. I travelled from Valladolid, tried the car and it did not disappoint, a one-of-a-kind car on the market. Worth mentioning: a small problem that came up afterwards was solved seriously and quickly.'],
+        9  => ['Friendly treatment, excellent service before and after the sale, they delivered everything they promised.'],
+        10 => ['We replaced our Peugeot 107 after 20 years. We found this car, which suited us in every way. We had been to other dealers before and they did not inspire confidence; IV Motorclass surprised us with the treatment, the presentation of the car and how quickly the purchase went. We took it home the same day and we are very happy.'],
+        11 => ['We bought the car for our daughter. We liked its spotless condition, the clear history and a car with nothing wrong.'],
+        12 => ['We have bought 3 cars in total from this company! They have treated us very well, offering spotless cars. We are delighted and have ordered another one for some relatives.'],
+        13 => ['Online sale, direct conversation with very clear videos showing the car, and they delivered it to my front door. We have made several trips with it and everything is great.'],
+        14 => ['We saw it online. Julián looked after us and explained everything in detail; they brought it to our home and everything was exactly as described. Very good!'],
+        15 => ['My brother recommended it. When we saw it in person we thought "this car is like new". I took it home the same day and I am very happy. Thank you for the trust and the speed.'],
+        16 => ['My first car in Spain. Julián explained every step to me and made everything very easy, and he helps me whenever I have a question. Recommended.'],
+        17 => ['He sent me every detail about the car before I travelled. Once there, we could see it and test it without any rush. Everything was very easy and the car is superb. That is how it should be.'],
+        18 => ['We bought the car as a Three Kings gift for our daughter. From the start, Julián answered all our questions and was clear when showing us the car, and after sorting out a few details, the paperwork was done in no time. Highly recommended.'],
+        19 => ['I needed a car for driving long distances and I found the best one, in its exterior, its interior and its engine. Iulian explained everything clearly, and from today we are more than neighbours: I am taking away a good friend.'],
+        20 => ['This weekend I bought a Mercedes C220 at IV Motorclass, and honestly a great purchase, the car in superb condition. Everything was handled by phone with Iulian, who gave me several trustworthy options; a great, sincere and reliable person. A sale with no tricks, honest from minute one, offering ways to buy without putting any obstacles in the way. A 10 out of 10 purchase in every sense. I am from Granada and he is from Santander; that says it all about how trustworthy they are.'],
+        21 => ['I could not be happier with my new BMW 2 Series and with the experience at IV MotorClass! From minute one, Julián gave me incredible confidence and a warmth that is very hard to find these days; I felt in the best hands and superbly advised at every moment.',
+               'But what made me fall in love was the handover: the car was absolutely immaculate, gleaming and cared for down to the smallest detail, it looked brand new from the factory! A thousand thanks, Julián, for your patience, for being so human and for making this process so special and simple. I will recommend you to everyone with my eyes closed!'],
+        22 => ['I found a one-of-a-kind car in excellent condition. We took it home the same day and we have crossed Spain on holiday without any problem. Both the service and the car, absolutely amazing.'],
+        23 => ['As a customer, what has given me the most confidence is knowing there is a company behind it that truly answers for what it sells: if any problem comes up, they deal with you personally, they face it and they look for a solution instead of leaving you stranded after the sale.'],
+        24 => ['Exactly the model I was looking for. They even carried out a service that was not yet due, to make sure the car was perfect and to avoid problems in the future. Few dealers do that: caring this much about the customer even before handing over the car. A 10 out of 10 for attention and service.'],
+        25 => ['After 20 years with the same car, we finally needed to change it. We had several options in mind, but as soon as we saw this car and met Iulian, we were sure.',
+               'His knowledge, his attention to detail and the confidence he puts into choosing every car show perfectly in the cars he sells: they look brand new from the factory.',
+               'We told him we intend to keep this car another 20 years, and after the experience we have had, we could not be happier with our choice. Without a doubt, 100% recommended.'],
+        26 => ['We can only say thank you for how well everything went. We bought a BMW and the experience was a 10 out of 10 from start to finish.',
+               'We want to give a special mention to Julian, who treated us wonderfully from the very first moment. He was very kind, attentive and always ready to help. He even came to pick us up at the airport and kindly invited us for a few beers, which made everything feel even more personal.',
+               'You can tell he knows cars very well. He explained everything patiently, answered all our questions and gave us a lot of confidence. The car was immaculate, really clean and in even better condition than we expected.',
+               'It is a pleasure to find companies that work like this, and professionals like him, who make the whole process easy and pleasant. Without a doubt we would trust them again, and we recommend them with complete peace of mind. A true 5-star experience.'],
+        27 => ['Excellent experience. The car was exactly as advertised, in very good condition and with no surprises. Warm, professional and transparent treatment. Highly recommended; I would buy again without hesitation.'],
+        28 => ['Good afternoon, Iulian.',
+               'I wanted to thank you for the whole process of selling and delivering the Audi A1. The car is in excellent mechanical and cosmetic condition, exactly as you assured me from the start, and it runs beautifully on the road.',
+               'I also want to highlight the paperwork: total transparency with the Audi digital service history, impeccable documents and a very fast agency, which issued the temporary DGT permit on the spot. The whole process conveyed great professionalism and peace of mind.',
+               'It has been a real pleasure buying the car from you. I will keep your contact for future purchases and I will recommend IV MotorClass without hesitation; in fact, I already have, to a colleague at work.',
+               'I wish you every success.'],
+        29 => ['Very quick handling, and honestly great.'],
+        30 => ['Great treatment, I would do it all again, everything perfect and trustworthy!'],
+        31 => ['A very good experience buying the car. As it was a purchase from a distance I had quite a few doubts, but from the first moment Iulian gave me all the information and documents I needed to check that everything was in order.',
+               'He gave me the service history, had no problem with a mechanic inspecting the car before the purchase, and gave me legal documents to verify the car properly. At every step he made it easy to take the decision calmly.',
+               'He also kindly picked me up at the airport and explained the car\'s features, along with some tips on using it.',
+               'The car is in very good condition and runs perfectly. I am very happy with both the purchase and the treatment I received. Without a doubt, a highly recommended experience.'],
+    ];
+
     public function index(): Response
     {
         return response()
@@ -93,11 +152,22 @@ class ReviewShowroomController extends Controller
             ->header('X-Robots-Tag', 'noindex, nofollow');
     }
 
-    public function show(int $n): Response
+    public function show(string $v)
     {
-        abort_unless(isset(self::VARIANTS[$n]), 404);
+        if (preg_match('/^(\d+)\.0$/', $v, $m)) {
+            return redirect('/muestras/opiniones/' . $m[1]);
+        }
+        $view = 'muestras.v' . str_replace('.', '-', $v);
+        abort_unless(isset(self::VARIANTS[$v]) && view()->exists($view), 404);
+        // "4" is the int 4 (as the frozen views were built with); "4.4" stays a string
+        $n = ctype_digit($v) ? (int) $v : $v;
         $reviews = $this->reviews();
         $embed   = (int) request()->query('embed', 0);
+        // 4.4 and later are shown in English for review (EN), unless ?lang=es
+        $en = is_string($n) && request()->query('lang') !== 'es';
+        if ($en) {
+            $reviews = $this->english($reviews);
+        }
 
         $data = [
             'n'       => $n,
@@ -108,6 +178,7 @@ class ReviewShowroomController extends Controller
             'variant' => self::VARIANTS[$n],
             'reviews' => $reviews,
             'json'    => $this->json($reviews),
+            'en'      => $en,
         ];
         if ($n === 1) {
             $data['beats'] = $this->pick($reviews, self::ENTREGA);
@@ -121,8 +192,16 @@ class ReviewShowroomController extends Controller
             $data['beats'] = $this->phrases($reviews);
         }
 
-        return response()
-            ->view('muestras.v' . $n, $data)
+        $html = view($view, $data)->render();
+        // the review bar is added here, not in the page, so every version's page
+        // stays exactly as it was designed. Not inside the showroom's frames.
+        if ($embed === 0) {
+            $bar = view('muestras._bar', ['current' => $n, 'variants' => self::VARIANTS,
+                'lang' => is_string($n) ? ($en ? 'en' : 'es') : null])->render();
+            $html = preg_replace('~</body>~i', $bar . '</body>', $html, 1);
+        }
+
+        return response($html)
             ->header('X-Robots-Tag', 'noindex, nofollow');
     }
 
@@ -157,6 +236,21 @@ class ReviewShowroomController extends Controller
                     'box'     => round(max(0.45, min(2.2, $ratio)), 4),
                 ];
             });
+    }
+
+    /** The same reviews with their English rendering (EN), for review only. */
+    private function english($reviews)
+    {
+        return $reviews->map(function ($r) {
+            $r = clone $r;
+            if (isset(self::EN[$r->id])) {
+                $r->paras = self::EN[$r->id];
+                $r->text  = implode(' ', $r->paras);
+                $r->len   = mb_strlen($r->text);
+            }
+            $r->caption = $r->name . ', with their car';
+            return $r;
+        });
     }
 
     /** The listed reviews that still exist, in the listed order. */
@@ -301,6 +395,26 @@ class ReviewShowroomController extends Controller
         } catch (\Throwable $e) {
             return null;
         }
+    }
+
+    /**
+     * 4.4 · Editorial: the pull-quote — the review's first sentence, whole.
+     * A first sentence that runs on (some reviews are one sentence of 300
+     * characters strung on commas) is cut at a word with "…" near $limit; the
+     * whole review is a tap away. ['short' => string, 'cut' => bool]
+     */
+    public static function pull(string $text, int $limit = 150): array
+    {
+        $text = trim($text);
+        $parts = preg_split('/(?<=[.!?…])\s+(?=\S)/u', $text);
+        $first = $parts[0] ?? $text;
+        if (mb_strlen($first) > $limit * 1.25) {
+            $head = mb_substr($first, 0, $limit + 1);
+            $sp = mb_strrpos($head, ' ');
+            $first = mb_substr($first, 0, $sp === false ? $limit : $sp);
+            $first = preg_replace('/[\s,;:.\-–—(«"“]+$/u', '', $first) . '…';
+        }
+        return ['short' => $first, 'cut' => mb_strlen($first) < mb_strlen($text)];
     }
 
     /** What the page script needs to draw a review in a viewer. */

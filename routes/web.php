@@ -60,7 +60,7 @@ Route::get('/catalogo', [App\Http\Controllers\BrandCatalogController::class, 'in
 // /muestras/*: private proposals for the client, behind a 4-digit PIN
 Route::middleware(App\Http\Middleware\MuestrasPin::class)->group(function () {
     Route::get('/muestras/opiniones', [App\Http\Controllers\ReviewShowroomController::class, 'index'])->name('muestras.opiniones');
-    Route::get('/muestras/opiniones/{n}', [App\Http\Controllers\ReviewShowroomController::class, 'show'])->whereNumber('n')->name('muestras.opiniones.show');
+    Route::get('/muestras/opiniones/{v}', [App\Http\Controllers\ReviewShowroomController::class, 'show'])->where('v', '[0-9]+(\.[0-9]+)?')->name('muestras.opiniones.show');
     Route::get('/muestras/por-que', [App\Http\Controllers\WhyShowroomController::class, 'index'])->name('muestras.porque');
     Route::get('/muestras/por-que/{v}', [App\Http\Controllers\WhyShowroomController::class, 'show'])->where('v', '[0-9]+(\.[0-9]+)?')->name('muestras.porque.show');
 });
