@@ -20,7 +20,7 @@
 <link rel="preload" href="/fonts/dm-sans/dm-sans-latin-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="{{ asset('css/fonts.css') }}">
 <link rel="stylesheet" href="{{ asset('css/mc-tokens.css') }}">
-<link rel="stylesheet" href="{{ asset('css/ad.css') }}">
+<link rel="stylesheet" href="{{ asset('css/panel.css') }}">
 </head>
 <body class="ad">
 
