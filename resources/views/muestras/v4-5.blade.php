@@ -22,7 +22,7 @@
 @php
   $C = \App\Http\Controllers\ReviewShowroomController::class;
   $asset = fn ($p) => asset($p) . '?v=' . (@filemtime(public_path($p)) ?: 1);
-  // for review the texts are English unless ?lang=es (ReviewShowroomController::EN)
+  // Spanish by default; English renderings for review with ?lang=en (ReviewShowroomController::EN)
   $t = fn ($es, $en_) => $en ? $en_ : $es;
   $looks = $reviews->mapWithKeys(fn ($r) => [$r->id => $C::look($r->img, $r->h ? $r->w / $r->h : .75)]);
   $first = $looks->first();

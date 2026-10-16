@@ -96,9 +96,9 @@ class ReviewShowroomController extends Controller
         20 => 'una compra de 10 en todos los sentidos',
     ];
 
-    /** For review only (2026-10-16: the people judging the new versions do not
-     *  read Spanish). Versions 4.4 and later show these English renderings of
-     *  the reviews unless ?lang=es is asked for; the version bar switches. The
+    /** For review only. The pages are Spanish (the user's rule: review chrome
+     *  in English, the page and its content in Spanish); versions 4.4 and later
+     *  can show these English renderings with ?lang=en; the version bar switches. The
      *  live site and the frozen versions (1–4) never use them. A review that has
      *  no rendering here (a new one) is shown as written. Faithful, not
      *  polished: the customer's tone and slips are kept where they carry meaning. */
@@ -167,8 +167,8 @@ class ReviewShowroomController extends Controller
         $n = ctype_digit($v) ? (int) $v : $v;
         $reviews = $this->reviews();
         $embed   = (int) request()->query('embed', 0);
-        // 4.4 and later are shown in English for review (EN), unless ?lang=es
-        $en = is_string($n) && request()->query('lang') !== 'es';
+        // Spanish by default; 4.4 and later can show English renderings with ?lang=en
+        $en = is_string($n) && request()->query('lang') === 'en';
         if ($en) {
             $reviews = $this->english($reviews);
         }

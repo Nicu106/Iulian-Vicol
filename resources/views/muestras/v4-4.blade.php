@@ -10,7 +10,7 @@
 @php
   $C = \App\Http\Controllers\ReviewShowroomController::class;
   $asset = fn ($p) => asset($p) . '?v=' . (@filemtime(public_path($p)) ?: 1);
-  // for review the texts are English unless ?lang=es (ReviewShowroomController::EN)
+  // Spanish by default; English renderings for review with ?lang=en (ReviewShowroomController::EN)
   $t = fn ($es, $en_) => $en ? $en_ : $es;
 @endphp
 <!DOCTYPE html>

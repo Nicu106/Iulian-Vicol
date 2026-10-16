@@ -8,7 +8,7 @@
   uksort($siblings, fn ($a, $b) => strnatcmp((string) $a, (string) $b));
   $label = fn ($k) => str_contains((string) $k, '.') ? (string) $k : $k . '.0';
   $lang = $lang ?? null;   // 'en' | 'es' on versions that have the English review texts
-  $href = fn ($k) => '/muestras/opiniones/' . $k . ($lang === 'es' && is_string($k) ? '?lang=es' : '');
+  $href = fn ($k) => '/muestras/opiniones/' . $k . ($lang === 'en' && is_string($k) ? '?lang=en' : '');
 @endphp
 <nav class="rvb" id="rvb" aria-label="Review versions" lang="en">
   <a class="rvb__all" href="/muestras/opiniones">All<span class="rvb__lg"> proposals</span></a>
@@ -23,7 +23,7 @@
   @endif
   @if($lang)
     <span class="rvb__lang">
-      <a class="{{ $lang === 'en' ? 'is-on' : '' }}" href="/muestras/opiniones/{{ $current }}" hreflang="en" @if($lang === 'en') aria-current="true" @endif title="Texts in English (for review)">EN</a><a class="{{ $lang === 'es' ? 'is-on' : '' }}" href="/muestras/opiniones/{{ $current }}?lang=es" hreflang="es" @if($lang === 'es') aria-current="true" @endif title="Original Spanish texts">ES</a>
+      <a class="{{ $lang === 'en' ? 'is-on' : '' }}" href="/muestras/opiniones/{{ $current }}?lang=en" hreflang="en" @if($lang === 'en') aria-current="true" @endif title="Texts in English (for review)">EN</a><a class="{{ $lang === 'es' ? 'is-on' : '' }}" href="/muestras/opiniones/{{ $current }}" hreflang="es" @if($lang === 'es') aria-current="true" @endif title="Original Spanish texts">ES</a>
     </span>
   @endif
   <button class="rvb__x" type="button" aria-label="Hide the review bar">&times;</button>
