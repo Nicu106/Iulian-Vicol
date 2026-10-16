@@ -380,8 +380,10 @@
         if (L.type !== 'line') {
           var P = R.layers[i - 1];
           if (P.word) {
-            var tw = L.h ? P.wb / L.h : 1;
-            var f = Math.round(c((t - (tw - 0.3)) / 0.26) * 100) / 100;
+            // ends just before the edge would reach it; never starts before the step does
+            // (the cover's h1 stands low, so its window would otherwise open at rest)
+            var e = (L.h ? P.wb / L.h : 1) - 0.03, b0 = Math.max(0.02, e - 0.26);
+            var f = Math.round(c((t - b0) / Math.max(0.05, e - b0)) * 100) / 100;
             if (f !== P.wl) {
               for (var q = 0; q < P.fade.length; q++) {
                 P.fade[q].style.opacity = f ? String(1 - f) : '';
