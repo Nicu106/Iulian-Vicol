@@ -1009,6 +1009,29 @@
   .pq-on .pq-run:not(.is-set) [data-layer="line"]{ opacity: 0; }
 }
 
+/* 2.5: the reading scenes on a phone (his story, what you don't see, after the delivery, the
+   way in): the photograph holds still at the top of the screen (sticky) and the paper with the
+   words slides up over it, so a picture and its text are one scene instead of a picture, then
+   a text. No script: the scroll itself moves the paper. The paper reaches both edges of the
+   screen from boxes that keep their measure (a box-shadow spread, clipped to the box's own
+   height), so nothing in the markup changes. The photograph comes first; the words keep their
+   order. */
+@media (max-width: 599px) and (max-aspect-ratio: 1 / 1){
+  .pq-me, .pq-paint{ row-gap: 0; }
+  .pq-me__ph{ order: -1; }
+  /* (the doors keep their heading above them: photographed first they followed the walk-round's
+     grey side view almost directly, two near-identical pictures in a row) */
+  .pq-me__ph, .pq-paint__ph{ position: sticky; top: 0; z-index: 0; margin: 0; }
+  .pq-me__ph{ margin-inline: calc(var(--pq-m) * -1); }   /* edge to edge, as before */
+  .pq-after .pq-plate--after, .pq-end .pq-plate--end{ position: sticky; top: 0; z-index: 0; }
+  .pq-paint__h{ margin-bottom: var(--pq-near); }
+  .pq-me__h, .pq-me__t, .pq-paint__t, .pq-after__t, .pq-end__t{
+    position: relative; z-index: 1; margin-top: 0; background: var(--mc-surface);
+    box-shadow: 0 0 0 100vmax var(--mc-surface); clip-path: inset(0 -100vmax); }
+  .pq-me__h, .pq-paint__t, .pq-after__t, .pq-end__t{ padding-top: var(--pq-beat); }
+  .pq-me__t{ padding-top: var(--pq-near); }
+}
+
 /* 2.5: WebKit's text-wrap: balance set the phone's display lines on more lines than they need
    ("Te lo / enseño / antes de que / vengas.", measured in WebKit at 320-430: 3 lines per span
    where 2 or 1 fit; greedy wrapping gives 2 / 1). Safari only (hanging-punctuation is Safari's
