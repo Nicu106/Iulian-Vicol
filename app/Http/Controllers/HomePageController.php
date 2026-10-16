@@ -223,44 +223,10 @@ class HomePageController extends Controller
             ];
         }
 
-        // The reviews, as one continuous row.
-        //
-        // Measured: 24 reviews, 6,900 characters, 7m25s of reading at Spanish
-        // reading speed. The distribution is what decides everything here —
-        // 49% of all the text lives in 5 of the 24 reviews (494 to 901
-        // characters), while 15 of them are under 250. A carousel with a fixed
-        // slide shape and a fixed interval cannot hold both, which is why the
-        // old one clamped the long ones behind "Ver más" and showed a truncated
-        // review as if it were the review.
-        //
-        // So the shape follows the text instead. Each review is a column whose
-        // WIDTH is proportional to how much it has to say, floored so it stays
-        // readable and capped at a 64-character measure. There are no slides to
-        // pack them into any more: the row drifts continuously, so a review is
-        // simply as wide as it needs to be and the row is 9,469px long.
-        //
-        // Inside a column the text takes what it needs and THE PHOTOGRAPH TAKES
-        // WHAT IS LEFT. A short review leaves a tall portrait; a long one leaves
-        // room for a thumbnail beside the name. Every photograph is used either
-        // way — the old mosaic threw 17 of 25 away, under a heading that counts
-        // photographs.
-        //
-        // author_location is not carried: it says Santander for 19 of 25 while
-        // those same quotes say Valencia, Valladolid and Granada.
-        $reviews = Testimonial::where('is_active', true)->orderBy('order_index')
-            ->whereNotNull('image_path')->get()
-            ->filter(fn ($t) => mb_strlen(trim((string) $t->quote)) > 20)   // one review is a comma
-            ->values()
-            ->map(fn ($t) => (object) array_merge(
-                    self::shapeFor(mb_strlen(trim($t->quote)), $this->ratioOf($t->image_path)),
-                [
-                    'name'  => $t->author_name,
-                    'quote' => trim($t->quote),
-                    'len'   => mb_strlen(trim($t->quote)),
-                    'xl'    => mb_strlen(trim($t->quote)) > 480,
-                    'img'   => $t->image_path,
-                ]
-            ));
+        // The reviews: a row of pairs, every active review with a photograph,
+        // newest first (App\Support\ReviewRow; 2026-10-16, 4.6 "La fila" from
+        // the showroom replaced the drifting rail that shapeFor() sized).
+        $reviews = \App\Support\ReviewRow::rows();
 
         return view('pages.inicio', [
             'available' => $available,
