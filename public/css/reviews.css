@@ -59,7 +59,7 @@ html:has(#rv-ov[open]){ overflow:hidden; }
   --gut:var(--mc-gutter-m);
   --side:max(var(--gut), round(down, calc((100cqi - var(--mc-container)) / 2 + var(--gut)), 1px));
   /* how many pairs are in view (--N) and the gap between them, per band */
-  --N:1.22; --gap:var(--gut); --b:8px; --fs:17px; --lh:22px; --L:5; --by:15px;
+  --N:1.22; --gap:var(--gut); --b:4px; --fs:17px; --lh:22px; --L:5; --by:15px;
   --qpx:18px; --Pmin:200px;
   /* what must share a computer's screen with the row: the heading, its
      sentence, the line. On a phone the width decides alone (--Ph off) */
@@ -71,7 +71,8 @@ html:has(#rv-ov[open]){ overflow:hidden; }
   --K:calc(16px + var(--mk) + var(--lh) * var(--L) + 80px);
   --Ph:9999px;
   --P:max(var(--Pmin), min(var(--Pw), var(--Ph)));
-  /* the print: 68% of the pair, a 3:4 window inside a white border */
+  /* the print: 68% of the pair, a 3:4 window inside a white border — a thin one
+     (4/5/6 px, was 8/10/12: 2026-10-16, the client: thinner reads more premium) */
   --pw:round(calc(var(--P) * .68), 2px);
   --fw:calc(var(--pw) - var(--b) * 2);
   --fh:round(calc(var(--fw) * 4 / 3), 2px);
@@ -87,10 +88,10 @@ html:has(#rv-ov[open]){ overflow:hidden; }
 @media (min-width:360px){ .rv__win{ --N:1.3; } }
 @media (min-width:540px){ .rv__win{ --N:1.8; } }
 @media (min-width:768px){ .rv__win{ --gut:var(--mc-gutter-d); } }
-@media (min-width:700px){ .rv__win{ --N:2.3; --gap:24px; --b:10px; --fs:18px; --lh:24px; --by:16px; --qpx:22px; --Pmin:240px;
+@media (min-width:700px){ .rv__win{ --N:2.3; --gap:24px; --b:5px; --fs:18px; --lh:24px; --by:16px; --qpx:22px; --Pmin:240px;
   --Ph:round(down, calc((var(--vh) * 100 - var(--chrome) - var(--K)) * 1.1), 2px); } }
 @media (min-width:900px){ .rv__win{ --N:2.6; } }
-@media (min-width:1000px){ .rv__win{ --N:2.8; --gap:32px; --b:12px; --fs:19px; --lh:25px; --qpx:24px; --Pmin:260px; } }
+@media (min-width:1000px){ .rv__win{ --N:2.8; --gap:32px; --b:6px; --fs:19px; --lh:25px; --qpx:24px; --Pmin:260px; } }
 @media (min-width:1150px){ .rv__win{ --N:3.2; } }
 @media (min-width:1280px){ .rv__win{ --N:3.45; } }
 @media (min-width:1600px){ .rv__win{ --N:3.85; } }
