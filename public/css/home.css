@@ -417,3 +417,58 @@
 .hm-search__ask[hidden]{ display:none; }
 .hm-how__more{ margin:var(--s-5) 0 0; }
 .hm-how__more .mc-link{ display:inline-flex; align-items:center; min-height:44px; font-weight:600; }
+
+/* =========================================================================
+   2026-10-16 · the page's rhythm: white → night (the reviews) → white.
+   The reviews row arrived as a dark band glued to the cars above it and
+   followed by the social band on TikTok's black: two dark sections back to
+   back, ~2000px of night. Now:
+     - the reviews band fades in from the page's white and back out to it
+       (its own ground is untouched; a gradient laid over its edges), so the
+       night is one moment in the page, not a slab;
+     - the social band moves into TikTok's LIGHT mode — white ground, ink
+       type, the number still carrying TikTok's cyan/red split (on white it
+       reads exactly as their mark does), a black "TikTok button" for the one
+       errand, and two very soft halos in the platform's cyan and red so the
+       band is told apart from the white sections around it.
+   ========================================================================= */
+main > .rv{ --fade:96px; --pt:calc(48px + var(--fade)); --pb:calc(48px + var(--fade)); }
+@media (min-width:1000px){ main > .rv{ --fade:160px; --pt:calc(96px + var(--fade)); --pb:calc(72px + var(--fade)); } }
+main > .rv::after{ content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  /* eased (not linear) so the mid-greys of white-over-navy pass quickly */
+  background:
+    linear-gradient(to bottom, var(--mc-surface) calc(var(--fade) * 0.00), color-mix(in oklab, var(--mc-surface) 94%, transparent) calc(var(--fade) * 0.12), color-mix(in oklab, var(--mc-surface) 82%, transparent) calc(var(--fade) * 0.24), color-mix(in oklab, var(--mc-surface) 66%, transparent) calc(var(--fade) * 0.36), color-mix(in oklab, var(--mc-surface) 48%, transparent) calc(var(--fade) * 0.48), color-mix(in oklab, var(--mc-surface) 32%, transparent) calc(var(--fade) * 0.60), color-mix(in oklab, var(--mc-surface) 18%, transparent) calc(var(--fade) * 0.72), color-mix(in oklab, var(--mc-surface) 8%, transparent) calc(var(--fade) * 0.84), transparent calc(var(--fade) * 1.00)),
+    linear-gradient(to top, var(--mc-surface) calc(var(--fade) * 0.00), color-mix(in oklab, var(--mc-surface) 94%, transparent) calc(var(--fade) * 0.12), color-mix(in oklab, var(--mc-surface) 82%, transparent) calc(var(--fade) * 0.24), color-mix(in oklab, var(--mc-surface) 66%, transparent) calc(var(--fade) * 0.36), color-mix(in oklab, var(--mc-surface) 48%, transparent) calc(var(--fade) * 0.48), color-mix(in oklab, var(--mc-surface) 32%, transparent) calc(var(--fade) * 0.60), color-mix(in oklab, var(--mc-surface) 18%, transparent) calc(var(--fade) * 0.72), color-mix(in oklab, var(--mc-surface) 8%, transparent) calc(var(--fade) * 0.84), transparent calc(var(--fade) * 1.00)); }
+
+.hm-soc{
+  color:var(--mc-ink);
+  background:
+    radial-gradient(42% 56% at 4% 46%,  color-mix(in srgb, #25F4EE 12%, transparent), transparent 72%),
+    radial-gradient(40% 50% at 97% 68%, color-mix(in srgb, #FE2C55 10%, transparent), transparent 72%),
+    var(--mc-surface);
+}
+.hm-soc__kick{ color:var(--mc-ink-2); }
+.hm-soc__h{ color:var(--mc-ink); }
+.hm-soc__p{ color:var(--mc-ink-2); }
+.hm-soc__real{ color:#000000; }                         /* TikTok's own ink */
+.hm-soc__ghost--c{ translate:-4px 3px; }               /* on white the cyan needs a hair more offset to read */
+.hm-soc__ghost--r{ translate:4px -3px; }
+@media (max-width:759.98px){ .hm-soc__ghost--c{ translate:-3px 2px; } .hm-soc__ghost--r{ translate:3px -2px; } }
+@media (prefers-reduced-motion:reduce){
+  .js .hm-soc.is-armed:not(.is-in) .hm-soc__ghost--c{ translate:-4px 3px; }
+  .js .hm-soc.is-armed:not(.is-in) .hm-soc__ghost--r{ translate:4px -3px; }
+}
+.hm-soc__unit{ color:var(--mc-ink); }
+.hm-soc__link{ color:var(--mc-ink); border-top-color:var(--mc-rule); }
+.hm-soc__row:last-child .hm-soc__link{ border-bottom-color:var(--mc-rule); }
+.hm-soc__link:hover{ background:color-mix(in srgb, var(--mc-ink) 4%, transparent); }
+.hm-soc__link:focus-visible{ outline-color:var(--mc-ink); }
+.hm-soc__t b{ color:var(--mc-ink); }
+.hm-soc__t em{ color:var(--mc-ink-2); }
+/* the one errand is TikTok's own black button */
+.hm-soc__row--lead .hm-soc__link{ background:#000000; color:#FFFFFF; }
+.hm-soc__row--lead .hm-soc__link:hover{ background:#1F1F1F; }
+.hm-soc__row--lead .hm-soc__t b{ color:#FFFFFF; }
+.hm-soc__row--lead .hm-soc__t em{ color:rgba(255,255,255,.66); }
+.hm-soc__cta{ color:var(--mc-ink); }
+.hm-soc__cta:focus-visible{ outline-color:var(--mc-ink); }

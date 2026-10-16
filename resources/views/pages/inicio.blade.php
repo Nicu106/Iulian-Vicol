@@ -124,8 +124,9 @@
        stating a symmetry that is not true and would waste the only number here
        big enough to make anyone press anything.
 
-       The number is the picture. It is set at display scale on TikTok's own
-       black, and it carries TikTok's own chromatic split — cyan #25F4EE and red
+       The number is the picture. It is set at display scale in TikTok's light
+       mode (white ground, black ink; was their black until 2026-10-16, when the
+       reviews above became the page's dark band), and it carries TikTok's own chromatic split — cyan #25F4EE and red
        #FE2C55, the two halves of their mark — offset and then resolving into
        register as it arrives. That device belongs to the platform being linked
        to; it is not an ornament borrowed from somewhere. Everything else here is
