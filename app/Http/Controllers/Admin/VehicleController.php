@@ -9,27 +9,143 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use App\Models\Vehicle;
+use App\Support\CarPhotos;
+use App\Support\YouTube;
 
 class VehicleController extends BaseController
 {
-    private function warmResizeCache(string $publicUrl): void
+    /* warmResizeCache() stood here: after every upload it fetched /img/240, /480 and
+       /1200 of up to twelve photos over HTTP from inside the request — a PHP-FPM
+       process waiting on another one (the pool has six), for widths that are not
+       on the ladder (App\Support\Img::WIDTHS). VehicleObserver queues
+       WarmVehicleImages with the real ladder on every save that changes the
+       photographs, so the request no longer pays for it. */
+
+    /** One rule set for adding and editing a car. */
+    private function rules(): array
     {
-        // Only warm for local storage URLs (/storage/...)
-        if (!is_string($publicUrl) || strpos($publicUrl, '/storage/') !== 0) {
-            return;
+        return [
+            'brand' => 'required|string|max:100',
+            'model' => 'required|string|max:150',
+            'year' => 'required|integer|min:1900|max:' . (date('Y') + 1),
+            'price' => 'required|numeric|min:0',
+            'original_price' => 'nullable|numeric|min:0',
+            'offer_price' => 'nullable|numeric|min:0',
+            'offer_expires_at' => 'nullable|date|after_or_equal:today',
+            'offer_type' => 'nullable|in:flash_sale,seasonal,clearance,negotiable,promotion',
+            'offer_description' => 'nullable|string|max:500',
+            'status' => 'nullable|in:available,reserved,sold,maintenance,draft,clearance',
+            'featured' => 'nullable|boolean',
+            'priority' => 'nullable|integer|min:0|max:999',
+            'badges' => 'nullable|string',
+            'mileage' => 'nullable|integer|min:0',
+            'fuel' => 'nullable|string|max:50',
+            'transmission' => 'nullable|string|max:50',
+            'engine' => 'nullable|string|max:50',
+            'power' => 'nullable|string|max:50',
+            'drivetrain' => 'nullable|string|max:50',
+            'color' => 'nullable|string|max:50',
+            'vin' => 'nullable|string|max:50',
+            'condition' => 'nullable|string|max:100',
+            'description' => 'nullable|string',
+            'features' => 'nullable|string',
+            // Any form of a YouTube link (watch?v=, youtu.be/, shorts/, embed/, live/,
+            // with or without a timestamp); stored canonical — see App\Support\YouTube.
+            'video_url' => ['nullable', 'string', 'max:500', function ($attribute, $value, $fail) {
+                if (! YouTube::valid($value)) {
+                    $fail('Este enlace no es de un vídeo de YouTube. Cópialo con el botón «Compartir» del vídeo.');
+                }
+            }],
+            'body_type' => 'nullable|string|max:50',
+            'cover_image' => 'nullable|image',
+            'gallery_images.*' => 'nullable|image',
+            'photos_exterior.*' => 'nullable|image',
+            'photos_interior.*' => 'nullable|image',
+            'photos_flaw.*' => 'nullable|image',
+            'photos' => 'nullable|array',
+            'staged' => 'nullable|array',
+            'photo_token' => 'nullable|string|max:64',
+            'location' => 'nullable|string|max:200',
+            'meta_title' => 'nullable|string|max:60',
+            'meta_description' => 'nullable|string|max:160',
+            'tags' => 'nullable|string',
+            'internal_notes' => 'nullable|string',
+            'referred_by' => 'nullable|integer|exists:referrers,id',   // "Vino de parte de"
+        ];
+    }
+
+    /** In Spanish, next to the field: there is no lang/es/validation.php, so the
+     *  defaults came out in English ("The brand field is required."). */
+    private function messages(): array
+    {
+        $photo = 'Uno de los archivos no es una foto (JPG, PNG o WebP).';
+
+        return [
+            'brand.required' => 'Escribe la marca.',
+            'model.required' => 'Escribe el modelo.',
+            'year.required' => 'Pon el año.',
+            'year.integer' => 'El año, con cuatro cifras: 2018.',
+            'year.min' => 'El año, con cuatro cifras: 2018.',
+            'year.max' => 'Ese año todavía no ha llegado.',
+            'price.required' => 'Pon el precio.',
+            'price.numeric' => 'El precio, solo el número: 23700.',
+            'price.min' => 'El precio no puede ser negativo.',
+            'original_price.numeric' => 'Solo el número: 25900.',
+            'offer_price.numeric' => 'Solo el número: 22900.',
+            'mileage.integer' => 'Los kilómetros, solo el número: 137000.',
+            'mileage.min' => 'Los kilómetros no pueden ser negativos.',
+            'priority.integer' => 'Un número entre 0 y 999.',
+            'priority.min' => 'Un número entre 0 y 999.',
+            'priority.max' => 'Un número entre 0 y 999.',
+            'offer_expires_at.date' => 'Esa fecha no es válida.',
+            'offer_expires_at.after_or_equal' => 'Esa fecha ya ha pasado.',
+            'cover_image.image' => 'La portada tiene que ser una foto.',
+            'gallery_images.*.image' => $photo,
+            'photos_exterior.*.image' => $photo,
+            'photos_interior.*.image' => $photo,
+            'photos_flaw.*.image' => $photo,
+            'referred_by.exists' => 'Ese enlace de recomendación ya no existe.',
+            'max' => 'Es demasiado largo.',
+            'in' => 'Elige una de las opciones.',
+        ];
+    }
+
+    /**
+     * "23.700", "23 700 €", "137.000 km" are how a Spaniard writes these on a
+     * phone, and `numeric` refused every one. Thousands separators go; a decimal
+     * comma becomes a point. "23700.00" (what the edit form prints back) is
+     * left alone.
+     */
+    public static function number(string $v): string
+    {
+        $s = preg_replace('/\s|€|eur(?:os)?|kms?/iu', '', trim($v));
+        if (preg_match('/^\d{1,3}(\.\d{3})+(,\d{1,2})?$/', $s)) {
+            return str_replace(['.', ','], ['', '.'], $s);
         }
-        $sizes = [240, 480, 1200];
-        foreach ($sizes as $w) {
-            try {
-                // Use the local HTTP kernel to invoke route handler
-                $resizeUrl = route('img.resize', ['w' => $w]) . '?p=' . urlencode($publicUrl);
-                // Fire-and-forget HTTP request via file_get_contents; ignore body
-                @file_get_contents($resizeUrl);
-            } catch (\Throwable $e) {
-                // Ignore failures (cache will build on first real request)
+        if (preg_match('/^\d{1,3}(,\d{3})+(\.\d{1,2})?$/', $s)) {
+            return str_replace(',', '', $s);
+        }
+        if (preg_match('/^\d+,\d{1,2}$/', $s)) {
+            return str_replace(',', '.', $s);
+        }
+
+        return $s;
+    }
+
+    private function normaliseNumbers(Request $request): void
+    {
+        $fix = [];
+        foreach (['price', 'original_price', 'offer_price', 'mileage', 'year', 'priority'] as $k) {
+            $v = $request->input($k);
+            if (is_string($v) && $v !== '' && ($n = self::number($v)) !== $v) {
+                $fix[$k] = $n;
             }
         }
+        if ($fix) {
+            $request->merge($fix);
+        }
     }
+
     private function readStore(): array
     {
         $storePath = storage_path('app/vehicles.json');
@@ -215,54 +331,9 @@ class VehicleController extends BaseController
         ini_set('max_file_uploads', '1000');
         ini_set('max_input_vars', '100000');
         
-        // DEBUG: Detailed logging for creation
-        \Log::info('STORE DEBUG START', [
-            'has_files' => !empty($request->allFiles()),
-            'all_files_keys' => array_keys($request->allFiles()),
-            'cover_image_hasfile' => $request->hasFile('cover_image'),
-            'cover_image_file' => $request->file('cover_image') ? 'EXISTS' : 'NULL',
-            'request_method' => $request->method(),
-            'content_type' => $request->header('Content-Type'),
-            'php_upload_max' => ini_get('upload_max_filesize'),
-            'php_post_max' => ini_get('post_max_size')
-        ]);
-        
-        $validated = $request->validate([
-            'brand' => 'required|string|max:100',
-            'model' => 'required|string|max:150',
-            'year' => 'required|integer|min:1900|max:' . date('Y'),
-            'price' => 'required|numeric|min:0',
-            'original_price' => 'nullable|numeric|min:0',
-            'offer_price' => 'nullable|numeric|min:0',
-            'offer_expires_at' => 'nullable|date|after_or_equal:today',
-            'offer_type' => 'nullable|in:flash_sale,seasonal,clearance,negotiable,promotion',
-            'offer_description' => 'nullable|string|max:500',
-            'status' => 'nullable|in:available,reserved,sold,maintenance,draft,clearance',
-            'featured' => 'nullable|boolean',
-            'priority' => 'nullable|integer|min:0|max:999',
-            'badges' => 'nullable|string',
-            'mileage' => 'nullable|integer|min:0',
-            'fuel' => 'nullable|string|max:50',
-            'transmission' => 'nullable|string|max:50',
-            'engine' => 'nullable|string|max:50',
-            'power' => 'nullable|string|max:50',
-            'drivetrain' => 'nullable|string|max:50',
-            'color' => 'nullable|string|max:50',
-            'vin' => 'nullable|string|max:50',
-            'condition' => 'nullable|string|max:100',
-            'description' => 'nullable|string',
-            'features' => 'nullable|string',
-            'video_url' => 'nullable|url',
-            'body_type' => 'nullable|string|max:50',
-            'cover_image' => 'nullable|image',
-            'gallery_images.*' => 'nullable|image',
-            'location' => 'nullable|string|max:200',
-            'meta_title' => 'nullable|string|max:60',
-            'meta_description' => 'nullable|string|max:160',
-            'tags' => 'nullable|string',
-            'internal_notes' => 'nullable|string',
-            'referred_by' => 'nullable|integer|exists:referrers,id',   // "Vino de parte de"
-        ]);
+        $this->normaliseNumbers($request);
+        $validated = $request->validate($this->rules(), $this->messages());
+        $validated['video_url'] = YouTube::canonical($validated['video_url'] ?? null);
 
         // Additional validation for offer fields
         if (!empty($validated['offer_price']) && empty($validated['original_price'])) {
@@ -277,81 +348,10 @@ class VehicleController extends BaseController
 
         $slug = Str::slug($validated['brand'] . ' ' . $validated['model'] . ' ' . $validated['year'] . ' ' . Str::random(5));
 
-        // Store uploads in storage/app/public/vehicles/{slug}
-        $coverUrl = null;
-        if ($request->hasFile('cover_image')) {
-            $file = $request->file('cover_image');
-            \Log::info('FILE DEBUG', [
-                'name' => $file->getClientOriginalName(),
-                'size' => $file->getSize(),
-                'mime' => $file->getMimeType(),
-                'is_valid' => $file->isValid(),
-                'error' => $file->getError()
-            ]);
-            
-            try {
-                $path = $file->store('vehicles/' . $slug, 'public');
-                $coverUrl = Storage::url($path);
-                \Log::info('SUCCESS: Cover image uploaded to: ' . $path);
-            } catch (\Exception $e) {
-                \Log::error('FAILED to store image: ' . $e->getMessage());
-                $coverUrl = null;
-            }
-        } else {
-            \Log::info('NO COVER IMAGE - hasFile returned false');
-        }
-
-        $galleryUrls = [];
-
-        // DEBUG: Detailed logging for gallery images
-        \Log::info('STORE - Gallery Images Check', [
-            'has_gallery_files' => $request->hasFile('gallery_images'),
-            'all_files_keys' => array_keys($request->allFiles()),
-            'gallery_files_count' => $request->hasFile('gallery_images') ? count($request->file('gallery_images')) : 0,
-        ]);
-
-        if ($request->hasFile('gallery_images')) {
-            $warmMax = 12; // limit warm-up to first 12 gallery images to avoid timeouts on bulk uploads
-            $warmed = 0;
-            \Log::info('STORE - Processing gallery images', ['count' => count($request->file('gallery_images'))]);
-
-            foreach ($request->file('gallery_images') as $index => $img) {
-                \Log::info('STORE - Gallery image ' . $index, [
-                    'name' => $img->getClientOriginalName(),
-                    'size' => $img->getSize(),
-                    'mime' => $img->getMimeType(),
-                    'is_valid' => $img->isValid(),
-                    'error' => $img->getError()
-                ]);
-
-                try {
-                    $path = $img->store('vehicles/' . $slug, 'public');
-                    $publicUrl = Storage::url($path);
-                    $galleryUrls[] = $publicUrl;
-                    \Log::info('STORE - Gallery image stored successfully', ['path' => $path, 'url' => $publicUrl]);
-                    if ($warmed < $warmMax) {
-                        try { $this->warmResizeCache($publicUrl); } catch (\Throwable $e) { /* ignore warmup failures */ }
-                        $warmed++;
-                    }
-                } catch (\Throwable $e) {
-                    \Log::error('STORE - Gallery image store failed: ' . $e->getMessage());
-                }
-            }
-            \Log::info('STORE - Final gallery URLs', ['count' => count($galleryUrls), 'urls' => $galleryUrls]);
-        } else {
-            \Log::info('STORE - No gallery images to process');
-        }
-
-        /* If he did not upload a separate cover, the first photograph is the
-           cover. Asking a man who has just chosen thirty pictures to choose a
-           thirty-first — usually the same one again — is a question with an
-           obvious answer, and a car saved without one shows a grey box in the
-           catalogue. He can change it afterwards from the grid on the edit
-           page, where all thirty are in front of him. */
-        if (empty($coverUrl) && ! empty($galleryUrls)) {
-            $coverUrl = $galleryUrls[0];
-            try { $this->warmResizeCache($coverUrl); } catch (\Throwable $e) { /* ignore */ }
-        }
+        /* The photographs: the ones the phone already sent one by one (moved here
+           from their draft folder), any that came in this POST, their groups, and
+           the cover — the first exterior photo unless he chose another. */
+        $photos = CarPhotos::apply($request, $slug, []);
 
         // "uno por línea" in the form; older entries were comma-separated
         $featIn = (string) ($validated['features'] ?? '');
@@ -390,8 +390,9 @@ class VehicleController extends BaseController
             'features' => $features,
             'video_url' => $validated['video_url'] ?? null,
             'body_type' => $validated['body_type'] ?? null,
-            'cover_image' => $coverUrl,
-            'gallery_images' => $galleryUrls,
+            'cover_image' => $photos['cover_image'],
+            'gallery_images' => $photos['gallery_images'],
+            'image_tags' => $photos['image_tags'],
             'location' => $validated['location'] ?? null,
             'meta_title' => $validated['meta_title'] ?? null,
             'meta_description' => $validated['meta_description'] ?? null,
@@ -416,7 +417,9 @@ class VehicleController extends BaseController
 
         return redirect()->route('admin.vehicles.index')
             ->with('status', '¡Vehículo añadido con éxito! Slug: ' . $slug)
-            ->with('preview_url', route('vehicle.show', ['slug' => $slug]));
+            ->with('preview_url', route('vehicle.show', ['slug' => $slug]))
+            // the copy of the form this phone kept while he typed is no longer needed
+            ->with('draft_clear', 'mc-car:new');
     }
 
     public function edit(string $slug)
@@ -441,44 +444,9 @@ class VehicleController extends BaseController
         ini_set('max_file_uploads', '1000');
         ini_set('max_input_vars', '100000');
         
-        // Removed excessive debug logging for performance
-        
-        $validated = $request->validate([
-            'brand' => 'required|string|max:100',
-            'model' => 'required|string|max:150',
-            'year' => 'required|integer|min:1900|max:' . date('Y'),
-            'price' => 'required|numeric|min:0',
-            'original_price' => 'nullable|numeric|min:0',
-            'offer_price' => 'nullable|numeric|min:0',
-            'offer_expires_at' => 'nullable|date|after_or_equal:today',
-            'offer_type' => 'nullable|in:flash_sale,seasonal,clearance,negotiable,promotion',
-            'offer_description' => 'nullable|string|max:500',
-            'status' => 'nullable|in:available,reserved,sold,maintenance,draft,clearance',
-            'featured' => 'nullable|boolean',
-            'priority' => 'nullable|integer|min:0|max:999',
-            'badges' => 'nullable|string',
-            'mileage' => 'nullable|integer|min:0',
-            'fuel' => 'nullable|string|max:50',
-            'transmission' => 'nullable|string|max:50',
-            'engine' => 'nullable|string|max:50',
-            'power' => 'nullable|string|max:50',
-            'drivetrain' => 'nullable|string|max:50',
-            'color' => 'nullable|string|max:50',
-            'vin' => 'nullable|string|max:50',
-            'condition' => 'nullable|string|max:100',
-            'description' => 'nullable|string',
-            'features' => 'nullable|string',
-            'video_url' => 'nullable|url',
-            'body_type' => 'nullable|string|max:50',
-            'cover_image' => 'nullable|image',
-            'gallery_images.*' => 'nullable|image',
-            'location' => 'nullable|string|max:200',
-            'meta_title' => 'nullable|string|max:60',
-            'meta_description' => 'nullable|string|max:160',
-            'tags' => 'nullable|string',
-            'internal_notes' => 'nullable|string',
-            'referred_by' => 'nullable|integer|exists:referrers,id',   // "Vino de parte de"
-        ]);
+        $this->normaliseNumbers($request);
+        $validated = $request->validate($this->rules(), $this->messages());
+        $validated['video_url'] = YouTube::canonical($validated['video_url'] ?? null);
 
         // Additional validation for offer fields
         if (!empty($validated['offer_price']) && empty($validated['original_price'])) {
@@ -502,89 +470,8 @@ class VehicleController extends BaseController
         
         $vehicleData = is_array($vehicle) ? $vehicle : $vehicle->toArray();
 
-        // Handle file uploads using Storage
-        if ($request->hasFile('cover_image')) {
-            $file = $request->file('cover_image');
-            // File upload debug removed for performance
-            
-            try {
-                $path = $file->store('vehicles/' . $slug, 'public');
-                $vehicleData['cover_image'] = Storage::url($path);
-                // Always warm cover image only
-                try { $this->warmResizeCache($vehicleData['cover_image']); } catch (\Throwable $e) { /* ignore */ }
-                // Success logging removed for performance
-            } catch (\Exception $e) {
-                \Log::error('FAILED to update image: ' . $e->getMessage());
-            }
-        }
-
-        /* Choose the lead photograph from the ones already uploaded.
-           A car carries a median of 30 photographs and the cover could only be
-           set by uploading a thirty-first — the same picture again, under a
-           different name. Only a URL that is already on this car is accepted,
-           so the field cannot be used to point the cover anywhere else. */
-        if ($request->filled('cover_from')) {
-            $owned = $vehicleData['gallery_images'] ?? [];
-            if (in_array($request->input('cover_from'), $owned, true)) {
-                $vehicleData['cover_image'] = $request->input('cover_from');
-                try { $this->warmResizeCache($vehicleData['cover_image']); } catch (\Throwable $e) { /* ignore */ }
-            }
-        }
-
-        if ($request->hasFile('gallery_images')) {
-            $galleryUrls = $vehicleData['gallery_images'] ?? [];
-            $warmMax = 12; // limit warm-up for gallery
-            $warmed = 0;
-            \Log::info('Processing gallery images', ['count' => count($request->file('gallery_images'))]);
-            
-            foreach ($request->file('gallery_images') as $index => $img) {
-                \Log::info('Gallery image ' . $index, [
-                    'name' => $img->getClientOriginalName(),
-                    'size' => $img->getSize(),
-                    'mime' => $img->getMimeType(),
-                    'is_valid' => $img->isValid(),
-                    'error' => $img->getError()
-                ]);
-                
-                try {
-                    $path = $img->store('vehicles/' . $slug, 'public');
-                    $url = Storage::url($path);
-                    $galleryUrls[] = $url;
-                    \Log::info('Gallery image stored successfully', ['path' => $path, 'url' => $url]);
-                    if ($warmed < $warmMax) { try { $this->warmResizeCache($url); } catch (\Throwable $e) { /* ignore */ } $warmed++; }
-                } catch (\Throwable $e) {
-                    \Log::error('Gallery image store failed: ' . $e->getMessage());
-                }
-            }
-            // Ensure unique and keep insertion order
-            $galleryUrls = array_values(array_unique($galleryUrls));
-            $vehicleData['gallery_images'] = $galleryUrls;
-            \Log::info('Final gallery URLs', ['count' => count($galleryUrls), 'urls' => $galleryUrls]);
-        } else {
-            \Log::info('No gallery images to process');
-        }
-
-        // Handle removal of existing gallery images
-        if ($request->filled('removed_gallery_images')) {
-            $toRemove = json_decode($request->input('removed_gallery_images'), true);
-            if (is_array($toRemove) && !empty($toRemove)) {
-                $current = $vehicleData['gallery_images'] ?? [];
-                $vehicleData['gallery_images'] = array_values(array_filter($current, function ($url) use ($toRemove) {
-                    return !in_array($url, $toRemove, true);
-                }));
-                // the cover went with them: the next photo becomes the cover, never a dead file
-                if (in_array($vehicleData['cover_image'] ?? null, $toRemove, true)) {
-                    $vehicleData['cover_image'] = $vehicleData['gallery_images'][0] ?? null;
-                }
-                // Optionally remove files from storage if they are ours
-                foreach ($toRemove as $url) {
-                    $path = str_replace('/storage/', '', parse_url($url, PHP_URL_PATH));
-                    if ($path) {
-                        try { Storage::disk('public')->delete($path); } catch (\Throwable $e) { /* ignore */ }
-                    }
-                }
-            }
-        }
+        // Photographs: new ones, groups, removals and the cover (App\Support\CarPhotos).
+        $vehicleData = array_merge($vehicleData, CarPhotos::apply($request, $slug, $vehicleData));
 
         // "uno por línea" in the form; older entries were comma-separated
         $featIn = (string) ($validated['features'] ?? '');
@@ -661,10 +548,12 @@ class VehicleController extends BaseController
         // Allow explicit redirect target from form (e.g., back to list)
         if ($request->filled('redirect_to')) {
             return redirect($request->input('redirect_to'))
-                ->with('status', 'Vehículo actualizado con éxito');
+                ->with('status', 'Vehículo actualizado con éxito')
+                ->with('draft_clear', 'mc-car:' . $slug);
         }
 
-        return redirect()->route('admin.vehicles.index')->with('status', 'Vehículo actualizado con éxito');
+        return redirect()->route('admin.vehicles.index')->with('status', 'Vehículo actualizado con éxito')
+            ->with('draft_clear', 'mc-car:' . $slug);
     }
 
     public function destroy(string $slug)

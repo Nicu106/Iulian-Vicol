@@ -30,10 +30,13 @@ class CarPageController extends Controller
         // URL. Anything he has not approved does not exist here.
         $car = Vehicle::where('slug', $slug)->whereIn('status', ['available', 'reserved', 'sold'])->firstOrFail();   // not pending, rejected or draft
 
-        $all = array_values(array_filter(array_merge(
+        // array_unique: when the cover is one of the gallery photos — which is what
+        // the form does when he does not upload a separate one — it was listed twice
+        // and "Todas" counted one photo more than there is.
+        $all = array_values(array_unique(array_filter(array_merge(
             [$car->cover_image],
             is_array($car->gallery_images) ? $car->gallery_images : []
-        )));
+        ))));
 
         $tags = is_array($car->image_tags) ? $car->image_tags : [];
 
@@ -63,6 +66,11 @@ class CarPageController extends Controller
             // the marque's own spelling ("BMW", "Mercedes-Benz"), whatever the data says ("Bmw")
             'brand'  => \App\Support\Marques::for($car->brand)['name'] ?? \Illuminate\Support\Str::title((string) $car->brand),
             'photos' => $photos,
+            // The video, if the link is one YouTube video: id, start, and the still
+            // that exists for it (App\Support\YouTube). Nothing from YouTube is
+            // loaded until it is pressed.
+            'video'  => ($v = \App\Support\YouTube::parse($car->video_url))
+                            ? $v + ['still' => \App\Support\YouTube::still($v['id'])] : null,
             'groups' => self::GROUPS,
             'counts' => $counts,
             // The short list, beside the price: what decides a viewing.

@@ -652,3 +652,41 @@
 @media (max-width:400px){
   .car-tech__row{ grid-template-columns:1fr; row-gap:2px; }
 }
+
+/* ============================================================================
+   THE VIDEO (2026-10-16) — a still and a button; the player only when pressed
+   Same frame as the stage above it (hairline, square), 16:9 because that is
+   what the dealer's phone videos are. The button is the stage arrows' chip at
+   play size: white over any photograph, ink inside. Nothing moves on hover but
+   the ground of the chip. A sold car's still goes grey with its photographs —
+   and so does the player, or one tap would turn the archive back to colour.
+   ========================================================================= */
+.car-grid > .car-video{ margin-top:0; }      /* the grid's own row gap, not that plus a section margin */
+.car-video .car-h2{ margin-bottom:var(--s-4); }   /* the frame does not touch the heading (the equipment list sits 16px under its own) */
+.car-video__frame{
+  position:relative; display:block; aspect-ratio:16 / 9; overflow:hidden;
+  background:rgb(var(--mc-scrim)); border:1px solid var(--mc-hairline);
+  border-radius:var(--mc-r-card);
+}
+.car-video__img{ width:100%; height:100%; object-fit:cover; display:block; }
+.car-video__player{ position:absolute; inset:0; width:100%; height:100%; border:0; display:block; }
+.car-video__play{
+  position:absolute; left:50%; top:50%; translate:-50% -50%;
+  width:72px; height:72px; display:grid; place-items:center;
+  border:1px solid rgba(17,28,46,.14); border-radius:var(--mc-r-pill);
+  background:rgba(255,255,255,.92);
+  transition:background var(--m-quick) var(--e-out);
+}
+.car-video__play::before{
+  content:""; width:0; height:0; margin-left:6px;
+  border-style:solid; border-width:12px 0 12px 20px;
+  border-color:transparent transparent transparent var(--mc-ink);
+}
+.car-video__frame:hover .car-video__play{ background:#FFFFFF; }
+.car-video__frame:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:2px; }
+@media (max-width:768px){
+  .car-video__play{ width:60px; height:60px; }
+  .car-video__play::before{ border-width:10px 0 10px 17px; margin-left:5px; }
+}
+.car--sold .car-video__img,
+.car--sold .car-video__player{ filter:var(--mc-sold-img); }

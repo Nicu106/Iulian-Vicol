@@ -61,6 +61,7 @@
     // many rows, so it stops dictating the height of row 1 — which is what left a
     // ~790px hole under the thumbnails while the panels ran on beside it.
     $mainRows = 1
+      + ($video ? 1 : 0)
       + (mb_strlen(trim(strip_tags((string) $car->description))) >= 40 ? 1 : 0)
       + ((is_array($car->features) && count($car->features)) ? 1 : 0);
   @endphp
@@ -139,6 +140,27 @@
       {{-- The one group that can be empty and still has to say something. --}}
       <p class="car-empty" id="car-empty" hidden></p>
     </section>
+
+    {{-- ---------------- the video ---------------- --}}
+    {{-- After the photographs, because it is the same question — what is it
+         like — answered with the car moving and the engine running. On a phone
+         that puts it before the price, which the dock at the bottom carries
+         anyway; on a desktop it falls under the gallery in the left column, beside
+         the panels. Until it is pressed it is one picture and a button: no iframe,
+         no script and no cookie from YouTube. Without JavaScript the picture is a
+         link to the video on YouTube. --}}
+    @if($video)
+      <section class="car-sec car-video" aria-labelledby="h-video">
+        <h2 class="car-h2" id="h-video">Te lo enseño en vídeo</h2>
+        <a class="car-video__frame" href="{{ \App\Support\YouTube::watch($video) }}" target="_blank" rel="noopener"
+           data-yt="{{ $video['id'] }}" data-embed="{{ \App\Support\YouTube::embed($video) }}"
+           aria-label="Ver el vídeo del {{ $brand }} {{ $car->model }}">
+          <img class="car-video__img" src="{{ $video['still'] }}" data-fallback="{{ \App\Support\YouTube::poster($video['id'], 'hqdefault') }}"
+               alt="" width="1280" height="720" loading="lazy" decoding="async">
+          <span class="car-video__play" aria-hidden="true"></span>
+        </a>
+      </section>
+    @endif
 
     {{-- ---------------- the facts ---------------- --}}
     <aside class="car-side">
@@ -344,6 +366,39 @@
 @endsection
 
 @push('js')
+@if($video)
+<script>
+/* The video: the still, then the player only when pressed (the privacy-enhanced
+   domain, which the CSP's frame-src lists). A still that is missing after all
+   — a 404 or YouTube's 120x90 grey placeholder — steps down to hqdefault. A
+   modified click (new tab) is left to the link. */
+(function () {
+  var a = document.querySelector('.car-video__frame');
+  if (!a) return;
+  var img = a.querySelector('img');
+  var hq = function () { var f = img.getAttribute('data-fallback'); if (f && img.src !== f) img.src = f; };
+  var look = function () { if (img.naturalWidth && img.naturalWidth <= 120) hq(); };
+  img.addEventListener('error', hq);
+  img.addEventListener('load', look);
+  if (img.complete) look();
+  a.addEventListener('click', function (e) {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button > 0) return;
+    e.preventDefault();
+    var box = document.createElement('div'), f = document.createElement('iframe');
+    box.className = 'car-video__frame is-playing';
+    f.className = 'car-video__player';
+    f.src = a.getAttribute('data-embed');
+    f.title = a.getAttribute('aria-label');
+    f.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; fullscreen');
+    f.setAttribute('allowfullscreen', '');
+    f.referrerPolicy = 'strict-origin-when-cross-origin';   // YouTube refuses to play with no referrer
+    box.appendChild(f);
+    a.parentNode.replaceChild(box, a);
+    f.focus();
+  });
+})();
+</script>
+@endif
 <script>
 (function () {
   var b = document.getElementById('car-share');

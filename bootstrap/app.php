@@ -36,5 +36,31 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: ['r/e']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        /* "419 Page Expired" in the panel. The owner fills the car form on his phone,
+           with breaks; a session that ran out under him ended on a white error page
+           with the work gone. The page now keeps the session alive (GET /admin/ping)
+           and keeps a copy of the form on the phone, so this is the last line: back
+           to the form with what he typed if he is still signed in, otherwise to the
+           sign-in, which returns to the form. Public pages keep the standard answer.
+           Laravel has already turned the TokenMismatchException into a 419 here. */
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e, \Illuminate\Http\Request $request) {
+            if ($e->getStatusCode() !== 419 || ! $request->is('admin', 'admin/*')) {
+                return null;
+            }
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'La sesión ha caducado.', 'csrf' => csrf_token(), 'auth' => auth()->check()], 419);
+            }
+            $back = (string) $request->headers->get('referer');
+            $same = $back !== '' && parse_url($back, PHP_URL_HOST) === $request->getHost()
+                && str_starts_with((string) parse_url($back, PHP_URL_PATH), '/admin');
+            $back = $same ? $back : route('admin.vehicles.index');
+            if (auth()->check()) {
+                return redirect()->to($back)->withInput($request->except(['_token', 'password']))
+                    ->with('error', 'No se ha guardado: la página llevaba demasiado tiempo abierta. Lo que escribiste sigue aquí; pulsa «Guardar» otra vez.');
+            }
+            $request->session()->put('url.intended', $back);
+
+            return redirect()->route('login')
+                ->with('status', 'Tu sesión había caducado y no se ha guardado. Entra otra vez y vuelves al formulario: lo que escribiste sigue guardado en este teléfono.');
+        });
     })->create();

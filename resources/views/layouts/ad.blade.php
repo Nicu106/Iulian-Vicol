@@ -142,6 +142,11 @@
 })();
 </script>
 @endif
+@if(session('draft_clear'))
+{{-- A car was saved: the copy of its form this phone kept while he typed
+     (admin/vehicles/_form) has done its job. --}}
+<script>try { localStorage.removeItem(@js(session('draft_clear'))); } catch (e) {}</script>
+@endif
 @stack('js')
 </body>
 </html>

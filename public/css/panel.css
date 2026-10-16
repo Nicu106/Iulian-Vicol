@@ -974,3 +974,225 @@ a.ad-ref__who:hover { color: var(--mc-blue); text-decoration: underline; text-un
 .ad-trail__i--whatsapp span, .ad-trail__i--email span,
 .ad-trail__i--form_sell span, .ad-trail__i--form_refer span { color: var(--mc-ink); font-weight: 600; }
 @media (max-width: 559.98px) { .ad-trail__i { grid-template-columns: minmax(0, 1fr); gap: 0; } }
+
+/* ============================================================================
+   THE CAR FORM, 2026-10-16 — built for the phone in the yard
+   ---------------------------------------------------------------------------
+   The owner adds cars from his phone, standing next to the car. Six panels in
+   the order of the work (photos, the car, price, details, video, publish), the
+   button always under the thumb, and the photographs in the three groups the
+   car page's tabs show.
+
+   The groups' tones come from the brandbook and stay SMALL — a square on the
+   heading and on each photo's chip, a tinted chip ground — never a coloured
+   block: Exterior the brand blue, Interior the ink, Desperfectos the red step
+   (--mc-accent, which is what this system uses for "something is wrong").
+   No new hue.
+   ========================================================================= */
+.ad-car-form {
+  /* one column that is the page's width and no wider: an implicit auto column
+     grew to the photos' min-content and the form ran 21px off a 320 screen */
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-5);
+  --cat-exterior: var(--mc-blue);      --cat-exterior-t: var(--mc-blue-tint);
+  --cat-interior: var(--mc-ink-2);     --cat-interior-t: var(--mc-band);
+  --cat-flaw:     var(--mc-accent);    --cat-flaw-t:     var(--mc-accent-tint);
+  --cat-none:     var(--mc-control);   --cat-none-t:     var(--mc-surface);
+}
+.ad-box { background: var(--mc-surface); border: 1px solid var(--mc-hairline); border-radius: var(--mc-r-card); padding: var(--s-6); }
+@media (max-width: 999.98px) { .ad-box { padding: var(--s-5) var(--s-3); } .ad-car-form { gap: var(--s-4); } }
+
+/* big targets: the shared .ad-in measured 39px tall here */
+.ad-car-form .ad-in { min-height: var(--mc-tap-pref); }
+.ad-car-form textarea.ad-in { min-height: 9rem; }
+
+/* the price is the one number read from arm's length */
+.ad-in--big { font-size: var(--t-h3); font-weight: 600; }
+
+/* a fold inside a panel */
+.ad-more--in { margin-top: var(--s-5); }
+.ad-more--in > summary { padding-inline: var(--s-4); }
+.ad-more--in > .ad-more__in { padding: 0 var(--s-4) var(--s-4); }
+
+/* ---- the groups ---------------------------------------------------------- */
+.ad-cat { margin-top: var(--s-5); padding-top: var(--s-5); border-top: 1px solid var(--mc-hairline); }
+.ad-cat[hidden] { display: none; }
+.ad-cat.is-over { outline: 2px dashed var(--mc-blue); outline-offset: 4px; }
+.ad-cat__h { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s-1) var(--s-3); margin-bottom: var(--s-3); }
+.ad-cat__t { margin: 0; display: inline-flex; align-items: center; gap: var(--s-2); font-size: var(--t-ui); font-weight: 700; color: var(--mc-ink); }
+.ad-cat__n { font-weight: 500; color: var(--mc-ink-3); font-variant-numeric: tabular-nums; }
+.ad-cat__p { flex-basis: 100%; margin: 0; font-size: var(--t-label); color: var(--mc-ink-3); }   /* always its own line: "Interior" fitted beside its hint and the three groups stopped matching */
+
+/* the group's mark: a square, like everything else here */
+.ad-dot { flex: 0 0 auto; width: 10px; height: 10px; background: var(--cat-none); }
+.ad-dot[data-tag="exterior"] { background: var(--cat-exterior); }
+.ad-dot[data-tag="interior"] { background: var(--cat-interior); }
+.ad-dot[data-tag="flaw"]     { background: var(--cat-flaw); }
+.ad-dot[data-tag="none"]     { background: none; box-shadow: inset 0 0 0 1.5px var(--cat-none); }
+
+/* ---- the photographs in a group ------------------------------------------
+   Two to a row on a phone (162px at 390): the chip under each has to hold
+   "Desperfectos" at 16px, because a <select> under 16px makes iOS zoom the
+   page when it is tapped. */
+.ad-car-form .ad-shots { grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); align-items: start; gap: var(--s-2); margin: 0 0 var(--s-3); }
+.ad-car-form .ad-shots:not(:has(> li)) { display: none; }
+@media (max-width: 999.98px) { .ad-car-form .ad-shots { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.ad-car-form .ad-shot { display: flex; flex-direction: column; min-width: 0; background: var(--mc-surface); border: 1px solid var(--mc-hairline); }
+.ad-shot__pic { position: relative; display: block; cursor: pointer; }
+.ad-shot__cv { position: absolute; width: 1px; height: 1px; opacity: 0; margin: 0; }
+.ad-shot__pic:has(.ad-shot__cv:focus-visible) { outline: 3px solid var(--mc-focus); outline-offset: -3px; }
+.ad-car-form .ad-shot__i { border: 0; }
+.ad-shot__i.is-blank { background: var(--mc-band); }
+
+/* "Portada": the chosen one, or — none chosen — the one the server will take */
+.ad-car-form .ad-shot__flag { display: none; }
+.ad-shot__cv:checked ~ .ad-shot__flag,
+.ad-shot.is-auto .ad-shot__flag { display: block; }
+.ad-shot.is-gone .ad-shot__flag { display: none; }
+
+/* remove: a 44px corner to press, a 28px chip to see; × to remove, ↺ to keep it after all */
+.ad-car-form .ad-shot__x {
+  top: 0; right: 0; width: var(--mc-tap); height: var(--mc-tap); padding: 0;
+  border: 0; border-radius: 0; background: none;
+}
+.ad-car-form .ad-shot__x:hover { background: none; }
+.ad-car-form .ad-shot__x input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.ad-car-form .ad-shot__x:has(input:focus-visible),
+.ad-car-form .ad-shot__x:focus-visible { outline: 3px solid var(--mc-focus); outline-offset: -3px; }
+.ad-shot__xi {
+  position: absolute; top: var(--s-2); right: var(--s-2); width: 28px; height: 28px;
+  display: grid; place-items: center; pointer-events: none;
+  background: rgba(255, 255, 255, .92); color: var(--mc-accent);
+  font-size: var(--t-h3); font-weight: 400; line-height: 1;
+}
+.ad-car-form .ad-shot__x:hover .ad-shot__xi { background: var(--mc-accent-tint); }
+.ad-shot__xi::before { content: "×"; }
+.ad-shot.is-gone .ad-shot__xi::before { content: "↺"; color: var(--mc-ink); }
+
+/* the group, under the photo: a native picker behind a chip */
+.ad-tag { position: relative; display: block; border-top: 1px solid var(--mc-hairline); }
+.ad-tag::before {
+  content: ""; position: absolute; left: var(--s-2); top: 50%; translate: 0 -50%;
+  width: 8px; height: 8px; pointer-events: none;
+  background: none; box-shadow: inset 0 0 0 1.5px var(--cat-none);
+}
+.ad-tag::after {
+  content: ""; position: absolute; right: var(--s-2); top: 50%; translate: 0 -70%; rotate: 45deg;
+  width: 6px; height: 6px; pointer-events: none;
+  border-right: 1.5px solid var(--mc-ink-2); border-bottom: 1.5px solid var(--mc-ink-2);
+}
+.ad-tag__s {
+  appearance: none; -webkit-appearance: none; display: block; width: 100%;
+  min-height: var(--mc-tap); margin: 0; padding: 0 1.25rem 0 calc(var(--s-2) + 8px + 6px);
+  border: 0; border-radius: 0; background: var(--cat-none-t);
+  font-family: inherit; font-size: var(--t-ui); font-weight: 500; letter-spacing: -.01em; color: var(--mc-ink);
+  cursor: pointer; text-overflow: ellipsis;
+}
+.ad-tag__s:focus-visible { outline: 3px solid var(--mc-focus); outline-offset: -3px; }
+.ad-tag[data-tag="exterior"]::before { background: var(--cat-exterior); box-shadow: none; }
+.ad-tag[data-tag="interior"]::before { background: var(--cat-interior); box-shadow: none; }
+.ad-tag[data-tag="flaw"]::before     { background: var(--cat-flaw); box-shadow: none; }
+.ad-tag[data-tag="exterior"] .ad-tag__s { background: var(--cat-exterior-t); }
+.ad-tag[data-tag="interior"] .ad-tag__s { background: var(--cat-interior-t); }
+.ad-tag[data-tag="flaw"]     .ad-tag__s { background: var(--cat-flaw-t); }
+/* 320: a two-column tile is 127px; 13px fits "Sin clasificar" in it. Only the
+   first-generation SE is this narrow, and it is the one that zooms. */
+@media (max-width: 359.98px) { .ad-tag__s { font-size: var(--t-label); } }
+
+/* a photo on its way up: dimmed, a line that fills, a word for the state */
+.ad-shot__st { display: none; }
+.ad-shot.is-new:not([data-state="done"]) .ad-shot__i { opacity: .55; }
+.ad-shot.is-new:not([data-state="done"]) .ad-shot__st {
+  position: absolute; left: 0; right: 0; top: 0; display: block;
+  aspect-ratio: var(--ar-card); pointer-events: none;
+}
+.ad-shot__bar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255, 255, 255, .7); }
+.ad-shot__bar i { display: block; height: 100%; width: 0; background: var(--mc-blue); transition: width var(--m-quick) linear; }
+.ad-shot__say {
+  position: absolute; left: 0; bottom: 3px; padding: 2px var(--s-2);
+  background: rgba(var(--mc-scrim), .72); color: #FFFFFF;
+  font-size: var(--t-label); line-height: 1.4; font-variant-numeric: tabular-nums;
+}
+.ad-shot[data-state="wait"] .ad-shot__bar i { background: var(--mc-ink-3); }
+/* failed: the reason in words, under the photo, as long as it needs to be */
+.ad-shot[data-state="bad"] { border-color: var(--mc-accent); }
+.ad-shot.is-new[data-state="bad"] .ad-shot__st { position: static; aspect-ratio: auto; order: 1; }
+.ad-shot[data-state="bad"] .ad-shot__bar { display: none; }
+.ad-shot[data-state="bad"] .ad-shot__say {
+  position: static; display: block; padding: var(--s-2) var(--s-3);
+  background: var(--mc-accent-tint); color: var(--mc-accent); line-height: 1.35;
+}
+.ad-shot[data-state="bad"] .ad-tag { order: 2; }
+
+/* add: the input's own label, a full-width target */
+.ad-up {
+  position: relative; display: flex; align-items: center; justify-content: center; gap: var(--s-2);
+  min-height: var(--mc-tap-pref); padding: var(--s-2) var(--s-4);
+  border: 1px dashed var(--mc-rule); background: var(--mc-surface);
+  font-size: var(--t-ui); font-weight: 600; color: var(--mc-ink); text-align: center; cursor: pointer;
+  transition: border-color var(--m-quick) var(--e-out), background var(--m-quick) var(--e-out);
+}
+.ad-up::before { content: "+"; font-size: 1.35em; font-weight: 400; line-height: 1; color: var(--mc-ink-3); }
+.ad-up:hover { border-color: var(--mc-blue); background: var(--mc-bg); }
+.ad-up:focus-within { outline: 3px solid var(--mc-focus); outline-offset: 2px; }
+.ad-up input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; }
+
+/* ---- the video ----------------------------------------------------------- */
+.ad-yt { display: grid; grid-template-columns: 10rem minmax(0, 1fr); gap: var(--s-3) var(--s-4); align-items: start; margin-top: var(--s-4); }
+.ad-yt[hidden] { display: none; }
+.ad-yt__i { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; background: var(--mc-band); }
+.ad-yt__t { display: grid; justify-items: start; gap: 0; min-width: 0; }
+.ad-yt__p { margin: 0 0 var(--s-1); font-size: var(--t-small); color: var(--mc-ink-2); }
+.ad-yt__miss { display: none; margin: 0 0 var(--s-1); font-size: var(--t-small); color: var(--mc-accent); }
+.ad-yt.is-missing .ad-yt__p { display: none; }
+.ad-yt.is-missing .ad-yt__miss { display: block; }
+.ad-yt__a, .ad-yt__x {
+  display: inline-flex; align-items: center; min-height: var(--mc-tap); padding: 0;
+  background: none; border: 0; font-family: inherit; font-size: var(--t-small); font-weight: 600;
+  color: var(--mc-blue); text-decoration: underline; text-underline-offset: .2em; cursor: pointer;
+}
+.ad-yt__x { color: var(--mc-ink-2); }
+
+/* ---- what the page has to say: a restored copy, a session that ran out ---- */
+.ad-note-box {
+  padding: var(--s-3) var(--s-4); border-left: 3px solid var(--mc-ink-3); background: var(--mc-surface);
+  font-size: var(--t-small); line-height: 1.5; color: var(--mc-ink);
+}
+.ad-note-box[hidden] { display: none; }
+.ad-note-box.is-bad { border-left-color: var(--mc-accent); background: var(--mc-accent-tint); }
+.ad-note-box.is-ok { border-left-color: var(--mc-ok); background: var(--mc-ok-tint); }
+.ad-note-box__a {
+  display: inline-flex; align-items: center; min-height: var(--mc-tap); padding: 0; margin-right: var(--s-1);
+  background: none; border: 0; font: inherit; font-weight: 700; color: inherit;
+  text-decoration: underline; text-underline-offset: .2em; cursor: pointer;
+}
+
+/* ---- the button, under the thumb ------------------------------------------
+   Sticky inside the form: it rides the bottom of the screen while the form is
+   on it and comes to rest after the last panel. On a phone it sits on top of
+   the 54px tab bar, not under it. */
+.ad-save {
+  position: sticky; bottom: 0; z-index: 30;
+  display: grid; gap: var(--s-1);
+  padding: var(--s-3) var(--s-4);
+  background: var(--mc-surface); border: 1px solid var(--mc-rule);
+}
+@media (max-width: 999.98px) {
+  .ad-save { bottom: calc(55px + env(safe-area-inset-bottom)); padding: var(--s-2) var(--s-3); }
+}
+.ad-save__row { display: flex; gap: var(--s-2); }
+@media (max-width: 359.98px) { .ad-save__row { flex-wrap: wrap; } .ad-save__row .ad-btn--q { flex: 1 1 auto; } }
+.ad-save__go { flex: 1 1 auto; }
+@media (min-width: 1000px) { .ad-save__go { flex: 0 1 auto; min-width: 16rem; } }
+.ad-save__go[aria-busy="true"] { cursor: progress; }
+.ad-save__go:disabled { background: var(--mc-ink-2); }
+.ad-save__msg { margin: 0; font-size: var(--t-label); line-height: 1.4; color: var(--mc-ink-2); }
+.ad-save__msg:empty { display: none; }
+.ad-save__msg.is-busy { color: var(--mc-ink); }
+.ad-save__msg.is-bad { color: var(--mc-accent); }
+.ad-save__act {
+  display: inline-flex; align-items: center; min-height: var(--mc-tap); padding: 0 var(--s-1);
+  background: none; border: 0; font: inherit; font-weight: 700; color: var(--mc-ink);
+  text-decoration: underline; text-underline-offset: .2em; cursor: pointer;
+}

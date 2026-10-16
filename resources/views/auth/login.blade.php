@@ -4,6 +4,9 @@
 
     @if($errors->any())
       <p class="ad-flash ad-flash--bad" style="margin:0">{{ $errors->first() }}</p>
+    @elseif(session('status'))
+      {{-- e.g. the car form's session ran out (bootstrap/app.php, the 419 answer) --}}
+      <p class="ad-flash" style="margin:0">{{ session('status') }}</p>
     @endif
 
     <label class="ad-field">

@@ -104,6 +104,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/admin/inquiries/{inquiry}', [App\Http\Controllers\Admin\InquiryAdminController::class, 'destroy'])->name('admin.inquiries.destroy');
     Route::get('/admin/contacts', [App\Http\Controllers\Admin\ContactMessageController::class, 'index'])->name('admin.contacts.index');
     Route::delete('/admin/contacts/{contact}', [App\Http\Controllers\Admin\ContactMessageController::class, 'destroy'])->name('admin.contacts.destroy');
+    // The car form's photos, sent one at a time, and its heartbeat (see VehiclePhotoController).
+    // Not under /admin/vehicles/: {slug} there would take "fotos" for a car.
+    Route::post('/admin/fotos', [App\Http\Controllers\Admin\VehiclePhotoController::class, 'store'])->name('admin.photos.store');
+    Route::delete('/admin/fotos', [App\Http\Controllers\Admin\VehiclePhotoController::class, 'destroy'])->name('admin.photos.destroy');
+    Route::get('/admin/ping', [App\Http\Controllers\Admin\VehiclePhotoController::class, 'ping'])->name('admin.ping');
     Route::get('/admin/vehicles/create', [VehicleController::class, 'create'])->name('admin.vehicles.create');
     // fixed paths before /{slug}, or {slug} swallows them
     Route::post('/admin/vehicles/bulk-action', [VehicleController::class, 'bulkAction'])->name('admin.vehicles.bulk-action');
