@@ -998,6 +998,13 @@
   .pq-on .pq-run--b [data-layer="foot"]{ top: auto; height: calc(var(--line) + 2 * var(--cap) + var(--s-6)); }
   .pq-on .pq-run--b [data-layer="foot"] figure{ height: 100%; }
   .pq-on .pq-run--b .pq-slide .pq-word{ position: absolute; left: 0; right: 0; bottom: var(--line); margin: 0; }
+  /* the exterior was shot on the same wall: its top melts into the stage's wall instead of
+     standing on it as an edge (its wall is a little lighter, its joints fall elsewhere).
+     Three stops, the middle at 20%, in px (DESIGN-GUIDE §4). Only the exterior: under the
+     side view lies the interior, which a soft top would let through */
+  .pq-on .pq-run--b .pq-slide--ext .pq-f{
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, rgba(0, 0, 0, .2) 24px, #000 56px);
+            mask-image: linear-gradient(to bottom, transparent 0, rgba(0, 0, 0, .2) 24px, #000 56px); }
   /* from the foot: the picture, its word, a beat, the closing line's place (it is uncovered
      last, so "Te lo enseño… / Para que sepas…" read as one sentence pair), then the heading */
   /* --endh: the closing line's own height (pq25.js measures it; two lines until then) */
