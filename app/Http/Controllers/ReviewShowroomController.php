@@ -56,6 +56,8 @@ class ReviewShowroomController extends Controller
      *  2026-10-16 and dropped: the client chose 4.4.)
      *  Keys "1".."4" are ints to PHP; "4.4" etc. stay strings. */
     public const VARIANTS = [
+        '4.6' => ['Pares · La fila', 'A row of many',
+                  'Pares as a carousel row, in the brand\'s colours: every review a white print and a navy card (with a whisper of its photo\'s hue), several in view at once (1.3 on a phone, 2.3 on a tablet, 3.5 on a laptop, 4.3 on a large screen), the next one always showing, all of them newest first. A fixed structure: the arrows by the heading, every pair one size, every quote five lines, the whole review and photo in an overlay. Tap the card behind to bring it forward.', 'Pares'],
         '4.4' => ['Pares · Editorial', 'Editorial',
                   'A magazine page: the first sentence of each review as a large serif pull-quote (Fraunces) that wraps around the photo, the whole review on tap. Thin rules, brand ink and one red accent.', 'Pares'],
         4     => ['Pares', 'Pares 4.0',

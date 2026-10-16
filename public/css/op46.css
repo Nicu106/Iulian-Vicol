@@ -1,0 +1,282 @@
+/* ============================================================
+   /muestras/opiniones/4.6 — Pares in a row, in colour (2026-10-16).
+   Its own file: nothing here touches 4.0, 4.4, 4.5 or the file 1–3 share.
+
+   - every review a Pares pair: a white print and a card in the review's own
+     colour under its corner, on the diagonal;
+   - all of them in one row, more than fits, newest first: 1.3 pairs on a
+     phone, 2.3 on a tablet, 3.45 on a laptop, 4.3 on a large screen. The
+     count is fixed per band of widths (--N) and the pair's width solved from
+     it, so the next pair always shows by a clear margin and never by a sliver;
+   - a fixed structure: every size below comes from the screen, never from a
+     review, and is rounded to whole (mostly even) pixels: the heading, the
+     arrows, the pairs and the row stand still whatever is in them;
+   - the brand's colours only (mc-tokens): the --mc-deep ground lit by
+     --mc-navy, navy cards, white prints and white words, one accent
+     (--mc-blue-light, on navy only: the quotation mark and the underline of
+     "Ver más"). Depth is value, not hue: deep < navy < white, and real shadows
+     in the scrim's channels. A card's own colour is the navy with 12 % of its
+     photograph's hue (the view's $look): a whisper, never a field;
+   - the ground stands still too, with the stitching of a quilted seat
+     (diamonds in dashes, in --mc-navy-line) fading off the top.
+   ============================================================ */
+
+/* 2.4's figures face: the page's own DM Sans file with its whole weight axis,
+   for the light hung quotation mark (fonts.css stops at 400) */
+@font-face{ font-family:"PQ Figures"; src:url(/fonts/dm-sans/dm-sans-latin-normal.woff2) format("woff2");
+  font-weight:100 1000; font-style:normal; font-display:swap; unicode-range:U+201C; }
+
+:root{ --vh:1vh; --vis-top:0px; }
+@supports (height:1svh){ :root{ --vh:1svh; } }
+body.op46{ background:var(--mc-deep); color:#FFFFFF; }
+.ms-sr{ position:absolute !important; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden;
+  clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; border:0; }
+html:has(dialog[open]){ overflow:hidden; }
+
+/* ---- the section and its ground ------------------------------------------ */
+/* clip, not hidden: a hidden box can still be scrolled by focus(), and focusing
+   the row (its padding holds the shadows below the section's foot) slid the
+   whole section up by 21 px at 320x568 */
+.o6{ position:relative; isolation:isolate; overflow:hidden; overflow:clip; container:o6 / inline-size; color:#FFFFFF;
+  --pt:48px; --pb:48px;
+  padding-block:var(--pt) var(--pb);
+  background:
+    radial-gradient(80% 62% at 86% -12%, var(--mc-navy), color-mix(in srgb, var(--mc-navy) 40%, transparent) 50%, transparent 78%),
+    radial-gradient(70% 46% at 8% 108%, color-mix(in srgb, var(--mc-navy) 55%, transparent), transparent 78%),
+    var(--mc-deep); }
+/* the page is this section: its ground reaches the foot of the screen, and on
+   a computer the block stands in the middle of it */
+html:not(.is-embed) .o6{ min-height:calc(var(--vh) * 100); box-sizing:border-box; }
+@media (min-width:1000px){ html:not(.is-embed) .o6{ display:flex; flex-direction:column; justify-content:center; } }
+@media (min-width:1000px){ .o6{ --pt:64px; --pb:64px; } }
+@media (min-width:1000px) and (max-height:860px){ .o6{ --pt:44px; --pb:40px; } }
+@media (max-width:699px) and (max-height:640px){ .o6{ --pt:24px; --pb:24px; } }
+/* a quilted seat's stitching: a lattice of diamonds in short dashes, light,
+   strongest at the top right and gone before the row */
+.o6::before{ content:""; position:absolute; inset:0; z-index:-1; pointer-events:none; background:var(--mc-navy-line); opacity:.9;
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='34'%3E%3Cpath d='M17 .5L33.5 17L17 33.5L.5 17Z' fill='none' stroke='black' stroke-width='1' stroke-dasharray='3 3'/%3E%3Ccircle cx='17' cy='17' r='.9'/%3E%3C/svg%3E"),
+    radial-gradient(110% 80% at 92% 0%, #000 0%, rgba(0,0,0,.45) 34%, transparent 64%);
+  -webkit-mask-size:34px 34px, 100% 100%; -webkit-mask-composite:source-in;
+          mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='34'%3E%3Cpath d='M17 .5L33.5 17L17 33.5L.5 17Z' fill='none' stroke='black' stroke-width='1' stroke-dasharray='3 3'/%3E%3Ccircle cx='17' cy='17' r='.9'/%3E%3C/svg%3E"),
+    radial-gradient(110% 80% at 92% 0%, #000 0%, rgba(0,0,0,.45) 34%, transparent 64%);
+          mask-size:34px 34px, 100% 100%; mask-composite:intersect; }
+
+/* ---- the window: the whole screen up to 1920, then centred ----------------
+   Every measure is declared here and resolved in the children, where 100cqi
+   is this window's width (a scrollbar never counts, unlike 100vw). */
+.o6__win{ container:o6win / inline-size; position:relative; width:min(100cqi, 1920px);
+  margin-left:round(down, calc((100cqi - min(100cqi, 1920px)) / 2), 1px);
+  /* the text edge is the site's spine (.cat-wrap: --mc-container with the
+     16/32 gutters; 152 px at 1440), so this section lines up with every other */
+  --gut:var(--mc-gutter-m);
+  --side:max(var(--gut), round(down, calc((100cqi - var(--mc-container)) / 2 + var(--gut)), 1px));
+  /* how many pairs are in view (--N) and the gap between them, per band */
+  --N:1.22; --gap:var(--gut); --b:8px; --fs:17px; --lh:22px; --L:5; --by:15px;
+  --qpx:18px; --Pmin:200px; --chrome:calc(var(--pt) + var(--pb) + var(--d2) * 2 + 54px);
+  --d2:round(clamp(1.875rem, 9.2cqi, 4.5rem), 1px);
+  /* the pair: its width from the band's count, or from the screen's height
+     when that is the tighter of the two; never under --Pmin */
+  --V:calc(100cqi - var(--side));
+  --Pw:round(down, calc(var(--V) / var(--N) - var(--gap)), 2px);
+  --K:calc(16px + var(--mk) + var(--lh) * var(--L) + 80px);
+  --Ph:round(down, calc((var(--vh) * 100 - var(--chrome) - var(--K)) * 1.1), 2px);
+  --P:max(var(--Pmin), min(var(--Pw), var(--Ph)));
+  /* the print: 68% of the pair, a 3:4 window inside a white border */
+  --pw:round(calc(var(--P) * .68), 2px);
+  --fw:calc(var(--pw) - var(--b) * 2);
+  --fh:round(calc(var(--fw) * 4 / 3), 2px);
+  --ph:calc(var(--fh) + var(--b) * 2);
+  /* the words' card: 88% of the pair, under the print's lower 30% */
+  --qw:round(calc(var(--P) * .88), 2px);
+  --ov:round(calc(var(--ph) * .3), 1px);
+  --mk:round(calc(var(--fs) * 1.1), 1px);
+  --qh:calc(var(--ov) + var(--K));
+  --H:calc(var(--ph) - var(--ov) + var(--qh));
+  /* room for the swap's lift and the shadows, inside the scroller */
+  --lt:40px; --lb:84px; }
+@media (min-width:360px){ .o6__win{ --N:1.3; } }
+@media (min-width:540px){ .o6__win{ --N:1.8; } }
+@media (min-width:768px){ .o6__win{ --gut:var(--mc-gutter-d); } }
+@media (min-width:700px){ .o6__win{ --N:2.3; --gap:24px; --b:10px; --fs:18px; --lh:24px; --by:16px; --qpx:22px; --Pmin:240px;
+  --chrome:calc(var(--pt) + var(--pb) + var(--d2) + 64px); } }
+@media (min-width:900px){ .o6__win{ --N:2.6; } }
+@media (min-width:1000px){ .o6__win{ --N:2.8; --gap:32px; --b:12px; --fs:19px; --lh:25px; --qpx:24px; --Pmin:260px; } }
+@media (min-width:1150px){ .o6__win{ --N:3.2; } }
+@media (min-width:1280px){ .o6__win{ --N:3.45; } }
+@media (min-width:1600px){ .o6__win{ --N:3.85; } }
+@media (min-width:1800px){ .o6__win{ --N:4.3; } }
+@media (max-width:699px) and (max-height:640px){ .o6__win{ --L:4; } }
+
+/* ---- the heading's row: the heading left, the arrows right, on its foot ---- */
+.o6__head{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px;
+  padding-inline:var(--side); margin-bottom:24px; }
+@media (min-width:700px){ .o6__head{ margin-bottom:32px; } }
+.o6__h{ margin:0; min-width:0; flex:1 1 auto; font-size:var(--d2); font-weight:700; line-height:1; letter-spacing:-.045em;
+  color:#FFFFFF; text-wrap:balance; }
+.o6__nav{ display:flex; gap:12px; flex:0 0 auto; }
+/* the car page's round control on a dark ground: a white chevron, a ring at
+   55% white */
+.o6__arw{ position:relative; display:grid; place-items:center; width:52px; height:52px; padding:0; margin:0; cursor:pointer;
+  border:1px solid rgba(255,255,255,.55); border-radius:var(--mc-r-pill); background:rgba(255,255,255,.06); color:#FFFFFF;
+  -webkit-tap-highlight-color:transparent;
+  transition:background var(--m-quick) var(--e-out), border-color var(--m-quick) var(--e-out), color var(--m-quick) var(--e-out), transform var(--m-instant) var(--e-out); }
+.o6__arw::before{ content:""; width:11px; height:11px; border-right:2px solid currentColor; border-bottom:2px solid currentColor; }
+/* the chevron's optical centre: its point, not its box */
+.o6__arw--prev::before{ rotate:135deg; translate:2.5px 0; }
+.o6__arw--next::before{ rotate:-45deg; translate:-2.5px 0; }
+@media (hover:hover){ .o6__arw:hover{ background:#FFFFFF; border-color:#FFFFFF; color:var(--mc-deep); } }
+.o6__arw:active{ transform:scale(.94); }
+.o6__arw:focus-visible{ outline:3px solid #FFFFFF; outline-offset:4px; }
+.o6__arw[aria-disabled="true"]{ background:transparent; border-color:rgba(255,255,255,.2); color:rgba(255,255,255,.35); cursor:default; transform:none; }
+@media (hover:hover){ .o6__arw[aria-disabled="true"]:hover{ background:transparent; border-color:rgba(255,255,255,.2); color:rgba(255,255,255,.35); } }
+html:not(.js) .o6__nav{ display:none; }
+
+/* ---- the row: native scrolling, pair by pair ------------------------------ */
+/* its height is set, not found: the document streams, and a row that grew pair
+   by pair as they arrived (or a line that arrived after them) shifted the block */
+.o6__row{ position:relative; box-sizing:border-box; height:calc(var(--lt) + var(--H) + var(--lb));
+  overflow-x:auto; overflow-y:hidden; scroll-snap-type:x mandatory; scroll-padding-inline:var(--side);
+  overscroll-behavior-x:contain; scrollbar-width:none; -webkit-overflow-scrolling:touch;
+  padding-block:var(--lt) var(--lb); margin-block:calc(var(--lt) * -1) calc(var(--lb) * -1);
+  /* the edges: three stops, the middle at 20% (DESIGN-GUIDE §4). On the left
+     only where the margin is wider than the gap, so the first pair never fades */
+  --fl:clamp(0px, calc(var(--side) - var(--gap)), 96px); --fr:clamp(28px, calc(var(--side) * .6), 72px);
+  -webkit-mask-image:linear-gradient(90deg, transparent 0, rgba(0,0,0,.2) calc(var(--fl) * .5), #000 var(--fl), #000 calc(100% - var(--fr)), rgba(0,0,0,.2) calc(100% - var(--fr) * .5), transparent 100%);
+          mask-image:linear-gradient(90deg, transparent 0, rgba(0,0,0,.2) calc(var(--fl) * .5), #000 var(--fl), #000 calc(100% - var(--fr)), rgba(0,0,0,.2) calc(100% - var(--fr) * .5), transparent 100%); }
+.o6__row::-webkit-scrollbar{ display:none; }
+/* scrolled on the compositor at every pixel ratio: Chrome does not composite a
+   see-through scroller at 1x by itself, and repainted the row on every frame
+   (p95 83-100 ms at 1440 before this) */
+.js .o6__row{ will-change:scroll-position; }
+.o6__row:focus-visible{ outline:none; }
+.o6__row:focus-visible + .o6__bar{ outline:2px solid #FFFFFF; outline-offset:6px; }
+.o6__row.is-drag{ scroll-snap-type:none; cursor:grabbing; -webkit-user-select:none; user-select:none; }
+.o6__list{ display:flex; width:max-content; gap:var(--gap); margin:0; padding:0 var(--side); list-style:none; }
+/* Safari: flex longhands and no shrinking in a scrolling row (CLAUDE.md §6) */
+.o6__i{ position:relative; flex-grow:0; flex-shrink:0; flex-basis:var(--P); width:var(--P); height:var(--H); scroll-snap-align:start; }
+.o6__pair{ position:absolute; inset:0; }
+
+/* ---- the print: a white border round a 3:4 window ------------------------- */
+.o6__ph{ position:absolute; z-index:3; left:0; top:0; width:var(--pw); height:var(--ph); box-sizing:border-box; padding:var(--b); margin:0;
+  border:0; border-radius:0; background:#FFFFFF; cursor:zoom-in; -webkit-tap-highlight-color:transparent;
+  box-shadow:0 1px 1px rgba(var(--mc-scrim), .3), 0 8px 16px -6px rgba(var(--mc-scrim), .45), 0 28px 56px -18px rgba(var(--mc-scrim), .75); }
+.o6__mat{ display:block; position:relative; width:var(--fw); height:var(--fh); overflow:hidden; background:var(--mc-navy); }
+.o6__img{ position:absolute; left:0; top:0; display:block; width:100%; height:100%; max-width:none; object-fit:cover; }
+/* whole: at even margins (--mg on the long side, the rest shared equally),
+   over a blurred copy of itself under a navy veil. The picture's box is
+   its own shape to the even pixel, so cover trims under a pixel and no sliver
+   of the mat ever shows along an edge */
+.o6__mat--tall, .o6__mat--wide{ --mg:round(calc(var(--fw) * .08), 1px);
+  background:
+    linear-gradient(color-mix(in srgb, var(--mc-navy) 72%, transparent), color-mix(in srgb, var(--mc-navy) 72%, transparent)),
+    var(--amb, none) center / cover no-repeat, var(--mc-navy); }
+.o6__mat--tall .o6__img{ --ih:calc(var(--fh) - var(--mg) * 2); --iw:round(calc(var(--ih) * var(--r)), 2px);
+  width:var(--iw); height:var(--ih); left:calc((var(--fw) - var(--iw)) / 2); top:var(--mg); }
+.o6__mat--wide .o6__img{ --iw:calc(var(--fw) - var(--mg) * 2); --ih:round(calc(var(--iw) / var(--r)), 2px);
+  width:var(--iw); height:var(--ih); left:var(--mg); top:calc((var(--fh) - var(--ih)) / 2); }
+.o6__mat--tall .o6__img, .o6__mat--wide .o6__img{ box-shadow:0 2px 3px rgba(var(--mc-scrim), .3), 0 10px 24px -8px rgba(var(--mc-scrim), .55); }
+.o6__ph:focus-visible{ outline:3px solid #FFFFFF; outline-offset:4px; }
+
+/* ---- the words: a navy card (its photo's whisper in it), under the print's corner */
+.o6__q{ position:absolute; z-index:2; right:0; top:calc(var(--ph) - var(--ov)); width:var(--qw); height:var(--qh);
+  background:var(--card, var(--mc-navy)); color:#FFFFFF;
+  box-shadow:0 1px 1px rgba(var(--mc-scrim), .3), 0 8px 16px -6px rgba(var(--mc-scrim), .45), 0 28px 56px -18px rgba(var(--mc-scrim), .7); }
+/* the card takes the pointer (its words are on top, so a tap anywhere on it
+   lands on the card); this button under them is the keyboard's way in, and
+   its ring is the card's */
+.o6__q{ cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.o6__swap{ position:absolute; inset:0; z-index:0; width:100%; height:100%; padding:0; margin:0; border:0; background:none; cursor:pointer;
+  -webkit-tap-highlight-color:transparent; }
+.o6__swap:focus-visible{ outline:3px solid #FFFFFF; outline-offset:4px; }
+.o6__body{ position:absolute; inset:0; z-index:2; box-sizing:border-box;
+  display:flex; flex-direction:column; padding:calc(var(--ov) + 16px) var(--qpx) 6px; }
+/* 2.4's hung quotation mark, in the one accent */
+.o6__body::before{ content:"\201C"; content:"\201C" / ""; display:block; flex:0 0 auto; height:var(--mk); margin:0 0 0 -.06em;
+  font-family:"PQ Figures", var(--f-ui); font-weight:300; font-size:calc(var(--fs) * 2.6); line-height:.86; letter-spacing:0; color:var(--mc-blue-light); }
+/* the quote: 2.4's pull voice (500, tight). Its box is always --L lines of
+   the base size; a short review is set larger to fill it (5/3 in three lines,
+   5/4 in four: the script picks the largest that holds it whole), a long one
+   is clamped and "Ver más" shows */
+.o6__qt{ --s:1; --ql:var(--L); flex:0 0 auto; margin:0; height:calc(var(--lh) * var(--L)); font-size:calc(var(--fs) * var(--s));
+  line-height:calc(var(--lh) * var(--s)); font-weight:500; letter-spacing:-.02em; color:#FFFFFF;
+  overflow:hidden; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:var(--ql);
+  text-wrap:pretty; overflow-wrap:break-word; }
+.o6__qt.is-free{ display:block; height:auto; -webkit-line-clamp:none; }
+.o6__by{ flex:0 0 auto; margin:8px 0 0; height:22px; font-size:var(--by); font-weight:600; line-height:22px; color:var(--mc-on-navy-2);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+/* 2.4's "Ver más": 600, a 1 px underline at .3em; its line is always kept */
+.o6__more{ position:relative; z-index:3; flex:0 0 auto; align-self:flex-start; height:44px; margin:0 0 0 -10px; padding:0 10px;
+  border:0; background:none; cursor:pointer; visibility:hidden;
+  font:600 var(--t-ui)/44px var(--f-ui); color:#FFFFFF; text-decoration:underline; text-decoration-thickness:1px;
+  text-underline-offset:.3em; text-decoration-color:var(--mc-blue-light); -webkit-tap-highlight-color:transparent; }
+.o6__i.is-long .o6__more{ visibility:visible; }
+@media (hover:hover){ .o6__more:hover{ text-decoration-thickness:2px; } }
+.o6__more:focus-visible{ outline:2px solid #FFFFFF; outline-offset:-4px; }
+.o6__all{ display:none; }
+
+/* ---- which card is in front ----------------------------------------------
+   at rest both lie flat (no transform: whole pixels, sharp text); the print
+   behind is shaded, the words behind are not (they must read at rest) */
+.o6__ph::before{ content:""; position:absolute; inset:0; z-index:2; pointer-events:none; background:rgba(var(--mc-scrim), .38);
+  opacity:0; transition:opacity 320ms var(--e-inout); }
+/* while a pair swaps, its veil is a layer of its own: a flat colour, so it
+   fades on the compositor instead of repainting the photograph each frame */
+.is-swap .o6__ph::before{ will-change:opacity; }
+.is-q .o6__q{ z-index:3; }
+.is-q .o6__ph{ z-index:2; cursor:pointer; }
+.is-q .o6__ph::before{ opacity:1; }
+@media (prefers-reduced-motion:reduce){ .o6__ph::before{ transition:none !important; } }
+
+/* ---- where the row is: a hairline, the part in view lit ------------------ */
+.o6__win{ padding-bottom:30px; }
+.o6__bar{ position:absolute; left:var(--side); right:var(--side); bottom:0; height:2px; background:var(--mc-navy-line); overflow:hidden; }
+.o6__bar i{ position:absolute; left:0; top:0; height:100%; width:var(--tw, 25%); background:#FFFFFF;
+  transform:translate3d(var(--tx, 0px), 0, 0); }
+html:not(.js) .o6__bar{ visibility:hidden; }
+
+/* ---- without script: the row scrolls natively; each card holds the whole
+   review, scrolling inside it --------------------------------------------- */
+html:not(.js) .o6__swap, html:not(.js) .o6__body{ display:none; }
+html:not(.js) .o6__all{ display:block; position:absolute; inset:0; overflow-y:auto; box-sizing:border-box;
+  padding:calc(var(--ov) + 16px) var(--qpx) 16px; font-size:var(--fs); line-height:var(--lh); }
+html:not(.js) .o6__all p{ margin:0 0 .6em; }
+html:not(.js) .o6__ph{ cursor:default; }
+
+/* ---- the whole review, with the whole photograph ------------------------- */
+.o6-ov{ position:fixed; inset:0; width:100%; height:100%; max-width:none; max-height:none; margin:0; padding:0;
+  border:0; background:transparent; overflow:hidden; color:#FFFFFF; }
+.is-embed .o6-ov{ inset:var(--vis-top) 0 auto 0; height:calc(var(--vh) * 100); }
+.o6-ov::backdrop{ background:transparent; }
+.o6-ov__dim{ position:absolute; inset:0; background:rgba(var(--mc-scrim), .88); }
+/* a phone: one sheet in the review's navy, the photograph on top, whole, the
+   words under it; the sheet scrolls, the × stays */
+.o6-ov__panel{ position:absolute; inset:0; overflow-y:auto; overscroll-behavior:contain; background:var(--card, var(--mc-navy));
+  padding:calc(72px + env(safe-area-inset-top, 0px)) 20px calc(40px + env(safe-area-inset-bottom, 0px)); box-sizing:border-box; }
+.o6-ov__ph{ position:relative; margin:0 auto; width:var(--ow, 100%); height:var(--oh, auto); background:#FFFFFF; padding:8px; box-sizing:content-box;
+  box-shadow:0 1px 1px rgba(var(--mc-scrim), .3), 0 18px 40px -16px rgba(var(--mc-scrim), .7); }
+.o6-ov__ph img{ display:block; width:100%; height:100%; object-fit:cover; background-size:cover; background-position:center; }
+.o6-ov__txt{ max-width:36rem; margin:28px auto 0; }
+.o6-ov__txt::before{ content:"\201C"; content:"\201C" / ""; display:block; height:30px; margin:0 0 4px -.06em;
+  font-family:"PQ Figures", var(--f-ui); font-weight:300; font-size:68px; line-height:.86; color:var(--mc-blue-light); }
+.o6-ov__q{ margin:0; font-size:clamp(1.0625rem, 4.4vw, 1.1875rem); line-height:1.55; font-weight:400; color:#FFFFFF; }
+.o6-ov__q p{ margin:0; } .o6-ov__q p + p{ margin-top:.75em; }
+.o6-ov__by{ margin:16px 0 0; font-size:var(--t-ui); font-weight:600; line-height:1.4; color:var(--mc-on-navy-2); }
+.o6-x{ position:absolute; top:calc(16px + env(safe-area-inset-top, 0px)); right:16px; z-index:2;
+  width:44px; height:44px; padding:0; cursor:pointer; line-height:1; font-family:var(--f-ui);
+  border:1px solid rgba(255,255,255,.5); border-radius:var(--mc-r-pill); background:rgba(var(--mc-scrim), .28); color:#FFFFFF; font-size:24px; }
+@media (hover:hover){ .o6-x:hover{ background:#FFFFFF; color:var(--mc-deep); border-color:#FFFFFF; } }
+.o6-x:focus-visible{ outline:3px solid #FFFFFF; outline-offset:2px; }
+/* a computer: a panel over the dimmed page, the photograph left at its own
+   shape, the words right, scrolling inside if long */
+@media (min-width:860px){
+  .o6-ov__panel{ inset:auto; left:50%; top:50%; translate:-50% -50%; width:min(1080px, calc(100% - 96px)); height:var(--ph2, auto);
+    max-height:calc(100% - 96px); overflow:hidden; display:flex; gap:40px; padding:32px;
+    box-shadow:0 30px 80px -20px rgba(var(--mc-scrim), .8); }
+  .is-embed .o6-ov__panel{ max-height:calc(var(--vh) * 100 - 96px); }
+  .o6-ov__ph{ flex:0 0 auto; margin:0; }
+  .o6-ov__txt{ flex:1 1 auto; min-width:0; margin:0; max-width:none; overflow-y:auto; overscroll-behavior:contain; padding:8px 12px 8px 0;
+    scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.35) transparent; }
+  .o6-ov__q{ font-size:1.1875rem; }
+  .o6-x{ top:24px; right:24px; }
+}
+@media print{ .o6__nav, .o6__bar, .o6::before{ display:none; } }
