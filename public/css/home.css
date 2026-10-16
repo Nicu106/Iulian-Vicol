@@ -133,12 +133,19 @@
 .hm-marque__n{ font-size:var(--t-label); color:var(--mc-ink-3); font-variant-numeric:tabular-nums; }
 .hm-marque.is-empty .hm-marque__logo{ background:var(--mc-control); }
 .hm-marque.is-empty .hm-marque__name{ color:var(--mc-ink-2); }
+/* Phone (2026-10-16): three over two, CENTRED, no grid lines. The 3+2 grid with
+   hairlines left an empty sixth cell, ragged borders and "Mercedes-/Benz" on two
+   lines. Space separates the marques here, as it does everywhere else on the
+   phone; each name stays on one line (its size steps down with the width). */
 @media (max-width:760px){
-  .hm-marques__list{ grid-template-columns:repeat(3,minmax(0,1fr)); }
-  .hm-marques__list > li:nth-child(4){ border-left:0; }
-  .hm-marques__list > li:nth-child(n+4){ border-top:1px solid var(--mc-hairline); }
-  .hm-marque{ padding:var(--s-5) var(--s-3); }
-  .hm-marque__logo{ width:48px; height:48px; }
+  .hm-marques__list{ display:flex; flex-wrap:wrap; justify-content:center; row-gap:var(--s-2);
+    padding-block:var(--s-5); }
+  .hm-marques__list > li{ flex:0 0 33.333%; min-width:0; }
+  .hm-marques__list > li + li{ border-left:0; }
+  .hm-marque{ gap:var(--s-2); padding:var(--s-3) 0; }
+  .hm-marque__logo{ width:44px; height:44px; }
+  .hm-marque__name{ white-space:nowrap; font-size:clamp(.75rem, 3.55vw, 1rem); letter-spacing:-.01em; }
+  .hm-marque__n{ white-space:nowrap; font-size:clamp(.75rem, 3.3vw, .875rem); }
 }
 
 /* ---- sections ----------------------------------------------------------- */

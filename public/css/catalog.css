@@ -703,6 +703,26 @@
   .mc-head .mc-nav__i{ padding-inline:var(--s-1); min-width:0; }
 }
 @media (max-width:374.98px){ .mc-head .mc-nav__i{ padding-inline:2px; font-size:15px; } }
+/* 2026-10-16: "Por qué nosotros" is on the phone too (the client could not find
+   the page). The logo already goes home, so on a phone "Inicio" steps out, and the
+   link is set "Nosotros" there: "Por qué nosotros" in full left 6px between links
+   at 390 (measured). Four links on one line from 360 up; below 360 it scrolls. */
+/* where the row is short of room, "Por qué " steps out and the rest reads "Nosotros" */
+@media (max-width:430px), (min-width:900px) and (max-width:1079.98px){
+  .mc-head .mc-nav__pre{ display:none; }
+  .mc-head .mc-nav__rest{ display:inline-block; }
+  .mc-head .mc-nav__rest::first-letter{ text-transform:uppercase; }
+}
+@media (max-width:430px){
+  .mc-head .mc-nav__i--home{ display:none; }
+  .mc-head .mc-nav__i{ padding-inline:0; font-size:15px; }
+}
+@media (max-width:374.98px){ .mc-head .mc-nav__i{ font-size:14px; } }
+@media (max-width:359.98px){
+  .mc-head .mc-nav{ justify-content:flex-start; gap:var(--s-3);
+    -webkit-mask-image:linear-gradient(90deg, #000 calc(100% - 2rem), transparent);
+            mask-image:linear-gradient(90deg, #000 calc(100% - 2rem), transparent); }
+}
 
 /* ---- the page never moves sideways (2026-10-06) ------------------------------
    The client: swiping a photograph left or right moved the whole page. Nothing on
