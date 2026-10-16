@@ -419,33 +419,25 @@
 .hm-how__more .mc-link{ display:inline-flex; align-items:center; min-height:44px; font-weight:600; }
 
 /* =========================================================================
-   2026-10-16 · the page's rhythm: white → night (the reviews) → white.
-   The reviews row arrived as a dark band glued to the cars above it and
-   followed by the social band on TikTok's black: two dark sections back to
-   back, ~2000px of night. Now:
-     - the reviews band fades in from the page's white and back out to it
-       (its own ground is untouched; a gradient laid over its edges), so the
-       night is one moment in the page, not a slab;
-     - the social band moves into TikTok's LIGHT mode — white ground, ink
-       type, the number still carrying TikTok's cyan/red split (on white it
-       reads exactly as their mark does), a black "TikTok button" for the one
-       errand, and two very soft halos in the platform's cyan and red so the
-       band is told apart from the white sections around it.
+   2026-10-16 · the page's rhythm: white → the one dark band (the reviews)
+   → white. The reviews row arrived as a dark band glued to the cars above it
+   and followed by the social band on TikTok's black: two dark sections back
+   to back, ~2000px of night, against the system's "one full-bleed band per
+   page". Now the reviews are the band, with clean cuts and the section air on
+   both sides, and the social section moves into TikTok's LIGHT mode — white
+   ground, ink type, the number still carrying TikTok's cyan/red split (on
+   white it reads exactly as their mark does) and a black "TikTok button" for
+   the one errand. No gradients: every edge is a cut.
    ========================================================================= */
-main > .rv{ --fade:96px; --pt:calc(48px + var(--fade)); --pb:calc(48px + var(--fade)); }
-@media (min-width:1000px){ main > .rv{ --fade:160px; --pt:calc(96px + var(--fade)); --pb:calc(72px + var(--fade)); } }
-main > .rv::after{ content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
-  /* eased (not linear) so the mid-greys of white-over-navy pass quickly */
-  background:
-    linear-gradient(to bottom, var(--mc-surface) calc(var(--fade) * 0.00), color-mix(in oklab, var(--mc-surface) 94%, transparent) calc(var(--fade) * 0.12), color-mix(in oklab, var(--mc-surface) 82%, transparent) calc(var(--fade) * 0.24), color-mix(in oklab, var(--mc-surface) 66%, transparent) calc(var(--fade) * 0.36), color-mix(in oklab, var(--mc-surface) 48%, transparent) calc(var(--fade) * 0.48), color-mix(in oklab, var(--mc-surface) 32%, transparent) calc(var(--fade) * 0.60), color-mix(in oklab, var(--mc-surface) 18%, transparent) calc(var(--fade) * 0.72), color-mix(in oklab, var(--mc-surface) 8%, transparent) calc(var(--fade) * 0.84), transparent calc(var(--fade) * 1.00)),
-    linear-gradient(to top, var(--mc-surface) calc(var(--fade) * 0.00), color-mix(in oklab, var(--mc-surface) 94%, transparent) calc(var(--fade) * 0.12), color-mix(in oklab, var(--mc-surface) 82%, transparent) calc(var(--fade) * 0.24), color-mix(in oklab, var(--mc-surface) 66%, transparent) calc(var(--fade) * 0.36), color-mix(in oklab, var(--mc-surface) 48%, transparent) calc(var(--fade) * 0.48), color-mix(in oklab, var(--mc-surface) 32%, transparent) calc(var(--fade) * 0.60), color-mix(in oklab, var(--mc-surface) 18%, transparent) calc(var(--fade) * 0.72), color-mix(in oklab, var(--mc-surface) 8%, transparent) calc(var(--fade) * 0.84), transparent calc(var(--fade) * 1.00)); }
+/* the cars above end with the section air before the band: the band was glued
+   to the cards' feet (10px). A cut, not a fade — gradients as decoration are on
+   the forbidden list (DESIGN-GUIDE), and every edge on this site is a cut. */
+.hm-sec:has(+ .rv){ padding-bottom:var(--s-8); }
+@media (min-width:1000px){ .hm-sec:has(+ .rv){ padding-bottom:var(--s-9); } }
 
 .hm-soc{
   color:var(--mc-ink);
-  background:
-    radial-gradient(42% 56% at 4% 46%,  color-mix(in srgb, #25F4EE 12%, transparent), transparent 72%),
-    radial-gradient(40% 50% at 97% 68%, color-mix(in srgb, #FE2C55 10%, transparent), transparent 72%),
-    var(--mc-surface);
+  background:var(--mc-surface);
 }
 .hm-soc__kick{ color:var(--mc-ink-2); }
 .hm-soc__h{ color:var(--mc-ink); }
