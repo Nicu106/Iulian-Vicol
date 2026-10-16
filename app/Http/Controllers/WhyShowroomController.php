@@ -21,6 +21,7 @@ class WhyShowroomController extends Controller
 {
     /** version => [name, what changed, approach] — newest of each approach first in the list */
     public const VARIANTS = [
+        '2.5' => ['Gallery 2.5', 'The live page (2.4 + phone polish) with a custom phone design; the desktop is unchanged.', 'Gallery'],
         '2.4' => ['Gallery 2.4', 'Iteration of 2.3: "Preparados." on the left, "Para que disfrutes de algo especial." on the Mercedes.', 'Gallery'],
         '2.3' => ['Gallery 2.3', 'Iteration of 2.2: another opening photograph, the black Mercedes C-Class.', 'Gallery'],
         '2.2' => ['Gallery 2.2', 'Iteration of 2.1: a new, brilliant opening photograph.', 'Gallery'],
