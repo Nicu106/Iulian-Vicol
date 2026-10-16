@@ -254,3 +254,21 @@
   var t = 0;
   addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { qs.forEach(fit); }, 150); });
 })();
+
+/* 2.4.1: the letters' row on a phone is a swipe: only the letters wholly in view show their
+   words (the walk-round's old rule), so the next one's photograph peeks in, never its words
+   cut in half. Without the script, or with reduced motion, every word stays. */
+(function () {
+  var row = document.querySelector('.pq-say__l');
+  if (!row || !document.documentElement.classList.contains('pq-on')) return;
+  var qs = [].slice.call(row.children), t = 0;
+  function mark() {
+    t = 0;
+    var g = row.getBoundingClientRect();
+    qs.forEach(function (q) { var r = q.getBoundingClientRect();
+      q.classList.toggle('is-cur', r.left >= g.left - 2 && r.right <= g.right + 2); });
+  }
+  mark(); row.classList.add('is-live');
+  row.addEventListener('scroll', function () { if (!t) t = requestAnimationFrame(mark); }, { passive: true });
+  addEventListener('resize', mark);
+})();
