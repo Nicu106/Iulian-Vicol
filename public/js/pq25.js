@@ -76,6 +76,7 @@
   // no drift on a picture that holds still on purpose: a sticky one (it would swim
   // while pinned) and the cover
   var cover = document.querySelector('.pq-plate--cover');
+  var stageMq = matchMedia('(max-width: 599px) and (max-aspect-ratio: 1/1)');
   function still() {
     items.forEach(function (it) {
       var f = it.frame.closest('figure');
@@ -83,7 +84,9 @@
         // 2.2: the cover never drifts — its picture is placed to the pixel under its words
         (!!cover && cover.contains(it.el)) ||
         // 2.3 (2): a whole car never drifts: it has no overhang to move in (pq23.css)
-        it.frame.classList.contains('pq-whole');
+        it.frame.classList.contains('pq-whole') ||
+        // 2.5: inside a phone stage the scroll itself moves the picture (the stage engine below)
+        (stageMq.matches && !!it.el.closest('.pq-run'));
     });
   }
   still(); addEventListener('resize', function () { still(); kick(); });
@@ -271,4 +274,147 @@
   mark(); row.classList.add('is-live');
   row.addEventListener('scroll', function () { if (!t) t = requestAnimationFrame(mark); }, { passive: true });
   addEventListener('resize', mark);
+})();
+
+/* 2.5: the phone's stages. A [data-stage] run is a tall track; its .pq-run__v holds the screen
+   still (CSS sticky) while the scroll uncovers its layers one by one: layer k's box rises from
+   below the screen's foot to its place and its contents are moved back by the same amount, so
+   the picture itself stands still and only its top edge travels (transform only, two numbers
+   per layer per frame, written only when they change). Scrubbed, so linear in the scroll: a
+   step's last 18% is a hold, so each word stands a moment before the next picture comes. A
+   "foot" layer (a detail rising where the car stands) fades the word it replaces, lifting it
+   0.15em, before its own edge arrives there. data-stage: each step's length in screens (the
+   CSS height of the run is the same sum). Upright phones only, motion allowed (pq-on). */
+(function () {
+  var root = document.documentElement;
+  if (!root.classList.contains('pq-on') || !window.matchMedia) return;
+  var mq = matchMedia('(max-width: 599px) and (max-aspect-ratio: 1/1)');
+  var HOLD = 0.18;
+  var main = document.querySelector('main.pq');
+  var runs = [].slice.call(document.querySelectorAll('[data-stage]')).map(function (run) {
+    var w = run.getAttribute('data-stage').trim().split(/\s+/).map(Number);
+    var lead = +(run.getAttribute('data-lead') || 0);
+    var layers = [].slice.call(run.querySelectorAll('[data-layer]')).map(function (el) {
+      var type = el.getAttribute('data-layer');
+      var inner = type === 'base' ? [el.querySelector('.pq-plate__in') || el.firstElementChild] : [].slice.call(el.children);
+      var word = type === 'line' ? null : el.querySelector('.pq-w, .pq-word');
+      // what fades: a heading's lines (the cover's h1 keeps its own rise animation, which
+      // would hold an opacity set on it), or the word itself
+      var fade = word ? (word.children.length ? [].slice.call(word.children) : [word]) : [];
+      return { el: el, type: type, inner: inner, word: el.hasAttribute('data-keep') ? null : word, fade: fade, h: 0, wb: 0, last: null, wl: null };
+    });
+    var pre = run.classList.contains('pq-run--a') ? run.querySelector('.pq-cover > .pq-plate') : null;
+    return { run: run, view: run.querySelector('.pq-run__v'), w: w, lead: lead, layers: layers, pre: pre, preLast: null, on: false, D: 0, vh: 0, imgs: [].slice.call(run.querySelectorAll('img')), warm: false };
+  });
+  if (!runs.length) return;
+
+  var head = 100;
+  function measure() {
+    var s = main && getComputedStyle(main).getPropertyValue('--pq-head');
+    head = parseFloat(s) || 100;
+    runs.forEach(function (R) {
+      R.vh = R.view.offsetHeight;
+      R.D = R.run.offsetHeight - R.vh;
+      R.layers.forEach(function (L) {
+        L.h = L.el.offsetHeight; L.last = null; L.wl = null;
+        // how high its word stands above the screen's foot (its transforms cancel out, but the
+        // cover's is lifted by the header's height until the stage pins)
+        // (layout offsets: transforms never change them; every word's offset parent ends on the
+        // screen's foot: a plate's inner box, or a detail's own layer)
+        if (L.word) { var op = L.word.offsetParent; L.wb = op ? op.offsetHeight - L.word.offsetTop - L.word.offsetHeight : 0; }
+      });
+      R.preLast = null;
+      // stage B: the heading stands on the closing line's real height (it may wrap)
+      var end = R.run.querySelector('[data-layer="line"]');
+      if (end) R.run.style.setProperty('--endh', end.offsetHeight + 'px');
+      R.run.classList.add('is-set');
+    });
+  }
+  function clear() {
+    runs.forEach(function (R) {
+      R.layers.forEach(function (L) {
+        L.el.style.transform = ''; L.inner.forEach(function (i) { i.style.transform = ''; });
+        L.fade.forEach(function (w) { w.style.opacity = ''; w.style.transform = ''; });
+        L.last = null; L.wl = null;
+      });
+      if (R.pre) R.pre.style.transform = '';
+      R.preLast = null;
+      R.run.style.removeProperty('--endh');
+    });
+  }
+  // every picture of a stage is fetched and decoded before the stage reaches the screen,
+  // so no layer ever rises empty (they are lazy, and a covered layer is never "in view")
+  function warm(R) {
+    if (R.warm) return; R.warm = true;
+    R.imgs.forEach(function (im) {
+      if (im.loading === 'lazy') im.loading = 'eager';
+      if (im.decode) im.decode().catch(function () {});
+    });
+  }
+  var c = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
+  function frame() {
+    raf = 0;
+    if (!mq.matches) return;
+    runs.forEach(function (R) {
+      if (!R.on) return;
+      var x = -R.run.getBoundingClientRect().top;      // px of the run scrolled past the screen's top
+      if (R.pre) {
+        var p = Math.round(Math.max(Math.min(x, 0), -head));
+        if (p !== R.preLast) { R.pre.style.transform = 'translate3d(0,' + p + 'px,0)'; R.preLast = p; }
+      }
+      var sum = R.lead; R.w.forEach(function (v) { sum += v; });
+      var k = R.D / sum, a = R.lead * k;
+      for (var i = 1; i < R.layers.length; i++) {
+        var L = R.layers[i], len = (R.w[i - 1] || 0) * k;
+        var t = len > 0 ? c((x - a) / (len * (1 - HOLD))) : 1;
+        a += len;
+        var off = Math.round(L.h * (1 - t) * 2) / 2;
+        if (off !== L.last) {
+          var o = 'translate3d(0,' + off + 'px,0)', n = 'translate3d(0,' + (-off) + 'px,0)';
+          L.el.style.transform = o;
+          for (var j = 0; j < L.inner.length; j++) L.inner[j].style.transform = n;
+          L.last = off;
+        }
+        // the word this layer replaces lifts and fades as the new picture rises, and is gone
+        // just before the new edge reaches it (tw: the share of the travel at which it would)
+        if (L.type !== 'line') {
+          var P = R.layers[i - 1];
+          if (P.word) {
+            var tw = L.h ? P.wb / L.h : 1;
+            var f = Math.round(c((t - (tw - 0.3)) / 0.26) * 100) / 100;
+            if (f !== P.wl) {
+              for (var q = 0; q < P.fade.length; q++) {
+                P.fade[q].style.opacity = f ? String(1 - f) : '';
+                P.fade[q].style.transform = f ? 'translate3d(0,' + (-0.15 * f) + 'em,0)' : '';
+              }
+              P.wl = f;
+            }
+          }
+        }
+      }
+    });
+  }
+  var raf = 0;
+  function kick() { if (!raf) raf = requestAnimationFrame(frame); }
+  // a run is live from a screen before it until a screen after it
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      var R = runs.filter(function (r) { return r.run === e.target; })[0]; if (!R) return;
+      R.on = e.isIntersecting && mq.matches;
+      R.run.classList.toggle('is-live', R.on);
+      if (R.on) { warm(R); kick(); }
+    });
+  }, { rootMargin: '100% 0px 100% 0px' });
+  runs.forEach(function (R) { io.observe(R.run); });
+  function setup() {
+    if (mq.matches) { measure(); runs.forEach(function (R) { var r = R.run.getBoundingClientRect(); R.on = r.bottom > -innerHeight && r.top < 2 * innerHeight; R.run.classList.toggle('is-live', R.on); if (R.on) warm(R); }); kick(); }
+    else { clear(); runs.forEach(function (R) { R.on = false; R.run.classList.remove('is-live'); }); }
+  }
+  setup();
+  addEventListener('scroll', kick, { passive: true });
+  var rt = 0;
+  addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(setup, 120); });
+  if (mq.addEventListener) mq.addEventListener('change', setup);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(setup);
+  addEventListener('load', setup);
 })();

@@ -890,3 +890,131 @@
 @media (max-width: 340px) and (max-aspect-ratio: 1 / 1){
   .pq{ --pq-d2: 1.75rem; }
 }
+
+/* ==== 2.5 (2026-10-16): the phone in scenes ===================================================
+   The client, on the phone: "you stacked the pieces one after another and made the page longer;
+   make a custom design for mobile". Upright phones under 600 px only; tablets, desks and a phone
+   on its side are untouched (the wrappers below are display: contents there, so their boxes do
+   not exist). The language: a SEQUENCE is a stage, a screen that holds still while the
+   photograph under the words changes (the next picture is uncovered rising from the foot of the
+   screen, scrubbed with the scroll, linear); a COLLECTION is laid out across the width; reading
+   stays reading.
+     stage A  the cover, then Seleccionados. / Revisados. / Preparados. / Para que disfrutes…:
+              one wall; the black C-Class gives way to the grey one, the caliper and the leather
+              rise over the car's place at the foot, the silver C-Class closes it
+     details  a spread across the width: the vRS beside its line, the Cabrio whole, the door
+              beside its line (no swipe, nothing hidden)
+     stage B  Te lo enseño: his wall and the grey C-Class; the exterior, the interior and the
+              side rise in turn where the car stands, their word in place above them
+   Reduced motion or no script: no stage (the 2.4.1 page, still), the spread stays. */
+.pq-run, .pq-run__v{ display: contents; }
+/* the margins `.pq > section + section` gave before the wrappers existed */
+.pq-run__v > section + section, .pq-run + section{ margin-top: var(--pq-sec); }
+@media (min-width: 1000px){
+  .pq-show .pq-run__v > .pq-wrap{
+    --pq-ind: max(0px, var(--pq-logo) - max(0px, (100cqi - var(--pq-max)) / 2) - var(--pq-m)); }
+}
+
+@media (max-width: 599px) and (max-aspect-ratio: 1 / 1){
+
+  /* ---- the details: a spread across the width ----------------------------------------------
+     the vRS (square, the grille, the lamp and the badge) on the left edge with its line beside
+     it; the Cabrio whole, edge to edge, its line under it; the door (square) on the right edge
+     with its line beside it. Three pictures in about the height two took stacked. */
+  .pq-caps{ grid-template-columns: minmax(0, 1fr); row-gap: var(--pq-beat); margin-inline: calc(var(--pq-m) * -1); }
+  .pq-cap--a, .pq-cap--c{ display: grid; grid-template-columns: minmax(0, 13fr) minmax(0, 12fr);
+    column-gap: var(--pq-tight); align-items: end; }
+  .pq-cap--c{ grid-template-columns: minmax(0, 12fr) minmax(0, 13fr); }
+  .pq-cap--a .pq-f, .pq-cap--c .pq-f, .pq-cap--b .pq-f{ margin: 0; }
+  .pq-cap--a .pq-f{ --ar: 1; }
+  .pq-cap--a .pq-f img{ object-position: 4% 70%; }
+  .pq-cap--c .pq-f{ --ar: 1; --op: 64% 50%; grid-column: 2; grid-row: 1; }
+  .pq-cap--c figcaption{ grid-column: 1; grid-row: 1; }
+  .pq-cap--a figcaption, .pq-cap--c figcaption{ margin: 0; max-width: none; box-sizing: border-box;
+    font-size: clamp(1.125rem, 5.6vw, 1.4375rem); line-height: 1.12; letter-spacing: -.03em; }
+  .pq-cap--a figcaption{ padding: 0 var(--pq-m) 0 0; }
+  .pq-cap--c figcaption{ padding: 0 0 0 var(--pq-m); }
+  .pq-cap--b figcaption{ padding-inline: var(--pq-m); }
+
+  /* ---- the stages ------------------------------------------------------------------------- */
+  .pq-on .pq-run{ display: block; position: relative; height: calc(100svh * (1 + var(--steps))); }
+  /* the stage's own scroll, in screens: the sum of data-stage (pq25.js reads the same numbers) */
+  .pq-on .pq-run--a{ --steps: .96; }
+  .pq-on .pq-run--b{ --steps: .88; }
+  /* the screen that holds still: the small viewport's height, so nothing it carries is ever
+     under the browser's bars; when they slide away the strip below it is the same paper */
+  .pq-on .pq-run__v{ display: block; position: sticky; top: 0; height: 100svh; overflow: hidden;
+    background: var(--mc-surface); container-type: inline-size; }
+  .pq-on .pq-run--a .pq-three, .pq-on .pq-run--b .pq-run__v > div.pq-wrap, .pq-on .pq-run--b .pq-gal{ display: contents; }
+  .pq-on .pq-run [data-layer]{ position: absolute; inset: 0; margin: 0; padding: 0; overflow: hidden;
+    list-style: none; }
+  .pq-on .pq-run [data-layer] > *{ backface-visibility: hidden; }
+  .pq-on .pq-run.is-live [data-layer], .pq-on .pq-run.is-live [data-layer] > *{ will-change: transform; }
+  /* stacking: the source order of each stage */
+  .pq-on .pq-run--a .pq-cover{ z-index: 1; }
+  .pq-on .pq-run .pq-plate--sel{ z-index: 2; }
+  .pq-on .pq-run .pq-pic--rev{ z-index: 3; }
+  .pq-on .pq-run .pq-pic--joy{ z-index: 4; }
+  .pq-on .pq-run .pq-plate--pre{ z-index: 5; }
+  .pq-on .pq-run--b .pq-plate--show{ z-index: 1; }
+  .pq-on .pq-run--b .pq-slide--ext{ z-index: 2; }
+  .pq-on .pq-run--b .pq-slide--int{ z-index: 3; }
+  .pq-on .pq-run--b .pq-slide--det{ z-index: 4; }
+  .pq-on .pq-run--b .pq-show__end{ z-index: 5; }
+  /* every layer after the first waits below the screen until the script uncovers it */
+  .pq-on .pq-run [data-layer]:not(.pq-cover):not(.pq-plate--show){ transform: translate3d(0, 100%, 0); }
+
+  /* a stage's pictures do not arrive or drift on their own: the scroll moves them */
+  .pq-on .pq-run [data-r] .pq-f__in, .pq-on .pq-run [data-r].is-in .pq-f__in{ opacity: 1; transform: none; transition: none; }
+  .pq-on .pq-run .pq-plate[data-r] .pq-f{ opacity: 1; transition: none; }
+  .pq-on .pq-run .pq-plate[data-r] .pq-w{ opacity: 1; transform: none; transition: none; }
+  .pq-on .pq-run .pq-px, .pq-on .pq-run .pq-px img{ transform: none; transition: none; will-change: auto; }
+  /* their words are moved by the scroll too, never eased behind it */
+  .pq-on .pq-run .pq-word, .pq-on .pq-run .pq-w > span{ transition: none; }
+
+  /* the plates: the whole screen is his wall (pq25/tall-NNx), the car standing at its foot.
+     --line: where every word of a stage stands, the top of the car's 4:3 photograph plus 24 */
+  .pq-on .pq-run{ --zone: 75cqi; --line: calc(var(--zone) + var(--pq-near)); }
+  .pq-on .pq-run .pq-plate{ height: 100%; margin: 0; }
+  .pq-on .pq-run .pq-plate__in{ height: 100%; min-height: 0; max-height: none; }
+  .pq-on .pq-run .pq-plate .pq-win{ display: none; }
+  .pq-on .pq-run .pq-plate:not(.pq-plate--cover) .pq-w{ position: absolute; left: 0; right: 0; top: auto;
+    bottom: var(--line); padding: 0 var(--pq-m); }
+  /* the cover holds still while the header leaves (pq25.js moves it with the scroll; this is
+     its first frame, so nothing jumps when the script arrives): its car's feet on the fold */
+  .pq-on .pq-run--a .pq-cover > .pq-plate{ transform: translate3d(0, calc(-1 * var(--pq-head)), 0); }
+
+  /* the details rising where the car stands: a 4:3 photograph, whole, edge to edge at the
+     screen's foot, exactly over the car's own photograph; the word above it on the wall */
+  .pq-on .pq-run--a [data-layer="foot"]{ top: auto; height: calc(var(--line) + 2 * var(--pq-d1) + var(--s-6)); }
+  .pq-on .pq-run [data-layer="foot"] .pq-f{ position: absolute; left: 0; right: 0; bottom: 0; top: auto;
+    height: var(--zone); margin: 0; aspect-ratio: auto; }
+  .pq-on .pq-run [data-layer="foot"] .pq-f img{ object-position: 50% 50%; }
+  .pq-on .pq-run--a [data-layer="foot"] .pq-word{ position: absolute; left: 0; right: 0; bottom: var(--line);
+    margin: 0; padding: 0 var(--pq-m); }
+
+  /* stage B: the heading high on the wall, the walk-round's word in place over each picture */
+  .pq-on .pq-run--b{ --line: calc(var(--zone) + var(--pq-tight)); --cap: calc(var(--pq-d3) * 1.1); }
+  .pq-on .pq-run--b [data-layer="foot"]{ top: auto; height: calc(var(--line) + 2 * var(--cap) + var(--s-6)); }
+  .pq-on .pq-run--b [data-layer="foot"] figure{ height: 100%; }
+  .pq-on .pq-run--b .pq-slide .pq-word{ position: absolute; left: 0; right: 0; bottom: var(--line); margin: 0; }
+  /* from the foot: the picture, its word, a beat, the closing line's place (it is uncovered
+     last, so "Te lo enseño… / Para que sepas…" read as one sentence pair), then the heading */
+  /* --endh: the closing line's own height (pq25.js measures it; two lines until then) */
+  .pq-on .pq-run--b .pq-plate.pq-plate--show .pq-w{
+    bottom: calc(var(--line) + var(--cap) + var(--pq-beat) + var(--endh, 2 * var(--cap)) + var(--pq-near)); }
+  .pq-on .pq-run--b .pq-show__end{ inset: auto 0 calc(var(--line) + var(--cap) + var(--pq-beat)) 0;
+    max-width: none; padding: 0 var(--pq-m); }
+  /* a line waits unseen until the script has placed it */
+  .pq-on .pq-run:not(.is-set) [data-layer="line"]{ opacity: 0; }
+}
+
+/* 2.5: WebKit's text-wrap: balance set the phone's display lines on more lines than they need
+   ("Te lo / enseño / antes de que / vengas.", measured in WebKit at 320-430: 3 lines per span
+   where 2 or 1 fit; greedy wrapping gives 2 / 1). Safari only (hanging-punctuation is Safari's
+   alone), upright phones only. */
+@supports (hanging-punctuation: first){
+  @media (max-width: 599px) and (max-aspect-ratio: 1 / 1){
+    .pq-w, .pq-h, .pq-line, .pq-word, .pq-w > span, .pq-h > span, .pq-line > span{ text-wrap: wrap; }
+  }
+}
