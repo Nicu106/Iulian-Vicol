@@ -217,7 +217,7 @@
     </div>
     <div class="pq-read">
       <p>Y, junto a esa ilusión, hay preguntas que merecen una respuesta clara: ¿cómo lo han cuidado?, ¿qué sabemos de sus kilómetros?, ¿ha tenido algún accidente?, ¿quién me atenderá después?</p>
-      <p class="pq-k">En IV Motorclass, nuestra forma de trabajar empieza precisamente ahí.</p>
+      <p class="pq-k">En IV&nbsp;Motorclass, nuestra forma de trabajar empieza precisamente ahí.</p>
     </div>
   </section>
 
@@ -231,7 +231,7 @@
       </div></div></div>
     </figure>
     <div class="pq-read pq-me__t">
-      <p class="pq-lead">Soy Iulian, fundador de IV Motorclass. Desde pequeño me han apasionado los coches alemanes. Podía pasar horas fijándome en sus formas, sus interiores y los detalles que hacían especial una versión.</p>
+      <p class="pq-lead">Soy Iulian, fundador de IV&nbsp;Motorclass. Desde pequeño me han apasionado los coches alemanes. Podía pasar horas fijándome en sus formas, sus interiores y los detalles que hacían especial una versión.</p>
       <p>Esa misma curiosidad me lleva hoy a buscar unidades con personalidad: coches que apetece conducir, conservar y disfrutar. Pero convertir una pasión en un negocio implica algo más: asumir la responsabilidad de lo que eliges y de lo que vendes.</p>
       <p>Por eso me implico personalmente en la selección.</p>
       {{-- his paragraph's last sentence, where it stands, set as the page's pull quote --}}

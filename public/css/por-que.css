@@ -812,10 +812,9 @@
 @media (min-width: 1000px){
   .pq-pic--joy .pq-word{ font-size: min(5rem, 5.4vw); }
 }
-@media (max-width: 999px){
-  .pq-plate--pre{ order: 1; }
-  .pq-pic--joy{ order: 2; }
-}
+/* (2026-10-16) the phone follows the source order: "Preparados." under the seats,
+   then the Mercedes with "Para que disfrutes…" — the trio Seleccionados./Revisados./
+   Preparados. reads in one run, as on the desktop */
 
 /* 2.4: the latest three letters. A long one is held to two lines, as long as the short
    ones beside it (under its hung quote mark: 4.5em x (.42 + .06) = 2.16em), the end of
