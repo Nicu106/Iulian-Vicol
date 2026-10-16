@@ -58,6 +58,8 @@ class ReviewShowroomController extends Controller
     public const VARIANTS = [
         '4.6' => ['Pares · La fila', 'A row of many',
                   'Pares as a carousel row, in the brand\'s colours: every review a white print and a navy card (with a whisper of its photo\'s hue), several in view at once (1.3 on a phone, 2.3 on a tablet, 3.5 on a laptop, 4.3 on a large screen), the next one always showing, all of them newest first. A fixed structure: the arrows by the heading, every pair one size, every quote five lines, the whole review and photo in an overlay. Tap the card behind to bring it forward.', 'Pares'],
+        '4.5' => ['Pares · Editorial', 'Editorial, in the site\'s voice',
+                  'Iteration of 4.4. One pair at a time on a fixed stage: the photo as a white print, the words on a navy card under it; tap the card behind and it comes forward. The brandbook\'s navy falling into its deep, a brand-blue light behind the pair, each photo only tinting it. DM Sans and 2.4\'s details. Heading, arrows and stage never move.', 'Pares'],
         '4.4' => ['Pares · Editorial', 'Editorial',
                   'A magazine page: the first sentence of each review as a large serif pull-quote (Fraunces) that wraps around the photo, the whole review on tap. Thin rules, brand ink and one red accent.', 'Pares'],
         4     => ['Pares', 'Pares 4.0',
@@ -417,6 +419,242 @@ class ReviewShowroomController extends Controller
             $first = preg_replace('/[\s,;:.\-–—(«"“]+$/u', '', $first) . '…';
         }
         return ['short' => $first, 'cut' => mb_strlen($first) < mb_strlen($text)];
+    }
+
+    /**
+     * 4.5 · each review's own colour, and how its photograph sits in the
+     * 3:4 frame. Read once from the 320px derivative (already upright) and
+     * cached as JSON per photo path + mtime (storage/app/muestras-looks), so a
+     * replaced photograph is measured again and nothing else ever is.
+     *
+     * Colour (the brandbook's palette, nothing else): the grounds are the
+     * tokens' navy (--mc-navy) and deep (--mc-deep); the one accent is the
+     * tokens' blue (--mc-blue for the light, --mc-blue-light for the words on
+     * navy). The photograph only tints them: the hue its colourful parts lean
+     * to (OKLab, chroma-weighted mean of a/b), snapped to the nearest of seven
+     * hues, mixed in at 10 % (the field, the card) and 15 % (the light). A
+     * picture with almost no colour leaves the brand's own colours as they are.
+     *   field  the top of the section's ground (it falls into --mc-deep)
+     *   card   the quote card: white on it is ≥ 4.5:1 (measured ~13:1)
+     *   glow   the light behind the pair
+     *   tint   the quotation mark and the name: --mc-blue-light, ≥ 4.5:1 on the card
+     * Fit, against the 3:4 frame (FRAME):
+     *   cover    when filling the frame crops 13 % or less of one side; the
+     *            crop window is placed where the picture is busiest (edges and
+     *            skin: the people, the car), as object-position
+     *   contain  otherwise: the whole picture, edge to edge on its long side,
+     *            over a blurred copy of itself (ambient()) tinted with the field
+     */
+    public const FRAME = 0.75;
+
+    /** the seven hues a photograph's tint is snapped to (only ever mixed in at 10-15 %) */
+    private const TONES = [15 => 'red', 42 => 'copper', 155 => 'green', 205 => 'petrol', 255 => 'navy', 285 => 'indigo', 325 => 'aubergine'];
+
+    public static function look(string $img, float $ratio): array
+    {
+        $fs = public_path(ltrim($img, '/'));
+        $mt = (int) @filemtime($fs);
+        $file = storage_path('app/muestras-looks/' . substr(md5($img . '|' . $mt . '|' . $ratio . '|brand6'), 0, 16) . '.json');
+        if (is_file($file) && ($t = json_decode((string) file_get_contents($file), true))) {
+            return $t;
+        }
+        $h = 255.0; $c = 0.0; $fx = 50.0; $fy = 50.0; $trim = [0.0, 0.0, 0.0, 0.0];   // top right bottom left
+        $small = Img::url($img, 320);
+        $im = $small && str_starts_with($small, '/storage/cache/') ? @imagecreatefromwebp(storage_path('app/public/cache/' . basename($small))) : false;
+        if ($im) {
+            // black bars baked into the file (a phone's screenshot, a letterboxed export):
+            // rows or columns at an edge that are near-black and flat are not the picture
+            $W = imagesx($im); $Hh = imagesy($im);
+            // a bar row: 70 % or more of it true black (a phone's home bar may sit in it)
+            $flat = function (bool $row, int $k) use ($im, $W, $Hh) {
+                $n = $row ? $W : $Hh; $dark = 0; $m = 0;
+                for ($i = 0; $i < $n; $i += 2) {
+                    $rgb = $row ? imagecolorat($im, $i, $k) : imagecolorat($im, $k, $i);
+                    $l = 0.3 * (($rgb >> 16) & 255) + 0.59 * (($rgb >> 8) & 255) + 0.11 * ($rgb & 255);
+                    $dark += $l < 12 ? 1 : 0; $m++;
+                }
+                return $dark / $m >= .55;
+            };
+            // and it ends at an edge: a letterbox stops abruptly, a night sky fades
+            $mean = function (bool $row, int $k) use ($im, $W, $Hh) {
+                $n = $row ? $W : $Hh; $sum = 0; $m = 0;
+                for ($i = 0; $i < $n; $i += 2) { $rgb = $row ? imagecolorat($im, $i, $k) : imagecolorat($im, $k, $i);
+                    $sum += 0.3 * (($rgb >> 16) & 255) + 0.59 * (($rgb >> 8) & 255) + 0.11 * ($rgb & 255); $m++; }
+                return $sum / $m;
+            };
+            // from an edge inwards: up to 3 % of rows that are not bar may come first
+            // (a phone's home bar lies on the very edge), then the bar itself
+            $scan = function (bool $row, bool $fromEnd) use ($flat, $W, $Hh) {
+                $n = $row ? $Hh : $W; $at = fn ($k) => $fromEnd ? $n - 1 - $k : $k;
+                $k = 0; while ($k < $n * .03 && !$flat($row, $at($k))) $k++;
+                if ($k >= $n * .03) return 0;
+                while ($k < $n * .3 && $flat($row, $at($k))) $k++;
+                return $k;
+            };
+            $t0 = $scan(true, false); $b0 = $scan(true, true); $l0 = $scan(false, false); $r0 = $scan(false, true);
+            // only a real bar (2 % or more) counts; one more row each side for the soft edge
+            $f = fn ($px, $n) => $px >= $n * .02 ? round(min(.3, ($px + 1) / $n), 4) : 0.0;
+            $sharp = function (bool $row, int $in, int $dir) use ($mean, $W, $Hh) {   // 2-4 rows past the bar vs the bar
+                $n = $row ? $Hh : $W; $a = $mean($row, max(0, min($n - 1, $in - $dir * 2)));
+                $b = ($mean($row, max(0, min($n - 1, $in + $dir * 2))) + $mean($row, max(0, min($n - 1, $in + $dir * 4)))) / 2;
+                return $b - $a > 25;
+            };
+            if ($t0 && !$sharp(true, $t0, 1)) $t0 = 0;
+            if ($b0 && !$sharp(true, $Hh - 1 - $b0, -1)) $b0 = 0;
+            if ($l0 && !$sharp(false, $l0, 1)) $l0 = 0;
+            if ($r0 && !$sharp(false, $W - 1 - $r0, -1)) $r0 = 0;
+            $trim = [$f($t0, $Hh), $f($r0, $W), $f($b0, $Hh), $f($l0, $W)];
+            $ratio = $ratio * (1 - $trim[1] - $trim[3]) / max(.1, 1 - $trim[0] - $trim[2]);
+        }
+        $crop = $ratio < self::FRAME ? 1 - $ratio / self::FRAME : 1 - self::FRAME / $ratio;
+        $fit = $crop <= 0.13 && !array_filter($trim) ? 'cover' : 'contain';
+        if ($im) {
+            $w = imagesx($im); $hh = imagesy($im);
+            $tw = 64; $th = max(2, (int) round($hh * $tw / max(1, $w)));
+            $t = imagecreatetruecolor($tw, $th);
+            imagecopyresampled($t, $im, 0, 0, 0, 0, $tw, $th, $w, $hh);
+            $sa = $sb = $sw = 0.0; $px = [];
+            for ($y = 0; $y < $th; $y++) {
+                for ($x = 0; $x < $tw; $x++) {
+                    $rgb = imagecolorat($t, $x, $y);
+                    $r = ($rgb >> 16) & 255; $g = ($rgb >> 8) & 255; $b = $rgb & 255;
+                    $px[$y][$x] = [$r, $g, $b];
+                    [, $A, $B] = self::oklab($r, $g, $b);
+                    $k = sqrt($A * $A + $B * $B);
+                    $sa += $k * $A; $sb += $k * $B; $sw += $k;
+                }
+            }
+            imagedestroy($im); imagedestroy($t);
+            if ($sw > 0) {
+                $A = $sa / $sw; $B = $sb / $sw;
+                $c = sqrt($A * $A + $B * $B);
+                if ($c >= 0.008) {
+                    $h = fmod(rad2deg(atan2($B, $A)) + 360, 360);
+                }
+            }
+            // where the picture is busiest: edges, and skin counted three times
+            if ($fit === 'cover' && $crop > 0.001) {
+                $rows = array_fill(0, $th, 0.0); $cols = array_fill(0, $tw, 0.0);
+                for ($y = 1; $y < $th - 1; $y++) {
+                    for ($x = 1; $x < $tw - 1; $x++) {
+                        [$r, $g, $b] = $px[$y][$x];
+                        $l = fn ($q) => 0.3 * $q[0] + 0.59 * $q[1] + 0.11 * $q[2];
+                        $e = abs($l($px[$y][$x + 1]) - $l($px[$y][$x - 1])) + abs($l($px[$y + 1][$x]) - $l($px[$y - 1][$x]));
+                        $skin = $r > 95 && $g > 40 && $b > 20 && max($r, $g, $b) - min($r, $g, $b) > 15 && abs($r - $g) > 15 && $r > $g && $r > $b;
+                        $v = $e + ($skin ? 3 * 40 : 0);
+                        $rows[$y] += $v; $cols[$x] += $v;
+                    }
+                }
+                $best = function (array $line, float $keep) {
+                    $n = count($line); $win = max(1, (int) round($n * $keep)); $span = $n - $win;
+                    if ($span <= 0) return 50.0;
+                    $sum = array_sum(array_slice($line, 0, $win)); $bestS = $sum; $bestO = 0;
+                    for ($o = 1; $o <= $span; $o++) { $sum += $line[$o + $win - 1] - $line[$o - 1]; if ($sum > $bestS) { $bestS = $sum; $bestO = $o; } }
+                    return round($bestO / $span * 100, 1);
+                };
+                if ($ratio < self::FRAME) { $fy = $best($rows, 1 - $crop); } else { $fx = $best($cols, 1 - $crop); }
+            }
+        }
+        // the nearest of the seven tones
+        $key = 255;
+        if ($c >= 0.008) {
+            $d = 999;
+            foreach (array_keys(self::TONES) as $k) {
+                $dd = abs(fmod($h - $k + 540, 360) - 180);
+                if ($dd < $d) { $d = $dd; $key = $k; }
+            }
+        }
+        $src = $c >= 0.008 ? self::oklch(0.55, 0.12, $key) : null;
+        $field = $src ? self::mix('#0E2E57', $src, 0.10) : '#0E2E57';     // --mc-navy
+        $card  = $src ? self::mix('#0E2E57', $src, 0.08) : '#0E2E57';
+        $glow  = $src ? self::mix('#1558D6', $src, 0.15) : '#1558D6';     // --mc-blue
+        $tint  = '#6CAAE7';                                               // --mc-blue-light, on navy only
+        $out = ['field' => $field, 'card' => $card, 'glow' => $glow, 'tint' => $tint, 'tone' => $key, 'hue' => round($h), 'chroma' => round($c, 4),
+                'crWhite' => round(self::contrast('#FFFFFF', $card), 2), 'crTint' => round(self::contrast($tint, $card), 2),
+                'fit' => $fit, 'crop' => round($crop, 3), 'fx' => $fx, 'fy' => $fy, 'trim' => $trim, 'ratio' => round($ratio, 4),
+                'win' => self::window($ratio, $trim)];
+        @mkdir(dirname($file), 0775, true);
+        @file_put_contents($file, json_encode($out));
+        return $out;
+    }
+
+    /**
+     * contain: the window the picture's own area takes in the 3:4 frame (whole,
+     * edge to edge on its long side, centred), and where the file sits in that
+     * window so that baked-in bars fall outside it. Percentages, for the view.
+     */
+    private static function window(float $ratio, array $trim): array
+    {
+        [$t, $r, $b, $l] = $trim;
+        $F = self::FRAME;
+        $ww = $ratio < $F ? $ratio / $F * 100 : 100.0;
+        $wh = $ratio < $F ? 100.0 : $F / $ratio * 100;
+        // within 3 % of the frame: the window is the whole frame (never a sliver
+        // of a band), and the picture covers it, centred
+        if ($ww >= 97) { $ww = 100.0; }
+        if ($wh >= 97) { $wh = 100.0; }
+        $Ww = $ww / 100 * $F; $Wh = $wh / 100;
+        $aW = max($Ww, $Wh * $ratio); $aH = $aW / $ratio;            // the picture's own area, covering the window
+        $aw = $aW / $Ww * 100; $ah = $aH / $Wh * 100;
+        $ax = (100 - $aw) / 2; $ay = (100 - $ah) / 2;
+        $iw = $aw / max(.1, 1 - $l - $r); $ih = $ah / max(.1, 1 - $t - $b);   // the whole file, its bars outside the window
+        return ['ww' => round($ww, 3), 'wh' => round($wh, 3), 'iw' => round($iw, 3), 'ih' => round($ih, 3),
+                'il' => round($ax - $l * $iw, 3), 'it' => round($ay - $t * $ih, 3)];
+    }
+
+    /** #RRGGBB mixed: $t of $b into $a, in sRGB */
+    private static function mix(string $a, string $b, float $t): string
+    {
+        $out = '#';
+        foreach ([1, 3, 5] as $i) {
+            $out .= sprintf('%02X', (int) round(hexdec(substr($a, $i, 2)) * (1 - $t) + hexdec(substr($b, $i, 2)) * $t));
+        }
+        return $out;
+    }
+
+    private static function oklab(int $r, int $g, int $b): array
+    {
+        $f = fn ($v) => ($v /= 255) <= 0.04045 ? $v / 12.92 : (($v + 0.055) / 1.055) ** 2.4;
+        [$r, $g, $b] = [$f($r), $f($g), $f($b)];
+        $l = (0.4122214708 * $r + 0.5363325363 * $g + 0.0514459929 * $b) ** (1 / 3);
+        $m = (0.2119034982 * $r + 0.6806995451 * $g + 0.1073969566 * $b) ** (1 / 3);
+        $s = (0.0883024619 * $r + 0.2817188376 * $g + 0.6299787005 * $b) ** (1 / 3);
+        return [0.2104542553 * $l + 0.7936177850 * $m - 0.0040720468 * $s,
+                1.9779984951 * $l - 2.4285922050 * $m + 0.4505937099 * $s,
+                0.0259040371 * $l + 0.7827717662 * $m - 0.8086757660 * $s];
+    }
+
+    /** OKLCH to #RRGGBB; the chroma is reduced until the colour is inside sRGB. */
+    private static function oklch(float $L, float $C, float $h): string
+    {
+        for (; $C >= 0; $C -= 0.002) {
+            $a = $C * cos(deg2rad($h)); $b = $C * sin(deg2rad($h));
+            $l = ($L + 0.3963377774 * $a + 0.2158037573 * $b) ** 3;
+            $m = ($L - 0.1055613458 * $a - 0.0638541728 * $b) ** 3;
+            $s = ($L - 0.0894841775 * $a - 1.2914855480 * $b) ** 3;
+            $rgb = [ 4.0767416621 * $l - 3.3077115913 * $m + 0.2309699292 * $s,
+                    -1.2684380046 * $l + 2.6097574011 * $m - 0.3413193965 * $s,
+                    -0.0041960863 * $l - 0.7034186147 * $m + 1.7076147010 * $s];
+            if (min($rgb) >= -0.0005 && max($rgb) <= 1.0005) {
+                return '#' . implode('', array_map(function ($v) {
+                    $v = max(0, min(1, $v));
+                    $v = $v <= 0.0031308 ? 12.92 * $v : 1.055 * $v ** (1 / 2.4) - 0.055;
+                    return sprintf('%02X', (int) round($v * 255));
+                }, $rgb));
+            }
+        }
+        return '#111C2E';
+    }
+
+    /** WCAG contrast of two #RRGGBB colours. */
+    public static function contrast(string $x, string $y): float
+    {
+        $lum = function ($hex) {
+            $f = fn ($v) => ($v /= 255) <= 0.03928 ? $v / 12.92 : (($v + 0.055) / 1.055) ** 2.4;
+            return 0.2126 * $f(hexdec(substr($hex, 1, 2))) + 0.7152 * $f(hexdec(substr($hex, 3, 2))) + 0.0722 * $f(hexdec(substr($hex, 5, 2)));
+        };
+        $a = $lum($x); $b = $lum($y);
+        return (max($a, $b) + 0.05) / (min($a, $b) + 0.05);
     }
 
     /** What the page script needs to draw a review in a viewer. */

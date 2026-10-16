@@ -1,0 +1,293 @@
+/* ============================================================
+   /muestras/opiniones/4.5 — Pares, in the site's voice and in colour
+   (2026-10-16). A copy of 4.4 (frozen, tag opiniones-v4.4), rebuilt:
+
+   - the small things are the site's (mc-tokens, brandbook) and those of
+     /muestras/por-que/2.4 ("Lo cuentan ellos": .pq-h, .pq-pull, the letters'
+     hung quotation mark, "Ver más"; the car page's viewer for the photograph).
+     DM Sans only.
+   - one pair at a time on a fixed stage. Every size is derived from the
+     screen (cqi of the stage, --vh) and rounded to whole pixels, never from a
+     review: the heading, the arrows and the stage stand still on every review.
+   - Pares' two cards: the photograph as a white print, the words on a card in
+     the review's own colour, one under the other on a clear offset. Whichever
+     is behind is a little smaller (.96) and a touch darker, and still shows:
+     the words behind still show their name and lines; the photograph behind
+     still shows the people and the car.
+   - the ground: the brandbook's navy falling into its deep, a light of the
+     brand blue behind the pair, stitching like a seat's. Each photograph only
+     tints it (10-15 %, ReviewShowroomController::look). Crossfaded on opacity
+     only; the light drifts very slowly.
+   ============================================================ */
+
+/* 2.4's figures face: the page's own DM Sans file with its whole weight axis,
+   for the light hung quotation mark (fonts.css stops at 400) */
+@font-face{ font-family:"PQ Figures"; src:url(/fonts/dm-sans/dm-sans-latin-normal.woff2) format("woff2");
+  font-weight:100 1000; font-style:normal; font-display:swap; unicode-range:U+201C; }
+
+:root{ --vh:1vh; --vis-top:0px; }
+@supports (height:1svh){ :root{ --vh:1svh; } }
+body.op45{ background:#05080F; color:#FFFFFF; }
+.ms-sr{ position:absolute !important; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden;
+  clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; border:0; }
+[tabindex="-1"]:focus{ outline:none; }
+html:has(dialog[open]){ overflow:hidden; }
+
+/* 2.4's measures: the magazine margin; its heading size (.pq-h). Whole pixels. */
+.op45{ --m:round(clamp(1.25rem, 5vw, 5rem), 1px); --d2:clamp(1.875rem, 9.2vw, 4.5rem); --black:#05080F;
+  /* the content never wider than this: the stage's right edge is the arrows' */
+  --content:1120px; }
+.op-wrap{ max-width:calc(var(--content) + var(--m) * 2); margin-inline:auto; padding-inline:var(--m); box-sizing:border-box; }
+
+/* ---- the section and its ground --------------------------------------- */
+.op-sec{ position:relative; isolation:isolate; overflow:hidden; color:#FFFFFF; background:var(--black);
+  padding-block:var(--s-7) var(--s-7); }
+@media (min-width:700px){ .op-sec{ padding-block:var(--s-8); } }
+@media (min-width:700px) and (max-height:860px){ .op-sec{ padding-block:var(--s-7); } }
+/* each layer: the review's field falling hard into black. Three layers: the
+   review's tone, and the tones of the reviews either side, painted ahead while
+   nothing moves (at .001 opacity: invisible, but painted), so a change of
+   review only crossfades two finished layers; consecutive reviews of one tone
+   change nothing. Inside it, the light and the stitching, each its own
+   small layer: the light is the only thing that moves, slowly, on the compositor */
+.op-bg{ position:absolute; inset:0; z-index:-1; pointer-events:none; opacity:.001; overflow:hidden; will-change:opacity;
+  transition:opacity 600ms var(--e-inout);
+  /* the brandbook's grounds: --mc-navy (lightly tinted by the photograph) at the
+     top, falling through --mc-deep to --mc-deep-2: depth by value, not by hue */
+  background:linear-gradient(180deg, var(--field, #0E2E57) 0%, var(--mc-deep, #040B1F) 58%, var(--mc-deep-2, #02061A) 100%); }
+.op-bg.is-on{ opacity:1; }
+/* the light behind the pair (--gx/--gy: the pair's centre, from the fixed stage) */
+/* placed by translate, not by left/top: moving it to the pair's measured centre
+   is then no layout shift (it was 0.25 of CLS at 1440, measured) */
+.op-bg__light{ position:absolute; left:0; top:0; width:min(1100px, 150vw); aspect-ratio:1.25;
+  translate:calc(var(--gx, 50vw) - 50%) calc(var(--gy, 420px) - 50%);
+  background:radial-gradient(closest-side, color-mix(in srgb, var(--glow, #1558D6) 70%, transparent),
+    color-mix(in srgb, var(--glow, #1558D6) 26%, transparent) 55%, transparent); }
+/* the stitching: a dashed diagonal (6 on, 5 off) every 26 px, in
+   --mc-blue-light at a low opacity, strongest at the top right and gone before the middle. One mask (the
+   stitch); the fade is the background's own gradient */
+.op-bg__stitch{ position:absolute; right:0; top:0; width:min(100%, 1200px); height:min(100%, 760px); opacity:.16;
+  background:radial-gradient(farthest-side at 100% 0%, var(--tint, #CBE0FE), color-mix(in srgb, var(--tint, #CBE0FE) 45%, transparent) 50%, transparent);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpath d='M0 26L26 0' stroke='black' stroke-width='1.3' stroke-dasharray='6 5'/%3E%3C/svg%3E") 0 0 / 26px 26px;
+          mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpath d='M0 26L26 0' stroke='black' stroke-width='1.3' stroke-dasharray='6 5'/%3E%3C/svg%3E") 0 0 / 26px 26px; }
+/* life: the light breathes and drifts, very slowly (26 s a round) */
+/* it starts, and returns, exactly on the pair's centre */
+@keyframes op-drift{ 0%, 100%{ transform:none; } 25%{ transform:translate3d(2%, 1.5%, 0) scale(1.04); } 75%{ transform:translate3d(-2%, -1.5%, 0) scale(1.04); } }
+.js .op-bg.is-on .op-bg__light{ animation:op-drift 26s ease-in-out infinite; }
+/* the drift holds still while the cards move (op45.js, hold()): one motion at a time */
+@media (prefers-reduced-motion:reduce){ .js .op-bg.is-on .op-bg__light{ animation:none; } .op-bg{ transition:none; } }
+
+/* ---- the heading's row: the heading left, the arrows right, on its foot --- */
+.pr__head{ display:flex; align-items:flex-end; justify-content:space-between; gap:var(--s-4); margin-bottom:var(--s-5); }
+@media (min-width:700px){ .pr__head{ margin-bottom:var(--s-6); } }
+.pr__h{ margin:0; min-width:0; flex:1 1 auto; font-size:var(--d2); font-weight:700; line-height:1; letter-spacing:-.045em; color:#FFFFFF;
+  /* optical: the ink of its first capital ("L", "I": a .042em side bearing,
+     measured) on the photograph's edge, not its box */
+  margin-left:-.042em; }
+.pr__nav{ display:flex; gap:var(--s-3); flex:0 0 auto;
+  /* the arrows centred on the cap height of the heading's last line: its
+     baseline sits .165em above the box's foot, its capitals are .70em tall
+     (measured), the arrows 52 px */
+  margin-bottom:calc(var(--d2) * .515 - 26px); }
+/* the car page's round control (.car-view__nav) on a dark ground: a white
+   chevron, a ring at 55% white (3:1 and more on every field) */
+.pr__arw{ position:relative; display:grid; place-items:center; width:52px; height:52px; padding:0; margin:0; cursor:pointer;
+  border:1px solid rgba(255,255,255,.55); border-radius:var(--mc-r-pill); background:rgba(255,255,255,.06); color:#FFFFFF;
+  -webkit-tap-highlight-color:transparent;
+  transition:background var(--m-quick) var(--e-out), border-color var(--m-quick) var(--e-out), color var(--m-quick) var(--e-out), transform var(--m-instant) var(--e-out); }
+.pr__arw::before{ content:""; width:11px; height:11px; border-right:2px solid currentColor; border-bottom:2px solid currentColor; }
+/* the chevron's optical centre: its point, not its box */
+.pr__arw--prev::before{ rotate:135deg; translate:2.5px 0; }
+.pr__arw--next::before{ rotate:-45deg; translate:-2.5px 0; }
+@media (hover:hover){ .pr__arw:hover{ background:#FFFFFF; border-color:#FFFFFF; color:var(--black); } }
+.pr__arw:active{ transform:scale(.94); }
+.pr__arw:focus-visible{ outline:3px solid #FFFFFF; outline-offset:var(--s-1); }
+.pr__arw[aria-disabled="true"]{ background:transparent; border-color:rgba(255,255,255,.2); color:rgba(255,255,255,.35); cursor:default; transform:none; }
+@media (hover:hover){ .pr__arw[aria-disabled="true"]:hover{ background:transparent; border-color:rgba(255,255,255,.2); color:rgba(255,255,255,.35); } }
+html:not(.js) .pr__nav{ display:none; }
+
+/* ---- the stage: its size from the screen only ------------------------- */
+.pr__stage{ position:relative; container-type:inline-size; touch-action:pan-y; }
+.pr__list{ position:relative; margin:0; padding:0; list-style:none;
+  /* a phone: the photograph above, the words' card under its foot */
+  --b:8px; --lines:4;
+  --qs:clamp(1.125rem, 5.8cqi, 1.5rem);
+  /* what the words' card holds under the photograph: the mark (2.6 x .48 of the
+     quote size), the lines, the name (8 + 24), "Ver más" (44), padding (16 + 12) */
+  --c:calc(var(--qs) * (1.248 + 1.16 * var(--lines)) + 104px);
+  /* everything above and below the stage: the section's padding (48 + 48), the
+     heading (two lines) and its gap (24) */
+  --chrome:calc(var(--d2) * 2 + 120px);
+  --ph:round(down, min(calc((70cqi - var(--b) * 2) * 4 / 3 + var(--b) * 2), calc(var(--vh) * 100 - var(--chrome) - var(--c))), 2px);
+  --pw:round(down, calc((var(--ph) - var(--b) * 2) * 3 / 4 + var(--b) * 2), 1px);
+  --ov:round(calc(var(--ph) * .36), 1px);
+  --qw:round(down, 86cqi, 1px);
+  height:calc(var(--ph) + var(--c)); }
+/* a short phone (320x568): three lines, and 32 above and below */
+@media (max-height:640px) and (max-width:699px){ .pr__list{ --lines:3; --chrome:calc(var(--d2) * 2 + 88px); } .op-sec{ padding-block:var(--s-6); } }
+.js .pr__i{ position:absolute; inset:0; visibility:hidden; }
+.js .pr__i.is-on{ visibility:visible; }
+.pr__pair{ position:relative; height:100%; }
+
+/* the photograph: a white print, its picture in a 3:4 window */
+.pr__ph{ position:absolute; z-index:3; left:0; top:0; width:var(--pw); height:var(--ph); box-sizing:border-box; padding:var(--b); margin:0;
+  border:0; border-radius:0; background:#FFFFFF; cursor:zoom-in; -webkit-tap-highlight-color:transparent;
+  box-shadow:0 1px 1px rgba(0,0,0,.22), 0 8px 16px -6px rgba(0,0,0,.34), 0 28px 56px -18px rgba(0,0,0,.55); }
+.pr__mat{ display:block; position:relative; width:100%; height:100%; overflow:hidden; background:var(--field); }
+/* cover: the picture fills its window; the crop is placed where the people and
+   the car are (object-position from look()); 1 px over every edge, so no ground
+   shows at any pixel ratio */
+.pr__img{ -webkit-user-drag:none; user-select:none; position:absolute; inset:-1px; display:block; width:calc(100% + 2px); height:calc(100% + 2px); max-width:none; object-fit:cover; }
+/* contain: the whole picture, edge to edge on its long side, centred, over a
+   blurred copy of itself tinted with the field. Its window is whole pixels
+   (no soft seam); a file's baked-in black bars lie outside the window
+   (ReviewShowroomController::look/window) */
+.pr__mat--contain{ background:
+  linear-gradient(color-mix(in srgb, var(--field) 62%, transparent), color-mix(in srgb, var(--field) 62%, transparent)),
+  var(--amb, none) center / cover no-repeat, var(--field); }
+.pr__win{ position:absolute; overflow:hidden;
+  width:round(down, var(--ww), 1px); height:round(down, var(--wh), 1px);
+  left:round(calc((100% - round(down, var(--ww), 1px)) / 2), 1px); top:round(calc((100% - round(down, var(--wh), 1px)) / 2), 1px); }
+.pr__win .pr__img{ inset:auto; left:var(--il); top:var(--it); width:var(--iw); height:var(--ih); object-fit:fill; background:none !important; }
+.pr__ph:focus-visible{ outline:3px solid #FFFFFF; outline-offset:var(--s-1); }
+.pr__ph.is-out .pr__img{ visibility:hidden; }
+
+/* the words: a card in the brand navy (tinted 8 % by the photograph), under the
+   photograph's foot, its right edge on the arrows'; a hairline of
+   --mc-navy-line (decorative) keeps it off the navy at the top of the ground */
+.pr__txt{ position:absolute; z-index:2; right:0; top:calc(var(--ph) - var(--ov)); width:var(--qw); height:calc(var(--ov) + var(--c));
+  background:var(--card); color:#FFFFFF;
+  box-shadow:inset 0 0 0 1px var(--mc-navy-line, #2B4D73), 0 1px 1px rgba(0,0,0,.2), 0 8px 16px -6px rgba(0,0,0,.3), 0 28px 56px -18px rgba(0,0,0,.5); }
+.pr__swap{ position:absolute; inset:0; z-index:4; width:100%; padding:0; margin:0; border:0; background:none; cursor:pointer;
+  -webkit-tap-highlight-color:transparent; }
+.pr__swap:focus-visible{ outline:3px solid #FFFFFF; outline-offset:var(--s-1); }
+.pr__rest{ position:relative; z-index:1; height:100%; box-sizing:border-box; pointer-events:none;
+  display:flex; flex-direction:column; justify-content:flex-end; padding:calc(var(--ov) + var(--s-4)) var(--s-5) var(--s-3);
+  transition:opacity var(--m-state) var(--e-out); }
+/* the pull-quote's box: always the same height (the mark and --lines lines of
+   the base size), its words set on its foot, so the name and "Ver más" follow
+   the last line directly and the box itself never moves */
+.pr__q{ flex:0 0 auto; margin:0; display:flex; flex-direction:column; justify-content:flex-end;
+  height:calc(var(--qs) * 1.248 + var(--qs) * 1.16 * var(--lines)); }
+/* 2.4's hung quotation mark, in --mc-blue-light (5.1:1 and more on every card) */
+.pr__q::before{ content:"\201C"; content:"\201C" / ""; display:block; flex:0 0 auto; height:.42em;
+  /* optical: the mark's ink (a .02em side bearing, measured) on the words' edge */
+  margin:0 0 .06em -.02em;
+  font-family:"PQ Figures", var(--f-ui); font-weight:300; font-size:calc(var(--qs) * 2.6); line-height:.86; letter-spacing:0; color:var(--tint); }
+/* the words: 2.4's .pq-pull voice (500, -.03em, 1.16). A short quote is set
+   larger, in fewer lines of the same box (x 2 in two of four, x 4/3 in three;
+   x 5/3 or 5/4 of five): the script picks the largest that holds it whole */
+.pr__qt{ --s:1; --ql:var(--lines); display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:var(--ql); overflow:hidden;
+  max-height:calc(var(--qs) * 1.16 * var(--lines));
+  font-size:calc(var(--qs) * var(--s)); font-weight:500; line-height:1.16; letter-spacing:-.03em; color:#FFFFFF; text-wrap:pretty; }
+.js .pr__list:not(.is-fit) .pr__q{ visibility:hidden; }   /* until it is sized in its own face: no shift (CLS 0.004 at 1440, measured) */
+.pr__qt.is-free{ display:block; max-height:none; overflow:visible; -webkit-line-clamp:initial; line-clamp:initial; }
+/* 2.4's name: 16 / 600, one line, in --mc-blue-light (≥ 5:1 on every card, measured) */
+.pr__by{ flex:0 0 auto; margin:var(--s-2) 0 0; font-size:var(--t-ui); font-weight:600; line-height:1.5; color:var(--tint);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+/* 2.4's "Ver más": 600, a 1 px underline at .3em; its line is always kept */
+.pr__more{ flex:0 0 auto; display:flex; align-items:center; min-height:44px; margin:0; font-size:var(--t-ui); font-weight:600; color:#FFFFFF;
+  text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:.3em; text-decoration-color:var(--tint); opacity:0; }
+/* opacity, not visibility: a child made visible shows through a hidden review
+   (it did: every other review's "Ver más" was drawn over the one in view) */
+.pr__i.is-cut .pr__more, .pr__i.is-long .pr__more{ opacity:1; }
+@media (hover:hover){ .pr__swap:hover ~ .pr__rest .pr__more{ text-decoration-thickness:2px; } }
+
+/* the whole review, when the words are in front: scrolling inside the card,
+   which keeps its size; the lower edge fades while more follows */
+.pr__full{ display:none; }
+.js .pr__full{ display:flex; flex-direction:column; justify-content:safe center; position:absolute; inset:0; z-index:2; overflow-y:auto; overscroll-behavior:contain; box-sizing:border-box;
+  padding:var(--s-5); opacity:0; visibility:hidden; cursor:pointer;
+  transition:opacity var(--m-state) var(--e-out), visibility 0s linear var(--m-state);
+  scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.35) transparent; }
+.pr__full.is-more{ -webkit-mask-image:linear-gradient(to bottom, #000 calc(100% - 3.5rem), rgba(0,0,0,.2) calc(100% - 1.25rem), transparent);
+  mask-image:linear-gradient(to bottom, #000 calc(100% - 3.5rem), rgba(0,0,0,.2) calc(100% - 1.25rem), transparent); }
+/* the letter in 2.4's reading voice: italic, 17-19 / 1.5 */
+.pr__fq{ margin:0; font-style:italic; font-size:clamp(1.0625rem, 4.4cqi, 1.1875rem); line-height:1.5; color:#FFFFFF; }
+.pr__fq p{ margin:0; } .pr__fq p + p{ margin-top:.7em; }
+.pr__fby{ margin:var(--s-3) 0 0; font-size:var(--t-ui); font-weight:600; color:var(--tint); }
+
+/* ---- which card is in front ---------------------------------------------
+   the one behind: smaller (.96) and a touch darker (a veil under its words,
+   over its picture), still showing */
+.pr__ph::before, .pr__txt::before{ content:""; position:absolute; inset:0; z-index:2; pointer-events:none; background:rgba(5,8,15,.34);
+  opacity:0; transition:opacity 320ms var(--e-inout); }
+.pr__txt::before{ z-index:0; background:rgba(5,8,15,.3); }
+/* the lift: a deeper shadow, faded in while a card is in the air */
+.pr__ph::after, .pr__txt::after{ content:""; position:absolute; inset:0; z-index:-1; pointer-events:none; opacity:0;
+  box-shadow:0 46px 90px -26px rgba(0,0,0,.75); transition:opacity 260ms var(--e-out); }
+.pr__ph.is-fly::after, .pr__txt.is-fly::after{ opacity:1; }
+.pr__txt{ transform:scale(.96); }
+/* a card behind shrinks towards the edge it shares with the stage, so the
+   words' card keeps the arrows' right edge, the print the heading's left one */
+.pr__txt{ transform-origin:100% 50%; }
+.pr__ph{ transform-origin:0 50%; }
+.pr__txt::before{ opacity:1; }
+.is-q .pr__txt{ z-index:3; transform:none; }
+.is-q .pr__txt::before{ opacity:0; }
+.is-q .pr__ph{ z-index:2; transform:scale(.96); cursor:pointer; }
+.is-q .pr__ph::before{ opacity:1; }
+.is-q .pr__full{ opacity:1; visibility:visible; transition:opacity var(--m-reveal) var(--e-out) 140ms, visibility 0s; }
+.is-q .pr__rest{ opacity:0; transition-duration:100ms; }   /* out before the whole review comes in: never two texts at once */
+.is-q .pr__swap{ pointer-events:none; }
+@media (prefers-reduced-motion:reduce){ .pr__rest, .pr__full, .pr__ph::before, .pr__txt::before, .pr__ph::after, .pr__txt::after{ transition:none !important; } }
+
+/* ---- a tablet and a computer: side by side, the words' card overlapping the
+   print's right edge and lower, reaching the arrows' edge --------------------- */
+@media (min-width:700px){
+  /* five lines of the base size on a computer: the card is wide enough to give
+     a long first sentence its whole say */
+  .pr__list{ --b:12px; --lines:5;
+    --chrome:calc(var(--d2) + var(--s-6) + var(--s-8) * 2 + 8px);
+    --H:round(down, min(34rem, 66cqi, calc((var(--vh) * 100 - var(--chrome)) / 1.08)), 2px);
+    --pw:round(down, calc((var(--H) - var(--b) * 2) * 3 / 4 + var(--b) * 2), 1px);
+    --ox:round(calc(var(--pw) * .8), 1px);
+    --oy:round(calc(var(--H) * .26), 1px);
+    --qw:calc(100cqi - var(--ox));
+    --qs:clamp(1.375rem, calc(var(--H) * .054), 2.125rem);
+    height:calc(var(--oy) + var(--H) * .82); }
+  .pr__ph{ height:var(--H); }
+  .pr__txt{ top:var(--oy); left:var(--ox); right:auto; width:var(--qw); height:calc(var(--H) * .82); }
+  /* the words begin past the print's edge, so they read while the print is in front */
+  .pr__rest{ justify-content:center; padding:var(--s-6) var(--s-7) var(--s-4) calc(var(--pw) - var(--ox) + var(--s-7)); }
+  .pr__full{ padding:var(--s-6) var(--s-7); }
+  .pr__fq{ font-size:clamp(1.0625rem, calc(var(--H) * .038), 1.375rem); max-width:34em; }
+  /* a pull-quote's measure: about 34 characters, not the card's whole width */
+  .pr__qt{ max-width:calc(var(--qs) * 17); }
+}
+@media (min-width:700px) and (max-height:860px){ .pr__list{ --chrome:calc(var(--d2) + var(--s-6) + var(--s-7) * 2 + 8px); } }
+
+/* ---- without script: every pair in a row the thumb scrolls, both cards shown */
+html:not(.js) .pr__list{ display:flex; gap:var(--s-5); overflow-x:auto; scroll-snap-type:x mandatory; }
+html:not(.js) .pr__i{ position:relative; flex:0 0 100%; scroll-snap-align:start; }
+html:not(.js) .pr__swap, html:not(.js) .pr__more{ display:none; }
+html:not(.js) .pr__ph{ cursor:default; }
+
+/* ---- the viewer: the car page's (.car-view): the scrim, a round white × ---- */
+.op-x{ position:absolute; top:calc(var(--s-4) + env(safe-area-inset-top, 0px)); right:var(--s-4); z-index:2;
+  width:44px; height:44px; padding:0; cursor:pointer; line-height:1; font-family:var(--f-ui);
+  border:1px solid rgba(255,255,255,.22); border-radius:var(--mc-r-pill); background:rgba(255,255,255,.08); color:#FFFFFF; font-size:24px; }
+@media (hover:hover){ .op-x:hover{ background:rgba(255,255,255,.18); } }
+.op-x:focus-visible{ outline:3px solid #FFFFFF; outline-offset:2px; }
+.zm{ position:fixed; inset:0; width:100%; height:100%; max-width:none; max-height:none; margin:0; padding:0;
+  border:0; background:transparent; overflow:hidden; color:#FFFFFF; }
+.is-embed .zm{ inset:var(--vis-top) 0 auto 0; height:calc(var(--vh) * 100); }
+.zm::backdrop{ background:transparent; }
+.zm__dim{ position:absolute; inset:0; background:rgb(var(--mc-scrim)); }
+.zm__img{ position:absolute; left:0; top:0; display:block; max-width:none; transform-origin:0 0;
+  background-size:cover; background-repeat:no-repeat; will-change:transform; }
+.zm__by{ position:absolute; left:var(--s-4); right:var(--s-4); bottom:calc(var(--s-5) + env(safe-area-inset-bottom, 0px));
+  margin:0; text-align:center; font-size:var(--t-ui); font-weight:600; line-height:1.4; color:#FFFFFF; }
+@media print{ .pr__nav, .op-bg{ display:none; } }
+
+/* ---- what moves, composited ahead (measured: with the layers made at the
+   start of a swap, 1 frame in 4 ran long at 4x CPU) -------------------------
+   the pair in view: its cards, their veils and their lift shadows are each
+   their own layer while the pair is in view, so
+   a swap or a slide change only moves finished layers: no paint in flight */
+.js .pr__i.is-on .pr__ph, .js .pr__i.is-on .pr__txt{ will-change:transform; }
+.js .pr__i.is-on .pr__ph::before, .js .pr__i.is-on .pr__txt::before,
+.js .pr__i.is-on .pr__ph::after, .js .pr__i.is-on .pr__txt::after{ will-change:opacity; }
+/* (not the two faces of the words: as layers of their own under a card turning
+   in 3D, the software compositor kept a stale copy of the words in place
+   while the card moved; seen in the recorded frames) */
