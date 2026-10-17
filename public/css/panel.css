@@ -1125,6 +1125,73 @@ a.ad-ref__who:hover { color: var(--mc-blue); text-decoration: underline; text-un
 }
 .ad-shot[data-state="bad"] .ad-tag { order: 2; }
 
+/* ---- the order: a photo held and put where it goes (2026-10-17) ----------
+   He holds a photo (a quarter of a second under the finger, or the mouse
+   pressed and moved) and it comes off the grid: it follows the finger 4%
+   larger, on the panel's one elevation (--mc-shadow-2, with the hairline:
+   shadows fade in glare). Where it left stays open as a square of the band
+   colour framed in the tone of the group it is over, so where it will land
+   and what it will become read at once; the others make room (FLIP,
+   --m-move, --e-out). No tilt, no bounce, nothing else moves.
+
+   Long-press and not a handle: a handle on every photo is chrome, and holding
+   a thing to move it is what both phones already teach on their home screens.
+   The keyboard gets its handle (.ad-shot__mv), visible only when it has focus,
+   as the reviews row's halt button is. */
+.ad-car-form .ad-shot__pic,
+.ad-car-form .ad-shot__i { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; -webkit-user-drag: none; }
+.ad-car-form .ad-shots { position: relative; }          /* a tile's offsetTop is measured against its own list */
+
+/* the slot it will land in */
+.ad-car-form .ad-shot.is-slot { background: var(--mc-band); border-color: transparent; box-shadow: inset 0 0 0 2px var(--cat-none); }
+.ad-car-form .ad-shot.is-slot > * { visibility: hidden; }
+.ad-cat[data-cat="exterior"] .ad-shot.is-slot { box-shadow: inset 0 0 0 2px var(--cat-exterior); }
+.ad-cat[data-cat="interior"] .ad-shot.is-slot { box-shadow: inset 0 0 0 2px var(--cat-interior); }
+.ad-cat[data-cat="flaw"]     .ad-shot.is-slot { box-shadow: inset 0 0 0 2px var(--cat-flaw); }
+
+/* the one in the hand: a copy in a layer of its own above the page (outside
+   the form, so its inputs are no one's), moved with `translate` so the 4% is
+   taken about its centre and never multiplies the distance travelled */
+.ad-dnd-layer { position: fixed; inset: 0; z-index: 70; display: block; pointer-events: none; }
+.ad-car-form .ad-shot.is-ghost {
+  position: fixed; margin: 0; pointer-events: none;
+  border-color: var(--mc-rule); box-shadow: none; scale: 1;
+  transition: scale var(--m-quick) var(--e-out), box-shadow var(--m-quick) var(--e-out);
+}
+.ad-car-form .ad-shot.is-ghost.is-up { scale: 1.04; box-shadow: var(--mc-shadow-2); }
+.ad-car-form .ad-shot.is-ghost.is-land {
+  transition: translate var(--m-move) var(--e-out), scale var(--m-move) var(--e-out), box-shadow var(--m-move) var(--e-out);
+}
+/* moved by the keyboard: the photo itself, lifted where it is */
+.ad-car-form .ad-shot.is-lifted {
+  z-index: 2; scale: 1.04; box-shadow: var(--mc-shadow-2); border-color: var(--mc-rule);
+  transition: scale var(--m-quick) var(--e-out), box-shadow var(--m-quick) var(--e-out);
+}
+
+/* while one is held every group is somewhere to put it, an empty one too */
+.ad-car-form.is-dnd .ad-shots { display: grid; min-height: 5rem; }
+.ad-car-form.is-dnd .ad-shots:not(:has(> li)) { outline: 1px dashed var(--mc-rule); outline-offset: -1px; }
+.ad-car-form.is-dnd .ad-shot { scroll-margin-block: calc(48px + var(--s-5)) 10rem; }
+html.is-grabbing, html.is-grabbing * { cursor: grabbing !important; }
+/* the script keeps the group under the finger still itself; the browser's own
+   scroll anchoring (Chrome, Firefox) would correct the same shift a second time */
+html.is-ordering { overflow-anchor: none; }
+html.is-ordering body { -webkit-user-select: none; user-select: none; }
+
+/* the keyboard's handle: nothing until the keyboard reaches it, then the
+   photo's frame and a chip that says what it does */
+.ad-shot__mv {
+  position: absolute; left: 0; top: 0; width: 100%; aspect-ratio: var(--ar-card);
+  margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit;
+  pointer-events: none; clip-path: inset(50%);
+}
+.ad-shot__mv:focus-visible { clip-path: none; outline: 3px solid var(--mc-focus); outline-offset: -3px; }
+.ad-shot__mv span {
+  position: absolute; left: var(--s-2); bottom: var(--s-2); padding: 2px var(--s-2);
+  background: var(--mc-ink); color: #FFFFFF;
+  font-size: var(--t-label); font-weight: 600; line-height: 1.4;
+}
+
 /* add: the input's own label, a full-width target */
 .ad-up {
   position: relative; display: flex; align-items: center; justify-content: center; gap: var(--s-2);

@@ -21,7 +21,11 @@
         current CSRF token. A 401 means it is gone: the page says so, offers the
         sign-in in another tab and carries on by itself when it is back.
      5. SAVING. Spanish messages next to the field; the button waits for the
-        photos still going up, refreshes the token, then posts. --}}
+        photos still going up, refreshes the token, then posts.
+     6. THE ORDER (2026-10-17). A photo is held and dragged to its place, in its
+        group or into another; the keyboard does the same. The order goes with
+        the form (photo_order) and into the phone's copy; the last moves can be
+        undone. See "the order" below. --}}
 @push('js')
 <script>
 (function () {
@@ -47,8 +51,13 @@
   }
 
   /* --------------------------------------------------------- the status line */
-  var lost = false, waiting = false, savedAt = 0, flash = '', flashT = 0;
+  var lost = false, waiting = false, savedAt = 0, flash = '', flashT = 0, said = '';
+  var undoText = '', undoT = 0, restoring = false;
   function say(text, kind, actions) {
+    // the same line again is left alone: rebuilt, a focused button would lose focus
+    var key = (kind || '') + '|' + (text || '') + '|' + (actions || []).map(function (a) { return a[0]; }).join();
+    if (key === said) return;
+    said = key;
     saveMsg.textContent = text || '';
     saveMsg.className = 'ad-save__msg' + (kind ? ' is-' + kind : '');
     (actions || []).forEach(function (a) {
@@ -61,6 +70,7 @@
   function status() {
     if (lost) return say('Tu sesión ha caducado; nada se ha perdido.', 'bad',
       [['Entrar otra vez', function () { window.open(form.getAttribute('data-login'), '_blank', 'noopener'); }]]);
+    if (undoText) return say(undoText, '', [['Deshacer', function () { Order.undo(); }]]);
     var p = Up.pending(), b = Up.failed();
     if (p) return say((p === 1 ? 'Subiendo 1 foto' : 'Subiendo ' + p + ' fotos') + (waiting ? '; se guarda al terminar.' : '…'), 'busy');
     if (b) return say(b === 1 ? '1 foto no se ha subido.' : b + ' fotos no se han subido.', 'bad',
@@ -69,6 +79,21 @@
     say(savedAt ? 'Copia guardada en este teléfono.' : '');
   }
   function tell(text) { flash = text; clearTimeout(flashT); flashT = setTimeout(function () { flash = ''; status(); }, 2600); status(); }
+  /* A move, and the way back from it: six seconds under the thumb, longer while
+     the finger or the focus is on "Deshacer". Ctrl/⌘+Z does the same. */
+  function offerUndo(text) {
+    undoText = text; clearTimeout(undoT);
+    undoT = setTimeout(endUndo, 6000);
+    status();
+    var b = saveMsg.querySelector('.ad-save__act');
+    if (b && !b._held) {
+      b._held = true;
+      var hold = function () { clearTimeout(undoT); }, go = function () { clearTimeout(undoT); undoT = setTimeout(endUndo, 3000); };
+      b.addEventListener('pointerenter', hold); b.addEventListener('focus', hold);
+      b.addEventListener('pointerleave', go); b.addEventListener('blur', go);
+    }
+  }
+  function endUndo() { undoText = ''; clearTimeout(undoT); status(); }
 
   function showNotice(kind, parts) {
     notice.textContent = '';
@@ -122,10 +147,11 @@
 
   /* ---------------------------------------------------------------- groups */
   function listOf(cat) { return $('.ad-cat[data-cat="' + cat + '"] [data-list]', form); }
+  /* A new photo, or one given another group, goes to the END of that group: the
+     order inside a group is his now (drag and drop), so slotting it in by
+     upload time would put it somewhere he could not predict. */
   function place(li, cat) {
-    var list = listOf(cat), i = +li.getAttribute('data-i'), before = null;
-    $$('.ad-shot', list).some(function (o) { if (o !== li && +o.getAttribute('data-i') > i) { before = o; return true; } return false; });
-    list.insertBefore(li, before);
+    listOf(cat).appendChild(li);
     var tag = $('.ad-tag', li);
     if (tag) tag.setAttribute('data-tag', cat);
     counts();
@@ -134,7 +160,8 @@
     $$('.ad-cat', form).forEach(function (c) {
       var all = $$('.ad-shot', c);
       $('[data-count]', c).textContent = all.filter(function (li) { return !li.classList.contains('is-gone'); }).length;
-      if (c.getAttribute('data-cat') === 'none') c.hidden = !all.length;
+      // not while one is held: the page must not jump under the finger
+      if (c.getAttribute('data-cat') === 'none' && !Order.busy()) c.hidden = !all.length;
     });
     coverHint();
   }
@@ -146,10 +173,8 @@
     var live = function (li) { return !li.classList.contains('is-gone') && (!li.classList.contains('is-new') || li.getAttribute('data-state') === 'done'); };
     var chosen = $$('.ad-shot__cv', form).filter(function (r) { return r.checked && !r.disabled && live(r.closest('.ad-shot')); })[0];
     if (chosen) return;
-    var pick = $$('.ad-cat[data-cat="exterior"] .ad-shot', form).filter(live)[0];
-    if (!pick) {
-      pick = $$('.ad-shot', form).filter(live).sort(function (a, b) { return a.getAttribute('data-i') - b.getAttribute('data-i'); })[0];
-    }
+    // the gallery's first, as the server orders it: Exterior, Interior, Desperfectos, then unsorted
+    var pick = GROUPS.reduce(function (all, g) { return all.concat($$('.ad-shot', listOf(g))); }, []).filter(live)[0];
     if (pick) pick.classList.add('is-auto');
   }
 
@@ -170,8 +195,9 @@
       li.innerHTML =
         '<input type="hidden" name="staged[' + it.j + '][path]" value="" disabled>' +
         '<label class="ad-shot__pic"><input class="ad-shot__cv" type="radio" name="cover_from" value="" disabled>' +
-        '<img class="ad-shot__i" alt=""><span class="ad-shot__flag">Portada</span><span class="ad-vh">Hacer esta foto la portada</span></label>' +
+        '<img class="ad-shot__i" alt="" draggable="false"><span class="ad-shot__flag">Portada</span><span class="ad-vh">Hacer esta foto la portada</span></label>' +
         '<span class="ad-shot__st"><span class="ad-shot__bar"><i></i></span><span class="ad-shot__say"></span></span>' +
+        '<button class="ad-shot__mv" type="button" aria-describedby="ad-dnd-help"><span>Mover</span></button>' +
         '<button class="ad-shot__x" type="button" data-unstage><span class="ad-shot__xi" aria-hidden="true"></span><span class="ad-vh">Quitar esta foto</span></button>' +
         '<label class="ad-tag" data-tag="' + it.cat + '"><span class="ad-vh">Grupo de la foto</span>' +
         '<select class="ad-tag__s" name="staged[' + it.j + '][tag]">' + options(it.cat) + '</select></label>';
@@ -330,6 +356,7 @@
       it.li.setAttribute('data-path', path);
       set(it, 'done');
       coverHint();
+      Order.sync();             // it has a path now, so it has a place in the order
       Draft.soon();
     }
 
@@ -398,9 +425,576 @@
     }
   }
 
+  /* -------------------------------------------------------------- the order
+     2026-10-17. The client: "he uploads the photos, but he must be able to set
+     their POSITION by drag and drop — make it as nice as possible."
+
+     Picking one up. On a phone: a quarter of a second under the finger without
+     moving (HOLD); a finger that moves first is scrolling, and the page
+     scrolls as it always did. Touch EVENTS, not pointer events, for this:
+     pointer events cannot stop a pan that has already been granted, a
+     non-passive touchmove can (registered on the photos panel only, so the
+     rest of the form still scrolls on the compositor). With a mouse: pressed
+     and moved MSLOP px. A tap or a click is still "make this the cover".
+
+     While it is held. A copy follows the finger in a layer above the page (the
+     form's own tile stays in the list as the open slot, so its inputs never
+     move out of the form). The slot goes where the finger is: onto a photo,
+     before or after it; above a group's photos, first; below them, last; into
+     an empty group, which opens while something is held. Everything that
+     shifts glides there (FLIP, --m-move). The group the finger is over keeps
+     still under it when the one above shrinks (the page scrolls by the
+     difference), or the photos would slide out from under the finger. Near
+     the top or the bottom of what is visible the page scrolls, faster the
+     nearer the edge (px/s, damped like every speed on this site). Off the
+     groups, the slot goes home: let go there, or press Esc, and nothing moved.
+
+     The keyboard. Each photo's "Mover" (seen only when it has focus): Space or
+     Enter picks it up, arrows move it (across the end of a group into the
+     next), Home/End, Space puts it down, Esc puts it back. Spoken in Spanish.
+
+     Every move can be undone ("Deshacer", Ctrl/⌘+Z). A photo still going up
+     cannot be picked up; the others move around it. */
+  var Order = (function () {
+    var box = $('#ad-photos', form), orderIn = $('#ad-order', form), live = $('#ad-dnd-live', form);
+    var root = document.documentElement, css = getComputedStyle(root);
+    var REDUCED = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+    var TR = !!(window.CSS && CSS.supports && CSS.supports('translate', '1px 1px') && CSS.supports('scale', '1'));
+    var MOVE = parseFloat(css.getPropertyValue('--m-move')) || 280;              // ms, the token
+    var EASE = css.getPropertyValue('--e-out').trim() || 'cubic-bezier(.22,.61,.36,1)';
+    var HOLD = 250, SLOP = 10, MSLOP = 4, ARM = 24; // ms; px a finger may wander while held; px a mouse moves to start;
+                                                   // px towards an edge before it scrolls
+    var MAXV = 1400, TAU = 150, TAU_OFF = 60;     // auto-scroll px/s at the very edge; damping (DESIGN-GUIDE §4),
+                                                   // quicker to stop than to start: out of the edge, it stops
+    var undos = [], drag = null, press = null, kb = null, landing = false, layer = null;
+    var swallowClick = 0, swallowKey = false, sayT = 0;
+    if (!box) return { sync: function () {}, paths: function () { return []; }, apply: function () {}, undo: function () {}, regroup: place, busy: function () { return false; } };
+
+    // what only works with this script is shown by it: the sentence that says so, each photo's "Mover"
+    $$('[data-dnd], .ad-shot__mv', box).forEach(function (el) { el.hidden = false; });
+
+    /* ---- what is where ---- */
+    function lists() { return GROUPS.map(listOf); }               // the order the server keeps
+    function shown() {                                           // top to bottom, as on the page
+      return $$('.ad-cat', box).filter(function (c) { return !c.hidden; }).map(function (c) { return $('[data-list]', c); });
+    }
+    function tiles(list) { return Array.prototype.filter.call(list.children, function (el) { return el.classList.contains('ad-shot'); }); }
+    function catOf(el) { var c = el.closest('.ad-cat'); return c ? c.getAttribute('data-cat') : 'none'; }
+    function movable(li) { return !li.classList.contains('is-new') || li.getAttribute('data-state') === 'done'; }
+    function paths() {
+      var out = [];
+      lists().forEach(function (l) { tiles(l).forEach(function (li) { var p = li.getAttribute('data-path'); if (p) out.push(p); }); });
+      return out;
+    }
+    function sync() { if (orderIn) orderIn.value = JSON.stringify(paths()); }
+    function says(li) {
+      var l = li.parentNode, all = tiles(l);
+      return 'Foto ' + (all.indexOf(li) + 1) + ' de ' + all.length + ', ' + TAGS[catOf(l)];
+    }
+    function announce(t) {
+      if (!live) return;
+      clearTimeout(sayT); live.textContent = '';
+      sayT = setTimeout(function () { live.textContent = t; }, 40);   // emptied first, so the same words are said again
+    }
+    function setCat(li, cat) {
+      var sel = $('.ad-tag__s', li), tag = $('.ad-tag', li);
+      if (sel) sel.value = cat;
+      if (tag) tag.setAttribute('data-tag', cat);
+      Up.setCat(li, cat);
+    }
+    function buzz() { try { if (navigator.vibrate) navigator.vibrate(10); } catch (e) {} }
+
+    /* Where layout puts an element, in page coordinates — transforms and running
+       animations ignored, so a decision is never taken on a photo mid-glide. */
+    function pageBox(el) {
+      var x = 0, y = 0, e = el;
+      while (e) { x += e.offsetLeft; y += e.offsetTop; e = e.offsetParent; }
+      return { left: x, top: y, width: el.offsetWidth, height: el.offsetHeight };
+    }
+
+    /* ---- the others make room: FLIP ----
+       Groups glide as blocks; a photo or an "Añadir fotos" inside one glides by
+       its own movement minus its group's, so nested motion adds up exactly. */
+    function movers() {
+      var out = [];
+      $$('.ad-cat', box).forEach(function (c) {
+        if (c.hidden) return;
+        out.push(c);
+        $$('.ad-shot, .ad-up', c).forEach(function (el) { out.push(el); });
+      });
+      Array.prototype.forEach.call(box.children, function (el) { if (el.matches('.ad-more, .ad-err')) out.push(el); });
+      return out;
+    }
+    function glide(el, dx, dy) {
+      if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) return;
+      var k = TR ? [{ translate: dx + 'px ' + dy + 'px' }, { translate: '0px 0px' }]
+                 : [{ transform: 'translate(' + dx + 'px,' + dy + 'px)' }, { transform: 'none' }];
+      try { el._mv = el.animate(k, { duration: MOVE, easing: EASE }); } catch (e) {}
+    }
+    function flip(mutate, anchor) {
+      var a0 = anchor ? pageBox(anchor).top : 0;
+      var fix = function () { if (anchor) { var d = pageBox(anchor).top - a0; if (d) window.scrollBy(0, d); } };
+      if (REDUCED.matches || !Element.prototype.animate) { mutate(); fix(); return; }
+      var first = new Map();
+      movers().forEach(function (el) { first.set(el, el.getBoundingClientRect()); });
+      first.forEach(function (r, el) { if (el._mv) { el._mv.cancel(); el._mv = null; } });
+      mutate();
+      fix();
+      var now = movers(), last = new Map(), sec = new Map(), H = window.innerHeight;
+      // off screen before and after: nothing to show, so no animation to run (a 51-photo car animates ~12, not 55)
+      var off = function (f, l) { return (f.bottom < -80 || f.top > H + 80) && (l.bottom < -80 || l.top > H + 80); };
+      now.forEach(function (el) { last.set(el, el.getBoundingClientRect()); });
+      now.forEach(function (el) {
+        var f = first.get(el), l = last.get(el);
+        if (f && el.classList.contains('ad-cat')) sec.set(el, off(f, l) ? [0, 0] : [f.left - l.left, f.top - l.top]);
+      });
+      now.forEach(function (el) {
+        var f = first.get(el), l = last.get(el);
+        if (!f || off(f, l)) return;                      // just appeared (no history to glide from), or never seen
+        var dx = f.left - l.left, dy = f.top - l.top;
+        if (!el.classList.contains('ad-cat')) { var s = sec.get(el.closest('.ad-cat')); if (s) { dx -= s[0]; dy -= s[1]; } }
+        glide(el, dx, dy);
+      });
+    }
+
+    /* ---- where the finger is: which group, and where in it ---- */
+    /* The groups, their lists and photos in page coordinates, read once and kept
+       until something in the panel changes (a MutationObserver counts changes):
+       reading offsets every frame forced a style and layout pass each time —
+       on the 51-photo car, 4x slower CPU, ~5 ms a frame for nothing. */
+    var ver = 0, seen = -1, geo = null;
+    if (window.MutationObserver) new MutationObserver(function () { ver++; }).observe(box, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'hidden', 'data-state'] });
+    else ver = NaN;                                        // never equal: measured every time
+    window.addEventListener('resize', function () { ver++; });
+    function layout() {
+      if (geo && seen === ver) return geo;
+      var secs = $$('.ad-cat', box).filter(function (c) { return !c.hidden; });
+      geo = { box: pageBox(box), secs: secs.map(function (c) {
+        var list = $('[data-list]', c), lb = pageBox(list);
+        return { top: pageBox(c).top, height: c.offsetHeight, list: list, lb: lb, tiles: tiles(list).map(function (li) {
+          return { li: li, l: lb.left + li.offsetLeft, t: lb.top + li.offsetTop, w: li.offsetWidth, h: li.offsetHeight };
+        }) };
+      }) };
+      seen = ver;
+      return geo;
+    }
+    function hit(x, y) {
+      var g = layout(), px = x + window.pageXOffset, py = y + window.pageYOffset, fb = g.box, sec = null;
+      if (px < fb.left - 16 || px > fb.left + fb.width + 16) return null;
+      for (var k = 0; k < g.secs.length; k++) {
+        var top = g.secs[k].top, next = g.secs[k + 1] ? g.secs[k + 1].top : top + g.secs[k].height + 16;
+        if (py >= (k ? top : top - 16) && py < next) { sec = g.secs[k]; break; }
+      }
+      if (!sec) return null;
+      var list = sec.list, all = sec.tiles;
+      if (!all.length || py < sec.lb.top) return { list: list, before: all.length ? all[0].li : null };
+      for (var i = 0; i < all.length; i++) {
+        var r = all[i];
+        if (px >= r.l && px < r.l + r.w && py >= r.t && py < r.t + r.h) return { list: list, over: r.li };
+      }
+      var e = all[all.length - 1];
+      if (py >= e.t + e.h || (py >= e.t && px >= e.l + e.w)) return { list: list, before: null };
+      return { list: list, keep: true };                  // in the gap between two: stay
+    }
+    function homeOf(from, li) {      // where it came from, even if the photo after it has gone since
+      if (from.before && from.before.parentNode === from.list && from.before !== li) return from.before;
+      return tiles(from.list).filter(function (x) { return x !== li; })[from.i] || null;
+    }
+    function aim(t) {
+      var li = drag.li, list, before;
+      if (!t) { list = drag.from.list; before = homeOf(drag.from, li); }
+      else if (t.keep) return;
+      else if (t.over) {
+        if (t.over === li) return;
+        list = t.list;
+        var all = tiles(list), si = all.indexOf(li), oi = all.indexOf(t.over);
+        before = si >= 0 && si < oi ? t.over.nextElementSibling : t.over;
+      } else { list = t.list; before = t.before; }
+      if (before === li || (li.parentNode === list && li.nextElementSibling === before)) return;
+      flip(function () { list.insertBefore(li, before); }, list);
+      tone(catOf(list));
+    }
+    function tone(cat) {             // the copy in the hand wears the group it is over
+      if (!drag || drag.tone === cat) return;
+      drag.tone = cat;
+      var sel = $('.ad-tag__s', drag.ghost), tag = $('.ad-tag', drag.ghost);
+      if (sel) sel.value = cat;
+      if (tag) tag.setAttribute('data-tag', cat);
+    }
+
+    /* ---- the visible band, for scrolling at its edges ---- */
+    var head = $('.ad-rail__head'), nav = $('.ad-rail__nav'), bar = $('#ad-save');
+    function fixed(el) { return el && getComputedStyle(el).position === 'fixed'; }
+    function band() {                 // the fixed strips once per drag; the sticky bar when the page has moved
+      var y = window.pageYOffset;
+      if (drag.barAt !== y || drag.barVer !== ver) {
+        var r = bar && bar.getBoundingClientRect();
+        drag.barTop = r && r.top < drag.bottom && r.bottom > drag.top ? r.top : Infinity;
+        drag.barAt = y; drag.barVer = ver;
+      }
+      return [drag.top, Math.min(drag.bottom, drag.barTop)];
+    }
+    function sq(t) { t = t < 0 ? 0 : t > 1 ? 1 : t; return t * t; }
+
+    /* ---- held by a finger or a mouse ---- */
+    function begin(li, x, y, how, id) {
+      if (drag || kb || landing || !li.isConnected || !movable(li) || !li.parentNode.hasAttribute('data-list')) return;
+      var r = li.getBoundingClientRect();
+      if (!layer) {
+        layer = document.createElement('div');
+        layer.className = 'ad-car-form ad-dnd-layer';
+        layer.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(layer);
+      }
+      var g = li.cloneNode(true);
+      // nameless before it is anywhere: a checked "cover_from" copy would uncheck the real one
+      $$('[name], [id]', g).forEach(function (el) { el.removeAttribute('name'); el.removeAttribute('id'); });
+      g.removeAttribute('data-path');
+      g.classList.remove('is-slot', 'is-lifted');
+      g.classList.add('is-ghost');
+      g.setAttribute('inert', '');
+      g.style.left = r.left + 'px'; g.style.top = r.top + 'px';
+      g.style.width = r.width + 'px'; g.style.height = r.height + 'px';
+      layer.appendChild(g);
+      drag = { li: li, ghost: g, how: how, id: id, x: x, y: y, sx: x, sy: y, gx: r.left, gy: r.top,
+               v: 0, acc: 0, t: 0, tone: null,
+               top: fixed(head) ? Math.max(0, head.getBoundingClientRect().bottom) : 0,
+               bottom: fixed(nav) ? Math.min(window.innerHeight, nav.getBoundingClientRect().top) : window.innerHeight,
+               from: { list: li.parentNode, before: li.nextElementSibling, i: tiles(li.parentNode).indexOf(li), cat: catOf(li) } };
+      tone(drag.from.cat);
+      root.classList.add('is-ordering');
+      if (how === 'mouse') root.classList.add('is-grabbing');
+      flip(function () { li.classList.add('is-slot'); form.classList.add('is-dnd'); }, li.parentNode);
+      ver++;                          // the form's class is outside what the observer watches
+      requestAnimationFrame(function () { if (drag && drag.ghost === g) g.classList.add('is-up'); });   // a frame later, so it lifts
+      if (how === 'touch') buzz();
+      drag.raf = requestAnimationFrame(tick);
+    }
+    function tick(now) {
+      if (!drag) return;
+      var dt = drag.t ? Math.min(100, now - drag.t) : 16;   // px/s even on a slow frame; capped after a stall
+      drag.t = now;
+      // reads first (the layout is clean from the last frame), writes after
+      // near an edge of what is visible the page scrolls under it, faster nearer the edge
+      // An edge only counts once the photo has been taken towards it: one picked up
+      // near the top of the screen must not set the page moving by itself.
+      var b = band(), zone = Math.min(96, (b[1] - b[0]) * 0.16), want = 0;
+      if (drag.y > b[0] + zone || drag.sy - drag.y > ARM) drag.armUp = true;
+      if (drag.y < b[1] - zone || drag.y - drag.sy > ARM) drag.armDown = true;
+      if (drag.armUp && drag.y < b[0] + zone) want = -MAXV * sq((b[0] + zone - drag.y) / zone);
+      else if (drag.armDown && drag.y > b[1] - zone) want = MAXV * sq((drag.y - b[1] + zone) / zone);
+      // never past the photos: the panel's own ends are where it stops, at once
+      var g = layout().box, frTop = g.top - window.pageYOffset;
+      var down = Math.max(0, frTop + g.height - b[1]), up = Math.max(0, b[0] - frTop);
+      if ((want > 0 && !down) || (want < 0 && !up)) want = 0;
+      drag.v += (want - drag.v) * (1 - Math.exp(-dt / (Math.abs(want) >= Math.abs(drag.v) ? TAU : TAU_OFF)));
+      if (!want && Math.abs(drag.v) < 4) { drag.v = 0; drag.acc = 0; }
+      var step = 0;
+      if (drag.v) {
+        drag.acc += drag.v * dt / 1000;                     // the float is ours; the page only takes whole pixels
+        step = drag.acc < 0 ? Math.ceil(drag.acc) : Math.floor(drag.acc);
+        if (step > down || step < -up) { step = Math.max(-up, Math.min(down, step)); drag.v = 0; drag.acc = 0; }
+        else drag.acc -= step;
+      }
+      aim(hit(drag.x, drag.y));                           // reads a clean layout; moves the slot (FLIP)
+      var dx = drag.x - drag.sx, dy = drag.y - drag.sy;
+      if (TR) drag.ghost.style.translate = dx + 'px ' + dy + 'px';
+      else drag.ghost.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+      if (step) window.scrollBy(0, step);                 // the next frame's hit sees it
+      drag.raf = requestAnimationFrame(tick);
+    }
+    function end(cancel) {
+      if (!drag) return;
+      var d = drag;
+      drag = null;
+      cancelAnimationFrame(d.raf);
+      root.classList.remove('is-grabbing');
+      var li = d.li;
+      if (!li.isConnected) {                               // taken away meanwhile (its upload withdrawn)
+        if (d.ghost.parentNode) d.ghost.parentNode.removeChild(d.ghost);
+        form.classList.remove('is-dnd'); root.classList.remove('is-ordering'); counts(); sync();
+        return;
+      }
+      if (cancel) flip(function () { d.from.list.insertBefore(li, homeOf(d.from, li)); }, d.from.list);
+      var to = li.parentNode, moved = to !== d.from.list || tiles(to).indexOf(li) !== d.from.i;
+      if (d.how === 'touch' && !cancel) buzz();
+      landing = true;
+      land(d, function () {
+        landing = false;
+        flip(function () {
+          li.classList.remove('is-slot');
+          form.classList.remove('is-dnd');
+          if (moved && catOf(to) !== d.from.cat) setCat(li, catOf(to));
+          counts();
+        }, to);
+        root.classList.remove('is-ordering');
+        if (moved) {
+          remember(li, d.from);
+          offerUndo(catOf(to) !== d.from.cat ? 'Foto movida a ' + TAGS[catOf(to)] + '.' : 'Foto movida.');
+        }
+        sync(); Draft.soon();
+      });
+    }
+    function land(d, then) {
+      var g = d.ghost, b = pageBox(d.li);
+      var tx = b.left - window.pageXOffset - d.gx, ty = b.top - window.pageYOffset - d.gy;
+      var done = false, fin = function () {
+        if (done) return;
+        done = true;
+        if (g.parentNode) g.parentNode.removeChild(g);
+        then();
+      };
+      if (REDUCED.matches) { fin(); return; }
+      g.classList.add('is-land');
+      g.classList.remove('is-up');
+      if (TR) g.style.translate = tx + 'px ' + ty + 'px';
+      else g.style.transform = 'translate(' + tx + 'px,' + ty + 'px)';
+      g.addEventListener('transitionend', function (e) { if (e.propertyName === 'translate' || e.propertyName === 'transform') fin(); });
+      setTimeout(fin, MOVE + 80);
+    }
+    function unpress() { if (press) { clearTimeout(press.timer); press = null; } }
+    function pic(e) {
+      var p = e.target && e.target.closest && e.target.closest('.ad-shot__pic'), li = p && p.closest('.ad-shot');
+      return li && !li.classList.contains('is-ghost') && li.parentNode && li.parentNode.hasAttribute('data-list') && movable(li) ? li : null;
+    }
+    function touch(list, id) {
+      for (var i = 0; list && i < list.length; i++) if (list[i].identifier === id) return list[i];
+      return null;
+    }
+
+    // a finger
+    box.addEventListener('touchstart', function (e) {
+      if (drag || kb || landing) return;
+      unpress();
+      if (e.touches.length !== 1) return;
+      var li = pic(e);
+      if (!li) return;
+      var t = e.touches[0];
+      press = { li: li, x: t.clientX, y: t.clientY, id: t.identifier, how: 'touch' };
+      press.timer = setTimeout(function () {
+        var p = press;
+        press = null;
+        if (p) begin(p.li, p.x, p.y, 'touch', p.id);
+      }, HOLD);
+    }, { passive: true });
+    box.addEventListener('touchmove', function (e) {
+      if (drag && drag.how === 'touch') {
+        if (e.cancelable) e.preventDefault();               // the page must not scroll under a held photo
+        var t = touch(e.touches, drag.id);
+        if (t) { drag.x = t.clientX; drag.y = t.clientY; }
+        return;
+      }
+      if (press && press.how === 'touch') {
+        var p = touch(e.touches, press.id);
+        if (!p || e.touches.length > 1 || Math.abs(p.clientX - press.x) + Math.abs(p.clientY - press.y) > SLOP) unpress();
+      }
+    }, { passive: false });
+    box.addEventListener('touchend', function (e) {
+      if (drag && drag.how === 'touch' && !touch(e.touches, drag.id)) {
+        if (e.cancelable) e.preventDefault();               // no click: letting go is not "make it the cover"
+        end(false);
+        return;
+      }
+      if (press && press.how === 'touch') unpress();
+    }, { passive: false });
+    box.addEventListener('touchcancel', function () { if (drag && drag.how === 'touch') end(true); unpress(); });
+    // Android's long-press menu ("Descargar imagen") and the selection it would start
+    box.addEventListener('contextmenu', function (e) { if (press || drag) e.preventDefault(); });
+    box.addEventListener('dragstart', function (e) { if (e.target.closest && e.target.closest('.ad-shot')) e.preventDefault(); });
+
+    // a mouse
+    box.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'touch' || e.button !== 0 || drag || kb || landing) return;
+      var li = pic(e);
+      if (!li) return;
+      press = { li: li, x: e.clientX, y: e.clientY, id: e.pointerId, how: 'mouse' };
+      e.preventDefault();             // no text selection; the click that follows still chooses the cover
+    });
+    document.addEventListener('pointermove', function (e) {
+      if (drag) { if (drag.how === 'mouse' && e.pointerId === drag.id) { drag.x = e.clientX; drag.y = e.clientY; } return; }
+      if (press && press.how === 'mouse' && e.pointerId === press.id
+          && Math.abs(e.clientX - press.x) + Math.abs(e.clientY - press.y) > MSLOP) {
+        var p = press;
+        press = null;
+        begin(p.li, p.x, p.y, 'mouse', p.id);
+        if (drag) { drag.x = e.clientX; drag.y = e.clientY; }
+      }
+    });
+    document.addEventListener('pointerup', function (e) {
+      if (drag && drag.how === 'mouse' && e.pointerId === drag.id) { swallowClick = Date.now(); end(false); }
+      if (press && press.how === 'mouse') press = null;
+    });
+    document.addEventListener('pointercancel', function () {
+      if (drag && drag.how === 'mouse') end(true);
+      if (press && press.how === 'mouse') press = null;
+    });
+    // letting go over the photo it came from must not make it the cover
+    window.addEventListener('click', function (e) {
+      if (swallowClick && Date.now() - swallowClick < 400) { swallowClick = 0; e.preventDefault(); e.stopPropagation(); }
+    }, true);
+
+    // away: put it back
+    window.addEventListener('blur', function () { if (drag) end(true); });
+    document.addEventListener('visibilitychange', function () { if (document.hidden) { if (drag) end(true); if (kb) put(true); } });
+    window.addEventListener('orientationchange', function () { if (drag) end(true); });
+
+    /* ---- the keyboard ---- */
+    function handle(li) { return $('.ad-shot__mv', li); }
+    function chip(li, text) { var s = $('.ad-shot__mv span', li); if (s) s.textContent = text; }
+    function pick(li) {
+      if (!movable(li)) { announce('Esta foto todavía se está subiendo; podrás moverla cuando termine.'); return; }
+      kb = { li: li, from: { list: li.parentNode, before: li.nextElementSibling, i: tiles(li.parentNode).indexOf(li), cat: catOf(li) } };
+      root.classList.add('is-ordering');
+      flip(function () { li.classList.add('is-lifted'); form.classList.add('is-dnd'); }, li.parentNode);
+      chip(li, 'Flechas · Espacio');
+      announce(says(li) + '. Cogida: muévela con las flechas, Espacio para dejarla, Escape para cancelar.');
+    }
+    function to(list, t) {           // to place t of a list, counted without the photo itself
+      var li = kb.li, others = tiles(list).filter(function (x) { return x !== li; });
+      t = Math.max(0, Math.min(others.length, t));
+      var before = others[t] || null;
+      if (li.parentNode === list && li.nextElementSibling === before) { announce(says(li) + '.'); return; }
+      kb.holding = true;
+      flip(function () {
+        list.insertBefore(li, before);
+        if (catOf(list) !== $('.ad-tag', li).getAttribute('data-tag')) setCat(li, catOf(list));
+      });
+      var h = handle(li);
+      try { h.focus({ preventScroll: true }); } catch (e) { h.focus(); }
+      kb.holding = false;
+      li.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: REDUCED.matches ? 'auto' : 'smooth' });
+      announce(says(li) + '.');
+    }
+    function cols(list) {
+      var c = getComputedStyle(list).gridTemplateColumns;
+      return c && c !== 'none' ? Math.max(1, c.trim().split(/\s+/).length) : 1;
+    }
+    function step(dir) {             // ←/→ one place, over the end of a group into the next
+      var li = kb.li, list = li.parentNode, all = tiles(list), i = all.indexOf(li), vis = shown(), g = vis.indexOf(list);
+      if (dir > 0) { if (i < all.length - 1) return to(list, i + 1); if (vis[g + 1]) return to(vis[g + 1], 0); }
+      else { if (i > 0) return to(list, i - 1); if (vis[g - 1]) return to(vis[g - 1], 1e6); }
+      announce(says(li) + '.');
+    }
+    function row(dir) {              // ↑/↓ one row, into the group above or below at the edges
+      var li = kb.li, list = li.parentNode, all = tiles(list), i = all.indexOf(li), c = cols(list), col = i % c;
+      var vis = shown(), g = vis.indexOf(list), n;
+      if (dir > 0) {
+        if (i + c < all.length) return to(list, i + c);
+        if (Math.floor(i / c) < Math.floor((all.length - 1) / c)) return to(list, all.length - 1);
+        if (vis[g + 1]) return to(vis[g + 1], col);
+      } else {
+        if (i - c >= 0) return to(list, i - c);
+        if (vis[g - 1]) { n = tiles(vis[g - 1]).length; return to(vis[g - 1], (n ? Math.floor((n - 1) / cols(vis[g - 1])) * cols(vis[g - 1]) : 0) + col); }
+      }
+      announce(says(li) + '.');
+    }
+    function put(cancel) {
+      var k = kb;
+      if (!k) return;
+      kb = null;
+      var li = k.li, h = handle(li);
+      if (cancel) {
+        flip(function () { k.from.list.insertBefore(li, homeOf(k.from, li)); setCat(li, k.from.cat); });
+        if (document.activeElement !== h) { try { h.focus({ preventScroll: true }); } catch (e) {} }
+      }
+      var moved = li.parentNode !== k.from.list || tiles(li.parentNode).indexOf(li) !== k.from.i;
+      flip(function () { li.classList.remove('is-lifted'); form.classList.remove('is-dnd'); counts(); });
+      root.classList.remove('is-ordering');
+      chip(li, 'Mover');
+      if (moved) {
+        remember(li, k.from);
+        offerUndo(catOf(li.parentNode) !== k.from.cat ? 'Foto movida a ' + TAGS[catOf(li.parentNode)] + '.' : 'Foto movida.');
+      }
+      announce(cancel ? 'Cancelado. ' + says(li) + '.' : 'Foto dejada. ' + says(li) + '.');
+      sync(); Draft.soon();
+    }
+    form.addEventListener('keydown', function (e) {
+      var h = e.target.closest && e.target.closest('.ad-shot__mv');
+      if (!h) return;
+      var k = e.key;
+      if (kb && h === handle(kb.li)) {
+        if (k === 'ArrowRight' || k === 'ArrowLeft') { e.preventDefault(); step(k === 'ArrowRight' ? 1 : -1); }
+        else if (k === 'ArrowDown' || k === 'ArrowUp') { e.preventDefault(); row(k === 'ArrowDown' ? 1 : -1); }
+        else if (k === 'Home' || k === 'End') { e.preventDefault(); to(kb.li.parentNode, k === 'Home' ? 0 : 1e6); }
+        else if (k === ' ' || k === 'Enter') { e.preventDefault(); swallowKey = true; put(false); }
+        else if (k === 'Escape') { e.preventDefault(); put(true); }
+        return;
+      }
+      if (!kb && !drag && (k === ' ' || k === 'Enter')) { e.preventDefault(); swallowKey = true; pick(h.closest('.ad-shot')); }
+    });
+    form.addEventListener('keyup', function (e) { if (e.key === ' ' || e.key === 'Enter') setTimeout(function () { swallowKey = false; }, 0); });
+    form.addEventListener('click', function (e) {
+      var h = e.target.closest && e.target.closest('.ad-shot__mv');
+      if (!h) return;
+      e.preventDefault();
+      if (swallowKey) { swallowKey = false; return; }
+      // a press that did not come through our keys (a screen reader's): pick up, or put down
+      if (kb) put(false); else pick(h.closest('.ad-shot'));
+    });
+    // focus leaving the held photo puts it down where it is
+    form.addEventListener('focusout', function (e) {
+      if (!kb || kb.holding || e.target !== handle(kb.li)) return;
+      setTimeout(function () { if (kb && !kb.holding && document.activeElement !== handle(kb.li)) put(false); }, 0);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (drag && e.key === 'Escape') { e.preventDefault(); end(true); return; }
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && (e.key === 'z' || e.key === 'Z') && undos.length && !drag && !kb) {
+        var t = e.target;
+        if (t && (t.isContentEditable || (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) && !/^(radio|checkbox|button|submit|file)$/.test(t.type || '')))) return;   // the text's own undo
+        e.preventDefault();
+        undo();
+      }
+    });
+
+    /* ---- undo ---- */
+    function remember(li, from) {
+      undos.push({ li: li, list: from.list, before: from.before, i: from.i, cat: from.cat });
+      if (undos.length > 50) undos.shift();
+    }
+    function undo() {
+      var u;
+      do { u = undos.pop(); } while (u && !u.li.isConnected);
+      endUndo();
+      if (!u || drag || kb) return;
+      flip(function () {
+        u.list.insertBefore(u.li, homeOf(u, u.li));
+        if (catOf(u.list) !== $('.ad-tag', u.li).getAttribute('data-tag')) setCat(u.li, u.cat);
+        counts();
+      });
+      u.li.scrollIntoView({ block: 'nearest', behavior: REDUCED.matches ? 'auto' : 'smooth' });
+      tell('La foto ha vuelto a su sitio.');
+      announce('Deshecho. ' + says(u.li) + '.');
+      sync(); Draft.soon();
+    }
+
+    /* ---- the chip: a move like any other ---- */
+    function regroup(li, cat) {
+      var from = { list: li.parentNode, before: li.nextElementSibling, i: tiles(li.parentNode).indexOf(li), cat: catOf(li) };
+      flip(function () { Up.setCat(li, cat); place(li, cat); });
+      remember(li, from);
+      offerUndo('Foto movida al final de ' + TAGS[cat] + '.');
+      sync();
+    }
+
+    /* ---- the phone's copy, put back: each group in the order it had ---- */
+    function apply(order) {
+      var at = {};
+      order.forEach(function (p, i) { if (typeof p === 'string' && !at.hasOwnProperty(p)) at[p] = i; });
+      lists().forEach(function (l) {
+        tiles(l).map(function (li, i) { var p = li.getAttribute('data-path'); return [li, p && at.hasOwnProperty(p) ? at[p] : 1e9 + i]; })
+          .sort(function (a, b) { return a[1] - b[1]; })
+          .forEach(function (x) { l.appendChild(x[0]); });
+      });
+      counts(); sync();
+    }
+
+    return { sync: sync, paths: paths, apply: apply, undo: undo, regroup: regroup,
+             busy: function () { return !!(drag || kb || landing); } };
+  })();
+
   /* -------------------------------------------------------- the phone's copy */
   var Draft = (function () {
-    var KEY = form.getAttribute('data-draft'), BASE = form.getAttribute('data-base'), t = 0, first = null, off = false;
+    var KEY = form.getAttribute('data-draft'), BASE = form.getAttribute('data-base'), t = 0, first = null, firstOrder = null, off = false;
     function ls() { try { return window.localStorage; } catch (e) { return null; } }
     function fields() {
       var out = {};
@@ -416,10 +1010,10 @@
     function now() {
       var s = ls();
       if (!s || off) return;
-      var f = fields(), staged = Up.done();
+      var f = fields(), staged = Up.done(), order = Order.paths();
       try {
-        if (JSON.stringify(f) === first && !staged.length) { s.removeItem(KEY); savedAt = 0; }
-        else { s.setItem(KEY, JSON.stringify({ v: 1, at: Date.now(), base: BASE, token: tokenIn.value, fields: f, staged: staged })); savedAt = Date.now(); }
+        if (JSON.stringify(f) === first && !staged.length && JSON.stringify(order) === firstOrder) { s.removeItem(KEY); savedAt = 0; }
+        else { s.setItem(KEY, JSON.stringify({ v: 1, at: Date.now(), base: BASE, token: tokenIn.value, fields: f, staged: staged, order: order })); savedAt = Date.now(); }
       } catch (e) { /* storage full or private browsing: the form still works */ }
       status();
     }
@@ -430,6 +1024,7 @@
     }
     function restore() {
       first = JSON.stringify(fields());
+      firstOrder = JSON.stringify(Order.paths());
       var s = ls(), d = null;
       if (!s) return;
       try { d = JSON.parse(s.getItem(KEY) || 'null'); } catch (e) { d = null; }
@@ -439,6 +1034,7 @@
       if (d.v !== 1 || d.base !== BASE || Date.now() - d.at > 14 * 864e5) { try { s.removeItem(KEY); } catch (e) {} return; }
 
       var n = 0, touched = [];
+      restoring = true;           // what comes back is not a move to offer undoing
       if (d.staged && d.staged.length) {
         // the photos it names were sent under that token; it has to come back with them
         if (/^[A-Za-z0-9]{32,64}$/.test(d.token || '')) tokenIn.value = d.token;
@@ -459,6 +1055,13 @@
           el.dispatchEvent(new Event(el.tagName === 'SELECT' ? 'change' : 'input', { bubbles: true }));
         }
       });
+      // last, once every photo is back in its group: where he had put each one
+      if (Array.isArray(d.order) && d.order.length) {
+        var was = JSON.stringify(Order.paths());
+        Order.apply(d.order);
+        if (JSON.stringify(Order.paths()) !== was) n++;
+      }
+      restoring = false;
       if (n) {
         savedAt = d.at;
         showNotice('', ['Lo que no llegaste a guardar (' + ago(Date.now() - d.at) + ') está otra vez aquí. ',
@@ -574,9 +1177,8 @@
       return;
     }
     if (li && t.classList.contains('ad-tag__s')) {
-      Up.setCat(li, t.value);
-      place(li, t.value);
-      tell('Foto movida a ' + TAGS[t.value] + '.');
+      if (restoring) { Up.setCat(li, t.value); place(li, t.value); }
+      else Order.regroup(li, t.value);
     }
     if (li && t.type === 'checkbox') { li.classList.toggle('is-gone', t.checked); counts(); }
     if (t.classList.contains('ad-shot__cv')) coverHint();
@@ -634,6 +1236,7 @@
     sending = true; busy(true, 'Guardando…');
     ping(8000).then(function (r) {
       if (r === 'lost') { sending = false; busy(false); return; }
+      Order.sync();
       Draft.now();
       $$('input[type="file"][data-up]', form).forEach(function (i) { i.disabled = true; });
       window.removeEventListener('beforeunload', guard);
@@ -654,6 +1257,7 @@
   $$('.ad-shot.is-new[data-state="done"]', form).forEach(Up.adopt);
   Draft.restore();
   counts();
+  Order.sync();
   status();
 })();
 </script>

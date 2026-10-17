@@ -40,6 +40,13 @@ class CarPageController extends Controller
 
         $tags = is_array($car->image_tags) ? $car->image_tags : [];
 
+        // Where each photograph sits in the order he set in the panel (drag and
+        // drop, 2026-10-17). "Todas" opens on the cover — the photograph the buyer
+        // tapped in the catalogue — and then follows that order; a group's tab
+        // follows it exactly, the cover included wherever he put it. A cover that
+        // is a separate file outside the gallery has no place in it: first.
+        $at = array_flip(array_values(is_array($car->gallery_images) ? $car->gallery_images : []));
+
         // Every photograph carries its own group, so the markup can be filtered
         // without asking the server again. Untagged ones are not invented into a
         // group — they simply appear under "Todas", which is what makes partial
@@ -50,6 +57,7 @@ class CarPageController extends Controller
                 'path'  => $path,
                 'group' => $tags[$path] ?? null,
                 'n'     => $i + 1,
+                'o'     => $at[$path] ?? -1,
             ];
         }
 

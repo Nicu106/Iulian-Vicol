@@ -22,6 +22,11 @@
        the session is kept alive while the page is open; an expired one is said
        in Spanish with a way back. Script: _form-script.blade.php.
 
+     2026-10-17 — and in his order. A photo is held and dragged to its place,
+     in its group or into another one; the order goes with the form as
+     photo_order and is the order of the car page. The keyboard does the same
+     from each photo's "Mover" button (visible only when it has focus).
+
      $vehicle is an array (the controller casts the model with toArray) or null
      on create. --}}
 @php
@@ -76,6 +81,20 @@
   }
   $coverNow = old('cover_from', $v['cover_image'] ?? null);
 
+  // One list for both kinds, so a photo sent today can sit between two that
+  // were already on the car. Back from a failed save, in the order he had left
+  // them (photo_order); otherwise the car's order, then the new ones.
+  $tiles = array_merge(
+      array_map(fn ($s) => $s + ['kind' => 'car'], $shots),
+      array_map(fn ($s, $j) => $s + ['kind' => 'staged', 'j' => $j], $staged, array_keys($staged))
+  );
+  if ($was = CarPhotos::orderOf(old('photo_order'))) {
+      $at = array_flip(array_reverse($was, true));
+      $seq = array_keys($tiles);
+      usort($seq, fn ($a, $b) => [$at[$tiles[$a]['path']] ?? PHP_INT_MAX, $a] <=> [$at[$tiles[$b]['path']] ?? PHP_INT_MAX, $b]);
+      $tiles = array_map(fn ($k) => $tiles[$k], $seq);
+  }
+
   $groups = [
       'none'     => ['Sin clasificar', 'Fotos de antes, sin grupo. Dile a cada una qué es con la etiqueta de debajo.'],
       'exterior' => ['Exterior', 'El coche por fuera, desde todos los lados.'],
@@ -122,6 +141,9 @@
       data-staged="{{ count($staged) }}">
   @csrf
   <input type="hidden" name="photo_token" id="ad-token" value="{{ $token }}">
+  {{-- Every photo's path, in the order of the groups and of the photos in them;
+       written by the script, empty (and ignored) without it. --}}
+  <input type="hidden" name="photo_order" id="ad-order" value="">
 
   {{-- The notice for a restored draft and for an expired session; filled by the script. --}}
   <div class="ad-note-box" id="ad-notice" role="status" aria-live="polite" hidden></div>
@@ -129,7 +151,9 @@
   {{-- ------------------------------------------------------------ photos --}}
   <fieldset class="ad-fs ad-box ad-photos" id="ad-photos">
     <h2 class="ad-fs__h">Las fotos</h2>
-    <p class="ad-fs__p">Cada una en su grupo: así salen en la ficha. Toca una foto para hacerla la portada.</p>
+    <p class="ad-fs__p">Así salen en la ficha, en este orden. Toca una foto para hacerla la portada.<span data-dnd hidden> Para moverla, mantenla pulsada y arrástrala a su sitio o a otro grupo.</span></p>
+    <p class="ad-vh" id="ad-dnd-help">Espacio para coger la foto, las flechas para moverla, Espacio para dejarla y Escape para cancelar.</p>
+    <p class="ad-vh" id="ad-dnd-live" aria-live="assertive" aria-atomic="true"></p>
 
     @foreach($groups as $key => [$label, $hint])
       @php $n = $count($key); @endphp
@@ -141,16 +165,18 @@
         </div>
 
         <ul class="ad-shots" data-list>
-          @foreach($shots as $s)
+          @foreach($tiles as $s)
             @continue($s['cat'] !== $key)
+            @if($s['kind'] === 'car')
             <li class="ad-shot {{ $s['rm'] ? 'is-gone' : '' }}" data-i="{{ $s['i'] }}" data-path="{{ $s['path'] }}">
               <input type="hidden" name="photos[{{ $s['k'] }}][path]" value="{{ $s['path'] }}">
               <label class="ad-shot__pic">
                 <input class="ad-shot__cv" type="radio" name="cover_from" value="{{ $s['path'] }}" @checked($coverNow === $s['path'])>
-                <img class="ad-shot__i" src="{{ \App\Support\Img::url($s['path'], 320) ?? $s['path'] }}" alt="" loading="lazy" decoding="async">
+                <img class="ad-shot__i" src="{{ \App\Support\Img::url($s['path'], 320) ?? $s['path'] }}" alt="" loading="lazy" decoding="async" draggable="false">
                 <span class="ad-shot__flag">Portada</span>
                 <span class="ad-vh">Hacer esta foto la portada</span>
               </label>
+              <button class="ad-shot__mv" type="button" aria-describedby="ad-dnd-help" hidden><span>Mover</span></button>
               <label class="ad-shot__x">
                 <input type="checkbox" name="photos[{{ $s['k'] }}][remove]" value="1" @checked($s['rm'])>
                 <span class="ad-shot__xi" aria-hidden="true"></span>
@@ -163,25 +189,25 @@
                 </select>
               </label>
             </li>
-          @endforeach
-          @foreach($staged as $j => $s)
-            @continue($s['cat'] !== $key)
-            <li class="ad-shot is-new" data-i="{{ 100000 + $j }}" data-path="{{ $s['path'] }}" data-state="done" data-j="{{ $j }}">
-              <input type="hidden" name="staged[{{ $j }}][path]" value="{{ $s['path'] }}">
+            @else
+            <li class="ad-shot is-new" data-i="{{ 100000 + $s['j'] }}" data-path="{{ $s['path'] }}" data-state="done" data-j="{{ $s['j'] }}">
+              <input type="hidden" name="staged[{{ $s['j'] }}][path]" value="{{ $s['path'] }}">
               <label class="ad-shot__pic">
                 <input class="ad-shot__cv" type="radio" name="cover_from" value="{{ $s['path'] }}" @checked($coverNow === $s['path'])>
-                <img class="ad-shot__i" src="{{ $s['path'] }}" alt="" loading="lazy" decoding="async">
+                <img class="ad-shot__i" src="{{ $s['path'] }}" alt="" loading="lazy" decoding="async" draggable="false">
                 <span class="ad-shot__flag">Portada</span>
                 <span class="ad-vh">Hacer esta foto la portada</span>
               </label>
+              <button class="ad-shot__mv" type="button" aria-describedby="ad-dnd-help" hidden><span>Mover</span></button>
               <button class="ad-shot__x" type="button" data-unstage><span class="ad-shot__xi" aria-hidden="true"></span><span class="ad-vh">Quitar esta foto</span></button>
               <label class="ad-tag" data-tag="{{ $s['cat'] }}">
                 <span class="ad-vh">Grupo de la foto</span>
-                <select class="ad-tag__s" name="staged[{{ $j }}][tag]">
+                <select class="ad-tag__s" name="staged[{{ $s['j'] }}][tag]">
                   @foreach($tagNames as $tk => $tn)<option value="{{ $tk }}" @selected($tk === $s['cat'])>{{ $tn }}</option>@endforeach
                 </select>
               </label>
             </li>
+            @endif
           @endforeach
         </ul>
 

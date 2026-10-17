@@ -13,8 +13,11 @@ use Illuminate\Support\Str;
  * each belongs to. One set of rules for the add form and the edit form.
  *
  * Where a photograph lives
- *   gallery_images  ["/storage/vehicles/{slug}/{name}", …]  in upload order
- *   cover_image     one path; usually a separate file, sometimes a gallery entry
+ *   gallery_images  ["/storage/vehicles/{slug}/{name}", …]  in the order he set
+ *                   in the form (2026-10-17: drag and drop): Exterior, Interior,
+ *                   Desperfectos, then unsorted, each group in his order
+ *   cover_image     one path; a gallery entry, or a separate file (every car
+ *                   from the old site has one until its form is saved again)
  *   image_tags      {"<path>": "exterior" | "interior" | "flaw"}; a path with no
  *                   entry is "sin clasificar" and shows only under "Todas"
  *
@@ -207,6 +210,8 @@ final class CarPhotos
      *         photos_exterior[] / photos_interior[] / photos_flaw[] / gallery_images[]
      *                                      plain multipart, without JavaScript
      *         cover_image (file), cover_from (a path already on the car, or staged)
+     *         photo_order                  JSON list of every photo in the form, in
+     *                                      the order he left them (see order())
      *
      * @param  array  $car  gallery_images, cover_image, image_tags as they are now
      * @return array{gallery_images: array, cover_image: ?string, image_tags: ?array}
@@ -297,7 +302,22 @@ final class CarPhotos
         }
         $gallery = array_values(array_unique($gallery));
 
-        // 4. the cover: an upload of its own, or one of the photos on the car
+        // 4. the order he set by dragging. Only with JavaScript — without it the
+        //    form has no way to say an order, and the gallery keeps the one it had.
+        $order = self::orderOf($r->input('photo_order'));
+        if ($order !== null) {
+            $order = array_map(fn ($p) => $staged[$p] ?? $p, $order);
+            // The cover the old site uploaded as a separate file is a photograph
+            // like the others in the form, so it takes its place among them: a
+            // position needs an entry in the list. It also means choosing another
+            // cover no longer drops that file from the car without a word.
+            if ($cover !== null && !in_array($cover, $gallery, true) && in_array($cover, $order, true)) {
+                $gallery[] = $cover;
+            }
+            $gallery = self::order($gallery, $tags, $order);
+        }
+
+        // 5. the cover: an upload of its own, or one of the photos on the car
         $coverFile = $r->file('cover_image');
         if ($coverFile instanceof UploadedFile && $coverFile->isValid()) {
             try {
@@ -319,24 +339,69 @@ final class CarPhotos
             $cover = collect($gallery)->first(fn ($p) => ($tags[$p] ?? null) === 'exterior') ?? $gallery[0];
         }
 
-        // 5. a tag only for a photograph that is still on the car
+        // 6. a tag only for a photograph that is still on the car
         $tags = array_filter($tags, fn ($t, $p) => self::tag($t) && ($p === $cover || in_array($p, $gallery, true)), ARRAY_FILTER_USE_BOTH);
 
         return ['gallery_images' => $gallery, 'cover_image' => $cover, 'image_tags' => $tags ?: null];
     }
 
     /**
-     * The photos in the order the car page shows them — the cover first unless it
-     * is also in the gallery — each with its group. The edit form groups these.
+     * Sort a car's gallery into the order the form sent: by group first
+     * (Exterior, Interior, Desperfectos, then unsorted — the car page's story,
+     * and what "Todas" reads), then by where he left each photo in its group.
+     * A photo the list does not name keeps its place after the ones it does.
+     *
+     * Only paths already in $gallery come out: the list orders, it never adds.
+     *
+     * @param  list<string>  $gallery
+     * @param  array<string,string>  $tags
+     * @param  list<string>  $order
+     * @return list<string>
+     */
+    public static function order(array $gallery, array $tags, array $order): array
+    {
+        $pos = [];
+        foreach ($order as $i => $p) {
+            $pos[$p] ??= $i;
+        }
+        $rank = array_flip(self::TAGS);
+        $was = array_flip($gallery);
+        usort($gallery, fn ($a, $b) => [$rank[$tags[$a] ?? ''] ?? 9, $pos[$a] ?? PHP_INT_MAX, $was[$a]]
+                                   <=> [$rank[$tags[$b] ?? ''] ?? 9, $pos[$b] ?? PHP_INT_MAX, $was[$b]]);
+
+        return $gallery;
+    }
+
+    /** photo_order as the form sends it (a JSON list) or as an array; null if absent, empty or not a list. */
+    public static function orderOf(mixed $v): ?array
+    {
+        if (is_string($v)) {
+            $v = trim($v) === '' ? null : json_decode($v, true);
+        }
+        if (!is_array($v) || !array_is_list($v)) {
+            return null;
+        }
+        $v = array_values(array_filter(array_slice($v, 0, 2000), fn ($p) => is_string($p) && $p !== ''));
+
+        return $v ?: null;
+    }
+
+    /**
+     * The photos in the order the form shows them and the car page's group tabs
+     * follow: the gallery's own order, with the cover first only while it is a
+     * separate file outside the gallery (where else could it go). Each with its
+     * group. The edit form groups these.
+     *
+     * Until 2026-10-17 the cover always came first, which was the old site's
+     * order. Now that he can move it, it is wherever he left it.
      *
      * @return list<array{path:string,tag:?string,i:int}>
      */
     public static function listFor(array $car): array
     {
-        $all = array_values(array_unique(array_filter(array_merge(
-            [$car['cover_image'] ?? null],
-            (array) ($car['gallery_images'] ?? [])
-        ), fn ($p) => is_string($p) && $p !== '')));
+        $gallery = array_values(array_filter((array) ($car['gallery_images'] ?? []), fn ($p) => is_string($p) && $p !== ''));
+        $cover = is_string($car['cover_image'] ?? null) && $car['cover_image'] !== '' ? $car['cover_image'] : null;
+        $all = array_values(array_unique($cover !== null && !in_array($cover, $gallery, true) ? array_merge([$cover], $gallery) : $gallery));
         $tags = is_array($car['image_tags'] ?? null) ? $car['image_tags'] : [];
 
         return array_map(fn ($p, $i) => ['path' => $p, 'tag' => self::tag($tags[$p] ?? null), 'i' => $i], $all, array_keys($all));

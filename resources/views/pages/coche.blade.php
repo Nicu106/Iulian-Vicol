@@ -129,6 +129,7 @@
              data-vset="{{ \App\Support\Img::srcset($p['path'], 2000) }}"
              data-group="{{ $p['group'] ?? 'none' }}"
              data-n="{{ $p['n'] }}"
+             data-o="{{ $p['o'] }}"
              aria-label="Foto {{ $p['n'] }}{{ $p['group'] ? ' · '.($groups[$p['group']] ?? '') : '' }}">
             {{-- 102px at 320, 118px from 1000 up. 160 covers it at DPR 2 and the
                  ladder rounds that to the 320 step. --}}
@@ -627,6 +628,13 @@
       var b = e.target.closest('.car-tab');
       if (!b) return;
       var g = b.getAttribute('data-group');
+
+      // "Todas" opens on the cover; a group follows the order set in the panel,
+      // where the cover sits wherever he put it (CarPageController, data-o).
+      var key = g === 'all' ? 'data-n' : 'data-o';
+      Array.prototype.slice.call(thumbs.children)
+        .sort(function (x, y) { return x.getAttribute(key) - y.getAttribute(key); })
+        .forEach(function (a) { thumbs.appendChild(a); });
 
       Array.prototype.forEach.call(tabs.children, function (x) {
         var on = x === b;
