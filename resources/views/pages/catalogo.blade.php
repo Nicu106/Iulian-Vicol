@@ -23,7 +23,7 @@
                 sides: it is drawn ~2.5x the screen's width, so ask for that --}}
            sizes="(max-width:768px) 250vw, 100vw" :max="2000" :fallback="1080" :priority="true" />
     <div class="cat-hero__in cat-wrap">
-      <span class="cat-hero__eyebrow">Málaga · {{ $sold }} coches entregados</span>
+      <span class="cat-hero__eyebrow">Málaga</span>
       <h1 class="cat-hero__h">Tu próximo capricho, bien elegido.</h1>
       <p class="cat-hero__p">Modelos y acabados que llaman la atención. Seleccionados, revisados
          y preparados por nuestro equipo para que disfrutes de algo especial.</p>

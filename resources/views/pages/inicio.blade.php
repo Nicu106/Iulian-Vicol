@@ -19,7 +19,7 @@
            sizes="100vw" :max="2000" :fallback="1080" :priority="true" />
     <div class="hm-hero__in cat-wrap">
       <div class="hm-hero__copy">
-        <span class="hm-hero__eyebrow">Málaga · {{ $sold }} coches entregados</span>
+        <span class="hm-hero__eyebrow">Málaga</span>
         <h1 class="hm-hero__h">Tu coche perfecto<br>te espera</h1>
         <p class="hm-hero__p">Meticulosamente escogido y llevado a los estándares más altos para ti.</p>
         <span class="hm-hero__credit">Foto de archivo · Unsplash</span>

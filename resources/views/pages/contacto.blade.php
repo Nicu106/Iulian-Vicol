@@ -36,7 +36,7 @@
   <section class="ct-open ct-grid" aria-labelledby="open-h">
 
     <div class="ct-open__say">
-      <p class="ct-open__kick ct-rise">Málaga · {{ $sold }} coches entregados</p>
+      <p class="ct-open__kick ct-rise">Málaga</p>
       <h1 class="ct-open__h ct-rise" id="open-h">Escríbeme.<br>Contesto&nbsp;yo.</h1>
     </div>
 
