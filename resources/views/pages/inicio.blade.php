@@ -51,20 +51,14 @@
           </select>
         </label>
 
-        <div class="hm-f">
-          <span>Pago</span>
-          <div class="hm-seg" role="radiogroup" aria-label="Forma de pago">
-            <label class="hm-seg__o"><input type="radio" name="pago" value="contado" checked><span>Al contado</span></label>
-            <label class="hm-seg__o"><input type="radio" name="pago" value="mes"><span>Al mes</span></label>
-          </div>
-        </div>
-
+        {{-- "Pago: al contado / al mes" removed 2026-10-20 at the client's request:
+             the price ceiling is always the cash price (the script still reads a
+             "pago" radio if one ever comes back) --}}
         <label class="hm-f">
           <span id="s-max-label">Precio máximo</span>
           <select class="mc-input" name="max" id="s-max" aria-labelledby="s-max-label">
             <option value="">Sin límite</option>
           </select>
-          <small class="hm-f__note" id="s-note" hidden>Al mes: precio entre {{ $months }} meses, <b>sin intereses ni comisiones</b>.</small>
         </label>
 
         <button class="mc-btn mc-btn--primary hm-search__go" type="submit" id="s-go">
@@ -413,7 +407,7 @@
     }
     max.value = keep && max.querySelector('option[value="' + keep + '"]') ? keep : '';
     maxLabel.textContent = monthly ? 'Cuota máxima' : 'Precio máximo';
-    note.hidden = !monthly;
+    if (note) note.hidden = !monthly;
   }
   function fillModels() {
     var keep = modelo.value;
