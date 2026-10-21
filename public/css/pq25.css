@@ -1012,8 +1012,9 @@
     bottom: calc(var(--line) + var(--cap) + var(--pq-beat) + var(--endh, 2 * var(--cap)) + var(--pq-near)); }
   .pq-on .pq-run--b .pq-show__end{ inset: auto 0 calc(var(--line) + var(--cap) + var(--pq-beat)) 0;
     max-width: none; padding: 0 var(--pq-m); }
-  /* a line waits unseen until the script has placed it */
-  .pq-on .pq-run:not(.is-set) [data-layer="line"]{ opacity: 0; }
+  /* a line waits unseen until the script has placed it; it fades in whole (pq25.js), so its
+     box neither starts below the screen nor clips its descenders */
+  .pq-on .pq-run [data-layer="line"]:not(.pq-cover):not(.pq-plate--show){ overflow: visible; transform: none; opacity: 0; }
 }
 
 /* 2.5: the reading scenes on a phone (his story, what you don't see, after the delivery, the

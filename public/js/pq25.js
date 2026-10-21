@@ -333,7 +333,7 @@
   function clear() {
     runs.forEach(function (R) {
       R.layers.forEach(function (L) {
-        L.el.style.transform = ''; L.inner.forEach(function (i) { i.style.transform = ''; });
+        L.el.style.transform = ''; L.el.style.opacity = ''; L.inner.forEach(function (i) { i.style.transform = ''; });
         L.fade.forEach(function (w) { w.style.opacity = ''; w.style.transform = ''; });
         L.last = null; L.wl = null;
       });
@@ -368,6 +368,17 @@
         var L = R.layers[i], len = (R.w[i - 1] || 0) * k;
         var t = len > 0 ? c((x - a) / (len * (1 - HOLD))) : 1;
         a += len;
+        // the closing line is text, not a picture: a wipe left it sliced wherever the scroll
+        // came to rest, so it fades in instead, rising 12px, never cut by its own box
+        if (L.type === 'line') {
+          var lo = Math.round(t * 100) / 100;
+          if (lo !== L.last) {
+            L.el.style.opacity = String(lo);
+            L.el.style.transform = 'translate3d(0,' + Math.round((1 - lo) * 24) / 2 + 'px,0)';
+            L.last = lo;
+          }
+          continue;
+        }
         var off = Math.round(L.h * (1 - t) * 2) / 2;
         if (off !== L.last) {
           var o = 'translate3d(0,' + off + 'px,0)', n = 'translate3d(0,' + (-off) + 'px,0)';
