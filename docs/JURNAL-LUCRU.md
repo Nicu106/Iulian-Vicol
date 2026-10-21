@@ -58,9 +58,11 @@ Timpul tău de gândire și de verificare între prompturi, peste 15 minute, **n
 | 15–16.10 | — | — | Admin: conturi străine șterse (de utilizator), resetarea parolei scoasă, ad.css → panel.css (Opera bloca stilul). Galería 2.4 (texte schimbate, ultimele 3 recenzii). Admin: poze în 3 grupuri (Exterior/Interior/Desperfectos) urcate una câte una din telefon, sesiune păstrată, ciorne; video YouTube pe pagina mașinii (15 mașini). Recenzii: 4.4 Editorial, 4.5 în lucru, 4.6 „La fila” pusă pe prima pagină (rollback: git revert f6cff16) |
 | 16.10 (2) | — | — | Prima pagină: recenziile 4.6 cu tăieturi curate și aer de secțiune (fără degrade), social media în stilul TikTok pe alb; recenziile din showroom implicit în spaniolă; /por-que-nosotros = Galería 2.4 pe producție (rollback: tag por-que-live-films) |
 | 17.10 | — | — | Meniu: „Nosotros” și pe telefon; logo-uri mărci centrate pe telefon; recenzii cu ramă albă subțire; /por-que-nosotros: polish telefon (poze întregi, o margine, ordinea Preparados); varianta 2.5 cu scene pe telefon (așteaptă confirmare pentru publicare); verificare securitate server (fără semne de intruziune; parolă root pe SSH = risc); admin: ordonarea pozelor prin drag and drop (telefon + calculator, Deshacer) |
+| 20.10 | — | — | Prima pagină: „Pago: al contado / al mes” scos din căutare; rândul de sus doar „Málaga” (fără „35 coches entregados”) pe prima pagină, catalog și contact |
+| 21.10 | — | — | /por-que-nosotros: varianta 2.5 pe producție (telefonul în scene; calculatorul identic pixel cu pixel pe 19 ecrane la 1440); fraza „Para que sepas…” apare întreagă, nu mai e tăiată (rollback: tag por-que-live-2.4.1) |
 | 14.10 (2) | — | — | Galería 2.3: „El color que te hace volver a mirarlo.” pe poza 27 (Cabrio bleumarin din spate, din HEIC, aceeași corecție de culoare), în loc de botul mașinii |
 | 14.10 (3) | — | — | Galería 2.3: toate mașinile întregi pe 19 formate de ecran (320 → 3440, plus ecran vertical 1080x1920); layout gândit separat pentru telefon (poze pe toată lățimea, poze mici ieșite din rând, detalii suprapuse); poza 27 pe toată lățimea; finalul cu poza 20; poza de bun venit fără efectul de deschidere pe telefon; prelungirile de asfalt și perete refăcute din blocuri reale (fără dungi) |
-| **Total** | **53,1 h** | **190** | **19 zile** |
+| **Total** | **74,9 h** | **256** | **27 zile** |
 
 
 **Consum de tokeni** (sesiunea principală plus sub-agenți, din 1 septembrie)

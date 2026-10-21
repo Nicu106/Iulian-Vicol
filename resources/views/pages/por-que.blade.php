@@ -1,8 +1,9 @@
-{{-- /por-que-nosotros — "Galería", live since 2026-10-16: proposal 2.4 from the
-     showroom (/muestras/por-que/2.4, tag por-que-v2.4), with its own assets
-     (css/por-que.css, js/por-que.js, copies of pq24.*) so later showroom work never
-     reaches the live page. Photos in storage/app/public/why/{photos,pq2,pq21,pq22,pq23}
-     — do not delete those folders. The earlier film page: tag por-que-live-films. --}}
+{{-- /por-que-nosotros — "Galería", live since 2026-10-16; since 2026-10-21 proposal 2.5
+     from the showroom (/muestras/por-que/2.5, tag por-que-v2.5): the computer and the tablet
+     exactly as 2.4, the upright phone in scenes. Its own assets (css/por-que.css, js/por-que.js,
+     copies of pq25.*) so later showroom work never reaches the live page. Photos in
+     storage/app/public/why/{photos,pq2,pq21,pq22,pq23,pq25} — do not delete those folders.
+     Earlier live pages: tags por-que-live-2.4.1, por-que-live-films. --}}
 @extends('layouts.site')
 
 @section('title', '¿Por qué IV MOTORCLASS? — Coches alemanes en Málaga')
@@ -46,6 +47,11 @@
   // cover is pq21/dkw-22.jpg, dk-22 rebuilt from the original HEIC at 4153 px
   // (same grade, same window); a phone never matches these sources.
   $wide = '(min-width: 2200px)';
+  // 2.5: an upright phone (the media query por-que.css scopes the phone design with). Its
+  // stages draw the plates a whole screen tall: pq25/tall-NNx.jpg is pq2/tall-NN with his
+  // wall carried on above (2400 x 5520, 2.3:1), so the wall reaches the top of any phone
+  $phone = '(max-width: 599px) and (max-aspect-ratio: 1/1)';
+  $tallx = fn ($k) => \App\Support\Img::srcset(sprintf('/storage/why/pq25/tall-%02dx.jpg', $k), 1600);
 @endphp
 
 {{-- =============================================================================
@@ -106,8 +112,13 @@
 @section('content')
 <main class="pq">
 
+  {{-- 2.5: on an upright phone the cover and the three words are ONE stage (por-que.css,
+       por-que.js): a screen that holds still while the photograph under the words changes.
+       Everywhere else (and with reduced motion) the two wrappers are display: contents
+       and the page is exactly the one above. --}}
+  <div class="pq-run pq-run--a" data-stage="0.26 0.22 0.22 0.26"><div class="pq-run__v">
   {{-- ---- the cover ---------------------------------------------------------- --}}
-  <section class="pq-cover" aria-labelledby="pq-h1">
+  <section class="pq-cover" aria-labelledby="pq-h1" data-layer="base">
     <div class="pq-plate pq-plate--cover">
       <div class="pq-plate__in">
         <h1 class="pq-w" id="pq-h1"><span>Un coche bien elegido.</span> <span>Y alguien que responde.</span></h1>
@@ -132,13 +143,14 @@
 
   {{-- ---- seleccionados, revisados, preparados ---------------------------------- --}}
   <section class="pq-three pq-wrap" aria-label="Seleccionados, revisados y preparados">
-    <div class="pq-plate pq-plate--sel" data-r>
+    <div class="pq-plate pq-plate--sel" data-r data-layer="base">
       <div class="pq-plate__in">
         <p class="pq-w">Seleccionados.</p>
         <div class="pq-win" aria-hidden="true"></div>
         <div class="pq-f pq-whole"><div class="pq-px"><picture>
           {{-- 2.3: photo 40 is the cover now; this plate is photo 12, the grey C-Class
                from three quarters (pq23/tall-12, dk-12: the set's grade and cut) --}}
+          <source media="{{ $phone }}" srcset="{{ $tallx(12) }}" sizes="100vw">
           <source media="{{ $frame }}" srcset="{{ \App\Support\Img::srcset('/storage/why/pq23/dk-12.jpg', 2000) }}" sizes="(min-width: 1000px) min(62vw, 960px), 100vw">
           <x-img src="/storage/why/pq23/tall-12.jpg" alt="Mercedes-Benz Clase C gris, de tres cuartos"
                  sizes="100vw" :max="1600" />
@@ -147,7 +159,7 @@
     </div>
     {{-- the word above its picture, like the two on the wall: each of the three
          words is the top-left corner of its own photograph --}}
-    <figure class="pq-pic pq-pic--rev">
+    <figure class="pq-pic pq-pic--rev" data-layer="foot">
       <figcaption class="pq-word">Revisados.</figcaption>
       <div class="pq-f" data-r><div class="pq-f__in"><div class="pq-px">
         <x-img :src="$ph(35)" alt="Rueda del Škoda Octavia RS con la pinza de freno roja"
@@ -159,18 +171,19 @@
          especial." on the silver C-Class's wall, where "Preparados." was. The leather comes
          first in the source so "Preparados." is read first; on a phone pq24.css keeps the
          plate shown before it, as in 2.3 --}}
-    <figure class="pq-pic pq-pic--joy">
+    <figure class="pq-pic pq-pic--joy" data-layer="foot">
       <div class="pq-f" data-r><div class="pq-f__in"><div class="pq-px">
         <x-img :src="$ph(24)" alt="El interior de cuero blanco del BMW Serie 4 Cabrio, visto desde arriba"
                sizes="(min-width: 1000px) 56vw, (min-width: 600px) 92vw, 167vw" :max="2000" />
       </div></div></div>
       <figcaption class="pq-word">Preparados.</figcaption>
     </figure>
-    <div class="pq-plate pq-plate--pre" data-r>
+    <div class="pq-plate pq-plate--pre" data-r data-layer="base">
       <div class="pq-plate__in">
         <p class="pq-w"><span>Para que disfrutes</span> <span>de algo especial.</span></p>
         <div class="pq-win" aria-hidden="true"></div>
         <div class="pq-f pq-whole"><div class="pq-px"><picture>
+          <source media="{{ $phone }}" srcset="{{ $tallx(51) }}" sizes="100vw">
           <source media="{{ $frame }}" srcset="{{ $src(51) }}" sizes="(min-width: 1000px) min(62vw, 960px), 100vw">
           <x-img :src="$tall(51)" alt="Mercedes-Benz Clase C plata AMG, de tres cuartos"
                  sizes="100vw" :max="1600" />
@@ -178,6 +191,7 @@
       </div>
     </div>
   </section>
+  </div></div>
 
   {{-- ---- his words, I: three details, his own sentences as their captions ------- --}}
   <section class="pq-love pq-wrap" aria-labelledby="pq-t1">
@@ -242,12 +256,15 @@
 
   {{-- ---- te lo enseño: one car, walked round ---------------------------------- --}}
   <section class="pq-show" aria-labelledby="pq-show">
+    {{-- 2.5: on an upright phone the plate and the walk-round are one stage (as above) --}}
+    <div class="pq-run pq-run--b" data-stage="0.22 0.22 0.22 0.16" data-lead="0.06"><div class="pq-run__v">
     <div class="pq-wrap">
-      <div class="pq-plate pq-plate--show" data-r>
+      <div class="pq-plate pq-plate--show" data-r data-layer="base" data-keep>
         <div class="pq-plate__in">
           <h2 class="pq-w" id="pq-show"><span>Te lo enseño</span> <span>antes de que vengas.</span></h2>
           <div class="pq-win" aria-hidden="true"></div>
           <div class="pq-f pq-whole"><div class="pq-px"><picture>
+            <source media="{{ $phone }}" srcset="{{ $tallx(14) }}" sizes="100vw">
             <source media="{{ $frame }}" srcset="{{ $srcw(14) }}" sizes="(min-width: 1000px) min(90vw, 1440px), 100vw">
             <x-img :src="$tall(14)" alt="Mercedes-Benz Clase C gris, de tres cuartos"
                    sizes="100vw" :max="1600" />
@@ -256,7 +273,7 @@
       </div>
     </div>
     <ul class="pq-gal" tabindex="0" aria-label="El exterior, el interior y sus desperfectos">
-      <li class="pq-slide pq-slide--ext">
+      <li class="pq-slide pq-slide--ext" data-layer="foot">
         <figure>
           <div class="pq-f pq-whole" data-r><div class="pq-f__in"><div class="pq-px">
             <x-img :src="$ph(17)" alt="El mismo Clase C gris por detrás, de tres cuartos"
@@ -265,7 +282,7 @@
           <figcaption class="pq-word">El exterior.</figcaption>
         </figure>
       </li>
-      <li class="pq-slide pq-slide--int">
+      <li class="pq-slide pq-slide--int" data-layer="foot">
         <figure>
           <div class="pq-f" data-r><div class="pq-f__in"><div class="pq-px">
             <x-img :src="$ph(18)" alt="El interior del mismo Clase C: volante, pantalla y consola"
@@ -274,7 +291,7 @@
           <figcaption class="pq-word">El interior.</figcaption>
         </figure>
       </li>
-      <li class="pq-slide pq-slide--det">
+      <li class="pq-slide pq-slide--det" data-layer="foot">
         <figure>
           <div class="pq-f" data-r><div class="pq-f__in"><div class="pq-px">
             <x-img :src="$ph(16)" alt="El lateral del mismo Clase C de cerca: puertas, pintura y llanta"
@@ -284,7 +301,8 @@
         </figure>
       </li>
     </ul>
-    <p class="pq-wrap pq-line pq-show__end"><span>Para que sepas</span> <span>qué te vas a encontrar.</span></p>
+    <p class="pq-wrap pq-line pq-show__end" data-layer="line"><span>Para que sepas</span> <span>qué te vas a encontrar.</span></p>
+    </div></div>
   </section>
 
   {{-- ---- his words, III: what you don't see -------------------------------- --}}
