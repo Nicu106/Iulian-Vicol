@@ -398,6 +398,8 @@ class VehicleController extends BaseController
             'meta_description' => $validated['meta_description'] ?? null,
             'tags' => $tags,
             'internal_notes' => $validated['internal_notes'] ?? null,
+            // the coches.net sheet read in the form, if any (Admin\SheetController::adopt)
+            'sheet' => SheetController::adopt($request, $slug, null),
             // Saving through the model fires ReferralObserver, which creates or removes
             // the reward for this car (App\Support\Referral::syncReward).
             'referred_by' => $validated['referred_by'] ?? null,
@@ -513,6 +515,8 @@ class VehicleController extends BaseController
             'meta_description' => $validated['meta_description'] ?? null,
             'tags' => $tags,
             'internal_notes' => $validated['internal_notes'] ?? null,
+            // the coches.net sheet read in the form, the one it had, or none (Admin\SheetController::adopt)
+            'sheet' => SheetController::adopt($request, $slug, is_array($vehicleData['sheet'] ?? null) ? $vehicleData['sheet'] : null),
             // Saving through the model fires ReferralObserver, which creates or removes
             // the reward for this car (App\Support\Referral::syncReward).
             'referred_by' => $validated['referred_by'] ?? null,

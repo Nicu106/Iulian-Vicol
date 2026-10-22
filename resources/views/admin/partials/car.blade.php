@@ -65,6 +65,11 @@
   <div class="ad-car__act">
     <a class="ad-btn ad-btn--q ad-btn--s" href="{{ route('admin.vehicles.edit', $slug) }}">Editar</a>
     <a class="ad-btn ad-btn--q ad-btn--s" href="{{ url('/coche/' . $slug) }}">Ver ficha</a>
+    {{-- The A4 placard for the bonnet (Admin\SheetController): "Imprimir" opens it
+         with the print button, "PDF" downloads it. Today's price, km and photo,
+         and a QR code to this car's page. --}}
+    <a class="ad-btn ad-btn--q ad-btn--s" href="{{ route('admin.vehicles.placard', $slug) }}">Imprimir</a>
+    <a class="ad-btn ad-btn--q ad-btn--s" href="{{ route('admin.vehicles.placard-pdf', $slug) }}" download>PDF</a>
     {{-- Selling is the second most frequent thing that happens to a car here.
          It used to mean opening the edit form and finding "Estado" among
          seventeen fields. --}}

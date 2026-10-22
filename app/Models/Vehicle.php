@@ -18,7 +18,7 @@ class Vehicle extends Model
         'purchase_price','internal_notes','views_count','inquiries_count',
         'location','availability_schedule','meta_title','meta_description','tags',
         'fuel_type','body_type','engine_capacity','images','seller_name','seller_phone','seller_email',
-        'referred_by'
+        'referred_by','sheet'
     ];
 
     protected $casts = [
@@ -43,6 +43,7 @@ class Vehicle extends Model
         'inquiries_count' => 'integer',
         'offer_expires_at' => 'date',
         'sold_date' => 'date',
+        'sheet' => 'array',          // App\Support\CochesNetSheet: specs, history, extras
     ];
 
     // Scopes for filtering

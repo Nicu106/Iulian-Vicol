@@ -117,6 +117,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/vehicles', [VehicleController::class, 'store'])->name('admin.vehicles.store');
     Route::get('/admin/vehicles/{slug}', [VehicleController::class, 'show'])->name('admin.vehicles.show');
     Route::get('/admin/vehicles/{slug}/edit', [VehicleController::class, 'edit'])->name('admin.vehicles.edit');
+    // The coches.net sheet read into the form, and the A4 placard for the bonnet (Admin\SheetController).
+    Route::post('/admin/fichas/leer', [App\Http\Controllers\Admin\SheetController::class, 'read'])->name('admin.sheets.read');
+    Route::get('/admin/fichas/{slug}/original', [App\Http\Controllers\Admin\SheetController::class, 'original'])->name('admin.sheets.original');
+    Route::get('/admin/vehicles/{slug}/cartel', [App\Http\Controllers\Admin\SheetController::class, 'placard'])->name('admin.vehicles.placard');
+    Route::get('/admin/vehicles/{slug}/cartel.pdf', [App\Http\Controllers\Admin\SheetController::class, 'placardPdf'])->name('admin.vehicles.placard-pdf');
     Route::post('/admin/vehicles/{slug}', [VehicleController::class, 'update'])->name('admin.vehicles.update');
     Route::delete('/admin/vehicles/{slug}', [VehicleController::class, 'destroy'])->name('admin.vehicles.destroy');
     

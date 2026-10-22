@@ -1263,3 +1263,47 @@ html.is-ordering body { -webkit-user-select: none; user-select: none; }
   background: none; border: 0; font: inherit; font-weight: 700; color: var(--mc-ink);
   text-decoration: underline; text-underline-offset: .2em; cursor: pointer;
 }
+
+/* ---- the coches.net sheet, read into the car form (_sheet.blade.php) ----------
+   A panel at the top of the form: what it is, one button, and after reading a
+   summary (green: all good; amber: something to check; red: not usable). Fields
+   it filled carry "De la ficha"; where his value differs, the sheet's waits under
+   the field with "Usar". */
+.ad-cnet { display: grid; gap: var(--s-4); }
+.ad-cnet__top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-4); }
+.ad-cnet__say { flex: 1 1 18rem; min-width: 0; }
+.ad-cnet__say .ad-fs__h { margin-bottom: var(--s-2); }
+.ad-cnet__p { margin: 0; font-size: var(--t-small); line-height: 1.5; color: var(--mc-ink-2); }
+.ad-cnet__a { margin-left: var(--s-2); font-weight: 600; color: var(--mc-blue); }
+.ad-cnet__pick { position: relative; flex: 0 0 auto; cursor: pointer; }
+.ad-cnet__pick:focus-within { outline: 2px solid var(--mc-blue); outline-offset: 2px; }
+.ad-cnet.is-busy .ad-cnet__pick { opacity: .55; pointer-events: none; }
+.ad-cnet__out {
+  padding: var(--s-4); border-left: 3px solid var(--mc-ink-3); background: var(--mc-band);
+  font-size: var(--t-small); line-height: 1.5; color: var(--mc-ink);
+}
+.ad-cnet__out[hidden] { display: none; }
+.ad-cnet__out p { margin: 0 0 var(--s-2); }
+.ad-cnet__out p:last-child { margin-bottom: 0; }
+.ad-cnet__out.is-ok { border-left-color: var(--mc-ok); background: var(--mc-ok-tint); }
+.ad-cnet__out.is-warn { border-left-color: var(--mc-warn); background: var(--mc-warn-tint); }
+.ad-cnet__out.is-bad { border-left-color: var(--mc-accent); background: var(--mc-accent-tint); }
+.ad-cnet__t { font-weight: 700; font-size: var(--t-body); }
+.ad-cnet__wh { font-weight: 700; margin-top: var(--s-3) !important; }
+.ad-cnet__w { margin: 0 0 var(--s-2); padding-left: 1.2em; }
+.ad-cnet__w li { margin: 0 0 var(--s-1); }
+.ad-cnet__m { font-weight: 600; }
+.ad-cnet__m a { color: var(--mc-blue); }
+.ad-cnet__n { color: var(--mc-ink-3); }
+.ad-cnet__rm { display: inline-flex; align-items: center; gap: var(--s-2); min-height: var(--mc-tap);
+  font-size: var(--t-small); color: var(--mc-ink-2); }
+.ad-field.is-filled .ad-in { border-color: var(--mc-ok); box-shadow: 0 0 0 1px var(--mc-ok); }
+.ad-field.is-filled .ad-pill input:checked + span { box-shadow: 0 0 0 2px var(--mc-ok); }
+.ad-sug { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-1) var(--s-3); margin-top: var(--s-1);
+  font-size: var(--t-label); line-height: 1.4; color: var(--mc-ink-2); }
+.ad-sug--ok { color: var(--mc-ok); font-weight: 600; }
+.ad-sug--use { padding: var(--s-2) var(--s-3); border-radius: 8px; background: var(--mc-warn-tint); color: var(--mc-ink); }
+.ad-sug__b { min-height: 36px; padding: 0 var(--s-3); border: 1px solid var(--mc-ink); border-radius: 8px;
+  background: var(--mc-surface); color: var(--mc-ink); font: inherit; font-weight: 700; cursor: pointer; }
+.ad-grid--s { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 700px) { .ad-grid--s { grid-template-columns: repeat(5, minmax(0, 1fr)); } }

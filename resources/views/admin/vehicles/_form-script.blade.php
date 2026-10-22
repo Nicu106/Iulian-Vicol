@@ -1253,6 +1253,16 @@
   }
   window.addEventListener('beforeunload', guard);
 
+  /* What the coches.net sheet reader (_sheet-script) needs from this form: the
+     draft token its photograph is staged under, how many photos there are, and a
+     way to put that photograph in like one sent from the phone. */
+  window.mcCarForm = {
+    token: function () { return tokenIn.value; },
+    photos: function () { return $$('.ad-shot', form).filter(function (li) { return !li.classList.contains('is-gone'); }).length; },
+    addPhotos: function (list) { Up.restore(list); counts(); Order.sync(); Draft.soon(); },
+    csrf: csrf
+  };
+
   /* ------------------------------------------------------------------ start */
   $$('.ad-shot.is-new[data-state="done"]', form).forEach(Up.adopt);
   Draft.restore();

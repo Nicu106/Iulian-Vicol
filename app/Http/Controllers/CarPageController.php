@@ -88,7 +88,8 @@ class CarPageController extends Controller
                 'Combustible'  => $car->fuel ?: $car->fuel_type,
                 'Cambio'       => $car->transmission,
                 'Potencia'     => $car->power ? $car->power . ' CV' : null,
-                'Estado'       => $car->condition,
+                // a DGT label typed into the old "Etiqueta" field landed here; it is not a state
+                'Estado'       => in_array(strtoupper((string) $car->condition), ['0', 'ECO', 'C', 'B'], true) ? null : $car->condition,
             ]),
 
             // The long list, further down: everything else that is known.
@@ -99,8 +100,21 @@ class CarPageController extends Controller
                 'Carrocería'             => $car->body_type,
                 'Tracción'               => $car->drivetrain,
                 'Color'                  => $car->color,
-                'Etiqueta medioambiental'=> $car->vin,   // the DGT label lives in this column
+                'Etiqueta medioambiental'=> $car->vin ?: ($car->sheet['label'] ?? null),   // the DGT label lives in this column
+                // from the coches.net sheet (Admin\SheetController), when there is one
+                'Puertas'                => $car->sheet['doors'] ?? null,
+                'Plazas'                 => $car->sheet['seats'] ?? null,
+                'Maletero'               => !empty($car->sheet['trunk']) ? number_format($car->sheet['trunk'], 0, ',', '.') . ' litros' : null,
+                'Emisiones de CO2'       => !empty($car->sheet['co2']) ? $car->sheet['co2'] . ' g/km' : null,
             ]),
+
+            // Its past, from the coches.net sheet: what it cost new in Spain with the
+            // extras it carries, against today's price, and what the dealer's own
+            // description says (registration, ITV, keys, accidents). Null without one.
+            'past'   => self::past($car),
+
+            // the warranty included with THIS car (the sheet says 1 or 2 years)
+            'warranty' => max(12, (int) ($car->sheet['warranty_months'] ?? 12)),
 
             // Price. Only what is true: what it costs, and what it cost before if that
             // is recorded. The live site puts a "market average" beside this, generated
@@ -128,5 +142,30 @@ class CarPageController extends Controller
             'km'     => fn ($n) => number_format((int) $n, 0, ',', '.') . ' km',
             'euros'  => fn ($n) => number_format((int) $n, 0, ',', '.') . ' €',
         ]);
+    }
+
+    /** the "Su historia" block: then against now, the factory extras, the facts */
+    public static function past(Vehicle $car): ?array
+    {
+        $s = $car->sheet;
+        if (!is_array($s)) return null;
+        $total = (float) ($s['new_total'] ?? 0);
+        $now = (int) $car->price;
+        $extras = collect($s['extras'] ?? [])->filter(fn ($x) => ($x['price'] ?? 0) > 0)->sortByDesc('price')
+            ->map(fn ($x) => ['name' => $x['name'], 'price' => (int) round($x['price'])])->values()->all();
+        $facts = \App\Support\CochesNetSheet::factLines($s['facts'] ?? []);
+        if (($total <= $now || $now <= 0) && !$extras && !$facts) return null;
+        return [
+            'year'   => $s['new_year'] ?? null,
+            // rounded, not cut: 49.990,6 € is 49.991 € here, on the placard and in the form
+            'total'  => $total > $now && $now > 0 ? (int) round($total) : null,
+            'base'   => isset($s['new_price']) ? (int) round($s['new_price']) : null,
+            'xtotal' => isset($s['extras_total']) ? (int) round($s['extras_total']) : null,
+            'now'    => $now,
+            'save'   => $total > $now ? (int) round($total - $now) : null,
+            'pct'    => $total > $now && $total > 0 ? (int) floor(($total - $now) / $total * 100) : null,
+            'extras' => $extras,
+            'facts'  => $facts,
+        ];
     }
 }

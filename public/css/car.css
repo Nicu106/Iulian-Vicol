@@ -690,3 +690,42 @@
 }
 .car--sold .car-video__img,
 .car--sold .car-video__player{ filter:var(--mc-sold-img); }
+
+/* ============================================================================
+   SU HISTORIA — the car's past, from the coches.net sheet
+   What it cost new (with its extras) against today, as two figures and one bar
+   of the same proportion: the navy part is what you pay, the rest of the track
+   is what the first owner paid on top. Then what the dealer's description says
+   about it, as rows like the spec list, and the factory extras with their
+   price, the dearest first. Brand tokens only; no gradient, no motion.
+   ========================================================================= */
+.car-past__cmp{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s-3) var(--s-5);
+  padding:var(--s-5); background:var(--mc-surface); border:1px solid var(--mc-hairline);
+  border-radius:var(--mc-r-card); box-shadow:var(--mc-shadow-1); }
+.car-past__fig{ margin:0; display:grid; gap:var(--s-1); min-width:0; }
+.car-past__k{ font-size:var(--t-small); color:var(--mc-ink-2); }
+.car-past__v{ font-size:clamp(1.5rem, 6vw, 2.25rem); line-height:1.05; font-weight:700; letter-spacing:-.03em;
+  color:var(--mc-ink-3); font-variant-numeric:tabular-nums; white-space:nowrap; }
+.car-past__fig--now .car-past__v{ color:var(--mc-ink); }
+.car-past__bar{ grid-column:1 / -1; height:10px; background:var(--mc-band); overflow:hidden; }
+.car-past__bar i{ display:block; height:100%; background:var(--mc-navy); }
+.car-past__say{ grid-column:1 / -1; margin:0; font-size:var(--t-body); line-height:1.5; color:var(--mc-ink); }
+
+.car-past__facts{ margin:var(--s-5) 0 0; padding:0; list-style:none; display:grid; gap:var(--s-2);
+  grid-template-columns:repeat(2,minmax(0,1fr)); }
+.car-past__facts li{ display:flex; align-items:center; gap:var(--s-2); min-width:0; padding:var(--s-3);
+  background:var(--mc-blue-tint); border-radius:var(--mc-r-card);
+  font-size:var(--t-small); line-height:1.3; font-weight:600; color:var(--mc-ink); }
+@media (min-width:700px){ .car-past__facts li{ padding:var(--s-3) var(--s-4); gap:var(--s-3); } }
+.car-past__facts li::before{ content:""; flex:0 0 auto; width:10px; height:6px; margin-top:-3px;
+  border-left:2px solid var(--mc-navy); border-bottom:2px solid var(--mc-navy); transform:rotate(-45deg); }
+
+.car-past__h{ margin:var(--s-6) 0 var(--s-3); font-size:var(--t-h3); font-weight:700; letter-spacing:-.010em; color:var(--mc-ink); }
+.car-past__ex{ margin:0; padding:0; list-style:none; display:grid; column-gap:var(--s-6);
+  grid-template-columns:minmax(0,1fr); }
+@media (min-width:700px){ .car-past__ex{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+.car-past__ex li{ display:flex; align-items:baseline; justify-content:space-between; gap:var(--s-4);
+  padding:var(--s-3) 0; border-bottom:1px solid var(--mc-hairline); font-size:var(--t-small); line-height:1.4; color:var(--mc-ink); }
+.car-past__ex li span:last-child{ flex:0 0 auto; color:var(--mc-ink-2); font-variant-numeric:tabular-nums; }
+.car-past__ex.is-folded [data-more]{ display:none; }
+.car-past .car-more{ margin-top:var(--s-3); }

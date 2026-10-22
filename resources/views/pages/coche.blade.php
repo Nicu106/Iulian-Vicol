@@ -63,11 +63,15 @@
     $mainRows = 1
       + ($video ? 1 : 0)
       + (mb_strlen(trim(strip_tags((string) $car->description))) >= 40 ? 1 : 0)
-      + ((is_array($car->features) && count($car->features)) ? 1 : 0);
+      + ((is_array($car->features) && count($car->features)) ? 1 : 0)
+      + ($past ? 1 : 0);
   @endphp
   <div class="car-grid" style="--main-rows:{{ $mainRows }}">
 
     {{-- ---------------- the photographs ---------------- --}}
+    {{-- A car saved without photographs (it happens: a car read from a sheet before
+         its photos are taken) has no gallery rather than a broken page. --}}
+    @if(count($photos))
     <section class="car-gallery" aria-label="Fotografías">
 
       {{-- The one being looked at. Without JavaScript this is simply the first
@@ -141,6 +145,7 @@
       {{-- The one group that can be empty and still has to say something. --}}
       <p class="car-empty" id="car-empty" hidden></p>
     </section>
+    @endif
 
     {{-- ---------------- the video ---------------- --}}
     {{-- After the photographs, because it is the same question — what is it
@@ -208,23 +213,22 @@
 
       <div class="car-with__grid">
 
+        {{-- One year is included with every car; a car whose sheet says two comes
+             with two, and the ladder starts there (the price of a third year from
+             two is not on the list: he says it). --}}
+        @php $wy = min(3, intdiv($warranty, 12)); @endphp
         <article class="car-off">
           <h3 class="car-off__h">Garantía</h3>
-          <p class="car-off__say">Un año va incluido con cada coche que vendo.
-            Si quieres más tiempo, se amplía.</p>
+          <p class="car-off__say">{{ $wy > 1 ? 'Con este coche van incluidos ' . ($wy === 2 ? 'dos' : 'tres') . ' años.' : 'Un año va incluido con cada coche que vendo.' }}
+            @if($wy < 3) Si quieres más tiempo, se amplía.@endif</p>
           <ul class="car-off__steps">
-            <li class="car-off__step car-off__step--inc">
-              <span class="car-off__t">1 año</span>
-              <span class="car-off__p">Incluido</span>
-            </li>
-            <li class="car-off__step">
-              <span class="car-off__t">2 años</span>
-              <span class="car-off__p">600 €</span>
-            </li>
-            <li class="car-off__step">
-              <span class="car-off__t">3 años</span>
-              <span class="car-off__p">900 €</span>
-            </li>
+            @foreach([1 => '600 €', 2 => '600 €', 3 => '900 €'] as $y => $cost)
+              @continue($y < $wy)
+              <li class="car-off__step {{ $y === $wy ? 'car-off__step--inc' : '' }}">
+                <span class="car-off__t">{{ $y === 1 ? '1 año' : $y . ' años' }}</span>
+                <span class="car-off__p">{{ $y === $wy ? 'Incluido' : ($wy === 1 ? $cost : 'Pregúntame') }}</span>
+              </li>
+            @endforeach
           </ul>
           <p class="car-off__note">Es una garantía nacional: vale en toda España, no
             sólo en Málaga. Si el coche te falla lejos de aquí, te lo atienden allí.</p>
@@ -267,6 +271,46 @@
              "Leer más" (script below; without it the text is simply all there). --}}
         <p class="car-text__p" id="car-desc">{{ \Illuminate\Support\Str::of($car->description)->stripTags() }}</p>
         <button class="car-more mc-link" type="button" id="car-more" hidden>Leer más</button>
+      </section>
+    @endif
+
+    {{-- Its past, from the coches.net sheet (CarPageController::past): what it cost
+         new against today, a bar of the same proportion, what the dealer's own
+         description says about it, and the extras it left the factory with, with
+         their price. Only what is on the sheet; nothing without one. --}}
+    @if($past)
+      <section class="car-sec car-past" aria-labelledby="h-past">
+        <h2 class="car-h2" id="h-past">Su historia</h2>
+        @if($past['total'])
+          <div class="car-past__cmp">
+            <p class="car-past__fig">
+              <span class="car-past__k">Nuevo{{ $past['year'] ? ', en ' . $past['year'] : '' }}</span>
+              <span class="car-past__v">{{ $euros($past['total']) }}</span>
+            </p>
+            <p class="car-past__fig car-past__fig--now">
+              <span class="car-past__k">Hoy</span>
+              <span class="car-past__v">{{ $euros($past['now']) }}</span>
+            </p>
+            <div class="car-past__bar" aria-hidden="true"><i style="width:{{ max(4, 100 - $past['pct']) }}%"></i></div>
+            <p class="car-past__say">{{ $euros($past['save']) }} menos que nuevo, un {{ $past['pct'] }}&nbsp;%.@if(($past['xtotal'] ?? 0) > 0) De lo que costaba, {{ $euros($past['xtotal']) }} eran extras de fábrica.@endif</p>
+          </div>
+        @endif
+        @if($past['facts'])
+          <ul class="car-past__facts">
+            @foreach($past['facts'] as $f)<li>{{ $f }}</li>@endforeach
+          </ul>
+        @endif
+        @if($past['extras'])
+          <h3 class="car-past__h">Lo que le pusieron de fábrica</h3>
+          <ul class="car-past__ex" id="past-ex">
+            @foreach($past['extras'] as $i => $x)
+              <li @if($i >= 6) data-more @endif><span>{{ $x['name'] }}</span><span>{{ $euros($x['price']) }}</span></li>
+            @endforeach
+          </ul>
+          @if(count($past['extras']) > 6)
+            <button class="car-more mc-link" type="button" id="past-more" hidden>Ver los {{ count($past['extras']) }} extras</button>
+          @endif
+        @endif
       </section>
     @endif
 
@@ -660,6 +704,17 @@
       thumbs.hidden = !n;
     });
   }
+
+  /* ---- the factory extras: the six dearest, then all of them -------------- */
+  (function () {
+    var l = document.getElementById('past-ex'), b = document.getElementById('past-more'); if (!l || !b) return;
+    l.classList.add('is-folded'); b.hidden = false;
+    b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-controls', 'past-ex');
+    var all = b.textContent;
+    b.addEventListener('click', function () { var open = l.classList.toggle('is-folded') === false;
+      b.textContent = open ? 'Ver menos' : all; b.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (!open && l.getBoundingClientRect().top < 0) l.scrollIntoView({ block: 'start' }); });
+  })();
 
   /* ---- the description folds when it is long ---------------------------- */
   (function () {

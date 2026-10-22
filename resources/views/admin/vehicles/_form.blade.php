@@ -148,6 +148,9 @@
   {{-- The notice for a restored draft and for an expired session; filled by the script. --}}
   <div class="ad-note-box" id="ad-notice" role="status" aria-live="polite" hidden></div>
 
+  {{-- ------------------------------------------------- the coches.net sheet --}}
+  @include('admin.vehicles._sheet')
+
   {{-- ------------------------------------------------------------ photos --}}
   <fieldset class="ad-fs ad-box ad-photos" id="ad-photos">
     <h2 class="ad-fs__h">Las fotos</h2>
@@ -366,7 +369,29 @@
       <label class="ad-field"><span>Potencia</span><input class="ad-in" type="text" name="power" value="{{ $f('power') }}" placeholder="150 CV" autocomplete="off" enterkeyhint="next"></label>
       <label class="ad-field"><span>Tracción</span><input class="ad-in" type="text" name="drivetrain" value="{{ $f('drivetrain') }}" autocomplete="off" enterkeyhint="next"></label>
       <label class="ad-field"><span>Color</span><input class="ad-in" type="text" name="color" value="{{ $f('color') }}" autocomplete="off" autocapitalize="words" enterkeyhint="next"></label>
-      <label class="ad-field"><span>Etiqueta medioambiental</span><input class="ad-in" type="text" name="condition" value="{{ $f('condition') }}" placeholder="C, ECO, 0" autocomplete="off" autocapitalize="characters" enterkeyhint="next"></label>
+      {{-- The DGT label lives in the vin column: that is where the car page reads it
+           ("Etiqueta medioambiental", CarPageController). This field wrote `condition`,
+           which the page shows as "Estado"; a label saved there before still shows here. --}}
+      @php $lbl = $f('vin') ?: (in_array(strtoupper((string) $f('condition')), ['0', 'ECO', 'C', 'B'], true) ? $f('condition') : ''); @endphp
+      <label class="ad-field"><span>Etiqueta medioambiental</span><input class="ad-in" type="text" name="vin" value="{{ $lbl }}" placeholder="C, ECO, 0" autocomplete="off" autocapitalize="characters" enterkeyhint="next" maxlength="10"></label>
+    </div>
+
+    {{-- From the coches.net sheet (or typed): what the car page and the placard show
+         beside the rest. Kept in the `sheet` column (Admin\SheetController::adopt). --}}
+    @php $sh = is_array($v['sheet'] ?? null) ? $v['sheet'] : []; $sv = fn ($k, $in) => old($in, $sh[$k] ?? ''); @endphp
+    <div class="ad-grid ad-grid--s" style="margin-top:var(--s-4)">
+      <label class="ad-field"><span>Puertas</span><input class="ad-in" type="text" name="sheet_doors" value="{{ $sv('doors', 'sheet_doors') }}" inputmode="numeric" maxlength="1" autocomplete="off" enterkeyhint="next"></label>
+      <label class="ad-field"><span>Plazas</span><input class="ad-in" type="text" name="sheet_seats" value="{{ $sv('seats', 'sheet_seats') }}" inputmode="numeric" maxlength="1" autocomplete="off" enterkeyhint="next"></label>
+      <label class="ad-field"><span>Maletero</span><span class="ad-unit"><input class="ad-in" type="text" name="sheet_trunk" value="{{ $sv('trunk', 'sheet_trunk') }}" inputmode="numeric" maxlength="5" autocomplete="off" enterkeyhint="next"><span class="ad-unit__u">l</span></span></label>
+      <label class="ad-field"><span>Emisiones</span><span class="ad-unit"><input class="ad-in" type="text" name="sheet_co2" value="{{ $sv('co2', 'sheet_co2') }}" inputmode="numeric" maxlength="3" autocomplete="off" enterkeyhint="next"><span class="ad-unit__u">g/km</span></span></label>
+      <div class="ad-field">
+        <span>Garantía incluida</span>
+        <select class="ad-in" name="sheet_warranty">
+          @foreach(['12' => '1 año', '24' => '2 años', '36' => '3 años'] as $m => $t)
+            <option value="{{ $m }}" @selected((string) $sv('warranty_months', 'sheet_warranty') === (string) $m || ($m === '12' && !$sv('warranty_months', 'sheet_warranty')))>{{ $t }}</option>
+          @endforeach
+        </select>
+      </div>
     </div>
 
     <label class="ad-field" style="margin-top:var(--s-5)">
@@ -501,3 +526,4 @@
 @endif
 
 @include('admin.vehicles._form-script', ['tagNames' => $tagNames])
+@include('admin.vehicles._sheet-script')

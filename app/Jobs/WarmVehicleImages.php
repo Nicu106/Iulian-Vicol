@@ -64,7 +64,9 @@ class WarmVehicleImages implements ShouldQueue
         // least visible thing: the card and the stage, then the thumbnail strip,
         // then the size the stage swaps to when a thumbnail is pressed.
         $queue = [];
-        foreach (self::FIRST as $w) {
+        // (no paths, only pairs: a car whose photos are all gone; on 18.10 this
+        // threw "Undefined array key 0" three times)
+        foreach ($paths ? self::FIRST : [] as $w) {
             $queue[] = [$paths[0], $w];
         }
         foreach (array_slice($paths, 1) as $p) {
