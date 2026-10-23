@@ -96,6 +96,10 @@ class SheetController extends Controller
                 'co2' => $sheet['co2'], 'warranty' => $sheet['warranty_months'],
                 'extras' => count($sheet['extras']), 'new_total' => $sheet['new_total'], 'new_year' => $sheet['new_year'],
                 'facts' => $sheet['facts'], 'title' => $sheet['title'],
+                // for the review window: the dearest extras and the past, in words
+                'extras_top' => collect($sheet['extras'])->filter(fn ($x) => ($x['price'] ?? 0) > 0)->sortByDesc('price')
+                    ->take(6)->map(fn ($x) => ['name' => $x['name'], 'price' => (int) round($x['price'])])->values()->all(),
+                'lines' => CochesNetSheet::factLines($sheet['facts']),
             ],
             'warnings' => $r['warnings'],
             'photo'    => $photo,

@@ -160,7 +160,10 @@ class CochesNetSheetTest extends TestCase
           ->assertJsonPath('fields.price', 19900)
           ->assertJsonPath('fields.vin', 'C')
           ->assertJsonPath('sheet.extras', 21)
-          ->assertJsonPath('sheet.seats', 5);
+          ->assertJsonPath('sheet.seats', 5)
+          // what the review window shows before anything goes in the form
+          ->assertJsonPath('sheet.extras_top.0', ['name' => 'Faros LED autoadaptables', 'price' => 1657])
+          ->assertJsonPath('sheet.lines', ['Matriculado en junio de 2020', 'Sin accidentes', 'ITV hasta 2028', 'Dos llaves']);
         // a car with no photos gets the sheet's, staged like one from the phone
         $photo = $r->json('photo.path');
         $this->assertNotEmpty($photo);

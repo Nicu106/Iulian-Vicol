@@ -1,10 +1,13 @@
 {{-- The coches.net sheet into the form (markup: _sheet.blade.php). The PDF goes to
-     POST /admin/fichas/leer the moment it is chosen; what comes back fills every
-     EMPTY field (marked "De la ficha") and, where he had already written something
-     else, waits under the field as "En la ficha: … Usar". Then a summary: what was
-     filled, what differs, the warnings the reader raised, and a car already in the
-     list that looks like the same one. The sheet's photograph comes in as a staged
-     photo only when the car has none. --}}
+     POST /admin/fichas/leer the moment it is chosen; what was read opens in a
+     window FIRST (2026-10-24, the client: "first a popup where I see the data, then
+     I confirm"): the warnings, a car already in the list, every value it would put
+     in the form (ticked where the field is empty; where he already wrote something
+     else, "Ahora: …" and unticked, his to choose), the photograph, and what is kept
+     with the car (extras, price new, its past). "Rellenar el formulario" puts the
+     ticked values in, marked "De la ficha"; "Cancelar" changes nothing. Nothing is
+     saved until Guardar. Without <dialog>, the old way: empty fields filled, the
+     rest offered under each field with "Usar". --}}
 @push('js')
 <script>
 (function () {
@@ -44,8 +47,10 @@
     e[0].dispatchEvent(new Event(e[0].tagName === 'SELECT' ? 'change' : 'input', { bubbles: true }));
     return true;
   }
+  // 1.657 €, not 1657 € (es-ES leaves four-digit numbers ungrouped; the site does not)
+  function eu(x) { return String(Math.round(Number(x))).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
   function show(name, v) {
-    var n = function (x) { return Number(x).toLocaleString('es-ES'); };
+    var n = eu;
     if (name === 'price') return n(v) + ' €';
     if (name === 'mileage') return n(v) + ' km';
     if (name === 'sheet_trunk') return v + ' l';
@@ -126,7 +131,7 @@
         return say('bad', [el('p', 'ad-cnet__t', 'No he podido usar este PDF.'), el('p', '', m || 'Vuelve a intentarlo.')]);
       }
       if (res.code !== 200 || !res.j.key) return say('bad', [el('p', 'ad-cnet__t', 'No he podido leer la ficha.'), el('p', '', 'Algo ha fallado en el servidor (' + res.code + '). Vuelve a intentarlo; si sigue, rellena el coche a mano.')]);
-      apply(res.j);
+      review(res.j);
     }, function () {
       box.classList.remove('is-busy');
       input.value = '';
@@ -134,7 +139,175 @@
     });
   });
 
-  function apply(j) {
+  /* ---- the review window ------------------------------------------------- */
+  var ORDER = ['brand', 'model', 'year', 'price', 'mileage', 'fuel', 'transmission', 'engine', 'power', 'body_type',
+               'color', 'vin', 'sheet_doors', 'sheet_seats', 'sheet_trunk', 'sheet_co2', 'sheet_warranty', 'description'];
+  var dlg = document.getElementById('ad-cnet-dlg');
+  var photosUrl = form.getAttribute('data-photos');
+
+  function canSet(name, v) {
+    var e = els(name);
+    if (!e.length) return false;
+    if (e[0].type === 'radio') return e.some(function (x) { return x.value === String(v); });
+    if (e[0].tagName === 'SELECT') return [].some.call(e[0].options, function (o) { return o.value === String(v); });
+    return true;
+  }
+  function rowsOf(j) {
+    var s = j.sheet || {}, f = {};
+    Object.keys(j.fields || {}).forEach(function (k) { f[k] = j.fields[k]; });
+    if (s.doors) f.sheet_doors = s.doors;
+    if (s.seats) f.sheet_seats = s.seats;
+    if (s.trunk) f.sheet_trunk = s.trunk;
+    if (s.co2) f.sheet_co2 = s.co2;
+    if (s.warranty) f.sheet_warranty = String(s.warranty);
+    var fresh = !box.classList.contains('has-sheet'), rows = [];
+    ORDER.forEach(function (name) {
+      var v = f[name], cur = current(name);
+      if (v == null || v === '' || cur === null) return;
+      var empty = cur === '' || (name === 'sheet_warranty' && fresh && cur === '12');
+      rows.push({ name: name, v: v, cur: cur, kind: same(cur, v) ? 'same' : (empty ? 'new' : 'diff'), ok: canSet(name, v) });
+    });
+    return rows;
+  }
+  function unstage(path) {
+    if (!path || !photosUrl) return;
+    fetch(photosUrl, { method: 'DELETE', credentials: 'same-origin', keepalive: true,
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': F.csrf ? F.csrf() : '' },
+      body: JSON.stringify({ token: F.token ? F.token() : '', path: path }) }).catch(function () {});
+  }
+  function row(r) {
+    var l = el('label', 'ad-cnet-row is-' + r.kind + (r.ok ? '' : ' is-off'));
+    var c = el('input'); c.type = 'checkbox'; c.checked = r.ok && r.kind === 'new'; c.disabled = !r.ok;
+    c.setAttribute('data-name', r.name);
+    var t = el('span', 'ad-cnet-row__t');
+    t.appendChild(el('span', 'ad-cnet-row__k', NAMES[r.name]));
+    t.appendChild(el('span', 'ad-cnet-row__v', show(r.name, r.v)));
+    if (r.kind === 'diff') t.appendChild(el('span', 'ad-cnet-row__was', 'Ahora: ' + (r.name === 'description' ? show(r.name, r.cur) : show(r.name, r.cur))));
+    if (!r.ok) t.appendChild(el('span', 'ad-cnet-row__was', 'No está en las opciones del formulario: ponlo a mano.'));
+    l.appendChild(c); l.appendChild(t);
+    return l;
+  }
+  function review(j) {
+    if (!dlg || typeof dlg.showModal !== 'function') return applyInline(j);
+    var s = j.sheet || {}, rows = rowsOf(j);
+    var news = rows.filter(function (r) { return r.kind === 'new'; }),
+        diffs = rows.filter(function (r) { return r.kind === 'diff'; }),
+        sames = rows.filter(function (r) { return r.kind === 'same'; });
+    var photo = j.photo && j.photo.path;
+    dlg.textContent = '';
+
+    var head = el('header', 'ad-cnet-dlg__head');
+    head.appendChild(el('h2', 'ad-cnet-dlg__h', 'Datos de la ficha'));
+    head.lastChild.id = 'ad-cnet-dlg-h';
+    head.lastChild.tabIndex = -1;
+    head.appendChild(el('p', 'ad-cnet-dlg__p', s.title || ''));
+    dlg.appendChild(head);
+
+    var body = el('div', 'ad-cnet-dlg__body');
+    var warn = j.warnings || [], matches = j.matches || [];
+    if (warn.length || matches.length) {
+      var w = el('div', 'ad-cnet-dlg__warn');
+      w.appendChild(el('p', 'ad-cnet-dlg__wh', warn.length + matches.length === 1 ? 'Revisa esto antes de confirmar:' : 'Revisa estas ' + (warn.length + matches.length) + ' cosas antes de confirmar:'));
+      var ul = el('ul');
+      warn.forEach(function (x) { ul.appendChild(el('li', '', x)); });
+      matches.forEach(function (m) {
+        var li = el('li', '', (m.status === 'sold' ? 'Parece el mismo coche que vendiste: ' : 'Parece que ya tienes este coche: ') + m.name + '. ');
+        var a = el('a', '', 'Abrirlo'); a.href = m.url; a.target = '_blank'; a.rel = 'noopener';
+        li.appendChild(a); ul.appendChild(li);
+      });
+      w.appendChild(ul);
+      body.appendChild(w);
+    }
+    if (photo) {
+      var ph = el('label', 'ad-cnet-dlg__photo');
+      var pc = el('input'); pc.type = 'checkbox'; pc.checked = true; pc.id = 'ad-cnet-photo';
+      var im = el('img'); im.src = photo; im.alt = '';
+      var pt = el('span', '', 'Poner esta foto como primera foto');
+      ph.appendChild(pc); ph.appendChild(im); ph.appendChild(pt);
+      body.appendChild(ph);
+    }
+    if (news.length) {
+      body.appendChild(el('h3', 'ad-cnet-dlg__g', diffs.length || sames.length ? 'Campos vacíos que rellena' : 'Lo que rellena'));
+      news.forEach(function (r) { body.appendChild(row(r)); });
+    }
+    if (diffs.length) {
+      var gh = el('div', 'ad-cnet-dlg__gh');
+      gh.appendChild(el('h3', 'ad-cnet-dlg__g', diffs.length === 1 ? 'Distinto de lo que tienes' : 'Distintos de lo que tienes'));
+      var all = el('button', 'ad-cnet-dlg__all', 'Usar los de la ficha'); all.type = 'button';
+      gh.appendChild(all);
+      body.appendChild(gh);
+      body.appendChild(el('p', 'ad-cnet-dlg__note', 'Marca los que quieras cambiar; los que dejes sin marcar se quedan como están.'));
+      var diffRows = diffs.map(function (r) { var x = row(r); body.appendChild(x); return x; });
+      all.addEventListener('click', function () {
+        var boxes = diffRows.map(function (x) { return x.querySelector('input'); }).filter(function (c) { return !c.disabled; });
+        var on = boxes.some(function (c) { return !c.checked; });
+        boxes.forEach(function (c) { c.checked = on; });
+        all.textContent = on ? 'Dejar los míos' : 'Usar los de la ficha';
+      });
+    }
+    if (sames.length) {
+      body.appendChild(el('p', 'ad-cnet-dlg__same', 'Ya coinciden: ' + sames.map(function (r) { return NAMES[r.name].toLowerCase(); }).join(', ') + '.'));
+    }
+
+    // what goes with the car on save, whatever is ticked above
+    var keep = el('section', 'ad-cnet-dlg__keep');
+    keep.appendChild(el('h3', 'ad-cnet-dlg__g', 'Se guarda con el coche'));
+    if (s.new_total) keep.appendChild(el('p', 'ad-cnet-dlg__big', 'Precio de nuevo' + (s.new_year ? ' en ' + s.new_year : '') + ': ' + eu(s.new_total) + ' €'));
+    if ((s.lines || []).length) keep.appendChild(el('p', '', s.lines.join(' · ')));
+    if ((s.extras_top || []).length) {
+      var ex = el('ul', 'ad-cnet-dlg__ex');
+      s.extras_top.forEach(function (x) {
+        var li = el('li'); li.appendChild(el('span', '', x.name)); li.appendChild(el('span', '', eu(x.price) + ' €')); ex.appendChild(li);
+      });
+      keep.appendChild(ex);
+      if (s.extras > s.extras_top.length) keep.appendChild(el('p', 'ad-cnet-dlg__note', 'y ' + (s.extras - s.extras_top.length) + ' extras más.'));
+    }
+    if (keep.childNodes.length > 1) body.appendChild(keep);
+    dlg.appendChild(body);
+
+    var foot = el('footer', 'ad-cnet-dlg__foot');
+    var no = el('button', 'ad-btn ad-btn--q', 'Cancelar'); no.type = 'button';
+    var yes = el('button', 'ad-btn', 'Rellenar el formulario'); yes.type = 'button';
+    foot.appendChild(no); foot.appendChild(yes);
+    dlg.appendChild(foot);
+
+    var done = false;
+    function finish(ok) {
+      if (done) return; done = true;
+      var usePhoto = photo && ok && document.getElementById('ad-cnet-photo') && document.getElementById('ad-cnet-photo').checked;
+      if (photo && !usePhoto) unstage(photo);
+      if (dlg.open) dlg.close();
+      if (!ok) return say('none', [el('p', '', 'No se ha cambiado nada. Puedes volver a subir la ficha cuando quieras.')]);
+      clearMarks();
+      var put = 0;
+      [].forEach.call(body.querySelectorAll('.ad-cnet-row input:checked'), function (c) {
+        var name = c.getAttribute('data-name'), r = rows.filter(function (x) { return x.name === name; })[0];
+        if (r && setVal(name, r.v)) { filled(name); put++; }
+      });
+      keyIn.value = j.key;
+      if (usePhoto && F.addPhotos) F.addPhotos([{ path: photo, tag: 'exterior' }]);
+      var kept = diffs.length - [].filter.call(body.querySelectorAll('.ad-cnet-row.is-diff input'), function (c) { return c.checked; }).length;
+      var msg = [el('p', 'ad-cnet__t', 'Ficha aplicada: ' + (s.title || 'el coche'))];
+      msg.push(el('p', '', (put ? put + (put === 1 ? ' dato puesto en el formulario' : ' datos puestos en el formulario') + ' (marcados «De la ficha»)' : 'Ningún dato cambiado en el formulario') +
+        (kept > 0 ? '; ' + kept + (kept === 1 ? ' se queda' : ' se quedan') + ' como lo tenías' : '') + '.'));
+      if (s.extras || s.new_total) msg.push(el('p', '', 'Los extras, el precio de nuevo y su historia se guardan con el coche.'));
+      msg.push(el('p', 'ad-cnet__n', 'Nada se guarda hasta que pulses «Guardar».'));
+      say('ok', msg);
+      var first = form.querySelector('.is-filled');
+      if (first) first.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+    no.addEventListener('click', function () { finish(false); });
+    yes.addEventListener('click', function () { finish(true); });
+    dlg.addEventListener('cancel', function () { finish(false); }, { once: true });   // Escape, the back gesture
+    out.hidden = true;
+    dlg.showModal();
+    body.scrollTop = 0;
+    // focus on the title, not on a button: nothing is pressed by a stray tap or Enter
+    head.firstChild.focus({ preventScroll: true });
+  }
+
+  /* ---- without <dialog>: fill the empty fields, offer the rest under each --- */
+  function applyInline(j) {
     clearMarks();
     keyIn.value = j.key;
     var s = j.sheet || {}, fields = {};
@@ -171,7 +344,7 @@
     nodes.push(el('p', '', line.join('. ') + '.'));
     var keep = [];
     if (s.extras) keep.push(s.extras + ' extras de fábrica con su precio');
-    if (s.new_total) keep.push('el precio de nuevo (' + Number(s.new_total).toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' €' + (s.new_year ? ' en ' + s.new_year : '') + ')');
+    if (s.new_total) keep.push('el precio de nuevo (' + eu(s.new_total) + ' €' + (s.new_year ? ' en ' + s.new_year : '') + ')');
     if (s.facts && Object.keys(s.facts).length) keep.push('su historia (matrícula, ITV, llaves…)');
     if (keep.length) nodes.push(el('p', '', 'Al guardar se quedan con el coche ' + keep.join(', ') + '.'));
     if (photo) nodes.push(el('p', '', 'He puesto la foto de la ficha como primera foto. Cuando subas las tuyas, quítala si quieres.'));

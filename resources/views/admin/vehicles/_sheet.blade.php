@@ -29,6 +29,8 @@
     </label>
   </div>
   <div class="ad-cnet__out" id="ad-cnet-out" role="status" aria-live="polite" hidden></div>
+  {{-- what was read, to look at and confirm before anything goes in the form (_sheet-script) --}}
+  <dialog class="ad-cnet-dlg" id="ad-cnet-dlg" aria-labelledby="ad-cnet-dlg-h"></dialog>
   @if($shRead)
     <label class="ad-cnet__rm"><input type="checkbox" name="sheet_remove" value="1"> Quitar la ficha de este coche</label>
   @endif
