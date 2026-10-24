@@ -248,7 +248,12 @@ class CochesNetSheetTest extends TestCase
         $this->actingAs($admin)->get(route('admin.vehicles.placard', $car->slug))->assertOk()
              ->assertSee('18.700 €')->assertSee('20.000 €')->assertSee('134.711 km')
              ->assertSee('49.991 €')->assertSee('Faros LED autoadaptables')->assertSee('<svg', false)
-             ->assertSee('Garantía 2 años incluida')->assertSee('Imprimir')->assertSee('Descargar PDF');
+             ->assertSee('Precio al contado')->assertSee('2 años')->assertSee('24 meses')
+             ->assertSee('Equipamiento extra')->assertSee('Desglose de la oferta')->assertSee('Matriculado en junio de 2020')
+             ->assertSee('data-ratio', false)->assertSee('Imprimir')->assertSee('Descargar PDF');
+
+        // the financed price was read at another cash price: not printed once the price moved
+        $this->assertNull(\App\Http\Controllers\Admin\SheetController::placardData($car, false)['financed']);
 
         $pdf = $this->actingAs($admin)->get(route('admin.vehicles.placard-pdf', $car->slug));
         $pdf->assertOk()->assertHeader('Content-Type', 'application/pdf');

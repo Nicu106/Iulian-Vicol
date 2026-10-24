@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Vehicle;
 use App\Support\CarPhotos;
 use App\Support\CochesNetSheet;
+use App\Support\Img;
 use App\Support\Marques;
 use chillerlan\QRCode\Common\EccLevel;
 use chillerlan\QRCode\QRCode;
@@ -228,81 +229,204 @@ class SheetController extends Controller
         }
     }
 
-    /** everything the placard shows, from the database today */
+    /** Largest photograph box on the placard, and the shortest it may get (mm). */
+    private const PHOTO_W = 122;
+    private const PHOTO_H = 86;
+    private const PHOTO_MIN_H = 62;
+
+    /**
+     * Everything the placard shows, from the database today.
+     *
+     * Laid out like the coches.net "Imprimir vehículo" sheet Iulian prints today
+     * (tests/fixtures/coches-net): his details and the photograph, the name, the
+     * prices and the warranty, the spec grid, the extras with their prices beside
+     * the QR code, then the description and what it cost new. The values are the
+     * car's own (price, km, colour… as they are in the admin now); the sheet only
+     * adds what the car form does not hold.
+     */
     public static function placardData(Vehicle $car, bool $inline): array
     {
         $s = $car->sheet ?? [];
         $marque = Marques::for($car->brand);
         $url = url('/coche/' . $car->slug);
 
+        // ?c=qr: a scan of this sheet is counted as such (App\Support\Stats); the
+        // page takes it off the address straight away
         $qr = (new QRCode(new QROptions([
             'outputType' => 'svg', 'outputBase64' => false, 'eccLevel' => EccLevel::M,
             'addQuietzone' => false, 'svgUseFillAttributes' => true, 'drawLightModules' => false,
             'connectPaths' => true, 'svgAddXmlHeader' => false,
-        ])))->render($url);
+        ])))->render($url . '?c=qr');
 
-        // the cover: the file itself (print wants every pixel), inline for Chrome
-        $photo = null;
-        $cover = $car->primary_image ?? $car->cover_image;
-        if ($cover) {
-            $file = public_path(ltrim(parse_url($cover, PHP_URL_PATH) ?? '', '/'));
-            if (!is_file($file)) $file = storage_path('app/public/' . preg_replace('~^/?storage/~', '', $cover));
-            if (is_file($file)) {
-                $photo = $inline ? 'data:' . (mime_content_type($file) ?: 'image/jpeg') . ';base64,' . base64_encode(file_get_contents($file)) : $cover;
-            }
-        }
+        $now = (int) $car->price;
+        $newTotal = (float) ($s['new_total'] ?? 0);
+        // the financed price was read with the cash price of that day: once the
+        // price has changed it is no longer true, so it is not printed
+        $fin = (float) ($s['price_financed'] ?? 0);
+        $finOk = $fin > 0 && (int) round((float) ($s['price_cash'] ?? 0)) === $now;
 
         $label = strtoupper(trim((string) ($car->vin ?: ($s['label'] ?? ''))));
         $label = in_array($label, ['0', 'CERO', 'ECO', 'C', 'B'], true) ? ($label === 'CERO' ? '0' : $label) : null;
-        $now = (int) $car->price;
-        $newTotal = (float) ($s['new_total'] ?? 0);
+
+        $extras = collect($s['extras'] ?? [])->filter(fn ($x) => trim((string) ($x['name'] ?? '')) !== '')
+            ->sortByDesc(fn ($x) => (float) ($x['price'] ?? 0))->values()->all();
 
         return [
             'car'      => $car,
             'inline'   => $inline,
             'brand'    => $marque['name'] ?? Str::title((string) $car->brand),
             'url'      => $url,
-            'urlShort' => preg_replace('~^https?://(www\.)?~', '', $url),
             'qr'       => $qr,
-            'photo'    => $photo,
+            'logo'     => self::asset(public_path('img/brand/iv-motorclass.png'), $inline, '/img/brand/iv-motorclass.png'),
+            'photo'    => self::placardPhoto($car, $inline),
             'label'    => $label,
             'price'    => $now,
+            'financed' => $finOk ? $fin : null,
             'before'   => $car->original_price && $car->original_price > $car->price ? (int) $car->original_price : null,
-            'warranty' => (int) ($s['warranty_months'] ?? 12),
-            'specs'    => self::specs($car),
-            'new'      => $newTotal > $now && $newTotal > 0 ? [
-                'year' => $s['new_year'] ?? null, 'total' => $newTotal, 'base' => $s['new_price'] ?? null,
-                'extras' => $s['extras_total'] ?? null, 'save' => $newTotal - $now,
+            'warranty' => max(12, (int) ($s['warranty_months'] ?? 12)),
+            'specs'    => self::specs($car, $label),
+            'new'      => $newTotal > $now && $now > 0 ? [
+                'year' => $s['new_year'] ?? null, 'total' => $newTotal, 'base' => (float) ($s['new_price'] ?? 0),
+                'extras' => (float) ($s['extras_total'] ?? 0), 'save' => $newTotal - $now,
                 'pct' => (int) floor(($newTotal - $now) / $newTotal * 100),
             ] : null,
-            'extras'   => collect($s['extras'] ?? [])->filter(fn ($x) => ($x['price'] ?? 0) > 0)
-                            ->sortByDesc('price')->values()->all(),
+            'extras'   => $extras,
             'facts'    => CochesNetSheet::factLines($s['facts'] ?? []),
-            // a car without a sheet: its own equipment list, as much as fits
-            'features' => array_slice(array_values(array_filter((array) $car->features, 'is_string')), 0, 16),
+            // a car without a sheet: its own equipment list
+            'features' => $extras ? [] : self::equipment($car),
+            'about'    => self::paragraphs((string) ($car->description ?: ($s['description'] ?? ''))),
             'fonts'    => $inline ? self::fontFaces() : null,
         ];
     }
 
-    /** the facts that decide a viewing, then the rest, in the site's words */
-    public static function specs(Vehicle $car): array
+    /**
+     * His equipment list, less the lines that only repeat the grid above it: he
+     * often starts it with the car's name, the year and the kilometres
+     * ("Volkswagen Golf VII 2.0 TDI Lounge", "año 2016", "114.000 km").
+     */
+    private static function equipment(Vehicle $car): array
+    {
+        $brand = Str::lower((string) (Marques::for($car->brand)['name'] ?? $car->brand));
+        $first = Str::lower(strtok($brand, ' -'));
+        return array_values(array_filter(array_map('trim', array_filter((array) $car->features, 'is_string')), function ($f) use ($brand, $first) {
+            $l = Str::lower($f);
+            return $f !== ''
+                && !preg_match('~^(año\s*)?(19|20)\d\d$~u', $l)
+                && !preg_match('~^[\d.\s]+\s*km$~u', $l)
+                && !($first !== '' && str_starts_with($l, $first))
+                && !str_starts_with($l, $brand);
+        }));
+    }
+
+    /**
+     * The cover photograph and the box it is drawn in, at its own proportions:
+     * nothing is cut off. As wide as fits beside the dealer panel and as tall as
+     * the header allows; a very wide photo is matted above and below rather than
+     * trimmed. In the PDF the 2000px derivative is used when it is built (already
+     * turned upright, a fraction of the bytes), else the original file.
+     *
+     * @return array{src:string,w:float,h:float,ratio:float}|null
+     */
+    private static function placardPhoto(Vehicle $car, bool $inline): ?array
+    {
+        $cover = $car->primary_image ?? $car->cover_image;
+        if (!$cover) return null;
+
+        $file = public_path(ltrim(parse_url($cover, PHP_URL_PATH) ?? '', '/'));
+        if (!is_file($file)) $file = storage_path('app/public/' . preg_replace('~^/?storage/~', '', $cover));
+        if (!is_file($file)) return null;
+
+        $size = Img::size($cover) ?: (@getimagesize($file) ?: null);
+        $ratio = $size && $size[1] > 0 ? $size[0] / $size[1] : 4 / 3;
+
+        $w = min(self::PHOTO_W, self::PHOTO_H * $ratio);
+        $h = max(self::PHOTO_MIN_H, $w / $ratio);
+
+        $src = $inline ? (self::jpeg(self::derivative($cover)) ?? self::asset($file, true, $cover)) : $cover;
+
+        return ['src' => $src, 'w' => round($w, 1), 'h' => round($h, 1), 'ratio' => round($ratio, 4)];
+    }
+
+    /**
+     * The site's 2000px derivative of a photo (App\Support\Img), built now if it
+     * is not yet: upright, 2000px (≈450 dpi at the width it prints) and a
+     * fraction of the bytes. A 3 MB PNG cover made a 3.8 MB PDF.
+     */
+    private static function derivative(string $cover): ?string
+    {
+        $path = parse_url($cover, PHP_URL_PATH) ?: '';
+        if (!str_starts_with($path, '/storage/')) return null;
+        $rel = Img::relativeFor($path);
+        $fs = storage_path('app/public/' . $rel);
+        if (!is_file($fs)) return null;
+        $out = storage_path('app/public/cache/img_' . Img::cacheKey($rel, 2000, (int) filemtime($fs))
+            . '.' . (function_exists('imagewebp') ? 'webp' : 'jpg'));
+        if (!is_file($out)) {
+            try {
+                app(\App\Http\Controllers\ImageController::class)->resize(Request::create('/img/2000', 'GET', ['p' => $path]), 2000);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+        return is_file($out) ? $out : null;
+    }
+
+    /** Chrome puts a JPEG into the PDF as it is, and anything else (WebP, PNG)
+        uncompressed: the derivative as a JPEG keeps the PDF small. */
+    private static function jpeg(?string $file): ?string
+    {
+        if (!$file || !function_exists('imagecreatefromwebp')) return null;
+        $im = str_ends_with($file, '.webp') ? @imagecreatefromwebp($file) : @imagecreatefromjpeg($file);
+        if (!$im) return null;
+        ob_start();
+        imagejpeg($im, null, 88);
+        return 'data:image/jpeg;base64,' . base64_encode((string) ob_get_clean());
+    }
+
+    /** a file as a data: URI for the PDF (Chrome reads nothing else), or its URL on screen */
+    private static function asset(string $file, bool $inline, string $url): ?string
+    {
+        if (!is_file($file)) return null;
+        return $inline ? 'data:' . (mime_content_type($file) ?: 'application/octet-stream') . ';base64,' . base64_encode(file_get_contents($file)) : $url;
+    }
+
+    /** the description as he wrote it: blank lines part paragraphs, single ones break lines */
+    private static function paragraphs(string $text): array
+    {
+        $text = trim(str_replace(["\r\n", "\r"], "\n", strip_tags(preg_replace('~<br\s*/?>|</p>~i', "\n", $text))));
+        if ($text === '') return [];
+        return array_values(array_filter(array_map(
+            fn ($p) => preg_replace("/[ \t]+/", ' ', trim($p)),
+            preg_split("/\n\s*\n+/", $text)
+        ), fn ($p) => $p !== ''));
+    }
+
+    /**
+     * The spec grid, in the coches.net sheet's order, with the car's values of
+     * today. Etiqueta is drawn by the view from $label.
+     */
+    public static function specs(Vehicle $car, ?string $label = null): array
     {
         $s = $car->sheet ?? [];
         $num = fn ($n) => number_format((int) $n, 0, ',', '.');
         $cv = (int) preg_replace('/\D/', '', (string) $car->power);
+        $cc = (int) ($s['cc'] ?? 0);
+        $engine = trim((string) $car->engine);
         return array_filter([
             'Año'         => $car->year,
             'Kilómetros'  => $car->mileage ? $num($car->mileage) . ' km' : null,
-            'Combustible' => $car->fuel ?: $car->fuel_type,
+            'Tipología'   => $car->body_type,
             'Cambio'      => $car->transmission,
-            'Potencia'    => $cv ? $cv . ' CV' : null,
-            'Motor'       => $car->engine ? (preg_match('/^\d\.\d$/', $car->engine) && !empty($s['cc']) ? $car->engine . ' · ' . $num($s['cc']) . ' cc' : $car->engine) : null,
-            'Carrocería'  => $car->body_type,
-            'Color'       => $car->color,
             'Puertas'     => $s['doors'] ?? null,
             'Plazas'      => $s['seats'] ?? null,
-            'Maletero'    => !empty($s['trunk']) ? $num($s['trunk']) . ' l' : null,
+            'Cubicaje'    => $cc ? $num($cc) . ' cc' : null,
+            'Motor'       => !$cc && $engine !== '' ? $engine : null,
+            'Potencia'    => $cv ? $cv . ' CV' : null,
             'Emisiones'   => !empty($s['co2']) ? $s['co2'] . ' g/km' : null,
+            'Color'       => $car->color,
+            'Combustible' => $car->fuel ?: $car->fuel_type,
+            'Maletero'    => !empty($s['trunk']) ? $num($s['trunk']) . ' l' : null,
+            'Etiqueta'    => $label,
         ], fn ($v) => $v !== null && $v !== '');
     }
 
