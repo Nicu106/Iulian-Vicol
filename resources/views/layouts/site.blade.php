@@ -83,6 +83,92 @@
 
 @yield('after')
 
+{{-- The panel's statistics (App\Support\Stats, POST /s — read its docblock).
+     Anonymous and counted, never followed: no cookie, no storage, nothing typed.
+     One beacon when the page opens; one when it is hidden or left, with the
+     seconds it was on screen, how far down it was read and how many photographs
+     were seen; one per press on WhatsApp, the phone, e-mail, the map, or any
+     element marked data-stat="name". A form marked data-stat-form="name" says
+     when it is started and when it is sent, never what is in it. --}}
+<script>
+(function () {
+  var path = location.pathname, beacon = navigator.sendBeacon && navigator.sendBeacon.bind(navigator);
+  function send(d) {
+    if (!beacon) return;
+    d.p = path;
+    try { beacon('/s', new URLSearchParams(d)); } catch (e) {}
+  }
+  window.mcStat = function (t, name) { send(name ? { t: 'ev', e: name } : { t: t }); };
+  send({ t: 'view', q: location.search, r: document.referrer });
+
+  // The bonnet placard's QR opens /coche/…?c=qr: counted above, then taken off
+  // the address so a link shared from here is not another "scan".
+  if (/[?&]c=qr(&|$)/.test(location.search) && history.replaceState) {
+    try {
+      var u = new URL(location.href); u.searchParams.delete('c');
+      history.replaceState(history.state, '', u.pathname + u.search + u.hash);
+    } catch (e) {}
+  }
+
+  // Time on screen, depth, photographs. Sent as differences, so a page hidden
+  // and shown again many times still adds up once.
+  var on = document.visibilityState === 'visible' ? Date.now() : 0, ms = 0, sent = 0;
+  var y = 0, ySent = 0, seen = {}, nSeen = 0, phSent = 0, first = true, tick = false;
+  function depth() {
+    tick = false;
+    var h = document.documentElement.scrollHeight, v = innerHeight + (scrollY || pageYOffset || 0);
+    var pct = h > 0 ? Math.round(100 * v / h) : 100;
+    if (pct >= 97) pct = 100;
+    if (pct > y) y = pct;
+  }
+  addEventListener('scroll', function () { if (!tick) { tick = true; requestAnimationFrame(depth); } }, { passive: true });
+  addEventListener('load', depth);
+  window.mcStatPhoto = function (k) { if (!seen[k]) { seen[k] = 1; nSeen++; } };
+  function bucket(v) { return Math.min(100, Math.floor(v / 25) * 25); }
+  function flush() {
+    if (on) { ms += Date.now() - on; on = 0; }
+    var total = Math.min(1800, Math.round(ms / 1000)), s = total - sent, b = bucket(y);
+    if (!first && s <= 0 && b <= ySent && nSeen <= phSent) return;
+    send({ t: 'eng', s: Math.max(0, s), y: b, y0: ySent, ph: nSeen - phSent, f: first ? '1' : '0' });
+    sent = total; ySent = b; phSent = nSeen; first = false;
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') flush(); else on = Date.now();
+  });
+  addEventListener('pagehide', flush);
+
+  // Presses. Capture, so a link that leaves the page is counted before it goes.
+  // A control that is already open (aria-expanded="true") is being closed: not counted.
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest && e.target.closest('a[href], [data-stat]');
+    if (!el) return;
+    var name = el.getAttribute('data-stat');
+    if (name) { if (el.getAttribute('aria-expanded') !== 'true') window.mcStat('ev', name); return; }
+    var href = el.getAttribute('href') || '', host = '';
+    try { host = new URL(el.href).hostname; } catch (x) {}
+    if (/(^|\.)wa\.me$|(^|\.)whatsapp\.com$/.test(host)) window.mcStat('wa');
+    else if (/^tel:/i.test(href)) window.mcStat('tel');
+    else if (/^mailto:/i.test(href)) window.mcStat('mail');
+    else if (/(^|\.)google\.[a-z.]+$/.test(host) && /\/maps/.test(el.href) || /^maps\.google\./.test(host)) window.mcStat('ev', 'mapa');
+  }, true);
+
+  // A full-screen viewer and the like: counted when it opens.
+  document.querySelectorAll('[data-stat-open]').forEach(function (el) {
+    new MutationObserver(function () {
+      if (!el.hidden) window.mcStat('ev', el.getAttribute('data-stat-open'));
+    }).observe(el, { attributes: true, attributeFilter: ['hidden'] });
+  });
+
+  // Forms: started (the first time anything in them gets the focus), and sent.
+  document.querySelectorAll('form[data-stat-form]').forEach(function (f) {
+    var name = f.getAttribute('data-stat-form'), started = false;
+    f.addEventListener('focusin', function () { if (!started) { started = true; window.mcStat('ev', name + '-empieza'); } });
+    // data-stat-sent="js": the page says itself when it really sent (/contacto).
+    if (f.getAttribute('data-stat-sent') !== 'js') f.addEventListener('submit', function () { window.mcStat('ev', name + '-envia'); });
+  });
+})();
+</script>
+
 {{-- A recommendation code rides into WhatsApp.
      /r/{code} leaves the code in the mc_ref cookie (App\Support\Referral).
      Buyers here write on WhatsApp rather than fill in forms, so while the

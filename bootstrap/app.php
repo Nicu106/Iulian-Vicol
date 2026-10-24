@@ -33,7 +33,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // navigator.sendBeacon cannot carry a CSRF token. The endpoint only
         // appends an event for the visitor in the requester's own cookie.
-        $middleware->validateCsrfTokens(except: ['r/e']);
+        $middleware->validateCsrfTokens(except: ['r/e', 's']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         /* "419 Page Expired" in the panel. The owner fills the car form on his phone,

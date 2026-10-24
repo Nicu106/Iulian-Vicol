@@ -52,6 +52,16 @@
     @if($facts)
       <p class="ad-car__f">{{ implode(' · ', $facts) }}</p>
     @endif
+    {{-- The last 30 days, from App\Support\Stats::perCar() — the list passes
+         $carStats in (one query for the whole list); null until anything has
+         been counted, so the first day shows nothing rather than "0 vistas". --}}
+    @isset($carStats)
+      @php $st = $carStats[$slug] ?? ['views' => 0, 'wa' => 0]; @endphp
+      <p class="ad-car__st">
+        <a href="{{ route('admin.stats', ['coche' => $slug]) }}">{{ \App\Support\Stats::num($st['views']) . ($st['views'] === 1 ? ' vista' : ' vistas') . ' · ' . \App\Support\Stats::num($st['wa']) . ' WhatsApp' }}</a>
+        <span>en 30 días</span>
+      </p>
+    @endisset
     <p class="ad-car__s">
       <span class="ad-chip ad-chip--{{ $chip[0] }}">{{ $chip[1] }}</span>
       {{-- The number of photographs is the one fact that decides whether the

@@ -60,7 +60,7 @@
           </select>
         </label>
 
-        <button class="mc-btn mc-btn--primary hm-search__go" type="submit" id="s-go">
+        <button class="mc-btn mc-btn--primary hm-search__go" type="submit" id="s-go" data-stat="buscar">
           <span id="s-lead">Buscar</span> <b id="s-n">{{ $total }}</b> <span id="s-word">coches</span>
         </button>
         <a class="mc-link hm-search__ask" id="s-ask" hidden href="https://wa.me/34614753187">No lo tengo ahora: te lo busco por WhatsApp</a>

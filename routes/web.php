@@ -75,6 +75,9 @@ Route::get('/por-que-nosotros', [App\Http\Controllers\WhyUsController::class, 'i
 // What the page script reports as a WhatsApp or e-mail press leaves the site.
 Route::post('/r/e', [App\Http\Controllers\ReferralController::class, 'event'])
     ->middleware('throttle:120,1')->name('refer.event');
+// The panel's statistics: one anonymous beacon per page and press — App\Support\Stats.
+Route::post('/s', [App\Http\Controllers\BeaconController::class, 'hit'])
+    ->middleware('throttle:120,1')->name('stats.hit');
 Route::get('/r/{code}', [App\Http\Controllers\ReferralController::class, 'visit'])->name('refer.visit');
 Route::get('/recomienda', [App\Http\Controllers\ReferralController::class, 'show'])->name('refer');
 Route::post('/recomienda', [App\Http\Controllers\ReferralController::class, 'store'])
@@ -88,6 +91,7 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/admin', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.home');
+    Route::get('/admin/estadisticas', [App\Http\Controllers\Admin\StatsController::class, 'index'])->name('admin.stats');
     // The sections that do not fit the phone bar, as a page. The "Más" tab opens
     // them in a sheet; this is where it goes when the sheet cannot open.
     Route::view('/admin/mas', 'admin.more')->name('admin.more');

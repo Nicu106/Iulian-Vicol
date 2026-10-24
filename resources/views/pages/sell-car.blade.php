@@ -48,7 +48,7 @@
     </div>
   </section>
 
-  <form class="sl-form" method="post" action="{{ route('sell-car.store') }}" enctype="multipart/form-data" novalidate id="sl-form">
+  <form class="sl-form" method="post" action="{{ route('sell-car.store') }}" enctype="multipart/form-data" novalidate id="sl-form" data-stat-form="vende">
     @csrf
     {{-- Two traps, neither of which asks the visitor anything.
 

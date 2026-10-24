@@ -100,11 +100,11 @@
       @php $sorted = $counts['exterior'] + $counts['interior'] + $counts['flaw'] > 0; @endphp
       @if($sorted)
       <div class="car-tabs" role="tablist" aria-label="Tipo de fotografía" hidden>
-        <button class="car-tab is-on" type="button" role="tab" aria-selected="true"
+        <button data-stat="fotos-tipo" class="car-tab is-on" type="button" role="tab" aria-selected="true"
                 data-group="all">Todas <span>{{ $counts['all'] }}</span></button>
         @foreach($groups as $key => $label)
           @continue($counts[$key] === 0 && $key !== 'flaw')
-          <button class="car-tab" type="button" role="tab" aria-selected="false"
+          <button data-stat="fotos-tipo" class="car-tab" type="button" role="tab" aria-selected="false"
                   data-group="{{ $key }}">{{ $label }} <span>{{ $counts[$key] }}</span></button>
         @endforeach
       </div>
@@ -158,7 +158,7 @@
     @if($video)
       <section class="car-sec car-video" aria-labelledby="h-video">
         <h2 class="car-h2" id="h-video">Te lo enseño en vídeo</h2>
-        <a class="car-video__frame" href="{{ \App\Support\YouTube::watch($video) }}" target="_blank" rel="noopener"
+        <a class="car-video__frame" href="{{ \App\Support\YouTube::watch($video) }}" target="_blank" rel="noopener" data-stat="video"
            data-yt="{{ $video['id'] }}" data-embed="{{ \App\Support\YouTube::embed($video) }}"
            aria-label="Ver el vídeo del {{ $brand }} {{ $car->model }}">
           <img class="car-video__img" src="{{ $video['still'] }}" data-fallback="{{ \App\Support\YouTube::poster($video['id'], 'hqdefault') }}"
@@ -196,7 +196,7 @@
       {{-- Most cars are decided by two people. The phone's own share sheet
            (WhatsApp, Messages…); where there is none, the link is copied. Shown
            by the script, so without one there is no dead button. --}}
-      <button class="car-share" type="button" id="car-share" hidden
+      <button class="car-share" type="button" id="car-share" hidden data-stat="compartir"
               data-title="{{ $brand }} {{ $car->model }} {{ $car->year }}">
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>
         <span>Compartir este coche</span>
@@ -270,7 +270,7 @@
         {{-- The whole description, never cut: long ones fold after a few lines with
              "Leer más" (script below; without it the text is simply all there). --}}
         <p class="car-text__p" id="car-desc">{{ \Illuminate\Support\Str::of($car->description)->stripTags() }}</p>
-        <button class="car-more mc-link" type="button" id="car-more" hidden>Leer más</button>
+        <button class="car-more mc-link" type="button" id="car-more" hidden data-stat="descripcion">Leer más</button>
       </section>
     @endif
 
@@ -308,7 +308,7 @@
             @endforeach
           </ul>
           @if(count($past['extras']) > 6)
-            <button class="car-more mc-link" type="button" id="past-more" hidden>Ver los {{ count($past['extras']) }} extras</button>
+            <button class="car-more mc-link" type="button" id="past-more" hidden data-stat="extras">Ver los {{ count($past['extras']) }} extras</button>
           @endif
         @endif
       </section>
@@ -369,7 +369,7 @@
 {{-- Below the footer: the full-screen photograph viewer, and the phone dock. --}}
 @section('after')
 {{-- Full screen. Built empty; the script fills and opens it. --}}
-<div class="car-view" id="view" hidden role="dialog" aria-modal="true" aria-label="Fotografía a pantalla completa">
+<div class="car-view" id="view" hidden data-stat-open="galeria" role="dialog" aria-modal="true" aria-label="Fotografía a pantalla completa">
   <button class="car-view__x" type="button" id="view-x" aria-label="Cerrar">&times;</button>
   <button class="car-view__nav car-view__nav--prev" type="button" id="view-prev" aria-label="Anterior"></button>
   <figure class="car-view__fig">
@@ -821,6 +821,31 @@
   // closing — ×, Esc or Back — brings the page strip to the photograph you stopped on
   onClose = function () { if (!list.length) return; track.scrollLeft = vcur * track.clientWidth; setIdx(vcur); };
   build();
+})();
+</script>
+<script>
+/* Photographs seen, for the statistics (App\Support\Stats 'photos'): each one
+   once per visit to this page, on the stage or full screen. A photograph is known
+   by its thumbnail — the stage shows its data-stage file, the viewer its href. */
+(function () {
+  if (!window.mcStatPhoto) return;
+  var idx = {};
+  document.querySelectorAll('#thumbs .car-thumb').forEach(function (a, i) {
+    [a.getAttribute('href'), a.getAttribute('data-stage')].forEach(function (u) {
+      if (u) { try { idx[new URL(u, location.href).pathname] = i; } catch (e) {} }
+    });
+  });
+  ['stage', 'view-img'].forEach(function (id) {
+    var img = document.getElementById(id);
+    if (!img) return;
+    var look = function () {
+      var s = img.getAttribute('src'), i;
+      try { i = s ? idx[new URL(s, location.href).pathname] : undefined; } catch (e) {}
+      if (i !== undefined) window.mcStatPhoto(i);
+    };
+    look();
+    new MutationObserver(look).observe(img, { attributes: true, attributeFilter: ['src'] });
+  });
 })();
 </script>
 @endpush

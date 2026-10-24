@@ -56,6 +56,7 @@ final class AdminNav
         $raw = self::$fake ?? [
             ['route' => 'admin.home',               'label' => 'Panel'],
             ['route' => 'admin.vehicles.index',     'label' => 'Coches',    'match' => 'admin.vehicles.*'],
+            ['route' => 'admin.stats',              'label' => 'Estadísticas', 'tab' => 'Datos', 'match' => 'admin.stats'],
             ['route' => 'admin.contacts.index',     'label' => 'Mensajes',  'match' => 'admin.contacts.*', 'count' => Inbox::counts()['real'] ?: null],
             ['route' => 'admin.testimonials.index', 'label' => 'Opiniones', 'match' => 'admin.testimonials.*'],
             ['route' => 'admin.sell-cars.index',    'label' => 'Ventas',    'match' => 'admin.sell-cars.*'],

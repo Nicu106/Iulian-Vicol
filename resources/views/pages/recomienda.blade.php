@@ -48,7 +48,7 @@
           <p class="rf-note" id="rf-said" role="status" aria-live="polite"></p>
         </section>
       @else
-        <form class="rf-form" method="post" action="{{ route('refer.store') }}" novalidate>
+        <form class="rf-form" method="post" action="{{ route('refer.store') }}" novalidate data-stat-form="recomienda">
           @csrf
 
           {{-- The trap and the clock, as on /vende. --}}

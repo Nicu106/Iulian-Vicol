@@ -113,6 +113,9 @@ class DashboardController extends Controller
             'nReal'     => $inbox['real'],
             'nMsgTotal' => $inbox['total'],
             'todo'      => $todo,
+            // The line under the numbers and the button that opens Estadísticas.
+            'week'      => \App\Support\Stats::week(),
+            'carStats'  => \App\Support\Stats::perCar(30),
         ]);
     }
 }

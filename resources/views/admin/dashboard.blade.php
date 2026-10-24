@@ -53,6 +53,21 @@
     </li>
   </ul>
 
+  {{-- What people do on the site, one press away (App\Support\Stats). The line
+       says this week in words; the button opens everything in a window. --}}
+  <div class="ad-st-teaser">
+    <p class="ad-st-teaser__p">
+      @if(! $week['any'])
+        Desde hoy se cuentan las visitas: quién entra, qué coches mira y quién pulsa WhatsApp.
+      @else
+        Esta semana entraron <b>{{ \App\Support\Stats::num($week['people']) }}</b> {{ $week['people'] === 1 ? 'persona' : 'personas' }}
+        y <b>{{ \App\Support\Stats::num($week['wa']) }}</b> {{ $week['wa'] === 1 ? 'pulsó' : 'pulsaron' }} WhatsApp.
+      @endif
+    </p>
+    <a class="ad-btn ad-btn--q" href="{{ route('admin.stats') }}" data-stats>Ver estadísticas</a>
+  </div>
+  @include('admin.stats._dialog')
+
   {{-- Only what is true today. Four invented rows used to sit here saying
        "Nueva consulta recibida — hace 4 horas" on a site that has never
        received one. --}}

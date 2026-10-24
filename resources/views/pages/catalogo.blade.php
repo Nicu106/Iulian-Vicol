@@ -72,7 +72,7 @@
             @if($row['total'])
               {{-- Opens the marque to the full screen. Without JavaScript it is not
                    rendered at all, because there would be nothing for it to do. --}}
-              <button class="cat-row__all" type="button" hidden
+              <button class="cat-row__all" type="button" hidden data-stat="marca-abrir"
                       aria-expanded="false" aria-controls="cars-{{ $row['key'] }}"
                       data-open="{{ $row['total'] > 4 ? 'Ver los '.$row['total'] : 'Ver todos' }}"
                       data-close="Cerrar">{{ $row['total'] > 4 ? 'Ver los '.$row['total'] : 'Ver todos' }}</button>

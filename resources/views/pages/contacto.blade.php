@@ -158,7 +158,7 @@
       <p class="ct-lede ct-rise">Tres campos. Al enviar eliges si te abro WhatsApp o el
         correo — en los dos casos el mensaje va redactado y lo lees antes de mandarlo.</p>
 
-      <form class="ct-form ct-rise" id="ct-form">
+      <form class="ct-form ct-rise" id="ct-form" data-stat-form="contacto" data-stat-sent="js">
         <label class="ct-f">
           <span>Tu nombre</span>
           <input class="mc-input" type="text" id="f-name" name="name" autocomplete="name" autocapitalize="words" enterkeyhint="next" required>
@@ -355,6 +355,7 @@
     }
     var body = 'Hola' + (name ? ', soy ' + name : '') + '. ' + msg + (tel ? '\n\nMi teléfono: ' + tel : '');
     if (window.mcRefTrack) { window.mcRefTrack(via === 'mail' ? 'email' : 'whatsapp'); }
+    if (window.mcStat) { window.mcStat('ev', 'contacto-envia'); window.mcStat(via === 'mail' ? 'mail' : 'wa'); }
     if (via === 'mail') {
       window.location.href = 'mailto:' + MAIL
         + '?subject=' + encodeURIComponent('Consulta de ' + (name || 'la web'))

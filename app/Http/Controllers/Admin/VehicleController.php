@@ -312,7 +312,8 @@ class VehicleController extends BaseController
         // Get pricing statistics
         $pricingStats = $this->getPricingStatistics($items);
         
-        return view('admin.vehicles.index', compact('items', 'q', 'status', 'featured', 'sort', 'priceRange', 'hasOffers', 'pricingStats'));
+        return view('admin.vehicles.index', compact('items', 'q', 'status', 'featured', 'sort', 'priceRange', 'hasOffers', 'pricingStats')
+            + ['carStats' => \App\Support\Stats::perCar(30)]);   // "N vistas · M WhatsApp" on each row, one query
     }
 
     public function create()

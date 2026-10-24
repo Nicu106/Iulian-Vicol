@@ -15,6 +15,8 @@
   </div>
 </div>
 
+@include('admin.vehicles._stats')
+
 @include('admin.vehicles._form', [
   'vehicle' => $vehicle,
   'action'  => route('admin.vehicles.update', $vehicle['slug']),
