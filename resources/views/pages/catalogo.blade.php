@@ -28,7 +28,6 @@
       <p class="cat-hero__p">Modelos y acabados que llaman la atención. Seleccionados, revisados
          y preparados por nuestro equipo para que disfrutes de algo especial.</p>
       <a class="cat-hero__go" href="#cat-first">Encuentra el tuyo <span aria-hidden="true">↓</span></a>
-      <span class="cat-hero__credit">Foto de archivo · Unsplash</span>
     </div>
   </header>
 

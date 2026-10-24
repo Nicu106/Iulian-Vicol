@@ -22,7 +22,6 @@
         <span class="hm-hero__eyebrow">Málaga</span>
         <h1 class="hm-hero__h">Tu coche perfecto<br>te espera</h1>
         <p class="hm-hero__p">Meticulosamente escogido y llevado a los estándares más altos para ti.</p>
-        <span class="hm-hero__credit">Foto de archivo · Unsplash</span>
       </div>
 
       {{-- The search. Every figure on it is counted from the stock. --}}

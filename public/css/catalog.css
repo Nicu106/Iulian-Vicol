@@ -639,12 +639,6 @@
   font-size:var(--t-display); line-height:1.04; letter-spacing:-.024em;
   color:#FFFFFF;
 }
-/* Said out loud, because the brandbook holds the live site to account for exactly
-   this: a stock photograph of a car that is not his. Small, but present. */
-.cat-hero__credit{
-  display:block; margin-top:var(--s-4);
-  font-size:var(--t-label); letter-spacing:.020em; color:rgba(255,255,255,.62);
-}
 .cat-hero__go{
   display:inline-flex; align-items:center; gap:.5em; min-height:44px; margin-top:var(--s-5);
   padding:0 1.25rem; border-radius:999px; background:#FFFFFF; color:var(--mc-ink);
