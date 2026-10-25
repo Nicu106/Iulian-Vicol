@@ -39,6 +39,9 @@ final class StatsInsights
 
     private const MALAGA = [36.7213, -4.4214];
 
+    /** Mainland Spain, south-west and north-east corners (lat, lon). */
+    private const SPAIN = [35.9, -9.4, 43.8, 3.4];
+
     /* ---- marques -------------------------------------------------------- */
 
     /** @return array{rows:list<array>,say:list<string>,people:int,enough:bool} */
@@ -229,7 +232,8 @@ final class StatsInsights
             $cities[$id]['n'] += $n;
             if ($g['cc'] === 'ES') {
                 $spain += $n;
-                $rid = $alias[$g['region']] ?? null;
+                // the name DB-IP gives, else the region the point falls in on the map itself
+                $rid = $alias[$g['region']] ?? ($meta && ($g['lat'] || $g['lon']) ? self::esRegionAt($g['lat'], $g['lon'], $meta) : null);
                 if ($rid !== null) {
                     $regions[$rid] = ($regions[$rid] ?? 0) + $n;
                 }
@@ -243,6 +247,8 @@ final class StatsInsights
         $cities = array_values($cities);
         usort($cities, fn ($a, $b) => $b['n'] <=> $a['n']);
         arsort($countries);
+        $countries = array_map(fn ($cc, $n) => ['cc' => $cc, 'name' => Geo::country($cc), 'n' => $n], array_keys($countries), $countries);
+        $world = self::map('world');
 
         return [
             'total'     => $total,
@@ -253,10 +259,282 @@ final class StatsInsights
             'cities'    => $cities,
             'regions'   => $regions,
             'names'     => $names,
-            'countries' => array_map(fn ($cc, $n) => ['cc' => $cc, 'name' => Geo::country($cc), 'n' => $n], array_keys($countries), $countries),
+            'countries' => $countries,
             'es'        => $meta ?: null,
-            'world'     => self::map('world') ?: null,
+            'spainMap'  => $meta && $spain ? self::spainMap($cities, $meta) : null,
+            'wide'      => $world ? self::wide($cities, $countries, $world) : null,
         ];
+    }
+
+    /** Both maps are drawn 600 wide, so a dot and a name come out the same size on either. */
+    private const MAP_W = 600;
+
+    /**
+     * The Spain map's towns: a dot each, sized by people (the biggest drawn first,
+     * so a small town next to it stays on top and visible), and a name on the
+     * three biggest that have room.
+     *
+     * @return array{dots:list<array>,names:list<array>}
+     */
+    private static function spainMap(array $cities, array $m): array
+    {
+        $towns = array_values(array_filter($cities, fn ($c) => $c['cc'] === 'ES' && ($c['lat'] || $c['lon'])));
+        $max = max(1, $towns[0]['n'] ?? 1);
+        $dots = [];
+        foreach ($towns as $c) {
+            [$x, $y] = self::esXy($c['lat'], $c['lon'], $m);
+            $dots[] = ['x' => $x, 'y' => $y, 'r' => round(4 + 11 * sqrt($c['n'] / $max), 1), 'n' => $c['n'],
+                'name' => $c['city'], 'title' => $c['city'] . ': ' . $c['n']];
+        }
+
+        return ['dots' => $dots, 'names' => self::names(array_slice($dots, 0, 6), self::MAP_W, $m['h'], 3)];
+    }
+
+    /**
+     * The map beyond Spain, drawn as soon as someone from another country is in
+     * the period: framed on the places there are, and on Málaga, so it always
+     * reads from here. As tight as the data allows: Portugal or Gibraltar show
+     * the Peninsula, a German shows Europe, an American the Atlantic. Every town
+     * gets a dot, a country too small to draw (Gibraltar, Malta, Andorra) too;
+     * towns that would sit on each other at that scale become one dot, named for
+     * the biggest. Longitude is narrowed by the cosine of the middle latitude, so
+     * Europe is not stretched sideways. A country known without a town is framed
+     * by its main body (France, not French Guiana).
+     *
+     * @return array{w:int,h:int,m:string,lands:list<array>,dots:list<array>,names:list<array>}|null
+     */
+    public static function wide(array $cities, array $countries, array $m): ?array
+    {
+        $shapes = self::shapes($m);
+        $k = $m['k'];
+        $top = $m['latTop'];
+        $bottom = $top - $m['h'] / $k;
+        $pts = array_values(array_filter($cities, fn ($c) => $c['cc'] !== 'ZZ' && ($c['lat'] || $c['lon'])));
+        $located = array_flip(array_column($pts, 'cc'));
+
+        // mainland Spain is always in the frame, whole, so the map reads from here;
+        // beyond it only the places abroad move the frame (a town in the Canaries
+        // or Mallorca is on the Spain map already)
+        $lats = [self::SPAIN[0], self::SPAIN[2]];
+        $lons = [self::SPAIN[1], self::SPAIN[3]];
+        $foreign = false;
+        foreach ($pts as $c) {
+            if ($c['cc'] !== 'ES') {
+                $lats[] = $c['lat'];
+                $lons[] = $c['lon'];
+                $foreign = true;
+            }
+        }
+        foreach ($countries as $c) {
+            if (in_array($c['cc'], ['ES', 'ZZ'], true) || isset($located[$c['cc']]) || ! isset($shapes[$c['cc']])) {
+                continue;
+            }
+            [$x0, $y0, $x1, $y1] = $shapes[$c['cc']]['main'];
+            array_push($lons, $x0 / $k - 180, $x1 / $k - 180);
+            array_push($lats, $top - $y0 / $k, $top - $y1 / $k);
+            $foreign = true;
+        }
+        if (! $foreign) {
+            return null;                                   // only Spain (or only hidden): the Spain map says it all
+        }
+
+        // the frame, in degrees (longitude already narrowed): padded for dots and
+        // names, never closer than the Peninsula, between square-ish and 2:1
+        $s = max(.5, cos(deg2rad(max(-60, min(60, (min($lats) + max($lats)) / 2)))));
+        $w = (max($lons) - min($lons)) * $s * 1.3 + 4;
+        $h = max(11, (max($lats) - min($lats)) * 1.3 + 4);
+        $w = max($w, $h * 1.2);
+        $h = max($h, $w / 2);
+        $w = min($w, 360 * $s);
+        $h = min($h, $top - $bottom);
+        $left = max(0, min(360 * $s - $w, ((min($lons) + max($lons)) / 2 + 180) * $s - $w / 2));
+        $up = max(0, min($top - $bottom - $h, $top - (min($lats) + max($lats)) / 2 - $h / 2));
+
+        $z = self::MAP_W / ($w * $k);
+        $H = (int) round($h * $k * $z);
+        $xy = fn ($lat, $lon) => [round((($lon + 180) * $s - $left) * $k * $z, 1), round(($top - $lat - $up) * $k * $z, 1)];
+
+        $people = array_column($countries, 'n', 'cc');
+        $maxC = max(1, max(array_values(array_diff_key($people, ['ZZ' => 0])) ?: [1]));
+        $lands = [];
+        foreach ($m['countries'] as $c) {
+            [$x0, $y0, $x1, $y1] = $shapes[$c['iso2']]['box'];
+            if ($x1 * $s < $left * $k || $x0 * $s > ($left + $w) * $k || $y1 < $up * $k || $y0 > ($up + $h) * $k) {
+                continue;                                  // off the frame: not sent
+            }
+            $n = $people[$c['iso2']] ?? 0;
+            $lands[] = ['d' => $c['d'], 'name' => $c['name'], 'n' => $n, 'o' => $n ? round(.25 + .6 * $n / $maxC, 2) : null];
+        }
+
+        // one dot per town, merged with a bigger one when they would touch
+        $dots = [];
+        foreach ($pts as $c) {
+            [$x, $y] = $xy($c['lat'], $c['lon']);
+            if ($x < 0 || $x > self::MAP_W || $y < 0 || $y > $H) {
+                continue;                                  // a Spanish island off the frame
+            }
+            foreach ($dots as $i => $d) {
+                if (hypot($d['x'] - $x, $d['y'] - $y) < 18) {
+                    $dots[$i]['n'] += $c['n'];
+                    $dots[$i]['towns'][] = $c;
+                    continue 2;
+                }
+            }
+            $dots[] = ['x' => $x, 'y' => $y, 'n' => $c['n'], 'towns' => [$c]];
+        }
+        usort($dots, fn ($a, $b) => $b['n'] <=> $a['n']);
+        $max = max(1, $dots[0]['n'] ?? 1);
+        $far = $w / $s > 30;                               // a continent or more: foreign dots named by country
+        foreach ($dots as &$d) {
+            $big = $d['towns'][0];
+            $d['r'] = round(4 + 11 * sqrt($d['n'] / $max), 1);
+            $d['name'] = $far && $big['cc'] !== 'ES' ? $big['country'] : $big['city'];
+            $d['abroad'] = $big['cc'] !== 'ES';
+            $more = count($d['towns']) - 1;
+            $d['title'] = $big['city'] . ($big['cc'] !== 'ES' && $big['city'] !== $big['country'] ? ' (' . $big['country'] . ')' : '')
+                . ($more ? ' y ' . $more . ' ' . ($more === 1 ? 'sitio' : 'sitios') . ' más' : '') . ': ' . $d['n'];
+            unset($d['towns']);
+        }
+        unset($d);
+
+        // names: the places abroad first (they are why this map is here), then Málaga's side
+        $order = array_merge(array_filter($dots, fn ($d) => $d['abroad']), array_filter($dots, fn ($d) => ! $d['abroad']));
+
+        return [
+            'w'     => self::MAP_W,
+            'h'     => $H,
+            'm'     => implode(',', array_map(fn ($v) => round($v, 4), [$s * $z, 0, 0, $z, -$left * $k * $z, -$up * $k * $z])),
+            'lands' => $lands,
+            'dots'  => $dots,
+            'names' => self::names(array_slice(array_values($order), 0, 8), self::MAP_W, $H, 4),
+        ];
+    }
+
+    /**
+     * Names beside dots, biggest first, each on the right of its dot (on the left
+     * near the right edge), skipped when it would sit on a name already placed
+     * or run off the map. 17px type, about 9.5 a letter.
+     *
+     * @param  list<array{x:float,y:float,r:float,name:string}>  $dots
+     * @return list<array{x:float,y:float,end:bool,name:string}>
+     */
+    private static function names(array $dots, float $w, float $h, int $limit): array
+    {
+        $placed = [];
+        foreach ($dots as $d) {
+            if (count($placed) === $limit) {
+                break;
+            }
+            $len = 9.5 * mb_strlen($d['name']);
+            $end = $d['x'] + $d['r'] + 5 + $len > $w;
+            $x0 = $end ? $d['x'] - $d['r'] - 5 - $len : $d['x'] + $d['r'] + 5;
+            $box = [$x0, $d['y'] - 13, $x0 + $len, $d['y'] + 7];
+            if ($box[0] < 0 || $box[1] < 0 || $box[3] > $h) {
+                continue;
+            }
+            foreach ($placed as $p) {
+                if ($box[0] < $p['box'][2] && $box[2] > $p['box'][0] && $box[1] < $p['box'][3] && $box[3] > $p['box'][1]) {
+                    continue 2;
+                }
+            }
+            $placed[] = ['box' => $box, 'x' => round($end ? $d['x'] - $d['r'] - 5 : $d['x'] + $d['r'] + 5, 1),
+                'y' => round($d['y'] + 6, 1), 'end' => $end, 'name' => $d['name']];
+        }
+
+        return array_map(fn ($p) => array_diff_key($p, ['box' => 0]), $placed);
+    }
+
+    /**
+     * Each country's extent on the world map: 'box' all of it (to leave out what
+     * is off the frame), 'main' its largest piece (to frame on).
+     *
+     * @return array<string,array{box:array,main:array}>
+     */
+    private static function shapes(array $m): array
+    {
+        static $cache = [];
+        $key = md5(json_encode(array_column($m['countries'], 'iso2')) . $m['w']);
+        if (isset($cache[$key])) {
+            return $cache[$key];
+        }
+        $out = [];
+        foreach ($m['countries'] as $c) {
+            $all = [INF, INF, -INF, -INF];
+            $main = null;
+            $area = -1;
+            foreach (self::rings($c['d']) as $ring) {
+                $b = [INF, INF, -INF, -INF];
+                $a = 0;
+                foreach ($ring as $i => [$x, $y]) {
+                    $b = [min($b[0], $x), min($b[1], $y), max($b[2], $x), max($b[3], $y)];
+                    [$nx, $ny] = $ring[($i + 1) % count($ring)];
+                    $a += $x * $ny - $nx * $y;
+                }
+                $all = [min($all[0], $b[0]), min($all[1], $b[1]), max($all[2], $b[2]), max($all[3], $b[3])];
+                if (abs($a) > $area) {
+                    $area = abs($a);
+                    $main = $b;
+                }
+            }
+            if ($main) {
+                $out[$c['iso2']] = ['box' => $all, 'main' => $main];
+            }
+        }
+
+        return $cache[$key] = $out;
+    }
+
+    /** The rings of an "M x,y L x,y x,y … Z" path, as lists of [x, y]. */
+    private static function rings(string $d): array
+    {
+        $rings = [];
+        foreach (preg_split('~M~', $d, -1, PREG_SPLIT_NO_EMPTY) as $part) {
+            preg_match_all('~(-?[\d.]+),(-?[\d.]+)~', $part, $mm, PREG_SET_ORDER);
+            if (count($mm) >= 3) {
+                $rings[] = array_map(fn ($p) => [(float) $p[1], (float) $p[2]], $mm);
+            }
+        }
+
+        return $rings;
+    }
+
+    /**
+     * The Spanish region a point falls in, read off the map: for a region name
+     * DB-IP spells in a way the aliases do not know. Even-odd across the rings
+     * (so a hole is a hole); a point just off a simplified coast goes to the
+     * nearest region within ~30 km.
+     */
+    private static function esRegionAt(float $lat, float $lon, array $m): ?string
+    {
+        static $cache = [];
+        $key = md5($m['regions'][0]['d'] ?? '');
+        $cache[$key] ??= array_map(fn ($r) => ['id' => $r['id'], 'rings' => self::rings($r['d'])], $m['regions']);
+        [$x, $y] = self::esXy($lat, $lon, $m);
+        $best = null;
+        $bestD = 12.0;
+        foreach ($cache[$key] as $r) {
+            $in = false;
+            foreach ($r['rings'] as $ring) {
+                $j = count($ring) - 1;
+                foreach ($ring as $i => [$xi, $yi]) {
+                    [$xj, $yj] = $ring[$j];
+                    if (($yi > $y) !== ($yj > $y) && $x < ($xj - $xi) * ($y - $yi) / ($yj - $yi) + $xi) {
+                        $in = ! $in;
+                    }
+                    $j = $i;
+                    $dd = hypot($xi - $x, $yi - $y);
+                    if ($dd < $bestD) {
+                        $bestD = $dd;
+                        $best = $r['id'];
+                    }
+                }
+            }
+            if ($in) {
+                return $r['id'];
+            }
+        }
+
+        return $best;
     }
 
     /** x, y on the Spain map (same formulas as resources/data/map-es.json was drawn with). */

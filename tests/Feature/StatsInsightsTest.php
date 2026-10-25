@@ -125,6 +125,61 @@ class StatsInsightsTest extends TestCase
         }
     }
 
+    public function test_the_wider_map_comes_with_the_first_visitor_from_abroad_and_frames_wherever_they_are(): void
+    {
+        $spain = ['ES|Andalusia|Málaga|36.72|-4.42' => 40, 'ES|Madrid|Madrid|40.42|-3.7' => 12,
+            'ES|Canary Islands|Telde|27.99|-15.42' => 2,
+            'ES|Andalucia Oriental|Granada|37.18|-3.6' => 5];             // a region name nobody spells: read off the map
+        $g = StatsInsights::places($spain);
+        if (! $g['es']) {
+            $this->markTestSkipped('no map geometry');
+        }
+        $this->assertNull($g['wide']);                                    // only Spain: the Spain map says it all
+        $this->assertSame(45, $g['regions']['01']);
+        $this->assertSame(5, $g['andalucia']);
+        $this->assertSame(['Málaga', 'Madrid', 'Granada', 'Telde'], array_column($g['spainMap']['dots'], 'name'));
+
+        $inside = function (array $w) {
+            foreach ($w['dots'] as $d) {
+                $this->assertTrue($d['x'] >= 0 && $d['x'] <= $w['w'] && $d['y'] >= 0 && $d['y'] <= $w['h'], json_encode($d));
+            }
+            foreach ($w['names'] as $p) {
+                $this->assertTrue($p['y'] - 19 >= 0 && $p['y'] <= $w['h']);
+            }
+        };
+
+        // next door: the Peninsula, Gibraltar's dot although it is too small to draw
+        $near = StatsInsights::places($spain + ['GI|Gibraltar|Gibraltar|36.14|-5.35' => 3, 'PT|Lisbon|Lisboa|38.72|-9.14' => 2])['wide'];
+        $inside($near);
+        $this->assertLessThan(15, count($near['lands']));
+        $this->assertContains('Gibraltar', array_column($near['names'], 'name'));
+        $this->assertContains('Lisboa', array_column($near['names'], 'name'));    // close up: towns by name
+        $this->assertSame(['Portugal'], array_values(array_column(array_filter($near['lands'], fn ($l) => $l['o'] && $l['name'] !== 'España'), 'name')));
+
+        // far: the frame opens to take them in, and names countries
+        $far = StatsInsights::places($spain + ['AU|New South Wales|Sydney|-33.87|151.21' => 1, 'US|California|Los Angeles|34.05|-118.24' => 2])['wide'];
+        $inside($far);
+        $this->assertGreaterThan(150, count($far['lands']));
+        $this->assertSame(['Estados Unidos', 'Australia', 'Málaga'], array_column($far['names'], 'name'));
+        $this->assertCount(1, array_filter($far['dots'], fn ($d) => str_starts_with($d['title'], 'Málaga y')));  // Spain is one dot from that far
+
+        // a country known without a town is framed by its main body and coloured, without a dot
+        $fr = StatsInsights::places($spain + ['FR||||0' => 2])['wide'];
+        $this->assertNotNull($fr);
+        $this->assertNotNull(collect($fr['lands'])->firstWhere('name', 'Francia')['o']);
+        $this->assertCount(0, array_filter($fr['dots'], fn ($d) => str_contains($d['title'], 'Francia')));
+        $this->assertLessThan(80, count($fr['lands']));                   // France, not French Guiana
+
+        // nobody from Spain: the wider map alone, Spain still in the frame
+        $only = StatsInsights::places(['DE|Hesse|Frankfurt am Main|50.11|8.68' => 3, 'ZZ||||0' => 1]);
+        $this->assertNull($only['spainMap']);
+        $this->assertNotNull($only['wide']);
+        $this->assertNotNull(collect($only['wide']['lands'])->firstWhere('name', 'España'));
+
+        // hidden only: nothing to draw
+        $this->assertNull(StatsInsights::places(['ZZ||||0' => 4])['wide']);
+    }
+
     public function test_one_cars_photographs_one_by_one(): void
     {
         $car = Vehicle::where('slug', 'bmw-318d-2020')->first();

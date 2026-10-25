@@ -1,41 +1,47 @@
 {{-- Where the visitors are (StatsInsights::places): Spain by region, a dot per
-     town sized by people, the towns and countries as lists underneath — the
-     lists carry the numbers, the map carries the picture. Drawn here, from
-     resources/data/map-es.json and map-world.json: no map service, no request
-     leaves the panel. Towns come from a GeoIP lookup on the server (App\Support\Geo). --}}
+     town sized by people; as soon as someone from another country is in the
+     period, a second map framed on wherever they all are (StatsInsights::wide);
+     the towns and countries as lists underneath — the lists carry the numbers,
+     the maps carry the picture. Drawn here, from resources/data/map-es.json and
+     map-world.json: no map service, no request leaves the panel. Towns come from
+     a GeoIP lookup on the server (App\Support\Geo). --}}
 @php
   use App\Support\Stats;
-  use App\Support\StatsInsights as In;
   $n = fn ($v) => Stats::num($v);
   $pct = fn ($v) => $g['total'] ? (int) round(100 * $v / $g['total']) : 0;
   $es = $g['es'];
+  $sp = $g['spainMap'] ?? null;
+  $wide = $g['wide'] ?? null;
   $hidden = collect($g['countries'])->firstWhere('cc', 'ZZ')['n'] ?? 0;
   $abroad = $g['abroad'] - $hidden;
   $rest = $g['spain'] - $g['near'] - $g['andalucia'];
   $towns = array_values(array_filter($g['cities'], fn ($c) => $c['cc'] !== 'ZZ'));
-  $inSpain = array_values(array_filter($towns, fn ($c) => $c['cc'] === 'ES'));
-  $maxTown = max(1, $inSpain[0]['n'] ?? 1);
-  $maxReg = max(1, max($g['regions'] ?: [0]));
+  $countries = array_values(array_filter($g['countries'], fn ($c) => $c['cc'] !== 'ZZ'));
+  $out = array_values(array_filter($countries, fn ($c) => $c['cc'] !== 'ES'));
+  $outNames = count($out) > 2
+      ? $out[0]['name'] . ', ' . $out[1]['name'] . ' y ' . (count($out) - 2) . ' ' . (count($out) === 3 ? 'país' : 'países') . ' más'
+      : collect($out)->pluck('name')->implode(' y ');
+  $lead = collect([
+      $g['spain'] ? $pct($g['near']) . ' % a menos de 60 km de Málaga' : null,
+      $g['andalucia'] ? $pct($g['andalucia']) . ' % del resto de Andalucía' : null,
+      $rest > 0 ? $pct($rest) . ' % del resto de España' : null,
+      $abroad > 0 ? $pct($abroad) . ' % de fuera' . ($outNames !== '' ? ' (' . $outNames . ')' : '') : null,
+  ])->filter()->implode(', ');
 @endphp
 <section class="ad-st-sec">
   <h3 class="ad-st-h">De dónde son</h3>
   @if(! $g['total'])
     <p class="ad-st-quiet">Todavía nada.</p>
   @else
-    @if($g['spain'])
-      <p class="ad-st-say ad-st-say--lead">
-        {{ collect([
-          $pct($g['near']) . ' % a menos de 60 km de Málaga',
-          $g['andalucia'] ? $pct($g['andalucia']) . ' % del resto de Andalucía' : null,
-          $rest > 0 ? $pct($rest) . ' % del resto de España' : null,
-          $abroad > 0 ? $pct($abroad) . ' % de fuera' : null,
-        ])->filter()->implode(', ') }}.
-      </p>
+    @if($lead !== '')
+      <p class="ad-st-say ad-st-say--lead">{{ $lead }}.</p>
     @endif
 
-    @if($es && $g['spain'])
+    <div class="ad-st-maps">
+    @if($es && $sp)
       <figure class="ad-st-map">
         <svg viewBox="0 0 {{ $es['w'] }} {{ $es['h'] }}" role="img" aria-label="Mapa de España: de dónde son las personas que ven la web">
+          @php $maxReg = max(1, max($g['regions'] ?: [0])); @endphp
           <g class="ad-st-map__land">
             @foreach($es['regions'] as $r)
               @php $v = $g['regions'][$r['id']] ?? 0; @endphp
@@ -43,37 +49,24 @@
             @endforeach
           </g>
           <path class="ad-st-map__frame" d="{{ $es['canary']['frame'] }}" />
-          <g class="ad-st-map__dots">
-            @foreach(array_reverse($inSpain) as $c)
-              @php [$x, $y] = In::esXy($c['lat'], $c['lon'], $es); @endphp
-              <circle cx="{{ $x }}" cy="{{ $y }}" r="{{ round(4 + 11 * sqrt($c['n'] / $maxTown), 1) }}"><title>{{ $c['city'] }}: {{ $c['n'] }}</title></circle>
-            @endforeach
-          </g>
-          <g class="ad-st-map__names" aria-hidden="true">
-            @php
-              // the three biggest towns get their name, unless it would sit on a name already placed
-              $placed = [];
-              foreach (array_slice($inSpain, 0, 6) as $c) {
-                  if (count($placed) === 3) break;
-                  [$x, $y] = In::esXy($c['lat'], $c['lon'], $es);
-                  $r = 4 + 11 * sqrt($c['n'] / $maxTown);
-                  $w = 9.5 * mb_strlen($c['city']);
-                  $left = $x + $r + 5 + $w > $es['w'];        // near the right edge the name goes on the left
-                  $x0 = $left ? $x - $r - 5 - $w : $x + $r + 5;
-                  $box = [$x0, $y - 13, $x0 + $w, $y + 7];
-                  foreach ($placed as $p) {
-                      if ($box[0] < $p['box'][2] && $box[2] > $p['box'][0] && $box[1] < $p['box'][3] && $box[3] > $p['box'][1]) continue 2;
-                  }
-                  $placed[] = ['box' => $box, 'x' => $left ? $x - $r - 5 : $x + $r + 5, 'y' => $y + 6, 'end' => $left, 'name' => $c['city']];
-              }
-            @endphp
-            @foreach($placed as $p)
-              <text x="{{ round($p['x'], 1) }}" y="{{ round($p['y'], 1) }}" text-anchor="{{ $p['end'] ? 'end' : 'start' }}">{{ $p['name'] }}</text>
-            @endforeach
-          </g>
+          @include('admin.stats._map-marks', ['marks' => $sp])
         </svg>
       </figure>
     @endif
+
+    @if($wide)
+      <figure class="ad-st-map ad-st-map--world">
+        <svg viewBox="0 0 {{ $wide['w'] }} {{ $wide['h'] }}" role="img" aria-label="Mapa: de dónde son las personas de fuera de España">
+          <g class="ad-st-map__land" transform="matrix({{ $wide['m'] }})">
+            @foreach($wide['lands'] as $c)
+              <path d="{{ $c['d'] }}" @if($c['o']) class="is-on" style="fill-opacity: {{ $c['o'] }}" @endif><title>{{ $c['name'] }}@if($c['n']): {{ $c['n'] }} @endif</title></path>
+            @endforeach
+          </g>
+          @include('admin.stats._map-marks', ['marks' => $wide])
+        </svg>
+      </figure>
+    @endif
+    </div>
 
     <ul class="ad-st-facts">
       <li><span class="ad-st-facts__k">Cerca de Málaga</span><span class="ad-st-facts__v">{{ $n($g['near']) }}</span></li>
@@ -87,7 +80,7 @@
         <p class="ad-st-search__h">Ciudades</p>
         @if($towns)
           @include('admin.stats._rank', ['rows' => array_map(fn ($c) => [
-              'label' => $c['city'] . ($c['cc'] !== 'ES' ? ' (' . $c['country'] . ')' : ''),
+              'label' => $c['city'] . ($c['cc'] !== 'ES' && $c['city'] !== $c['country'] ? ' (' . $c['country'] . ')' : ''),
               'n' => $c['n'], 'share' => $pct($c['n']),
             ], array_slice($towns, 0, 12))])
         @endif
@@ -96,31 +89,10 @@
             no deja ver de dónde es.</p>
         @endif
       </div>
-      @php $countries = array_values(array_filter($g['countries'], fn ($c) => $c['cc'] !== 'ZZ')); @endphp
-      @if(count($countries) > 1 || ($countries && $countries[0]['cc'] !== 'ES'))
+      @if($out)
         <div>
           <p class="ad-st-search__h">Países</p>
           @include('admin.stats._rank', ['rows' => array_map(fn ($c) => ['label' => $c['name'], 'n' => $c['n'], 'share' => $pct($c['n'])], $countries)])
-          @if($g['world'] && $abroad > 0)
-            @php
-              $on = array_flip(array_column($countries, 'cc')); $maxC = max(1, max(array_column($countries, 'n'))); $byCc = array_column($countries, 'n', 'cc');
-              // Europe and the north of Africa when everyone is there; the world otherwise
-              $europe = ['AD','AL','AT','BA','BE','BG','BY','CH','CY','CZ','DE','DK','DZ','EE','ES','FI','FR','GB','GR','HR','HU','IE','IS','IT','LT','LU','LV','MA','MD','ME','MK','MT','NL','NO','PL','PT','RO','RS','SE','SI','SK','TN','UA','XK','LY','EG','TR'];
-              $wm = $g['world'];
-              [$vx, $vy] = \App\Support\StatsInsights::worldXy(72, -25, $wm);
-              [$vx2, $vy2] = \App\Support\StatsInsights::worldXy(27, 45, $wm);
-              $box = array_diff(array_keys($on), $europe) ? '0 0 ' . $wm['w'] . ' ' . $wm['h'] : "$vx $vy " . round($vx2 - $vx, 1) . ' ' . round($vy2 - $vy, 1);
-            @endphp
-            <figure class="ad-st-map ad-st-map--world">
-              <svg viewBox="{{ $box }}" role="img" aria-label="Mapa: países de las personas que ven la web">
-                <g class="ad-st-map__land">
-                  @foreach($g['world']['countries'] as $c)
-                    <path d="{{ $c['d'] }}" @isset($on[$c['iso2']]) class="is-on" style="fill-opacity: {{ round(.25 + .6 * $byCc[$c['iso2']] / $maxC, 2) }}" @endisset><title>{{ $c['name'] }}@isset($byCc[$c['iso2']]): {{ $byCc[$c['iso2']] }}@endisset</title></path>
-                  @endforeach
-                </g>
-              </svg>
-            </figure>
-          @endif
         </div>
       @endif
     </div>
