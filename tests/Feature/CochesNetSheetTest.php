@@ -258,6 +258,8 @@ class CochesNetSheetTest extends TestCase
         $pdf = $this->actingAs($admin)->get(route('admin.vehicles.placard-pdf', $car->slug));
         $pdf->assertOk()->assertHeader('Content-Type', 'application/pdf');
         $this->assertStringStartsWith('%PDF', $pdf->getContent());
+        // twenty-one extras, the offer and his whole description: still one sheet
+        $this->assertSame(1, preg_match_all('~/Type\s*/Page[^s]~', $pdf->getContent()));
         $this->assertStringContainsString('attachment; filename="IV-Motorclass-bmw-serie-2-gran-tourer-2020.pdf"', $pdf->headers->get('Content-Disposition'));
     }
 }

@@ -3,8 +3,10 @@
      Laid out like the coches.net "Imprimir vehículo" sheet Iulian prints today,
      on his instruction: his details beside the photograph, the name, the prices
      and the warranty, the spec grid (value above, word below), the extras with
-     their prices beside the QR code, then the description and what it cost new.
-     The first page is the one for the bonnet; the rest flows onto the next ones.
+     their prices, the description and what it cost new, with the QR code.
+     All of it on one A4 page, whatever the car carries: the lower part (the
+     equipment, the description, the offer) is set at the largest type that
+     fits, measured in the browser before printing (the script at the end).
 
      The photograph is never cut: its box takes the photo's own proportions
      (SheetController::placardPhoto), so the whole car is on the paper. The old
@@ -50,14 +52,14 @@
       font:500 8pt "DM Sans",Arial,sans-serif; color:#5D6B80; vertical-align:middle; }
   }
   *{ box-sizing:border-box; }
+  /* phones enlarge the type of wide blocks on their own: not on a sheet of paper */
+  html{ -webkit-text-size-adjust:100%; text-size-adjust:100%; }
   html,body{ margin:0; }
   body{ font-family:"DM Sans",system-ui,-apple-system,"Segoe UI",Arial,sans-serif; color:var(--ink);
     -webkit-print-color-adjust:exact; print-color-adjust:exact; }
   .pc{ width:190mm; background:#fff; font-size:10pt; line-height:1.4; }
-  /* page one is the bonnet's: exactly one A4 (297 - 10 - 14 mm), everything that
-     matters on it, the QR code always. Extras that do not fit move to page two. */
+  /* one A4 (297 - 10 - 14 mm), everything on it, never a second sheet */
   .p1{ height:273mm; display:flex; flex-direction:column; overflow:hidden; }
-  .pc--rest{ break-before:page; }
   .num{ font-variant-numeric:tabular-nums; }
 
   /* ---- his details, and the car whole ------------------------------------- */
@@ -97,41 +99,63 @@
   .pc__facts span{ white-space:nowrap; }
   .pc__facts span + span::before{ content:"·"; margin:0 2mm; color:var(--ink3); font-weight:400; }
 
-  /* ---- extras beside the QR code; the list flows on to the next page ------ */
-  .pc__h2{ margin:8mm 0 3mm; font-size:13pt; line-height:1.2; font-weight:700; break-after:avoid; }
-  .pc--rest > .pc__h2:first-child, .pc--rest > section:first-child > .pc__h2:first-child{ margin-top:0; }
-  .p1__eq{ flex:1 1 0; min-height:0; display:grid; grid-template-columns:minmax(0,1fr) 50mm; gap:8mm; margin-top:6mm; }
-  .p1__list{ display:flex; flex-direction:column; min-height:0; }
-  .p1__list .pc__h2{ margin-top:0; }
-  .p1__list .pc__list{ flex:1 1 0; min-height:0; overflow:hidden; }
-  .p1__more{ margin:2mm 0 0; font-size:9.5pt; font-weight:600; color:var(--ink2); }
-  .p1__more[hidden]{ display:none; }
-  .pc__qr{ align-self:start; padding:4.5mm 4mm 4mm; background:var(--panel); text-align:center; }
-  .pc__qr b{ display:block; margin-bottom:3mm; font-size:12pt; line-height:1.2; }
-  .pc__qr p{ margin:2.5mm 0 0; font-size:9.5pt; line-height:1.3; color:var(--ink2); }
-  .pc__qr svg{ display:block; width:40mm; height:40mm; margin:0 auto; }
-  .pc__qr svg path, .pc__qr svg rect{ fill:var(--ink); }
-  .pc__list{ display:flow-root; list-style:none; margin:0; padding:0; }
-  .pc__list li{ display:flex; justify-content:space-between; align-items:baseline; gap:4mm; padding:1.25mm 0;
+  /* ---- the lower part: the equipment and his words on the left, the QR code
+     and what it cost new on the right. Everything in it is sized in em from
+     --b, which the script sets to the largest that fits (9.5pt down to 6.5pt). */
+  /* with a great deal to say, the spaces between the top blocks close up */
+  .p1--tight .pc__name{ margin-top:4mm; }
+  .p1--tight .pc__prices{ margin-top:3mm; }
+  .p1--tight .pc__specs{ margin-top:4mm; gap:2.5mm 3mm; grid-template-columns:repeat(6,minmax(0,1fr)); }
+  .p1--tight .pc__facts{ margin-top:3mm; padding:1.5mm 0; }
+  .p1--tight .p1__low{ margin-top:4mm; }
+  .p1--tight .pc__dealer{ padding:4mm 4mm 4mm 5mm; gap:3mm; }
+  .p1--tight .pc__logo{ width:24mm; }
+  /* and, last, the big type in the top a size down */
+  .p1--tighter .pc__name{ font-size:19pt; margin-top:3mm; }
+  .p1--tighter .pc__v{ font-size:19pt; }
+  .p1--tighter .pc__specs dd{ font-size:11pt; }
+  .p1--tighter .pc__specs dt, .p1--tighter .pc__k, .p1--tighter .pc__n{ font-size:8.5pt; }
+  .p1__low{ flex:1 1 0; min-height:0; display:grid; grid-template-columns:minmax(0,1fr) 50mm;
+    grid-template-rows:minmax(0,1fr); gap:7mm; margin-top:6mm; padding-bottom:1.5mm;
+    font-size:var(--b,9.5pt); line-height:1.4; }
+  /* not clipped: the screen (where it is measured) and the printer round a
+     little differently, and a hair more goes into the 1.5 mm below */
+  .p1__main, .p1__side{ min-width:0; min-height:0; }
+  .p1__side{ display:flex; flex-direction:column; gap:5mm; }
+  .pc__h2{ margin:1.15em 0 .5em; font-size:1.3em; line-height:1.2; font-weight:700; }
+  .p1__main > .pc__h2:first-child, .p1__side .pc__h2:first-child{ margin-top:0; }
+  /* the equipment as one run of text: a list of fifty short lines would take the page */
+  .pc__feats{ margin:0; }
+  .pc__feats span{ white-space:nowrap; }
+  /* the extras carry a price: two columns, the price on the right */
+  .pc__list{ list-style:none; margin:0; padding:0; columns:2; column-gap:7mm; }
+  .pc__list li{ display:flex; justify-content:space-between; align-items:baseline; gap:3mm; padding:.12em 0;
     border-bottom:.5pt solid var(--hair); break-inside:avoid; }
   .pc__list li span:first-child::before{ content:"· "; color:var(--ink3); }
   .pc__list li span:last-child{ flex:0 0 auto; color:var(--ink2); }
-  .pc__list--f{ columns:2; column-gap:7mm; }
-  .pc__list--f li{ display:block; }
-
-  /* ---- his words, and what it cost new ------------------------------------ */
-  .pc__about{ columns:2; column-gap:8mm; }
-  .pc__about p{ margin:0 0 2.5mm; font-size:9.5pt; line-height:1.5; orphans:3; widows:3; overflow-wrap:anywhere; }
-  .pc__h2 + .pc__about{ margin-top:0; }
-  .pc__deal{ max-width:150mm; break-inside:avoid; }
-  .pc__deal p{ margin:0 0 1mm; color:var(--ink2); }
-  .pc__row{ display:flex; justify-content:space-between; gap:6mm; padding:1.6mm 0; font-size:10.5pt; }
+  .pc__about{ columns:3; column-gap:6mm; }
+  .pc__about{ orphans:2; widows:2; overflow-wrap:anywhere; }
+  .pc__nl, .pc__gap{ display:block; }
+  .pc__gap{ height:.6em; }
+  /* the description going on under the QR code: the fourth column, starting lower */
+  .pc__about--on{ columns:auto; }
+  .pc__about--on:empty{ display:none; }
+  .pc__about--on > .pc__nl:first-child, .pc__about--on > .pc__gap:first-child{ display:none; }
+  .pc__deal{ margin-top:auto; }
+  /* the QR code goes with the type: 40 mm at 9.5pt, 27 mm at the smallest */
+  .pc__qr{ flex:0 0 auto; padding:1.35em 1.2em 1.2em; background:var(--panel); text-align:center; line-height:1.3; }
+  .pc__qr b{ display:block; margin-bottom:.9em; font-size:1.26em; line-height:1.2; }
+  .pc__qr p{ margin:.75em 0 0; color:var(--ink2); }
+  .pc__qr svg{ display:block; width:12em; height:12em; margin:0 auto; }
+  .pc__qr svg path, .pc__qr svg rect{ fill:var(--ink); }
+  .pc__deal p{ margin:0 0 .3em; color:var(--ink2); }
+  .pc__row{ display:flex; justify-content:space-between; align-items:baseline; gap:2mm; padding:.3em 0; }
   .pc__row span:last-child{ font-weight:600; white-space:nowrap; }
-  .pc__row--sum{ margin-top:2mm; border-top:1pt solid var(--ink); padding-top:2.5mm; }
-  .pc__row--now{ font-size:13pt; font-weight:700; }
-  .pc__row--now span:last-child{ font-weight:700; }
-  .pc__row--save{ color:var(--ok); font-weight:700; }
-  .pc__row--save span:last-child{ font-weight:700; }
+  .pc__row--sum{ margin-top:.3em; border-top:1pt solid var(--ink); padding-top:.5em; }
+  .pc__row--now{ font-size:1.15em; font-weight:700; }
+  .pc__row--now span:last-child, .pc__row--save span:last-child{ font-weight:700; }
+  .pc__row--save{ color:var(--ok); font-weight:700; flex-wrap:wrap; }
+  .pc__cut{ color:var(--ink2); font-weight:600; }
 
   /* ---- on screen: the sheet on a desk, and the two buttons ----------------- */
   @media screen{
@@ -147,7 +171,6 @@
     .desk{ padding:24px 16px 48px; }
     /* the paper: 210 mm with its 10 mm margins drawn in */
     .pc{ width:210mm; margin:0 auto; padding:10mm 10mm 14mm; box-shadow:0 6px 30px rgba(4,11,31,.18); }
-    .pc + .pc{ margin-top:24px; min-height:297mm; }
     /* a phone: the whole sheet scaled to the screen's width */
     @media (max-width:820px){ .desk{ padding:12px 0 32px; } .pc{ zoom:var(--k,1); } }
   }
@@ -224,123 +247,170 @@
     <p class="pc__facts">@foreach($facts as $f)<span>{{ $f }}</span>@endforeach</p>
   @endif
 
-  {{-- the list takes the room that is left; what does not fit is moved to page
-       two by the script below (Chrome runs it before printing the PDF too) --}}
-  <div class="p1__eq">
-    <div class="p1__list">
+  <div class="p1__low">
+    <div class="p1__main" data-main>
       @if($extras)
         <h2 class="pc__h2">Equipamiento extra</h2>
-        <ul class="pc__list num" data-fit>
+        <ul class="pc__list num">
           @foreach($extras as $x)
             <li><span>{{ $x['name'] }}</span>@if(($x['price'] ?? 0) > 0)<span>{{ $eurc($x['price']) }}</span>@endif</li>
           @endforeach
         </ul>
       @elseif($features)
         <h2 class="pc__h2">Equipamiento</h2>
-        <ul class="pc__list" data-fit>
-          @foreach($features as $x)<li><span>{{ \Illuminate\Support\Str::ucfirst($x) }}</span></li>@endforeach
-        </ul>
+        <p class="pc__feats">@foreach($features as $x)<span>{{ \Illuminate\Support\Str::ucfirst($x) }}</span>@if(! $loop->last) · @endif @endforeach</p>
       @endif
-      <p class="p1__more" data-more hidden>y más en la página siguiente</p>
+
+      @if($about)
+        <h2 class="pc__h2">Descripción</h2>
+        {{-- a sentence each, so what does not fit beside the QR code can go on under
+             it; between paragraphs a gap, between his lines a break (no whitespace
+             between the pieces: they are moved one by one) --}}
+        @php
+          $bits = [];
+          foreach ($about as $pi => $para) {
+              foreach (array_values(array_filter(array_map('trim', explode("\n", $para)), 'strlen')) as $li => $line) {
+                  if ($pi || $li) $bits[] = '<span class="' . ($li ? 'pc__nl' : 'pc__gap') . '"></span>';
+                  $parts = preg_split('/(?<=[.!?…:])\s+/u', $line, -1, PREG_SPLIT_NO_EMPTY);
+                  foreach ($parts as $k => $t) $bits[] = '<span class="pc__s">' . e($t) . ($k < count($parts) - 1 ? ' ' : '') . '</span>';
+              }
+          }
+        @endphp
+        <div class="pc__about" data-about>{!! implode('', $bits) !!}</div>
+      @endif
     </div>
-    <aside class="pc__qr">
-      <b>¿Te interesa?</b>
-      {!! $qr !!}
-      <p>Fotos, vídeo y todos los detalles, en ivmotorclass.com</p>
-    </aside>
+
+    <div class="p1__side" data-side>
+      <aside class="pc__qr">
+        <b>¿Te interesa?</b>
+        {!! $qr !!}
+        <p>Fotos, vídeo y todos los detalles, en ivmotorclass.com</p>
+      </aside>
+      <div class="pc__about pc__about--on" data-flow></div>
+      @if($new)
+        <section class="pc__deal num">
+          <h2 class="pc__h2">Desglose de la oferta</h2>
+          @if($new['base'] > 0)
+            <p>PVP vehículo nuevo en España{{ $new['year'] ? ' (año ' . $new['year'] . ')' : '' }}</p>
+            <div class="pc__row"><span>{{ $title }}</span><span>{{ $eurc($new['base']) }}</span></div>
+            @if($new['extras'] > 0)
+              <div class="pc__row"><span>Total equipamiento extra añadido</span><span>{{ $eurc($new['extras']) }}</span></div>
+            @endif
+          @endif
+          <div class="pc__row pc__row--sum"><span>Total{{ $new['base'] > 0 ? '' : ', nuevo' . ($new['year'] ? ' en ' . $new['year'] : '') }}</span><span>{{ $eurc($new['total']) }}</span></div>
+          <div class="pc__row pc__row--now"><span>Precio oferta</span><span>{{ $eur($price) }}</span></div>
+          <div class="pc__row pc__row--save"><span>Te ahorras, frente a nuevo</span><span>{{ $eurc($new['save']) }} · {{ $new['pct'] }} %</span></div>
+        </section>
+      @endif
+    </div>
   </div>
 
 </div>
 </article>
-
-{{-- the rest: what did not fit, what it cost new, and his description --}}
-<article class="pc pc--rest" data-rest>
-  <section data-rest-list hidden>
-    <h2 class="pc__h2">{{ $extras ? 'Equipamiento extra' : 'Equipamiento' }}, continuación</h2>
-    <ul class="pc__list {{ $extras ? 'num' : 'pc__list--f' }}"></ul>
-  </section>
-
-  @if($new)
-    <section class="pc__deal num">
-      <h2 class="pc__h2">Desglose de la oferta</h2>
-      @if($new['base'] > 0)
-        <p>PVP vehículo nuevo en España{{ $new['year'] ? ' (año ' . $new['year'] . ')' : '' }}</p>
-        <div class="pc__row"><span>{{ $title }}</span><span>{{ $eurc($new['base']) }}</span></div>
-        @if($new['extras'] > 0)
-          <div class="pc__row"><span>Total equipamiento extra añadido</span><span>{{ $eurc($new['extras']) }}</span></div>
-        @endif
-      @endif
-      <div class="pc__row pc__row--sum"><span>Total{{ $new['base'] > 0 ? '' : ', nuevo' . ($new['year'] ? ' en ' . $new['year'] : '') }}</span><span>{{ $eurc($new['total']) }}</span></div>
-      <div class="pc__row pc__row--now"><span>Precio oferta</span><span>{{ $eur($price) }}</span></div>
-      <div class="pc__row pc__row--save"><span>Te ahorras, frente a nuevo</span><span>{{ $eurc($new['save']) }} · {{ $new['pct'] }} %</span></div>
-    </section>
-  @endif
-
-  @if($about)
-    <h2 class="pc__h2">Descripción</h2>
-    <div class="pc__about">
-      @foreach($about as $p)<p>{!! nl2br(e($p)) !!}</p>@endforeach
-    </div>
-  @endif
-</article>
 </div>
 
 <script>
-  // Page one holds what fits of the list; the rest moves, in order, to page two,
-  // and "y N más" says so. Measured after the fonts are in, because the line
-  // heights depend on them; html[data-ready] tells the PDF printer it is done.
+  // Everything on one page. The top (photo, name, prices, specs) stays as it is;
+  // the lower part takes the largest type that fits, 9.5pt down to 8pt, and the
+  // description lines that do not fit beside the QR code go on under it. When
+  // even 8pt does not fit, the photograph gives up height first, at its own
+  // proportions, down to 56 mm (smaller, never cut); then the spaces in the top
+  // close up and the type goes on down to 6.5pt, the photo to 48 mm, the big
+  // type in the top a size down. Past that the end gives way, and says so. Measured
+  // after the fonts are in, because the line heights depend on them;
+  // html[data-ready] tells the PDF printer it is done.
   (function () {
     var root = document.documentElement;
-    var MM = 96 / 25.4;
+    var q = function (s) { return document.querySelector(s); };
+    var zoom = function () {};
     function fit() {
-      // 1. the QR code must be whole on page one. When the page is fuller than
-      //    usual (two-line name, a row of history, a fourth price) the photograph
-      //    gives up the height, at its own proportions, down to 56 mm — it is
-      //    made smaller, never cut.
-      var p1 = document.querySelector('.p1'), qr = document.querySelector('.pc__qr'), fig = document.querySelector('[data-ratio]');
-      if (p1 && qr && fig) {
-        // on a phone the sheet is zoomed: measured boxes are in screen pixels,
-        // the sizes set below are in the sheet's own
-        var z = fig.currentCSSZoom || 1;
-        var over = (qr.getBoundingClientRect().bottom - p1.getBoundingClientRect().bottom) / z + 1;
-        if (over > 0) {
-          var r = parseFloat(fig.getAttribute('data-ratio')) || 4 / 3;
-          var h = Math.max(56 * MM, fig.getBoundingClientRect().height / z - over);
-          fig.style.height = h + 'px'; fig.style.width = Math.min(122 * MM, h * r) + 'px';
-          fig.parentNode.style.setProperty('--ph', h + 'px');
+      var p1 = q('.p1'), low = q('.p1__low'), main = q('[data-main]'), side = q('[data-side]');
+      if (!(p1 && low && main && side)) return;
+      root.style.setProperty('--k', '1');          // measured at the paper's own size, not the phone's
+      var about = q('[data-about]'), flow = q('[data-flow]'), fig = q('[data-ratio]');
+      var r = fig ? parseFloat(fig.getAttribute('data-ratio')) || 4 / 3 : 0;
+      var h0 = fig ? parseFloat(fig.style.height) : 0;
+      var over = function (el) { return el.scrollHeight > el.clientHeight + 1; };
+      var bad = function () { return over(main) || over(side) || over(p1); };
+      function lay(pt, h) {
+        low.style.setProperty('--b', pt + 'pt');
+        if (fig) {
+          fig.style.height = h + 'mm'; fig.style.width = Math.min(122, h * r) + 'mm';
+          fig.parentNode.style.setProperty('--ph', h + 'mm');
+        }
+        if (about && flow) {
+          while (flow.firstElementChild) about.appendChild(flow.firstElementChild);
+          var move = function () { flow.insertBefore(about.lastElementChild, flow.firstElementChild); };
+          while (over(main) && about.children.length > 1) {
+            move();
+            while (about.lastElementChild && !about.lastElementChild.classList.contains('pc__s')) move();   // a break goes with what follows it
+          }
+        }
+        return !bad();
+      }
+      // the largest size between lo and hi, in quarter points, that fits; 0 if none
+      // (smaller type never fits worse, so halving the range finds it)
+      function best(lo, hi, h) {
+        if (!lay(lo, h)) return 0;
+        var a = lo * 4, b = hi * 4;
+        while (a < b) { var m = Math.ceil((a + b) / 2); if (lay(m / 4, h)) a = m; else b = m - 1; }
+        lay(a / 4, h);
+        return a / 4;
+      }
+      var size = best(8, 9.5, h0);
+      for (var h = h0 - 4; !size && fig && h > 56; h -= 4) size = best(8, 9.5, h);
+      if (!size) { p1.classList.add('p1--tight'); size = best(6.5, 8, fig ? 56 : 0); }
+      if (!size && fig) size = best(6.5, 8, 48);
+      if (!size) { p1.classList.add('p1--tighter'); size = best(6.5, 8, fig ? 48 : 0); }
+      if (!size) { lay(6.5, fig ? 48 : 0); cut(); }
+      root.setAttribute('data-size', (size || 6.5) + 'pt');
+
+      // the last resort: the description's end, then the equipment's, each saying so
+      function cut() {
+        var last = function () { return (flow && flow.lastElementChild) || (about && about.lastElementChild); };
+        var n = function () { return (about ? about.children.length : 0) + (flow ? flow.children.length : 0); };
+        var b, gone = false;
+        while (bad() && n() > 1) { last().remove(); gone = true; }
+        while ((b = last()) && n() > 1 && !b.classList.contains('pc__s')) b.remove();
+        if ((b = last()) && (gone || bad())) {
+          var words = b.textContent.split(/\s+/);
+          var put = function () {
+            b.textContent = words.join(' ') + '… ';
+            var more = document.createElement('span');
+            more.className = 'pc__cut'; more.textContent = 'Sigue en ivmotorclass.com';
+            b.appendChild(more);
+          };
+          put();
+          while (bad() && words.length > 6) { words.splice(-4); put(); }
+        }
+        var list = main.querySelector('ul, .pc__feats');
+        var items = list ? list.children : [], k = 0;
+        while (list && bad() && items.length > 1) {
+          var it = items[items.length - 1];
+          if (it.previousSibling && it.previousSibling.nodeType === 3) it.previousSibling.remove();
+          it.remove(); k++;
+        }
+        if (k) {
+          var tail = document.createElement(list.tagName === 'UL' ? 'li' : 'span');
+          tail.className = 'pc__cut'; tail.textContent = (list.tagName === 'UL' ? '' : ' · ') + 'y ' + k + ' más en ivmotorclass.com';
+          list.appendChild(tail);
         }
       }
-      // 2. the list: what fits stays, the rest moves on in order
-      var ul = document.querySelector('[data-fit]'), more = document.querySelector('[data-more]');
-      var rest = document.querySelector('[data-rest-list]'), page2 = document.querySelector('[data-rest]');
-      if (ul && rest) {
-        more.hidden = false;                       // its line is part of the room
-        var limit = ul.getBoundingClientRect().bottom + 0.5, moved = [];
-        while (ul.lastElementChild && ul.lastElementChild.getBoundingClientRect().bottom > limit) {
-          moved.unshift(ul.removeChild(ul.lastElementChild));
-        }
-        var to = rest.querySelector('ul');
-        moved.forEach(function (li) { to.appendChild(li); });
-        if (moved.length) {
-          more.textContent = 'y ' + moved.length + ' más en la página siguiente';
-          rest.hidden = false;
-        } else {
-          more.hidden = true;
-        }
-      }
-      // nothing for page two at all: no blank second sheet
-      if (page2 && !page2.querySelector('section:not([hidden]), .pc__about')) page2.remove();
-      root.setAttribute('data-ready', '1');
     }
-    var go = function () { (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(fit); };
+    var go = function () {
+      (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(function () {
+        try { fit(); } finally { zoom(); root.setAttribute('data-ready', '1'); }
+      });
+    };
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
 @unless($inline)
-    // a phone: the whole sheet scaled to the screen's width
-    function zoom() {
-      var k = Math.min(1, (window.innerWidth - 16) / (210 * 96 / 25.4));
+    // a phone: the whole sheet scaled to the screen's width (the layout width:
+    // innerWidth grows with a sheet wider than the screen and never shrinks it)
+    zoom = function () {
+      var k = Math.min(1, (document.documentElement.clientWidth - 16) / (210 * 96 / 25.4));
       root.style.setProperty('--k', k.toFixed(4));
-    }
-    zoom(); window.addEventListener('resize', zoom);
+    };
+    zoom(); window.addEventListener('resize', function () { zoom(); });
 @endunless
   })();
 </script>
