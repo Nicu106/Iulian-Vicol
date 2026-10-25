@@ -1,7 +1,12 @@
+# Search engines and answer engines (Googlebot, Bingbot, GPTBot, OAI-SearchBot,
+# ChatGPT-User, PerplexityBot, ClaudeBot, Google-Extended...) are all welcome: none
+# is named below, so each reads these rules. /llms.txt has the site in plain words.
 User-agent: *
 Disallow: /admin
 Disallow: /login
 Disallow: /brandbook
+Disallow: /muestras
+Disallow: /no-contar
 Disallow: /r/
 
 Sitemap: https://ivmotorclass.com/sitemap.xml

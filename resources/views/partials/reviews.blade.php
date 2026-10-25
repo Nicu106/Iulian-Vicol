@@ -14,7 +14,8 @@
      Without script the row still scrolls and each card holds its whole text.
      ========================================== --}}
 @php
-  $v = fn ($p) => asset($p) . '?v=' . (@filemtime(public_path($p)) ?: 1);
+  // asset() already adds ?v=<mtime> (App\Support\VersionedUrlGenerator); a second one was being appended
+  $v = fn ($p) => asset($p);
 @endphp
 @push('css')
 <link rel="stylesheet" href="{{ $v('css/reviews.css') }}">

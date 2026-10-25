@@ -65,6 +65,9 @@ class BrandCatalogController extends Controller
         $chips = self::chips();
         $sub   = self::sub();
 
+        // every card's photograph size in one cache read (App\Support\Img::prime)
+        \App\Support\Img::prime(collect($rows)->flatMap(fn ($r) => $r['cars']->concat($r['delivered']))->map(fn ($v) => $v->primary_image));
+
         return view('pages.catalogo', [
             'chips' => $chips,
             'sub'   => $sub,

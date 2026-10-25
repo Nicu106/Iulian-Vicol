@@ -273,6 +273,38 @@ final class Img
         return self::$memo[$key] = $out;
     }
 
+    /**
+     * size() for many files with ONE cache read. The cache is the database: a car
+     * page asked it 70 times, one query per photograph — 18 of the page's 45 ms
+     * (measured 2026-10-25). A page that knows its photographs calls this first;
+     * size() then answers from the memo, and still works alone for anything not
+     * primed or not cached yet.
+     *
+     * @param iterable<?string> $paths
+     */
+    public static function prime(iterable $paths): void
+    {
+        $want = [];
+        foreach ($paths as $p) {
+            $key = (string) $p;
+            if ($key === '' || array_key_exists($key, self::$memo)) {
+                continue;
+            }
+            $fs = self::fsPath(self::clean($p));
+            if ($fs !== null) {
+                $want['imgsize|' . md5($fs) . '|' . @filemtime($fs)] = $key;
+            }
+        }
+        if (! $want) {
+            return;
+        }
+        foreach (\Illuminate\Support\Facades\Cache::many(array_keys($want)) as $ck => $hit) {
+            if (is_array($hit)) {
+                self::$memo[$want[$ck]] = $hit;
+            }
+        }
+    }
+
     public static function nearestWidth(int $w): int
     {
         foreach (self::WIDTHS as $c) {

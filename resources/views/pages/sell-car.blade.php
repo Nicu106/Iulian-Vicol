@@ -3,6 +3,7 @@
 @section('title', 'Vende tu coche — IV MOTORCLASS')
 @section('description', 'Vende tu coche alemán en Málaga a quien lo va a vender: dime marca, modelo y kilómetros, y te digo qué puedo hacer.')
 @section('current', 'vender')
+@php \App\Support\Schema::page('WebPage', [['Vende tu coche', '/vende']]); @endphp
 
 @push('css')
 <link rel="stylesheet" href="{{ asset('css/contact.css') }}">

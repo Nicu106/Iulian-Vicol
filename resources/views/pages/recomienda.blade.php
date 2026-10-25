@@ -3,6 +3,7 @@
 @section('title', 'Recomienda a un amigo — IV MOTORCLASS')
 @section('description', '¿Conoces a alguien que busca coche? Crea tu enlace personal en un minuto y compártelo por WhatsApp.')
 @section('current', 'recomienda')
+@php \App\Support\Schema::page('WebPage', [['Recomienda a un amigo', '/recomienda']]); @endphp
 
 @push('css')
 <link rel="stylesheet" href="{{ asset('css/contact.css') }}">

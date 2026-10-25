@@ -176,13 +176,7 @@ require __DIR__.'/auth.php';
 // them. Probed with the lockdown switched off, which is what launch does, all
 // three GETs answered 200 with the real content. Removed 2026-09-08.
 
-// The sitemap, from the database, so a car added in the panel is in it the same minute.
-Route::get('/sitemap.xml', function () {
-    $urls = collect(['/', '/catalogo', '/por-que-nosotros', '/contacto', '/vende', '/recomienda'])
-        ->map(fn ($p) => ['loc' => url($p), 'lastmod' => null]);
-    \App\Models\Vehicle::whereIn('status', ['available', 'sold'])->orderByDesc('updated_at')->get(['slug', 'updated_at'])
-        ->each(fn ($v) => $urls->push(['loc' => url('/coche/' . $v->slug), 'lastmod' => optional($v->updated_at)->toAtomString()]));
-    $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-    foreach ($urls as $u) $xml .= '<url><loc>' . e($u['loc']) . '</loc>' . ($u['lastmod'] ? '<lastmod>' . $u['lastmod'] . '</lastmod>' : '') . '</url>';
-    return response($xml . '</urlset>', 200, ['Content-Type' => 'application/xml']);
-})->name('sitemap');
+// The sitemap (with every car's photographs) and /llms.txt, from the database, so a
+// car added in the panel is in them the same minute — App\Http\Controllers\SeoController.
+Route::get('/sitemap.xml', [App\Http\Controllers\SeoController::class, 'sitemap'])->name('sitemap');
+Route::get('/llms.txt', [App\Http\Controllers\SeoController::class, 'llms'])->name('llms');

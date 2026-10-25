@@ -64,6 +64,18 @@ class HomePageController extends Controller
     public const MONTHS = 48;
 
     /**
+     * The home page's "Preguntas frecuentes", question and answer, exactly as
+     * printed. One list for three readers: the page, its FAQPage structured data
+     * (App\Support\Schema) and /llms.txt — so none of them can say something the
+     * others do not.
+     */
+    public const FAQ = [
+        ['¿Ofrecen garantía para vehículos?', 'Sí, ofrecemos garantía extendida hasta 36 meses, dependiendo del modelo.'],
+        ['¿Puedo comprar en leasing o con financiación?', 'Sí, colaboramos con socios financieros para ofertas rápidas y ventajosas.'],
+        ['¿Puedo hacer una prueba de conducción?', 'Por supuesto. Escríbeme por WhatsApp o llámame y la programamos.'],
+    ];
+
+    /**
      * The shape of one card.
      *
      * Only two things are decided here, and both are coarse on purpose:
@@ -198,6 +210,8 @@ class HomePageController extends Controller
     {
         $available = Vehicle::where('status', 'available')->orderByDesc('price')->get();
         $sold      = Vehicle::where('status', 'sold')->count();
+        // the cards' photograph sizes in one cache read (App\Support\Img::prime)
+        \App\Support\Img::prime($available->map(fn ($v) => $v->primary_image));
 
         $keyOf = function ($v): ?string {
             $b = mb_strtolower(trim((string) $v->brand));

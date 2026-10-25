@@ -3,6 +3,7 @@
 @section('title', 'Contacto — IV MOTORCLASS')
 @section('description', 'Escríbeme por WhatsApp, llámame o mándame un email. Contesto yo, normalmente en minutos. Málaga, con cita, donde esté el coche.')
 @section('current', 'contacto')
+@php \App\Support\Schema::page('ContactPage', [['Contacto', '/contacto']]); @endphp
 {{-- this page has its own map; the footer's band would be the same place twice --}}
 @section('foot-map', 'off')
 

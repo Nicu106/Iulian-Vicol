@@ -252,9 +252,13 @@
   {{-- ============ questions ============ --}}
   <section class="hm-sec hm-faq cat-wrap" aria-labelledby="h-faq">
     <h2 class="hm-h2" id="h-faq">Preguntas frecuentes</h2>
-    <details class="hm-q"><summary>¿Ofrecen garantía para vehículos?</summary><p>Sí, ofrecemos garantía extendida hasta 36 meses, dependiendo del modelo.</p></details>
-    <details class="hm-q"><summary>¿Puedo comprar en leasing o con financiación?</summary><p>Sí, colaboramos con socios financieros para ofertas rápidas y ventajosas.</p></details>
-    <details class="hm-q"><summary>¿Puedo hacer una prueba de conducción?</summary><p>Por supuesto. Escríbeme por WhatsApp o llámame y la programamos.</p></details>
+    {{-- HomePageController::FAQ: one list, printed here and handed to search and
+         answer engines (a FAQPage, App\Support\Schema; /llms.txt), so the
+         markup can never say something the page does not. --}}
+    @php \App\Support\Schema::add(\App\Support\Schema::faq(\App\Http\Controllers\HomePageController::FAQ)); @endphp
+    @foreach(\App\Http\Controllers\HomePageController::FAQ as [$q, $a])
+    <details class="hm-q"><summary>{{ $q }}</summary><p>{{ $a }}</p></details>
+    @endforeach
   </section>
 
   {{-- ============ the ask ============ --}}

@@ -10,9 +10,10 @@
 @section('description', 'Seleccionados, revisados y preparados. Te contesto yo, te lo enseño antes de que vengas y te lo llevas a tu nombre en 30 minutos.')
 @section('og_image', url(\App\Support\Img::url('/storage/why/welcome-graded.jpg', 1200) ?? '/storage/why/welcome-graded.jpg'))
 @section('current', 'porque')
+@php \App\Support\Schema::page('AboutPage', [['Por qué nosotros', '/por-que-nosotros']]); @endphp
 
 @push('css')
-<link rel="stylesheet" href="{{ asset('css/por-que.css') }}?v={{ @filemtime(public_path('css/por-que.css')) }}">
+<link rel="stylesheet" href="{{ asset('css/por-que.css') }}">
 @endpush
 
 @push('head')
@@ -457,5 +458,5 @@
 @endsection
 
 @push('js')
-<script src="{{ asset('js/por-que.js') }}?v={{ @filemtime(public_path('js/por-que.js')) }}" defer onerror="document.documentElement.classList.remove('pq-on')"></script>
+<script src="{{ asset('js/por-que.js') }}" defer onerror="document.documentElement.classList.remove('pq-on')"></script>
 @endpush

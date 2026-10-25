@@ -7,7 +7,8 @@
   // Every card has a page, sold included: the photographs are the record of what
   // he has actually delivered.
   $href = '/coche/'.$g('slug');
-  $alt = trim($g('brand').' '.$g('model').' '.$g('year'));
+  // the marque's own spelling ("BMW", "Mercedes-Benz"), whatever the data says ("Bmw"): image search reads it
+  $alt = trim((\App\Support\Marques::for($g('brand'))['name'] ?? $g('brand')).' '.$g('model').' '.$g('year'));
 @endphp
 <article class="mc-card {{ $kind === 'sold' ? 'mc-card--sold' : '' }}">
   @if($href)<a class="mc-card__link" href="{{ $href }}">@else<div class="mc-card__link">@endif

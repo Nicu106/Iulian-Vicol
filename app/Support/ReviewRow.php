@@ -44,12 +44,16 @@ final class ReviewRow
     /** The rows, newest first, ready to print. */
     public static function rows()
     {
-        return Testimonial::where('is_active', true)
+        $list = Testimonial::where('is_active', true)
             ->whereNotNull('image_path')
             ->orderByDesc('created_at')->orderByDesc('id')
             ->get()
             ->filter(fn ($t) => mb_strlen(trim((string) $t->quote)) > 20)
-            ->values()
+            ->values();
+        // every photograph's size in one cache read, not one per review
+        Img::prime($list->pluck('image_path'));
+
+        return $list
             ->map(function ($t) {
                 $paras = self::paragraphs((string) $t->quote);
                 $size  = Img::size($t->image_path) ?: [1200, 1600];
