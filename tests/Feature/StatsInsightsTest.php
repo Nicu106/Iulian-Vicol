@@ -221,7 +221,7 @@ class StatsInsightsTest extends TestCase
         $u = User::factory()->create();
         $this->actingAs($u)->get('/admin/estadisticas')->assertOk()
             ->assertSee('Qué marcas atraen')->assertSee('Qué precio miran')->assertSee('De dónde son')
-            ->assertSee('Las fotos')->assertSee('Tus visitas no cuentan')->assertSee('/no-contar?signature=', false);
+            ->assertSee('Las fotos')->assertSee('Tus visitas, aparte')->assertSee('/no-contar?signature=', false);
         $this->actingAs($u)->get('/admin/estadisticas?coche=bmw-318d-2020')->assertOk()->assertSee('Sus fotos');
     }
 }

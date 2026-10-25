@@ -241,10 +241,17 @@
   </section>
 
   <section class="ad-st-sec ad-st-me">
-    <h3 class="ad-st-h">Tus visitas no cuentan</h3>
-    <p class="ad-st-say">No cuentan los móviles y ordenadores que han entrado en este panel, aunque luego miren la web sin
-      entrar, ni lo que se vea desde la misma conexión durante las 6 horas siguientes. Para un móvil que nunca entra en
-      el panel —el de un compañero— ábrele este enlace en él:</p>
+    <h3 class="ad-st-h">Tus visitas, aparte</h3>
+    <p class="ad-st-say">Lo que miráis tú y tu equipo se apunta aquí al momento —páginas, segundos, fotos, WhatsApp—, para
+      que veas que todo se registra, y no se suma a ninguna cifra de arriba.</p>
+    @if($s['team'])
+      @include('admin.stats._feed', ['feed' => $s['team']])
+    @else
+      <p class="ad-st-quiet">Nada desde ayer.</p>
+    @endif
+    <p class="ad-st-say">Cuentan como tuyos los móviles y ordenadores que han entrado en este panel, aunque luego miren la
+      web sin entrar, y lo que se vea desde la misma conexión durante las 6 horas siguientes (el wifi de casa o de la
+      tienda). Para un móvil que nunca entra en el panel —el de un compañero— ábrele este enlace en él:</p>
     <div class="ad-st-me__row">
       <span class="ad-st-me__qr" role="img" aria-label="Código QR del enlace «No contar este dispositivo»">{!! (new \chillerlan\QRCode\QRCode(new \chillerlan\QRCode\QROptions([
         'outputType' => 'svg', 'outputBase64' => false, 'eccLevel' => \chillerlan\QRCode\Common\EccLevel::M,

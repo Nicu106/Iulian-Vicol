@@ -169,7 +169,8 @@ final class Stats
      */
     public static function hit(Request $request): bool
     {
-        if (! self::allowed($request)) {
+        $who = self::audience($request);
+        if ($who === '') {
             return false;
         }
 
@@ -181,41 +182,64 @@ final class Stats
 
         $type = (string) $request->input('t');
 
-        return self::locked(fn () => match (true) {
-            $type === 'view'                             => self::view($request, $path, $slug),
-            $type === 'eng'                              => self::engage($request, $path, $slug),
-            in_array($type, ['wa', 'tel', 'mail'], true) => self::press($request, $path, $type, $path, self::k($request)),
-            $type === 'ev'                               => self::event($request, $path),
-            default                                      => false,
-        });
+        // The team's beacons go the same way, written as their own visits
+        // (team = 1) and into no counter: "Tus visitas" shows them.
+        self::$team = $who === 'team';
+        try {
+            $done = self::locked(fn () => match (true) {
+                $type === 'view'                             => self::view($request, $path, $slug),
+                $type === 'eng'                              => self::engage($request, $path, $slug),
+                in_array($type, ['wa', 'tel', 'mail'], true) => self::press($request, $path, $type, $path, self::k($request)),
+                $type === 'ev'                               => self::event($request, $path),
+                default                                      => false,
+            });
+        } finally {
+            self::$team = false;
+        }
+
+        return $done && $who === 'visitor';
+    }
+
+    /** While a team beacon is written: no counters, its own rows. */
+    private static bool $team = false;
+
+    public static function allowed(Request $request): bool
+    {
+        return self::audience($request) === 'visitor';
     }
 
     /**
-     * Who is not counted: robots; the owner and his team — signed in, or on a
+     * Who is counted. Ignored: robots and server farms, the server itself, and
+     * anything not sent by this site's own pages. The team — signed in, or on a
      * device that has ever been signed in or opened the "no contar" link, or on
-     * a connection one of those used in the last hours; the server itself; and
-     * anything not sent by this site's own pages.
+     * a connection one of those used in the last hours — is recorded as its own
+     * visits ("Tus visitas" in the panel) and never counted.
+     *
+     * @return string 'visitor' (counted), 'team' (recorded, never counted) or '' (ignored)
      */
-    public static function allowed(Request $request): bool
+    public static function audience(Request $request): string
     {
         if (self::isBot((string) $request->userAgent())) {
-            return false;
+            return '';
         }
         $ip = (string) $request->ip();
         if ($ip === '' || $ip === '::1' || str_starts_with($ip, '127.')) {
-            return false;
+            return '';
+        }
+        $site = $request->header('Sec-Fetch-Site');
+        if ($site !== null && $site !== 'same-origin') {
+            return '';
         }
         if (Auth::check() || self::staffDevice($request)) {
             self::markStaff($ip);
 
-            return false;
+            return 'team';
         }
-        $site = $request->header('Sec-Fetch-Site');
-        if ($site !== null && $site !== 'same-origin') {
-            return false;
+        if (self::staffIp($ip)) {
+            return 'team';
         }
 
-        return ! self::staffIp($ip) && ! Geo::hosting($ip);
+        return Geo::hosting($ip) ? '' : 'visitor';
     }
 
     /**
@@ -324,7 +348,7 @@ final class Stats
         }
         DB::table('stats')->where('day', $r->day)->where('n', '<=', 0)->delete();
         if ($visits) {
-            DB::table('stat_visits')->whereIn('id', $visits)->delete();
+            DB::table('stat_visits')->whereIn('id', $visits)->update(['team' => true]);
         }
         DB::table('stat_seen')->where('day', $r->day)->where('hash', $r->hash)->delete();
     }
@@ -386,6 +410,7 @@ final class Stats
                 'steps'      => json_encode([['p' => $path, 't' => 0]], self::JSON),
                 'pages'      => 1,
                 'place'      => Geo::place($geo),
+                'team'       => self::$team,
             ]);
             $done['_v'][] = $visit;
         } else {
@@ -427,14 +452,15 @@ final class Stats
         DB::table('stat_seen')->upsert([[
             'day'       => $day,
             'hash'      => $hash,
-            'iph'       => self::iph($day, $ip),
+            'iph'       => self::$team ? '' : self::iph($day, $ip),     // forget() never touches the team's own rows
             'last_at'   => $t,
             'last_path' => $path,
             'visit'     => $visit,
             'source'    => $source,
             'cars'      => implode(',', array_slice($cars, -150)),
             'inc'       => json_encode($done, self::JSON),
-        ]], ['day', 'hash'], ['iph', 'last_at', 'last_path', 'visit', 'source', 'cars', 'inc']);
+            'team'      => self::$team,
+        ]], ['day', 'hash'], ['iph', 'last_at', 'last_path', 'visit', 'source', 'cars', 'inc', 'team']);
 
         self::bump($day, $inc);
         self::sometimesPrune();
@@ -701,7 +727,7 @@ final class Stats
 
     private static function hash(string $day, string $ip, string $ua): string
     {
-        return substr(hash('sha256', self::salt($day) . '|' . $ip . '|' . $ua), 0, 32);
+        return substr(hash('sha256', self::salt($day) . (self::$team ? '|team' : '') . '|' . $ip . '|' . $ua), 0, 32);
     }
 
     /** The connection alone, for the day: all the browsers behind one address. */
@@ -752,6 +778,9 @@ final class Stats
     /** @param list<array{0:string,1:string,2?:int}> $inc */
     private static function bump(string $day, array $inc): void
     {
+        if (self::$team) {
+            return;                                         // the team's visits are shown, never counted
+        }
         $rows = [];
         foreach ($inc as $i) {
             $key = mb_substr((string) $i[1], 0, 160);
@@ -1019,6 +1048,7 @@ final class Stats
             'photos'  => StatsInsights::photos($by),
             'history' => StatsInsights::history(),
             'me'      => \Illuminate\Support\Facades\URL::signedRoute('stats.me'),
+            'team'    => self::feed(self::clock()->subDay()->startOfDay(), 12, null, true),
         ];
     }
 
@@ -1042,7 +1072,7 @@ final class Stats
     public static function live(): array
     {
         $since = self::clock()->getTimestamp() - self::NOW;
-        $rows = DB::table('stat_seen')->where('last_at', '>=', $since)->pluck('last_path');
+        $rows = DB::table('stat_seen')->where('team', false)->where('last_at', '>=', $since)->pluck('last_path');
         $names = self::carNames($rows->filter(fn ($p) => str_starts_with($p, '/coche/'))->map(fn ($p) => substr($p, 7))->all());
         $where = [];
         foreach ($rows->countBy() as $path => $n) {
@@ -1175,9 +1205,9 @@ final class Stats
     }
 
     /** The latest visits, newest first, ready to read. */
-    public static function feed(CarbonImmutable $from, int $limit, ?string $car = null): array
+    public static function feed(CarbonImmutable $from, int $limit, ?string $car = null, bool $team = false): array
     {
-        $q = DB::table('stat_visits')->where('day', '>=', $from->toDateString());
+        $q = DB::table('stat_visits')->where('team', $team)->where('day', '>=', $from->toDateString());
         if ($car !== null) {
             $q->whereRaw('instr("steps", ?) > 0', ['"/coche/' . $car . '"']);
         }

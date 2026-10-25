@@ -284,7 +284,8 @@ class StatsTest extends TestCase
         foreach (['car', 'carp', 'wa', 'wap', 'timen', 'time', 'photos', 'pic', 'pict', 'search', 'carsrc'] as $m) {
             $this->assertSame(0, (int) DB::table('stats')->where('metric', $m)->sum('n'), $m);
         }
-        $this->assertSame(1, DB::table('stat_visits')->count());
+        $this->assertSame(1, DB::table('stat_visits')->where('team', false)->count());
+        $this->assertSame(2, DB::table('stat_visits')->where('team', true)->count());   // his, kept as "Tus visitas"
         $this->assertSame(1, DB::table('stat_seen')->count());
 
         // and for the next hours, nothing from that line counts — signed in or not
@@ -398,5 +399,34 @@ class StatsTest extends TestCase
         $this->assertNotSame('', DB::table('stat_visits')->value('place'));
         $this->assertNull(\App\Support\Geo::find('10.1.2.3'));
         $this->assertStringNotContainsString('83.56.1.1', json_encode(DB::table('stats')->get()) . json_encode(DB::table('stat_visits')->get()));
+    }
+
+    public function test_the_teams_visits_are_recorded_apart_and_never_counted(): void
+    {
+        $car = '/coche/bmw-318d-2020';
+        // the owner's phone on the line where the panel is open
+        \App\Support\Stats::markStaff('83.44.1.2');
+        $this->beacon(['t' => 'view', 'p' => '/']);
+        $this->travel(20)->seconds();
+        $this->beacon(['t' => 'view', 'p' => $car]);
+        $this->beacon(['t' => 'eng', 'p' => $car, 's' => 30, 'y' => 100, 'y0' => 0, 'f' => '1', 'pv' => self::pics(0, 4)]);
+        $this->beacon(['t' => 'wa', 'p' => $car]);
+        // and a real visitor
+        $this->beacon(['t' => 'view', 'p' => '/catalogo'], self::PC, '90.1.1.1');
+
+        // no counter has the team in it
+        $this->assertSame(1, $this->n('people'));
+        $this->assertSame(1, $this->n('views'));
+        $this->assertSame(0, (int) DB::table('stats')->whereIn('metric', ['car', 'carp', 'wa', 'wap', 'photos', 'pic', 'timen'])->sum('n'));
+        // nor "ahora en la web", nor the visitors' list
+        $this->assertSame(1, Stats::live()['n']);
+        $this->assertCount(1, Stats::feed(CarbonImmutable::now(Stats::TZ)->startOfDay(), 10));
+        // but the team's own visit is there, whole
+        $team = Stats::feed(CarbonImmutable::now(Stats::TZ)->startOfDay(), 10, null, true);
+        $this->assertCount(1, $team);
+        $this->assertSame(['Inicio', 'BMW 318d 2020'], array_column($team[0]['steps'], 'label'));
+        $this->assertSame(4, $team[0]['steps'][1]['ph']);
+        $this->assertSame(30, $team[0]['steps'][1]['d']);
+        $this->assertTrue($team[0]['wa']);
     }
 }
