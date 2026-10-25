@@ -78,6 +78,11 @@ Route::post('/r/e', [App\Http\Controllers\ReferralController::class, 'event'])
 // The panel's statistics: one anonymous beacon per page and press — App\Support\Stats.
 Route::post('/s', [App\Http\Controllers\BeaconController::class, 'hit'])
     ->middleware('throttle:120,1')->name('stats.hit');
+// "No contar este dispositivo": a signed link that keeps a phone of the team out of them.
+Route::get('/no-contar', [App\Http\Controllers\StatsMeController::class, 'show'])
+    ->middleware(['signed', 'throttle:20,1'])->name('stats.me');
+Route::get('/no-contar/quitar', [App\Http\Controllers\StatsMeController::class, 'undo'])
+    ->middleware(['signed', 'throttle:20,1'])->name('stats.me.undo');
 Route::get('/r/{code}', [App\Http\Controllers\ReferralController::class, 'visit'])->name('refer.visit');
 Route::get('/recomienda', [App\Http\Controllers\ReferralController::class, 'show'])->name('refer');
 Route::post('/recomienda', [App\Http\Controllers\ReferralController::class, 'store'])

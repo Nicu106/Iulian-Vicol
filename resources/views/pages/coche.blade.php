@@ -2,6 +2,23 @@
 
 @section('title', (\App\Support\Marques::for($car->brand)['name'] ?? $car->brand).' '.$car->model.' '.$car->year.' — IV MOTORCLASS')
 @section('current', '')
+{{-- For search and answer engines (App\Support\Schema): this car and its offer,
+     with what the page itself shows — price, the price before, kilometres, the
+     warranty, the photographs in the page's order. --}}
+@php
+  // every photograph's size (the stage, 70 thumbnails, the cards at the end) in one cache read
+  \App\Support\Img::prime([...array_column($photos, 'path'), ...$others->map(fn ($v) => $v->primary_image)]);
+  \App\Support\Schema::page('ItemPage', [['Coches', '/catalogo'], [$brand.' '.$car->model.' '.$car->year, '/coche/'.$car->slug]]);
+  \App\Support\Schema::add(\App\Support\Schema::car($car, $brand, array_column($photos, 'path'), $warranty, $price['before']));
+@endphp
+@section('og_type', 'product')
+@push('meta')
+<meta property="product:retailer_item_id" content="{{ $car->slug }}">
+<meta property="product:price:amount" content="{{ (int) $car->price }}">
+<meta property="product:price:currency" content="EUR">
+<meta property="product:availability" content="{{ ($car->status ?? '') === 'sold' ? 'out of stock' : 'in stock' }}">
+<meta property="product:condition" content="used">
+@endpush
 {{-- the link preview: price and the facts that decide a viewing, and the cover photo --}}
 @section('description', trim(implode(' · ', array_filter([
     ($car->status ?? '') === 'sold' ? 'Vendido' : ($car->price ? number_format((int) $car->price, 0, ',', '.') . ' €' : null),
@@ -76,13 +93,13 @@
 
       {{-- The one being looked at. Without JavaScript this is simply the first
            photograph and every other one is reachable below as its own link. --}}
-      <figure class="car-stage">
+      <figure class="car-stage" data-stat-gallery>
         {{-- Measured: 286px wide at 320, 356 at 390, 702 at 768, and it stops
              growing at 750 from 1000px up, because the gallery column stops
              growing. --}}
         <x-img class="car-stage__img" id="stage"
                :src="$photos[0]['path']"
-               :alt="$car->brand.' '.$car->model.' '.$car->year"
+               :alt="$brand.' '.$car->model.' '.$car->year"
                sizes="(min-width:1000px) 750px, calc(100vw - 2rem)"
                :max="1600" :fallback="1080" :priority="true" />
         {{-- Arrows and the full-screen open are written by the script: without it the
@@ -134,6 +151,7 @@
              data-group="{{ $p['group'] ?? 'none' }}"
              data-n="{{ $p['n'] }}"
              data-o="{{ $p['o'] }}"
+             data-k="{{ $p['k'] }}"
              aria-label="Foto {{ $p['n'] }}{{ $p['group'] ? ' · '.($groups[$p['group']] ?? '') : '' }}">
             {{-- 102px at 320, 118px from 1000 up. 160 covers it at DPR 2 and the
                  ladder rounds that to the 320 step. --}}
@@ -538,6 +556,7 @@
     if (was) was.classList.remove('is-on');
     a.classList.add('is-on');
     swapStage(a);
+    if (window.mcStatPic) window.mcStatPic(a.getAttribute('data-k'), false);
     stageN.textContent = a.getAttribute('data-n');
     warmAround(false);
     // keep the chosen thumbnail in view without yanking the page
@@ -608,6 +627,7 @@
     if (next.decode) { next.decode().then(show, show); } else { next.onload = show; next.onerror = show; }
     vImg.alt = a.getAttribute('aria-label') || '';
     vCnt.textContent = (i + 1) + ' / ' + list.length;
+    if (window.mcStatPic) window.mcStatPic(a.getAttribute('data-k'), true);
   }
   // iOS ignores overflow:hidden on <body> for touch: the page behind the viewer still
   // moved under a swipe. Pin the body where it is, and put the scroll back on close.
@@ -621,6 +641,7 @@
   function pushView() { try { history.pushState({ mcView: 1 }, ''); pushed = true; } catch (e) { pushed = false; } }
   function open() {
     lastFocus = document.activeElement;
+    if (window.mcStatPicView) window.mcStatPicView(true);
     paint();
     view.hidden = false;
     lock();                                      // the page must not move behind it
@@ -630,6 +651,7 @@
   function close(fromBack) {
     if (view.hidden) return;
     view.hidden = true;
+    if (window.mcStatPicView) window.mcStatPicView(false);
     unlock();
     if (onClose) onClose();
     if (lastFocus && lastFocus.focus) lastFocus.focus();
@@ -654,6 +676,10 @@
     else if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
     else if (e.key === 'ArrowLeft')  { e.preventDefault(); step(-1); }
   });
+
+  // the photograph the page opens on is the first one on show (on a phone the strip reports its own)
+  var first = thumbs.querySelector('.car-thumb.is-on');
+  if (first && window.mcStatPic) window.mcStatPic(first.getAttribute('data-k'), false);
 
   var PHONE = window.matchMedia('(max-width: 768px)');
   // a swipe across the full-screen photograph, which is how a phone expects to move
@@ -763,6 +789,7 @@
     drawDots(dots, list.length, i);
     var was = thumbs.querySelector('.car-thumb.is-on'); if (was) was.classList.remove('is-on');
     a.classList.add('is-on');
+    if (window.mcStatPic) window.mcStatPic(a.getAttribute('data-k'), false);
     thumbs.scrollTo({ left: a.offsetLeft - (thumbs.clientWidth - a.clientWidth) / 2, behavior: 'smooth' });
   }
   function slide(a, i, big) {
@@ -804,7 +831,7 @@
   var vdots = document.createElement('div'); vdots.className = 'car-dots car-dots--view'; vdots.setAttribute('aria-hidden', 'true');
   view.appendChild(vtrack); view.appendChild(vdots); view.classList.add('is-track');
   var vcur = 0, vraf = 0;
-  function vset(i) { vcur = i;
+  function vset(i) { vcur = i; if (window.mcStatPic && list[i]) window.mcStatPic(list[i].getAttribute('data-k'), true);
     for (var k = i - 1; k <= i + 2; k++) { var el = vtrack.children[k]; if (el && el.loading !== 'eager') el.loading = 'eager'; } vCnt.textContent = (i + 1) + ' / ' + list.length; drawDots(vdots, list.length, i); }
   vtrack.addEventListener('scroll', function () {
     if (vraf) return; vraf = requestAnimationFrame(function () { vraf = 0;
@@ -813,6 +840,7 @@
   function vopen() {
     lastFocus = document.activeElement;
     vtrack.innerHTML = ''; list.forEach(function (a, i) { var im = slide(a, i, true); im.loading = Math.abs(i - cur) < 2 ? 'eager' : 'lazy'; vtrack.appendChild(im); });
+    if (window.mcStatPicView) window.mcStatPicView(true);
     view.hidden = false; lock(); pushView();
     vtrack.scrollLeft = cur * vtrack.clientWidth; vset(cur);
     document.getElementById('view-x').focus();
@@ -821,31 +849,6 @@
   // closing — ×, Esc or Back — brings the page strip to the photograph you stopped on
   onClose = function () { if (!list.length) return; track.scrollLeft = vcur * track.clientWidth; setIdx(vcur); };
   build();
-})();
-</script>
-<script>
-/* Photographs seen, for the statistics (App\Support\Stats 'photos'): each one
-   once per visit to this page, on the stage or full screen. A photograph is known
-   by its thumbnail — the stage shows its data-stage file, the viewer its href. */
-(function () {
-  if (!window.mcStatPhoto) return;
-  var idx = {};
-  document.querySelectorAll('#thumbs .car-thumb').forEach(function (a, i) {
-    [a.getAttribute('href'), a.getAttribute('data-stage')].forEach(function (u) {
-      if (u) { try { idx[new URL(u, location.href).pathname] = i; } catch (e) {} }
-    });
-  });
-  ['stage', 'view-img'].forEach(function (id) {
-    var img = document.getElementById(id);
-    if (!img) return;
-    var look = function () {
-      var s = img.getAttribute('src'), i;
-      try { i = s ? idx[new URL(s, location.href).pathname] : undefined; } catch (e) {}
-      if (i !== undefined) window.mcStatPhoto(i);
-    };
-    look();
-    new MutationObserver(look).observe(img, { attributes: true, attributeFilter: ['src'] });
-  });
 })();
 </script>
 @endpush

@@ -61,14 +61,14 @@
     <h3 class="ad-st-h">Te contactaron</h3>
     <ul class="ad-st-facts">
       @if($s['any'])
-        <li><span class="ad-st-facts__k">Pulsaron WhatsApp</span><span class="ad-st-facts__v">{{ $n($s['wa'][0]) }}</span></li>
+        <li><span class="ad-st-facts__k">Pulsaron WhatsApp</span><span class="ad-st-facts__v">{{ $n($s['wap']) }}</span></li>
         <li><span class="ad-st-facts__k">Pulsaron llamar</span><span class="ad-st-facts__v">{{ $n($s['tel'][0]) }}</span></li>
       @endif
       <li><span class="ad-st-facts__k">Mensajes del formulario</span><span class="ad-st-facts__v">{{ $n($db['messages'][0]) }}</span></li>
       <li><span class="ad-st-facts__k">Te ofrecieron su coche</span><span class="ad-st-facts__v">{{ $n($db['offers'][0]) }}</span></li>
     </ul>
-    @if($s['any'] && $s['wa'][0] > 0 && $s['people'][0] >= 10)
-      <p class="ad-st-say">1 de cada {{ max(1, (int) round($s['people'][0] / $s['wa'][0])) }} personas que entran pulsa WhatsApp.</p>
+    @if($s['any'] && $s['wap'] > 0 && $s['people'][0] >= 10)
+      <p class="ad-st-say">1 de cada {{ max(1, (int) round($s['people'][0] / $s['wap'])) }} personas que entran pulsa WhatsApp.</p>
     @endif
     @if($s['any'] && $s['mail'][0] > 0)
       <p class="ad-st-quiet">Y {{ $n($s['mail'][0]) }} {{ $plural($s['mail'][0], 'pulsó', 'pulsaron') }} en tu e-mail.</p>
@@ -142,6 +142,11 @@
     @endif
   </section>
 
+  {{-- What to buy, where they are, the photographs --}}
+  @include('admin.stats._brands', ['b' => $s['brands'], 'pr' => $s['prices']])
+  @include('admin.stats._map', ['g' => $s['places']])
+  @include('admin.stats._photos', ['ph' => $s['photos']])
+
   {{-- Where from, on what --}}
   <div class="ad-st-two">
     <section class="ad-st-sec">
@@ -186,11 +191,11 @@
     </section>
   </div>
 
-  @if($s['search'])
+  @if(! empty($s['search']['modelo']) || ! empty($s['search']['precio']))
     <section class="ad-st-sec">
       <h3 class="ad-st-h">Lo que buscan</h3>
       <div class="ad-st-search">
-        @foreach(['marca' => 'Marca', 'modelo' => 'Modelo', 'precio' => 'Precio'] as $k => $h)
+        @foreach(['modelo' => 'Modelo', 'precio' => 'Precio'] as $k => $h)
           @if(! empty($s['search'][$k]))
             <div>
               <p class="ad-st-search__h">{{ $h }}</p>
@@ -211,6 +216,8 @@
     @include('admin.stats._feed', ['feed' => $s['visitsFeed']])
   </section>
 @endif
+
+  @include('admin.stats._history', ['h' => $s['history']])
 
   {{-- The stock: from the panel's own records, so it is here from day one. --}}
   <section class="ad-st-sec">
@@ -233,8 +240,27 @@
     </p>
   </section>
 
+  <section class="ad-st-sec ad-st-me">
+    <h3 class="ad-st-h">Tus visitas no cuentan</h3>
+    <p class="ad-st-say">No cuentan los móviles y ordenadores que han entrado en este panel, aunque luego miren la web sin
+      entrar, ni lo que se vea desde la misma conexión durante las 6 horas siguientes. Para un móvil que nunca entra en
+      el panel —el de un compañero— ábrele este enlace en él:</p>
+    <div class="ad-st-me__row">
+      <span class="ad-st-me__qr" role="img" aria-label="Código QR del enlace «No contar este dispositivo»">{!! (new \chillerlan\QRCode\QRCode(new \chillerlan\QRCode\QROptions([
+        'outputType' => 'svg', 'outputBase64' => false, 'eccLevel' => \chillerlan\QRCode\Common\EccLevel::M,
+        'addQuietzone' => false, 'svgUseFillAttributes' => true, 'drawLightModules' => false,
+        'connectPaths' => true, 'svgAddXmlHeader' => false,
+      ])))->render($s['me']) !!}</span>
+      <div>
+        <input class="ad-in ad-st-me__url" type="text" readonly value="{{ $s['me'] }}" aria-label="Enlace «No contar este dispositivo»" data-st-copy>
+        <p class="ad-st-quiet">Escanéalo con ese móvil, o envíaselo. En cada navegador que use (Safari, Chrome) una vez.</p>
+      </div>
+    </div>
+  </section>
+
   <p class="ad-st-foot">
     @if($since)Se cuenta desde el {{ $since }}, @else Se cuenta @endif sin cookies y sin guardar la IP de nadie.
-    Una persona que vuelve otro día cuenta otra vez. Tus visitas con el panel abierto no cuentan, ni los robots.
+    Una persona que vuelve otro día cuenta otra vez. No cuentan los robots ni los servidores que se hacen pasar por
+    navegadores, ni tus visitas.
   </p>
 </div>

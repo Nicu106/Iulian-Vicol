@@ -3,6 +3,11 @@
 @section('title', 'Catálogo — IV MOTORCLASS')
 @section('description', 'Tu próximo capricho, bien elegido: Volkswagen, Audi, BMW, Mercedes-Benz y Porsche en Málaga, seleccionados y revisados. Precio, kilómetros y fotos reales de cada coche.')
 @section('current', 'catalogo')
+@php
+  // For search and answer engines (App\Support\Schema): the cars for sale, in the order the rows show them.
+  \App\Support\Schema::page('CollectionPage', [['Coches', '/catalogo']]);
+  \App\Support\Schema::add(\App\Support\Schema::carList(collect($rows)->flatMap(fn ($r) => $r['cars']), 'Coches a la venta'));
+@endphp
 
 @section('content')
 @php
@@ -33,6 +38,7 @@
 
   @foreach($rows as $i => $row)
       <section @if($i === 0) id="cat-first" @endif class="cat-row {{ $i % 2 ? 'cat-row--rtl' : '' }}"
+               data-stat-seen="marca-vista" data-stat-k="{{ $row['key'] }}"
                style="--brand:{{ $row['colour'] }}"
                aria-labelledby="marque-{{ $row['key'] }}">
 
@@ -72,7 +78,7 @@
             @if($row['total'])
               {{-- Opens the marque to the full screen. Without JavaScript it is not
                    rendered at all, because there would be nothing for it to do. --}}
-              <button class="cat-row__all" type="button" hidden data-stat="marca-abrir"
+              <button class="cat-row__all" type="button" hidden data-stat="marca-abrir" data-stat-k="{{ $row['key'] }}"
                       aria-expanded="false" aria-controls="cars-{{ $row['key'] }}"
                       data-open="{{ $row['total'] > 4 ? 'Ver los '.$row['total'] : 'Ver todos' }}"
                       data-close="Cerrar">{{ $row['total'] > 4 ? 'Ver los '.$row['total'] : 'Ver todos' }}</button>
@@ -86,7 +92,7 @@
                  Written by the script, so it never appears without JavaScript and
                  never appears on a rail that fits. --}}
             <div class="cat-row__rail">
-            <div class="cat-row__cars" id="cars-{{ $row['key'] }}"
+            <div class="cat-row__cars" id="cars-{{ $row['key'] }}" data-stat-scroll="marca-desliza" data-stat-k="{{ $row['key'] }}"
                  style="--n:{{ $row['total'] ?: $row['soon'] }}">
               @foreach($row['cars'] as $car)
                 @include('partials.card', ['car' => $car, 'kind' => 'available'])
@@ -104,7 +110,7 @@
 
         @if(!$row['n'] && $row['delivered']->count())
           <p class="cat-row__note"><span>Ninguno disponible ahora mismo. Estos ya los entregué.
-            <a class="mc-link cat-row__ask" href="https://wa.me/34614753187?text={{ urlencode('Hola, avísame cuando entre un '.$row['name'].', por favor.') }}">Avísame cuando entre uno</a>.</span></p>
+            <a class="mc-link cat-row__ask" data-stat="avisame" data-stat-k="{{ $row['key'] }}" href="https://wa.me/34614753187?text={{ urlencode('Hola, avísame cuando entre un '.$row['name'].', por favor.') }}">Avísame cuando entre uno</a>.</span></p>
         @endif
       </section>
     @endforeach

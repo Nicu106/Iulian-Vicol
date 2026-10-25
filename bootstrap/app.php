@@ -31,6 +31,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // The pages a referred visitor sees (only those with the mc_rv cookie).
         $middleware->web(append: [\App\Http\Middleware\TrackReferralJourney::class]);
 
+        // Whoever is signed in is the team: their device and connection are kept
+        // out of the statistics from then on (App\Support\Stats::markStaff).
+        $middleware->web(append: [\App\Http\Middleware\MarkStatsStaff::class]);
+
         // navigator.sendBeacon cannot carry a CSRF token. The endpoint only
         // appends an event for the visitor in the requester's own cookie.
         $middleware->validateCsrfTokens(except: ['r/e', 's']);

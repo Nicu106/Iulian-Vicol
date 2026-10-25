@@ -32,6 +32,12 @@ class StatsTest extends TestCase
             ->post('/s', $data);
     }
 
+    /** $n photograph keys from $from on: a0000000, a0000001… */
+    private static function pics(int $from, int $n): string
+    {
+        return implode(',', array_map(fn ($i) => sprintf('a%07d', $i), range($from, $from + $n - 1)));
+    }
+
     private function n(string $metric, string $key = ''): int
     {
         return (int) DB::table('stats')->where('metric', $metric)->where('key', $key)->sum('n');
@@ -117,8 +123,10 @@ class StatsTest extends TestCase
         $this->beacon(['t' => 'view', 'p' => '/coche/bmw-318d-2020']);
         $this->beacon(['t' => 'ev', 'e' => 'galeria', 'p' => '/coche/bmw-318d-2020']);
         $this->beacon(['t' => 'ev', 'e' => 'NOT valid!', 'p' => '/coche/bmw-318d-2020']);
-        $this->beacon(['t' => 'eng', 'p' => '/coche/bmw-318d-2020', 's' => 70, 'y' => 60, 'y0' => 0, 'ph' => 9, 'f' => '1']);
-        $this->beacon(['t' => 'eng', 'p' => '/coche/bmw-318d-2020', 's' => 50, 'y' => 100, 'y0' => 50, 'ph' => 5, 'f' => '0']);
+        $this->beacon(['t' => 'eng', 'p' => '/coche/bmw-318d-2020', 's' => 70, 'y' => 60, 'y0' => 0, 'f' => '1',
+            'pv' => self::pics(0, 9), 'pt' => 'a0000000:12,a0000001:3', 'pz' => 'a0000000']);
+        $this->beacon(['t' => 'eng', 'p' => '/coche/bmw-318d-2020', 's' => 50, 'y' => 100, 'y0' => 50, 'f' => '0',
+            'pv' => self::pics(9, 5) . ',zzz,../x', 'pt' => 'a0000000:4,bad:9', 'ph' => 99]);
         $this->beacon(['t' => 'eng', 'p' => '/coche/bmw-318d-2020', 's' => 99999, 'y' => 100, 'y0' => 100, 'f' => '0']);
         $this->beacon(['t' => 'wa', 'p' => '/coche/bmw-318d-2020']);
         $this->beacon(['t' => 'tel', 'p' => '/coche/bmw-318d-2020']);
@@ -133,6 +141,12 @@ class StatsTest extends TestCase
         $this->assertSame(14, $this->n('photos', 'bmw-318d-2020'));
         $this->assertSame(1, $this->n('wa', $path));
         $this->assertSame(1, $this->n('tel', $path));
+        // each photograph: seen in how many page views, for how long, opened big
+        $this->assertSame(14, (int) DB::table('stats')->where('metric', 'pic')->sum('n'));
+        $this->assertSame(1, $this->n('pic', 'bmw-318d-2020|a0000000'));
+        $this->assertSame(16, $this->n('pict', 'bmw-318d-2020|a0000000'));
+        $this->assertSame(3, $this->n('pict', 'bmw-318d-2020|a0000001'));
+        $this->assertSame(1, $this->n('picz', 'bmw-318d-2020|a0000000'));
 
         $v = DB::table('stat_visits')->first();
         $this->assertTrue((bool) $v->wa);
@@ -151,7 +165,7 @@ class StatsTest extends TestCase
     {
         $this->beacon(['t' => 'view', 'p' => '/catalogo', 'q' => '?marca=bmw&modelo=Serie%203&max=20000']);
         $this->assertSame(1, $this->n('search', 'marca:bmw'));
-        $this->assertSame(1, $this->n('search', 'modelo:Serie 3'));
+        $this->assertSame(1, $this->n('search', 'modelo:serie 3'));
         $this->assertSame(1, $this->n('search', 'max:20000'));
     }
 
@@ -175,7 +189,7 @@ class StatsTest extends TestCase
         $this->beacon(['t' => 'view', 'p' => '/', 'r' => 'https://www.instagram.com/']);
         $this->travel(20)->seconds();
         $this->beacon(['t' => 'view', 'p' => '/coche/bmw-318d-2020']);
-        $this->beacon(['t' => 'eng', 'p' => '/coche/bmw-318d-2020', 's' => 95, 'y' => 100, 'y0' => 0, 'ph' => 6, 'f' => '1']);
+        $this->beacon(['t' => 'eng', 'p' => '/coche/bmw-318d-2020', 's' => 95, 'y' => 100, 'y0' => 0, 'pv' => self::pics(0, 6), 'f' => '1']);
         $this->beacon(['t' => 'wa', 'p' => '/coche/bmw-318d-2020']);
 
         $this->assertSame(['bmw-318d-2020' => ['views' => 1, 'wa' => 1]], Stats::perCar(30));
@@ -225,6 +239,8 @@ class StatsTest extends TestCase
         $this->beacon(['t' => 'wa', 'p' => '/coche/bmw-318d-2020']);
 
         $u = User::factory()->create();
+        // the owner signs in from his own connection; the visitor's stays counted
+        $this->withServerVariables(['REMOTE_ADDR' => '95.1.2.3']);
         $this->actingAs($u)->get('/admin/estadisticas')->assertOk()
             ->assertSee('Estadísticas')->assertSee('BMW 318d')->assertSee('Google');
         $this->actingAs($u)->get('/admin/estadisticas?d=7&frag=1')->assertOk()
@@ -237,5 +253,150 @@ class StatsTest extends TestCase
         $this->actingAs($u)->get('/admin/vehicles')->assertOk()->assertSee('1 WhatsApp', false);
         $this->actingAs($u)->get(route('admin.vehicles.edit', 'bmw-318d-2020'))->assertOk()
             ->assertSee('En la web')->assertSee('/admin/estadisticas?coche=bmw-318d-2020', false);
+    }
+
+    /* ---- 25.10: the owner, uncounted whether signed in or not ------------- */
+
+    public function test_the_owner_looking_before_signing_in_is_taken_out_again(): void
+    {
+        $car = '/coche/bmw-318d-2020';
+        // a real visitor elsewhere
+        $this->beacon(['t' => 'view', 'p' => '/'], self::PC, '90.1.1.1');
+        // the owner, not signed in yet, on his home line: a page, time, photographs, WhatsApp, a search
+        $this->beacon(['t' => 'view', 'p' => '/catalogo', 'q' => '?marca=bmw'], self::IPHONE, '83.44.1.2');
+        $this->beacon(['t' => 'view', 'p' => $car], self::IPHONE, '83.44.1.2');
+        $this->beacon(['t' => 'eng', 'p' => $car, 's' => 40, 'y' => 100, 'y0' => 0, 'f' => '1', 'pv' => self::pics(0, 3), 'pt' => 'a0000000:9'], self::IPHONE, '83.44.1.2');
+        $this->beacon(['t' => 'wa', 'p' => $car], self::IPHONE, '83.44.1.2');
+        // and on the same line, another browser (WhatsApp's own, say)
+        $this->beacon(['t' => 'view', 'p' => $car], self::PC, '83.44.1.2');
+        $this->assertSame(3, $this->n('people'));
+
+        // then he signs in, from that line
+        $this->withServerVariables(['REMOTE_ADDR' => '83.44.1.2'])
+            ->actingAs(User::factory()->create())->get('/admin')->assertOk()
+            ->assertCookie(Stats::STAFF_COOKIE);
+
+        // only the real visitor is left, in every number
+        $this->assertSame(1, $this->n('people'));
+        $this->assertSame(1, $this->n('views'));
+        $this->assertSame(1, $this->n('visits'));
+        $this->assertSame(1, $this->n('page', '/'));
+        foreach (['car', 'carp', 'wa', 'wap', 'timen', 'time', 'photos', 'pic', 'pict', 'search', 'carsrc'] as $m) {
+            $this->assertSame(0, (int) DB::table('stats')->where('metric', $m)->sum('n'), $m);
+        }
+        $this->assertSame(1, DB::table('stat_visits')->count());
+        $this->assertSame(1, DB::table('stat_seen')->count());
+
+        // and for the next hours, nothing from that line counts — signed in or not
+        auth()->logout();
+        $this->travel(2)->hours();
+        $this->beacon(['t' => 'view', 'p' => '/'], self::IPHONE, '83.44.1.2');
+        $this->assertSame(1, $this->n('people'));
+        // after that, the line is anybody's again
+        $this->travel(Stats::STAFF_IP + 60)->seconds();
+        $this->beacon(['t' => 'view', 'p' => '/contacto'], self::IPHONE, '83.44.1.2');
+        $this->assertSame(1, $this->n('page', '/contacto'));
+    }
+
+    public function test_a_device_of_the_team_never_counts_on_any_connection(): void
+    {
+        $this->withCookie(Stats::STAFF_COOKIE, '1');
+        $this->beacon(['t' => 'view', 'p' => '/'], self::IPHONE, '88.1.1.1');
+        $this->beacon(['t' => 'view', 'p' => '/'], self::IPHONE, '176.2.2.2');
+        $this->assertSame(0, DB::table('stats')->count());
+    }
+
+    public function test_the_no_count_link_marks_a_phone_and_can_be_undone(): void
+    {
+        $this->get('/no-contar')->assertForbidden();               // only the signed link
+        $r = $this->withServerVariables(['REMOTE_ADDR' => '88.9.9.9'])->get(\URL::signedRoute('stats.me'));
+        $r->assertOk()->assertSee('Este dispositivo ya no cuenta')->assertCookie(Stats::STAFF_COOKIE, '1');
+        $this->assertTrue(Stats::staffIp('88.9.9.9'));
+
+        $u = $this->withServerVariables(['REMOTE_ADDR' => '88.9.9.9'])->get(\URL::signedRoute('stats.me.undo'));
+        $u->assertOk()->assertSee('vuelve a contar')->assertCookieExpired(Stats::STAFF_COOKIE);
+        $this->assertFalse(Stats::staffIp('88.9.9.9'));
+    }
+
+    public function test_presses_and_searches_count_people_not_presses(): void
+    {
+        $car = '/coche/bmw-318d-2020';
+        $this->beacon(['t' => 'view', 'p' => '/catalogo', 'q' => '?marca=bmw']);
+        $this->travel(15)->seconds();
+        $this->beacon(['t' => 'view', 'p' => '/catalogo', 'q' => '?marca=bmw']);
+        $this->beacon(['t' => 'view', 'p' => $car]);
+        foreach ([1, 2, 3] as $i) {
+            $this->beacon(['t' => 'wa', 'p' => $car]);
+            $this->beacon(['t' => 'ev', 'e' => 'galeria', 'p' => $car]);
+        }
+        $this->beacon(['t' => 'wa', 'p' => '/catalogo']);
+        $this->beacon(['t' => 'ev', 'e' => 'marca-abrir', 'k' => 'bmw', 'p' => '/catalogo']);
+        $this->beacon(['t' => 'ev', 'e' => 'marca-abrir', 'k' => 'BMW!', 'p' => '/catalogo']);
+
+        $this->assertSame(1, $this->n('search', 'marca:bmw'));
+        $this->assertSame(1, $this->n('wa', $car));
+        $this->assertSame(1, $this->n('wa', '/catalogo'));
+        $this->assertSame(1, $this->n('wap'));                    // one person pressed WhatsApp
+        $this->assertSame(1, $this->n('ev', 'galeria|' . $car));
+        $this->assertSame(1, $this->n('evk', 'marca-abrir|bmw'));
+        $this->assertSame(1, (int) DB::table('stats')->where('metric', 'evk')->count());
+    }
+
+    public function test_the_day_salt_survives_a_cache_clear(): void
+    {
+        $this->beacon(['t' => 'view', 'p' => '/']);
+        \Illuminate\Support\Facades\Cache::flush();
+        $this->travel(20)->seconds();
+        $this->beacon(['t' => 'view', 'p' => '/catalogo']);
+        $this->beacon(['t' => 'wa', 'p' => '/catalogo']);
+        $this->assertSame(1, $this->n('people'));
+        $this->assertSame(1, $this->n('visits'));
+        $this->assertSame(1, $this->n('wa', '/catalogo'));
+    }
+
+    public function test_a_page_left_after_midnight_still_reports_on_its_own_day(): void
+    {
+        $this->travelTo(CarbonImmutable::parse('2026-10-24 23:58:00', Stats::TZ));
+        $this->beacon(['t' => 'view', 'p' => '/coche/bmw-318d-2020']);
+        $this->travelTo(CarbonImmutable::parse('2026-10-25 00:04:00', Stats::TZ));
+        $this->beacon(['t' => 'eng', 'p' => '/coche/bmw-318d-2020', 's' => 300, 'y' => 50, 'y0' => 0, 'f' => '1']);
+        $this->beacon(['t' => 'wa', 'p' => '/coche/bmw-318d-2020']);
+
+        $day = fn (string $m, string $k) => DB::table('stats')->where('metric', $m)->where('key', $k)->pluck('n', 'day')->all();
+        $this->assertSame(['2026-10-24' => 300], $day('time', '/coche/bmw-318d-2020'));
+        $this->assertSame(['2026-10-24' => 1], $day('wa', '/coche/bmw-318d-2020'));
+
+        // an hour later it is a new day's visit, not yesterday's
+        $this->travelTo(CarbonImmutable::parse('2026-10-25 01:10:00', Stats::TZ));
+        $this->beacon(['t' => 'wa', 'p' => '/coche/bmw-318d-2020']);
+        $this->assertSame(['2026-10-24' => 1], $day('wa', '/coche/bmw-318d-2020'));
+    }
+
+    public function test_rendering_robots_and_automated_browsers_are_not_counted(): void
+    {
+        foreach ([
+            'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Mobile Safari/537.36 (compatible; Google-InspectionTool/1.0;)',
+            'Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Mobile Safari/537.36 Chrome-Lighthouse',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 PTST/240101.120000',
+            'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; ClaudeBot/1.0; +claudebot@anthropic.com)',
+            'Mozilla/5.0 (compatible; AhrefsSiteAudit/6.1; +http://ahrefs.com/robot/site-audit)',
+        ] as $ua) {
+            $this->beacon(['t' => 'view', 'p' => '/'], $ua);
+        }
+        $this->assertSame(0, DB::table('stats')->count());
+    }
+
+    public function test_where_a_visitor_is_from_when_the_town_database_is_there(): void
+    {
+        if (! is_file(\App\Support\Geo::path())) {
+            $this->markTestSkipped('no GeoIP database on this machine');
+        }
+        $g = \App\Support\Geo::find('83.56.1.1');
+        $this->assertSame('ES', $g['cc']);
+        $this->beacon(['t' => 'view', 'p' => '/'], self::IPHONE, '83.56.1.1');
+        $this->assertSame(1, (int) DB::table('stats')->where('metric', 'geo')->where('key', 'like', 'ES|%')->sum('n'));
+        $this->assertNotSame('', DB::table('stat_visits')->value('place'));
+        $this->assertNull(\App\Support\Geo::find('10.1.2.3'));
+        $this->assertStringNotContainsString('83.56.1.1', json_encode(DB::table('stats')->get()) . json_encode(DB::table('stat_visits')->get()));
     }
 }

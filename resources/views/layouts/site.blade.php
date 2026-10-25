@@ -45,7 +45,7 @@
 @endphp
 <meta name="description" content="{{ $metaDesc }}">
 @unless(trim($__env->yieldContent('robots')))<link rel="canonical" href="{{ $metaUrl }}">@endunless
-<meta property="og:type" content="website">
+<meta property="og:type" content="@yield('og_type', 'website')">
 <meta property="og:site_name" content="IV MOTORCLASS">
 <meta property="og:locale" content="es_ES">
 <meta property="og:title" content="@yield('title')">
@@ -55,6 +55,14 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
+@stack('meta')
+{{-- What search engines and answer engines read: the dealer, the site, this page
+     and whatever the page adds (a car, the list of cars, its questions) — one
+     JSON-LD graph, App\Support\Schema (docblock first). Not on a page kept out
+     of the index. --}}
+@unless(trim($__env->yieldContent('robots')))
+<script type="application/ld+json">{!! \App\Support\Schema::render(trim($__env->yieldContent('title')), $metaDesc, $metaUrl, $metaImage) !!}</script>
+@endunless
 <meta name="theme-color" content="#111C2E">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" href="/icons/icon-192.png" type="image/png" sizes="192x192">
@@ -85,35 +93,58 @@
 
 {{-- The panel's statistics (App\Support\Stats, POST /s — read its docblock).
      Anonymous and counted, never followed: no cookie, no storage, nothing typed.
-     One beacon when the page opens; one when it is hidden or left, with the
-     seconds it was on screen, how far down it was read and how many photographs
-     were seen; one per press on WhatsApp, the phone, e-mail, the map, or any
-     element marked data-stat="name". A form marked data-stat-form="name" says
-     when it is started and when it is sent, never what is in it. --}}
+     One beacon when the page is seen (not while Chrome prerenders it; again when
+     Back brings it out of the back-forward cache); one when it is hidden or left,
+     with the seconds it was on screen, how far down it was read and the
+     photographs — which ones were on screen, for how long, which were opened full
+     screen; one per press on WhatsApp, the phone, e-mail, the map, or any element
+     marked data-stat="name" (data-stat-k="bmw" says what about). A form marked
+     data-stat-form="name" says when it is started and when it is sent, never what
+     is in it. data-stat-seen="name" is said once when half of it has been on screen
+     for a second; data-stat-scroll="name" once when it is first scrolled sideways.
+     Silent in automated browsers (navigator.webdriver). --}}
 <script>
 (function () {
+  if (navigator.webdriver) { window.mcStat = window.mcStatPic = window.mcStatPicView = function () {}; return; }
   var path = location.pathname, beacon = navigator.sendBeacon && navigator.sendBeacon.bind(navigator);
   function send(d) {
     if (!beacon) return;
     d.p = path;
     try { beacon('/s', new URLSearchParams(d)); } catch (e) {}
   }
-  window.mcStat = function (t, name) { send(name ? { t: 'ev', e: name } : { t: t }); };
-  send({ t: 'view', q: location.search, r: document.referrer });
+  window.mcStat = function (t, name, k) {
+    var d = name ? { t: 'ev', e: name } : { t: t };
+    if (k) d.k = k;
+    send(d);
+  };
+
+  // Seen: now, or when a prerendered page is actually shown.
+  var search = location.search;
+  function viewed() { send({ t: 'view', q: search, r: document.referrer }); }
+  if (document.prerendering) document.addEventListener('prerenderingchange', viewed, { once: true });
+  else viewed();
 
   // The bonnet placard's QR opens /coche/…?c=qr: counted above, then taken off
   // the address so a link shared from here is not another "scan".
-  if (/[?&]c=qr(&|$)/.test(location.search) && history.replaceState) {
+  if (/[?&]c=qr(&|$)/.test(search) && history.replaceState) {
     try {
       var u = new URL(location.href); u.searchParams.delete('c');
       history.replaceState(history.state, '', u.pathname + u.search + u.hash);
+      search = u.search;
     } catch (e) {}
   }
 
   // Time on screen, depth, photographs. Sent as differences, so a page hidden
   // and shown again many times still adds up once.
-  var on = document.visibilityState === 'visible' ? Date.now() : 0, ms = 0, sent = 0;
-  var y = 0, ySent = 0, seen = {}, nSeen = 0, phSent = 0, first = true, tick = false;
+  var on, ms, sent, y, ySent, first, tick = false;
+  var pic, picBig, viewer, picOn, dwell, dwellSent, seenK, seenSent, bigK, bigSent, galVis = false;
+  function reset() {
+    on = document.visibilityState === 'visible' ? Date.now() : 0; ms = 0; sent = 0;
+    y = 0; ySent = 0; first = true;
+    pic = null; picBig = false; viewer = false; picOn = 0;
+    dwell = {}; dwellSent = {}; seenK = {}; seenSent = {}; bigK = {}; bigSent = {};
+  }
+  reset();
   function depth() {
     tick = false;
     var h = document.documentElement.scrollHeight, v = innerHeight + (scrollY || pageYOffset || 0);
@@ -123,33 +154,79 @@
   }
   addEventListener('scroll', function () { if (!tick) { tick = true; requestAnimationFrame(depth); } }, { passive: true });
   addEventListener('load', depth);
-  window.mcStatPhoto = function (k) { if (!seen[k]) { seen[k] = 1; nSeen++; } };
-  function bucket(v) { return Math.min(100, Math.floor(v / 25) * 25); }
+
+  // A photograph counts while it is the one on show — on the page's gallery
+  // while half of the gallery is on screen, or in the full-screen viewer — and
+  // the page is visible. Seen = 0.7 s or more; a swipe flying past is not.
+  function picRunning() { return document.visibilityState === 'visible' && pic && (viewer ? picBig : galVis); }
+  function picStop() {
+    if (!picOn) return;
+    dwell[pic] = (dwell[pic] || 0) + (Date.now() - picOn); picOn = 0;
+    if (dwell[pic] >= 700) seenK[pic] = 1;
+  }
+  function picStart() { if (!picOn && picRunning()) picOn = Date.now(); }
+  window.mcStatPic = function (k, big) {
+    if (!/^[a-f0-9]{8}$/.test(k || '')) return;
+    if (k === pic && !!big === picBig) return;
+    picStop(); pic = k; picBig = !!big; if (big) bigK[k] = 1; picStart();
+  };
+  window.mcStatPicView = function (open) { picStop(); viewer = !!open; picStart(); };
+  function watch(sel, fn) {
+    if (!window.IntersectionObserver) return;
+    document.querySelectorAll(sel).forEach(function (el) {
+      new IntersectionObserver(function (es) { es.forEach(function (e) { fn(el, e.isIntersecting && e.intersectionRatio >= 0.5); }); },
+        { threshold: [0, 0.5, 1] }).observe(el);
+    });
+  }
+  watch('[data-stat-gallery]', function (el, vis) { picStop(); galVis = vis; picStart(); });
+
+  function list(o, done) {
+    var out = [];
+    for (var k in o) if (o[k] && !done[k]) { out.push(k); done[k] = 1; }
+    return out.slice(0, 80).join(',');
+  }
   function flush() {
     if (on) { ms += Date.now() - on; on = 0; }
-    var total = Math.min(1800, Math.round(ms / 1000)), s = total - sent, b = bucket(y);
-    if (!first && s <= 0 && b <= ySent && nSeen <= phSent) return;
-    send({ t: 'eng', s: Math.max(0, s), y: b, y0: ySent, ph: nSeen - phSent, f: first ? '1' : '0' });
-    sent = total; ySent = b; phSent = nSeen; first = false;
+    picStop();
+    var total = Math.min(1800, Math.round(ms / 1000)), s = total - sent, b = Math.min(100, Math.floor(y / 25) * 25);
+    var pt = [];
+    for (var k in dwell) {
+      var d = Math.round((dwell[k] - (dwellSent[k] || 0)) / 1000);
+      if (d > 0) { pt.push(k + ':' + d); dwellSent[k] = (dwellSent[k] || 0) + d * 1000; }
+    }
+    var pv = list(seenK, seenSent), pz = list(bigK, bigSent);
+    if (!first && s <= 0 && b <= ySent && !pv && !pz && !pt.length) return;
+    var data = { t: 'eng', s: Math.max(0, s), y: b, y0: ySent, f: first ? '1' : '0' };
+    if (pv) data.pv = pv;
+    if (pz) data.pz = pz;
+    if (pt.length) data.pt = pt.slice(0, 80).join(',');
+    send(data);
+    sent = total; ySent = b; first = false;
   }
   document.addEventListener('visibilitychange', function () {
-    if (document.visibilityState === 'hidden') flush(); else on = Date.now();
+    if (document.visibilityState === 'hidden') flush(); else { on = Date.now(); picStart(); }
   });
   addEventListener('pagehide', flush);
+  // Back to a page kept whole by the browser: it is seen again, as a new page view.
+  addEventListener('pageshow', function (e) {
+    if (!e.persisted) return;
+    reset(); depth(); viewed();
+  });
 
   // Presses. Capture, so a link that leaves the page is counted before it goes.
   // A control that is already open (aria-expanded="true") is being closed: not counted.
   document.addEventListener('click', function (e) {
     var el = e.target.closest && e.target.closest('a[href], [data-stat]');
     if (!el) return;
-    var name = el.getAttribute('data-stat');
-    if (name) { if (el.getAttribute('aria-expanded') !== 'true') window.mcStat('ev', name); return; }
+    var name = el.getAttribute('data-stat'), k = el.getAttribute('data-stat-k') || '';
+    if (name && el.getAttribute('aria-expanded') !== 'true') window.mcStat('ev', name, k);
+    if (el.tagName !== 'A') return;
     var href = el.getAttribute('href') || '', host = '';
     try { host = new URL(el.href).hostname; } catch (x) {}
-    if (/(^|\.)wa\.me$|(^|\.)whatsapp\.com$/.test(host)) window.mcStat('wa');
-    else if (/^tel:/i.test(href)) window.mcStat('tel');
-    else if (/^mailto:/i.test(href)) window.mcStat('mail');
-    else if (/(^|\.)google\.[a-z.]+$/.test(host) && /\/maps/.test(el.href) || /^maps\.google\./.test(host)) window.mcStat('ev', 'mapa');
+    if (/(^|\.)wa\.me$|(^|\.)whatsapp\.com$/.test(host)) window.mcStat('wa', '', k);
+    else if (/^tel:/i.test(href)) window.mcStat('tel', '', k);
+    else if (/^mailto:/i.test(href)) window.mcStat('mail', '', k);
+    else if (!name && (/(^|\.)google\.[a-z.]+$/.test(host) && /\/maps/.test(el.href) || /^maps\.google\./.test(host))) window.mcStat('ev', 'mapa');
   }, true);
 
   // A full-screen viewer and the like: counted when it opens.
@@ -157,6 +234,25 @@
     new MutationObserver(function () {
       if (!el.hidden) window.mcStat('ev', el.getAttribute('data-stat-open'));
     }).observe(el, { attributes: true, attributeFilter: ['hidden'] });
+  });
+
+  // Seen (half on screen for a second) and scrolled sideways: once per page view each.
+  var shown = {};
+  watch('[data-stat-seen]', function (el, vis) {
+    var id = el.getAttribute('data-stat-seen') + '|' + (el.getAttribute('data-stat-k') || '');
+    if (shown[id]) return;
+    clearTimeout(el.mcStatT);
+    if (vis) el.mcStatT = setTimeout(function () {
+      if (shown[id] || document.visibilityState !== 'visible') return;
+      shown[id] = 1; window.mcStat('ev', el.getAttribute('data-stat-seen'), el.getAttribute('data-stat-k') || '');
+    }, 1000);
+  });
+  document.querySelectorAll('[data-stat-scroll]').forEach(function (el) {
+    var x0 = el.scrollLeft;
+    el.addEventListener('scroll', function () {
+      if (el.mcStatS || Math.abs(el.scrollLeft - x0) < 40) return;
+      el.mcStatS = 1; window.mcStat('ev', el.getAttribute('data-stat-scroll'), el.getAttribute('data-stat-k') || '');
+    }, { passive: true });
   });
 
   // Forms: started (the first time anything in them gets the focus), and sent.

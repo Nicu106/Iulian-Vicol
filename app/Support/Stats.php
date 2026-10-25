@@ -10,7 +10,6 @@ use App\Models\Vehicle;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -33,8 +32,14 @@ use Illuminate\Support\Facades\DB;
  *   - per visit (stat_visits, 30 days): the device as the browser announces it,
  *     where it came from, and the pages and presses in order, with times.
  *     Never what anyone typed, never a name or a number.
- *   - the owner's own browsing while signed in to the panel is not counted, nor
- *     the server itself (our audits), nor robots.
+ *   - the owner and his team are not counted, signed in or not: a device that has
+ *     ever been signed in to the panel (or opened the "no contar" link) carries
+ *     the mc_staff cookie, and the connection it used is theirs for 6 hours
+ *     (stat_staff) — which also takes out, number by number, whatever that
+ *     connection was counted for earlier the same day (forget). Nor the server
+ *     itself, robots, or server farms posing as browsers (Geo::hosting).
+ *   - one beacon at a time (locked()), and the day's salt in the database
+ *     (stat_salt), so a burst of beacons or a cache:clear never splits a person.
  *
  * METRICS (stats.metric → key):
  *   people, visits, views     ''        a person / a visit (30 min of silence ends one) / a page
@@ -44,11 +49,19 @@ use Illuminate\Support\Facades\DB;
  *   car, carp, qr             slug              a car's views / people / scans of its bonnet placard
  *   carsrc                    'slug|source'     where the people who saw a car came from
  *   photos                    slug              photographs seen, summed (÷ timen = per view)
- *   wa, tel, mail             path              presses on WhatsApp, the phone, e-mail
- *   ev                        'name|path'       any element with data-stat="name", forms' start/send
+ *   wa, tel, mail             path              people who pressed WhatsApp, the phone, e-mail there (once a day each)
+ *   wap                       ''                people who pressed WhatsApp anywhere (for "1 de cada N")
+ *   ev                        'name|path'       people who pressed data-stat="name" there; forms' start/send
+ *   evk                       'name|k'          the same with what it was about: 'marca-abrir|bmw', 'avisame|audi', 'wa|bmw'
  *   time, timen               path              seconds visible, summed / page views measured
  *   s75, s100                 path              page views that reached 75 % / the end
- *   search                    'marca:bmw' 'modelo:…' 'max:20000' 'cuota:300'
+ *   photos                    slug              photographs seen (0.7 s or more), summed over page views
+ *   pic, pict, picz           'slug|k'          one photograph: page views that saw it / seconds on it / opened big
+ *   geo                       'ES|Andalusia|Málaga|36.72|-4.42'  the town of each person (App\Support\Geo)
+ *   cargeo                    'slug|ES|Málaga'  the town of the people who saw a car
+ *   search                    'marca:bmw' 'modelo:…' 'max:20000' 'cuota:300', once per person and day
+ *   h.*                       as above          the fortnight before 24.10, ESTIMATED from the server log
+ *                                               (App\Support\StatsHistory) — kept apart, never summed with these
  *
  * WHERE THE PRESSES COME FROM (layouts/site.blade.php): links to WhatsApp, tel:,
  * mailto: and Google Maps are recognised by their address; anything else is
@@ -106,6 +119,7 @@ final class Stats
         'cochesnet'   => 'coches.net',
         'wallapop'    => 'Wallapop',
         'milanuncios' => 'Milanuncios',
+        'ia'          => 'Asistentes de IA (ChatGPT…)',
         'cartel'      => 'El cartel del coche (QR)',
         'otras'       => 'Otras webs',
         'directo'     => 'Directo',
@@ -149,6 +163,9 @@ final class Stats
     /**
      * One beacon. Returns whether anything was counted (the endpoint answers
      * 204 either way, so a robot learns nothing from it).
+     *
+     * One beacon at a time (locked()): two pages opening at once used to read
+     * "not seen today" twice and count one person as two.
      */
     public static function hit(Request $request): bool
     {
@@ -164,31 +181,53 @@ final class Stats
 
         $type = (string) $request->input('t');
 
-        return match (true) {
-            $type === 'view'                        => self::view($request, $path, $slug),
-            $type === 'eng'                         => self::engage($request, $path, $slug),
-            in_array($type, ['wa', 'tel', 'mail'], true) => self::press($request, $path, $type, $path, $type),
-            $type === 'ev'                          => self::event($request, $path),
-            default                                 => false,
-        };
+        return self::locked(fn () => match (true) {
+            $type === 'view'                             => self::view($request, $path, $slug),
+            $type === 'eng'                              => self::engage($request, $path, $slug),
+            in_array($type, ['wa', 'tel', 'mail'], true) => self::press($request, $path, $type, $path, self::k($request)),
+            $type === 'ev'                               => self::event($request, $path),
+            default                                      => false,
+        });
     }
 
+    /**
+     * Who is not counted: robots; the owner and his team — signed in, or on a
+     * device that has ever been signed in or opened the "no contar" link, or on
+     * a connection one of those used in the last hours; the server itself; and
+     * anything not sent by this site's own pages.
+     */
     public static function allowed(Request $request): bool
     {
-        $ua = (string) $request->userAgent();
-        if (Journey::isBot($ua) || ! str_starts_with($ua, 'Mozilla/')) {
-            return false;
-        }
-        if (Auth::check()) {
+        if (self::isBot((string) $request->userAgent())) {
             return false;
         }
         $ip = (string) $request->ip();
         if ($ip === '' || $ip === '::1' || str_starts_with($ip, '127.')) {
             return false;
         }
-        $site = $request->header('Sec-Fetch-Site');
+        if (Auth::check() || self::staffDevice($request)) {
+            self::markStaff($ip);
 
-        return $site === null || $site === 'same-origin';
+            return false;
+        }
+        $site = $request->header('Sec-Fetch-Site');
+        if ($site !== null && $site !== 'same-origin') {
+            return false;
+        }
+
+        return ! self::staffIp($ip) && ! Geo::hosting($ip);
+    }
+
+    /**
+     * Robots that run JavaScript. The beacon needs a browser, so what is left
+     * after Journey's list is the rendering crawlers, audit tools and automated
+     * browsers (the page itself also stays silent when navigator.webdriver is set).
+     */
+    public static function isBot(string $ua): bool
+    {
+        return Journey::isBot($ua)
+            || ! str_starts_with($ua, 'Mozilla/')
+            || (bool) preg_match('~google-|googleother|inspectiontool|mediapartners|apis-google|feedfetcher|pingdom|gtmetrix|ptst|siteimprove|ahrefs|semrush|mj12|dataprovider|uptime|monitor|scan|prerender|phantomjs|selenium|puppeteer|playwright|cypress|chatgpt|claude|anthropic|perplexity|ccbot|amazonbot|applebot|meta-external|bytespider|petalbot~i', $ua);
     }
 
     /**
@@ -210,13 +249,102 @@ final class Stats
         return null;
     }
 
+    /* ---- the owner and his team ------------------------------------------- */
+
+    /** The cookie on a device of the team. Set by the panel (MarkStatsStaff) and by the "no contar" link. */
+    public const STAFF_COOKIE = 'mc_staff';
+
+    /** How long a connection the team used stays theirs. */
+    public const STAFF_IP = 6 * 3600;
+
+    /** Five years, HttpOnly: the browser keeps it, no script reads it. */
+    public static function staffCookie(): \Symfony\Component\HttpFoundation\Cookie
+    {
+        return cookie(self::STAFF_COOKIE, '1', 60 * 24 * 365 * 5, '/', null, null, true, false, 'lax');
+    }
+
+    public static function staffDevice(Request $request): bool
+    {
+        return $request->cookie(self::STAFF_COOKIE) === '1';
+    }
+
+    public static function staffIp(string $ip): bool
+    {
+        return DB::table('stat_staff')->where('ip', self::connection($ip))->where('until', '>=', self::clock()->getTimestamp())->exists();
+    }
+
+    /**
+     * This connection is the team's for the next hours. The first time (or after
+     * it lapsed), whatever its browsers were counted for today and yesterday is
+     * taken out again: the owner who looks at the site and THEN signs in.
+     */
+    public static function markStaff(string $ip): void
+    {
+        if ($ip === '' || $ip === '::1' || str_starts_with($ip, '127.')) {
+            return;
+        }
+        $key = self::connection($ip);
+        $now = self::clock()->getTimestamp();
+        $until = DB::table('stat_staff')->where('ip', $key)->value('until');
+        if ($until !== null && (int) $until - $now > self::STAFF_IP - 600) {
+            return;                                     // refreshed in the last ten minutes
+        }
+        DB::table('stat_staff')->upsert([['ip' => $key, 'until' => $now + self::STAFF_IP]], ['ip'], ['until']);
+        if ($until === null || (int) $until < $now) {
+            self::locked(fn () => self::forget($ip) >= 0);
+        }
+    }
+
+    /** Takes today's and yesterday's people on this connection out of every number. */
+    public static function forget(string $ip): int
+    {
+        $now = self::clock();
+        $n = 0;
+        foreach ([$now->toDateString(), $now->subDay()->toDateString()] as $day) {
+            $rows = DB::table('stat_seen')->where('day', $day)->where('iph', self::iph($day, $ip))->get();
+            foreach ($rows as $r) {
+                self::undo($r);
+                $n++;
+            }
+        }
+
+        return $n;
+    }
+
+    /** One person-day out: their counters subtracted, their visits deleted. */
+    private static function undo(object $r): void
+    {
+        $done = json_decode((string) $r->inc, true) ?: [];
+        $visits = array_map('intval', (array) ($done['_v'] ?? []));
+        unset($done['_v']);
+        foreach ($done as $id => $n) {
+            [$metric, $key] = explode("\t", (string) $id, 2) + [1 => ''];
+            DB::table('stats')->where('day', $r->day)->where('metric', $metric)->where('key', $key)
+                ->update(['n' => DB::raw('max(0, "n" - ' . (int) $n . ')')]);
+        }
+        DB::table('stats')->where('day', $r->day)->where('n', '<=', 0)->delete();
+        if ($visits) {
+            DB::table('stat_visits')->whereIn('id', $visits)->delete();
+        }
+        DB::table('stat_seen')->where('day', $r->day)->where('hash', $r->hash)->delete();
+    }
+
+    /** A connection, remembered for hours without keeping the address itself. */
+    public static function connection(string $ip): string
+    {
+        return substr(hash_hmac('sha256', $ip, (string) config('app.key')), 0, 32);
+    }
+
+    /* ---- the beacons --------------------------------------------------------- */
+
     private static function view(Request $request, string $path, ?string $slug): bool
     {
         $now = self::clock();
         $day = $now->toDateString();
         $t = $now->getTimestamp();
+        $ip = (string) $request->ip();
         $ua = (string) $request->userAgent();
-        $hash = self::hash($day, (string) $request->ip(), $ua);
+        $hash = self::hash($day, $ip, $ua);
         $query = self::query((string) $request->input('q'));
         $qr = $slug !== null && ($query['c'] ?? '') === 'qr';
 
@@ -224,18 +352,25 @@ final class Stats
         if ($seen && $seen->last_path === $path && $t - (int) $seen->last_at < self::RELOAD) {
             return false;
         }
+        $done = $seen ? self::done($seen) : [];
 
         $inc = [['views', '']];
         $source = $seen->source ?? '';
         $visit = $seen->visit ?? null;
 
         $who = Journey::describe($ua, '');
+        $geo = null;
         if (! $seen) {
+            $geo = Geo::find($ip);
             $inc[] = ['people', ''];
             $inc[] = ['device', $who['device']];
+            if ($geo) {
+                $inc[] = ['geo', Geo::key($geo)];
+            }
         }
 
         if (! $seen || ! $visit || $t - (int) $seen->last_at > self::VISIT_GAP) {
+            $geo ??= Geo::find($ip);
             $source = $qr ? 'cartel' : self::source((string) $request->input('r'), $ua, $request->getHost());
             $inc[] = ['visits', ''];
             $inc[] = ['source', $source];
@@ -250,7 +385,9 @@ final class Stats
                 'landing'    => $path,
                 'steps'      => json_encode([['p' => $path, 't' => 0]], self::JSON),
                 'pages'      => 1,
+                'place'      => Geo::place($geo),
             ]);
+            $done['_v'][] = $visit;
         } else {
             self::step((int) $visit, $t, fn (array $steps) => count($steps) < self::MAX_STEPS
                 ? [...$steps, ['p' => $path, 't' => null]] : $steps, true);
@@ -266,26 +403,38 @@ final class Stats
                 $cars[] = $slug;
                 $inc[] = ['carp', $slug];
                 $inc[] = ['carsrc', $slug . '|' . $source];
+                // and where the people who saw it are
+                $g = $geo ?? Geo::parse(self::doneGeo($done));
+                if ($g) {
+                    $inc[] = ['cargeo', $slug . '|' . $g['cc'] . '|' . $g['city']];
+                }
             }
         } else {
             $inc[] = ['page', $path];
         }
 
+        // What was asked for, once per person and day: one person searching
+        // "BMW" five times is one person who wants a BMW.
         if ($path === '/catalogo') {
             foreach (self::searches($query) as $k) {
-                $inc[] = ['search', $k];
+                if (! isset($done["search\t" . $k])) {
+                    $inc[] = ['search', $k];
+                }
             }
         }
 
+        $done = self::add($done, $inc);
         DB::table('stat_seen')->upsert([[
             'day'       => $day,
             'hash'      => $hash,
+            'iph'       => self::iph($day, $ip),
             'last_at'   => $t,
             'last_path' => $path,
             'visit'     => $visit,
             'source'    => $source,
             'cars'      => implode(',', array_slice($cars, -150)),
-        ]], ['day', 'hash'], ['last_at', 'last_path', 'visit', 'source', 'cars']);
+            'inc'       => json_encode($done, self::JSON),
+        ]], ['day', 'hash'], ['iph', 'last_at', 'last_path', 'visit', 'source', 'cars', 'inc']);
 
         self::bump($day, $inc);
         self::sometimesPrune();
@@ -293,7 +442,15 @@ final class Stats
         return true;
     }
 
-    /** Time visible, how far down, photographs seen — sent when the page is left or hidden. */
+    /**
+     * Time visible, how far down, the photographs — sent when the page is left
+     * or hidden, as differences since the last report.
+     *
+     * pv  photographs seen (on screen for 0.7 s or more), each once per page view
+     * pt  "k:seconds,…" seconds each photograph was on screen since the last report
+     * pz  photographs opened full screen, each once per page view
+     * A photograph is its data-k: the first 8 hex of md5(its stored path).
+     */
     private static function engage(Request $request, string $path, ?string $slug): bool
     {
         [$seen, $day, $t] = self::seen($request);
@@ -304,7 +461,6 @@ final class Stats
         $s = max(0, min(self::MAX_SECONDS, (int) $request->input('s')));
         $y = self::bucket((int) $request->input('y'));
         $y0 = self::bucket((int) $request->input('y0'));
-        $ph = max(0, min(300, (int) $request->input('ph')));
 
         $inc = [];
         if ($request->input('f') === '1') {
@@ -319,8 +475,27 @@ final class Stats
         if ($y0 < 100 && $y >= 100) {
             $inc[] = ['s100', $path];
         }
-        if ($slug !== null && $ph > 0) {
-            $inc[] = ['photos', $slug, $ph];
+
+        $ph = 0;
+        $dwell = [];
+        if ($slug !== null) {
+            $pv = self::keys((string) $request->input('pv'));
+            foreach ($pv as $k) {
+                $inc[] = ['pic', $slug . '|' . $k];
+            }
+            $ph = count($pv);
+            if ($ph) {
+                $inc[] = ['photos', $slug, $ph];
+            }
+            foreach (array_slice(explode(',', (string) $request->input('pt')), 0, 80) as $pair) {
+                if (preg_match('~^([a-f0-9]{8}):(\d{1,4})$~', $pair, $m) && ($sec = min(self::MAX_SECONDS, (int) $m[2])) > 0) {
+                    $inc[] = ['pict', $slug . '|' . $m[1], $sec];
+                    $dwell[$m[1]] = ($dwell[$m[1]] ?? 0) + $sec;
+                }
+            }
+            foreach (self::keys((string) $request->input('pz')) as $k) {
+                $inc[] = ['picz', $slug . '|' . $k];
+            }
         }
         if (! $inc) {
             return false;
@@ -342,25 +517,40 @@ final class Stats
             });
         }
 
-        DB::table('stat_seen')->where('day', $day)->where('hash', $seen->hash)->update(['last_at' => $t]);
-        self::bump($day, $inc);
+        self::commit($seen, $day, $t, $inc);
 
         return true;
     }
 
-    /** WhatsApp, the phone, e-mail, and any data-stat press. */
-    private static function press(Request $request, string $path, string $metric, string $key, string $word): bool
+    /**
+     * WhatsApp, the phone, e-mail, and any data-stat press: once per person, day
+     * and page — "pulsaron WhatsApp" means people, not presses. $k is what the
+     * press was about when the page says (data-stat-k: a marque on /catalogo).
+     */
+    private static function press(Request $request, string $path, string $metric, string $key, string $k = ''): bool
     {
         [$seen, $day, $t] = self::seen($request);
         if (! $seen) {
             return false;
         }
+        $done = self::done($seen);
+        $word = $metric === 'ev' ? explode('|', $key, 2)[0] : $metric;
+
+        $inc = [];
+        if (! isset($done[$metric . "\t" . $key])) {
+            $inc[] = [$metric, $key];
+        }
+        if ($metric === 'wa' && ! isset($done["wap\t"])) {
+            $inc[] = ['wap', ''];                       // people who pressed WhatsApp at all
+        }
+        if ($k !== '' && ! isset($done["evk\t" . $word . '|' . $k])) {
+            $inc[] = ['evk', $word . '|' . $k];
+        }
 
         if ($seen->visit) {
             self::step((int) $seen->visit, $t, fn (array $steps) => self::mark($steps, $path, $word), false, $metric === 'wa');
         }
-        DB::table('stat_seen')->where('day', $day)->where('hash', $seen->hash)->update(['last_at' => $t]);
-        self::bump($day, [[$metric, $key]]);
+        self::commit($seen, $day, $t, $inc);
 
         return true;
     }
@@ -372,7 +562,34 @@ final class Stats
             return false;
         }
 
-        return self::press($request, $path, 'ev', $name . '|' . $path, $name);
+        return self::press($request, $path, 'ev', $name . '|' . $path, self::k($request));
+    }
+
+    /** A photograph, as the car page and the beacon name it: the first 8 hex of md5(its stored path). */
+    public static function photoKey(string $path): string
+    {
+        return substr(md5($path), 0, 8);
+    }
+
+    /** data-stat-k, checked: a marque key or the like. */
+    private static function k(Request $request): string
+    {
+        $k = strtolower((string) $request->input('k'));
+
+        return preg_match('~^[a-z0-9-]{1,24}$~', $k) ? $k : '';
+    }
+
+    /** @return list<string> photograph keys, each once */
+    private static function keys(string $csv): array
+    {
+        $out = [];
+        foreach (array_slice(explode(',', $csv), 0, 80) as $k) {
+            if (preg_match('~^[a-f0-9]{8}$~', $k)) {
+                $out[$k] = $k;
+            }
+        }
+
+        return array_values($out);
     }
 
     /** @param list<array> $steps */
@@ -416,14 +633,70 @@ final class Stats
         DB::table('stat_visits')->where('id', $visit)->update($set);
     }
 
-    /** @return array{0:?object,1:string,2:int} today's row for this person, the day, the time */
+    /**
+     * Today's row for this person — or yesterday's, when they were there in the
+     * last half hour: a page opened at 23:58 and left at 00:03 still reports
+     * its minutes, and a WhatsApp press just after midnight still counts. What
+     * it adds goes to the day of that row, next to the page view it belongs to.
+     *
+     * @return array{0:?object,1:string,2:int} the row, its day, the time
+     */
     private static function seen(Request $request): array
     {
         $now = self::clock();
+        $t = $now->getTimestamp();
+        $ip = (string) $request->ip();
+        $ua = (string) $request->userAgent();
         $day = $now->toDateString();
-        $hash = self::hash($day, (string) $request->ip(), (string) $request->userAgent());
+        $row = DB::table('stat_seen')->where('day', $day)->where('hash', self::hash($day, $ip, $ua))->first();
+        if (! $row) {
+            $y = $now->subDay()->toDateString();
+            $old = DB::table('stat_seen')->where('day', $y)->where('hash', self::hash($y, $ip, $ua))->first();
+            if ($old && $t - (int) $old->last_at <= self::VISIT_GAP) {
+                return [$old, $y, $t];
+            }
+        }
 
-        return [DB::table('stat_seen')->where('day', $day)->where('hash', $hash)->first(), $day, $now->getTimestamp()];
+        return [$row, $day, $t];
+    }
+
+    /** Counts $inc on the row's day and remembers it on the row, so it can be taken out again. */
+    private static function commit(object $seen, string $day, int $t, array $inc): void
+    {
+        $set = ['last_at' => max($t, (int) $seen->last_at)];
+        if ($inc) {
+            $set['inc'] = json_encode(self::add(self::done($seen), $inc), self::JSON);
+        }
+        DB::table('stat_seen')->where('day', $day)->where('hash', $seen->hash)->update($set);
+        self::bump($day, $inc);
+    }
+
+    /** This person-day's town key, as view() counted it. */
+    private static function doneGeo(array $done): string
+    {
+        foreach ($done as $id => $n) {
+            if (str_starts_with((string) $id, "geo\t")) {
+                return substr((string) $id, 4);
+            }
+        }
+
+        return '';
+    }
+
+    /** @return array<string,mixed> what this person-day has added so far ("metric\tkey" → n, "_v" → visit ids) */
+    private static function done(object $seen): array
+    {
+        return json_decode((string) ($seen->inc ?? ''), true) ?: [];
+    }
+
+    private static function add(array $done, array $inc): array
+    {
+        foreach ($inc as $i) {
+            $id = $i[0] . "\t" . mb_substr((string) $i[1], 0, 160);
+            $done[$id] = ($done[$id] ?? 0) + (int) ($i[2] ?? 1);
+        }
+
+        return $done;
     }
 
     private static function hash(string $day, string $ip, string $ua): string
@@ -431,13 +704,49 @@ final class Stats
         return substr(hash('sha256', self::salt($day) . '|' . $ip . '|' . $ua), 0, 32);
     }
 
-    /** A random salt per day; Cache::add is atomic, so two first requests agree on it. */
+    /** The connection alone, for the day: all the browsers behind one address. */
+    private static function iph(string $day, string $ip): string
+    {
+        return substr(hash('sha256', self::salt($day) . '|ip|' . $ip), 0, 32);
+    }
+
+    /**
+     * A random salt per day, in the database: the first request of the day
+     * writes it (insertOrIgnore, so two first requests agree), every later one
+     * reads it. Deleted with the day's people after two days.
+     */
     private static function salt(string $day): string
     {
-        $key = 'stats:salt:' . $day;
-        Cache::add($key, bin2hex(random_bytes(16)), now()->addDays(2));
+        DB::table('stat_salt')->insertOrIgnore(['day' => $day, 'salt' => bin2hex(random_bytes(16))]);
 
-        return (string) Cache::get($key);
+        return (string) DB::table('stat_salt')->where('day', $day)->value('salt');
+    }
+
+    /**
+     * Runs $fn with the statistics to itself. SQLite takes one writer at a time
+     * anyway; this makes "read the person, then write them" one step, so two
+     * beacons of the same person never both find them new.
+     */
+    private static function locked(callable $fn): bool
+    {
+        $h = @fopen(storage_path('framework/cache/stats.lock'), 'c');
+        if (! $h) {
+            return (bool) $fn();
+        }
+        try {
+            $give = microtime(true) + 3;
+            while (! flock($h, LOCK_EX | LOCK_NB)) {
+                if (microtime(true) > $give) {
+                    return false;
+                }
+                usleep(5000);
+            }
+
+            return (bool) $fn();
+        } finally {
+            flock($h, LOCK_UN);
+            fclose($h);
+        }
     }
 
     /** @param list<array{0:string,1:string,2?:int}> $inc */
@@ -482,7 +791,7 @@ final class Stats
         }
         $modelo = trim(preg_replace('~\s+~u', ' ', strip_tags((string) ($q['modelo'] ?? ''))));
         if ($modelo !== '' && preg_match('~^[\pL\pN .\-/+]{1,60}$~u', $modelo)) {
-            $out[] = 'modelo:' . $modelo;
+            $out[] = 'modelo:' . mb_strtolower($modelo);
         }
         $max = (int) ($q['max'] ?? 0);
         if ($max >= 50 && $max <= 2000000) {
@@ -535,6 +844,7 @@ final class Stats
         return match (true) {
             (bool) preg_match('~(^|\.)google\.[a-z.]{2,8}$~', $host) => 'google',
             $is('bing\.com|duckduckgo\.com|yahoo\.com|ecosia\.org|search\.brave\.com|qwant\.com|yandex\.[a-z]+|startpage\.com') => 'buscadores',
+            $is('chatgpt\.com|openai\.com|perplexity\.ai|claude\.ai|gemini\.google\.com|copilot\.microsoft\.com') => 'ia',
             $is('instagram\.com')                     => 'instagram',
             $is('facebook\.com|fb\.com|fb\.me|messenger\.com') => 'facebook',
             $is('wa\.me|whatsapp\.com|whatsapp\.net') => 'whatsapp',
@@ -554,15 +864,14 @@ final class Stats
         }
     }
 
-    /** Yesterday's people and older go, with their salts; visits after 30 days. */
+    /** Yesterday's people and older go, with their salts; the team's connections when they lapse; visits after 30 days. */
     public static function prune(): int
     {
         $now = self::clock();
         $yesterday = $now->subDay()->toDateString();
         $n = DB::table('stat_seen')->where('day', '<', $yesterday)->delete();
-        for ($i = 2; $i <= 9; $i++) {
-            Cache::forget('stats:salt:' . $now->subDays($i)->toDateString());
-        }
+        DB::table('stat_salt')->where('day', '<', $yesterday)->delete();
+        DB::table('stat_staff')->where('until', '<', self::clock()->getTimestamp())->delete();
         $n += DB::table('stat_visits')->where('day', '<', $now->subDays(self::KEEP_VISITS)->toDateString())->delete();
 
         return $n;
@@ -574,7 +883,8 @@ final class Stats
 
     public static function firstDay(): ?CarbonImmutable
     {
-        $d = DB::table('stats')->min('day');
+        // the browser's own counting; the log estimate (h.*) is not "counting"
+        $d = DB::table('stats')->where('metric', 'views')->min('day');
 
         return $d ? CarbonImmutable::parse($d, self::TZ) : null;
     }
@@ -635,12 +945,12 @@ final class Stats
     public static function week(): array
     {
         $from = self::clock()->subDays(6)->toDateString();
-        $by = self::sums($from, self::today(), ['people', 'wa']);
+        $by = self::sums($from, self::today(), ['people', 'wap']);
 
         return [
             'any'    => DB::table('stats')->where('metric', 'views')->exists(),
             'people' => array_sum($by['people'] ?? []),
-            'wa'     => array_sum($by['wa'] ?? []),
+            'wa'     => array_sum($by['wap'] ?? []),          // people who pressed WhatsApp, not presses
         ];
     }
 
@@ -686,6 +996,7 @@ final class Stats
             'visits'  => [$visits, $tot($prev, 'visits')],
             'views'   => [$views, $tot($prev, 'views')],
             'wa'      => [$tot($by, 'wa'), $tot($prev, 'wa')],
+            'wap'     => $tot($by, 'wap'),
             'tel'     => [$tot($by, 'tel'), $tot($prev, 'tel')],
             'mail'    => [$tot($by, 'mail'), $tot($prev, 'mail')],
             'visitTime' => $visits ? (int) round($tot($by, 'time') / $visits) : 0,
@@ -702,6 +1013,12 @@ final class Stats
             'events'  => self::events($by['ev'] ?? []),
             'visitsFeed' => self::feed($p['from'], $feed),
             'db'      => self::database($p['from'], $p['to'], $p['pFrom'], $p['pTo']),
+            'brands'  => StatsInsights::brands($by),
+            'prices'  => StatsInsights::prices($by),
+            'places'  => StatsInsights::places($by['geo'] ?? []),
+            'photos'  => StatsInsights::photos($by),
+            'history' => StatsInsights::history(),
+            'me'      => \Illuminate\Support\Facades\URL::signedRoute('stats.me'),
         ];
     }
 
@@ -862,7 +1179,7 @@ final class Stats
     {
         $q = DB::table('stat_visits')->where('day', '>=', $from->toDateString());
         if ($car !== null) {
-            $q->where('steps', 'like', '%"/coche/' . str_replace(['%', '_'], ['\%', '\_'], $car) . '"%');
+            $q->whereRaw('instr("steps", ?) > 0', ['"/coche/' . $car . '"']);
         }
         $rows = $q->orderByDesc('last_at')->limit($limit)->get();
 
@@ -895,6 +1212,7 @@ final class Stats
                 'last'   => CarbonImmutable::createFromTimestamp((int) $r->last_at, self::TZ),
                 'who'    => self::who($r->device, $r->os, $r->browser),
                 'source' => self::SOURCES[$r->source] ?? $r->source,
+                'place'  => (string) ($r->place ?? ''),
                 'steps'  => $steps,
                 'wa'     => (bool) $r->wa,
             ];
@@ -970,7 +1288,8 @@ final class Stats
             'added'     => Vehicle::whereBetween('created_at', $in($from, $to))
                 ->where(fn ($q) => $q->whereNull('offer_type')->orWhere('offer_type', '!=', SellCarController::OFFER_TYPE))->count(),
             'sold'      => Vehicle::where('status', 'sold')->count(),
-            'soldNow'   => Vehicle::where('status', 'sold')->whereBetween('sold_date', [$from->toDateString(), $to->toDateString()])->count(),
+            'soldNow'   => Vehicle::where('status', 'sold')->whereDate('sold_date', '>=', $from->toDateString())
+                ->whereDate('sold_date', '<=', $to->toDateString())->count(),
             'reviews'   => Testimonial::where('is_active', true)->count(),
         ];
     }
@@ -1001,9 +1320,10 @@ final class Stats
                 $k = match (true) {
                     $r->metric === 'ev'     => 'ev:' . explode('|', $r->key)[0],
                     $r->metric === 'carsrc' => 'src:' . explode('|', $r->key, 2)[1],
+                    $r->metric === 'cargeo' => 'geo:' . explode('|', $r->key, 2)[1],
                     default                 => $r->metric,
                 };
-                if ($r->metric !== 'ev' && $r->metric !== 'carsrc' && $r->key !== $slug && $r->key !== $path) {
+                if (! in_array($r->metric, ['ev', 'carsrc', 'cargeo'], true) && $r->key !== $slug && $r->key !== $path) {
                     continue;
                 }
                 $m[$k] = ($m[$k] ?? 0) + (int) $r->n;
@@ -1040,9 +1360,11 @@ final class Stats
         for ($d = $p['from']; $d <= $p['to']; $d = $d->addDay()) {
             $series[] = ['day' => $d, 'n' => $daily[$d->toDateString()] ?? 0];
         }
-        $src = $ev = [];
+        $src = $ev = $geo = [];
         foreach ($cur['m'] as $k => $n) {
-            if (str_starts_with($k, 'src:')) {
+            if (str_starts_with($k, 'geo:')) {
+                $geo[substr($k, 4)] = $n;
+            } elseif (str_starts_with($k, 'src:')) {
                 $src[substr($k, 4)] = $n;
             } elseif (str_starts_with($k, 'ev:')) {
                 $ev[substr($k, 3)] = $n;
@@ -1061,8 +1383,46 @@ final class Stats
             'series'  => $series,
             'sources' => self::ranked($src, self::SOURCES),
             'events'  => self::events($ev),
+            'places'  => self::towns($geo),
+            'photos'  => StatsInsights::carPhotos($car, $p['from']->toDateString(), $p['to']->toDateString()),
+            'before'  => self::before($car),
             'feed'    => self::feed($p['from'], 30, $slug),
         ];
+    }
+
+    /** "ES|Málaga" → n, as a ranked list of towns ("Málaga", "Chisinau (Moldavia)"). */
+    private static function towns(array $geo): array
+    {
+        $out = [];
+        foreach ($geo as $k => $n) {
+            [$cc, $city] = explode('|', (string) $k, 2) + [1 => ''];
+            $label = $city !== '' ? $city : Geo::country($cc);
+            if ($cc !== 'ES' && $city !== '') {
+                $label .= ' (' . Geo::country($cc) . ')';
+            }
+            $out[$label] = ($out[$label] ?? 0) + $n;
+        }
+
+        return self::ranked($out, []);
+    }
+
+    /**
+     * What the old site's counter said about this car, until the new site went
+     * live on 6.10: every opening of its page, robots and the owner included.
+     * Only good for comparing cars listed over the same weeks.
+     *
+     * @return array{n:int,days:int}|null
+     */
+    private static function before(Vehicle $car): ?array
+    {
+        $n = (int) $car->views_count;
+        if ($n <= 0 || ! $car->created_at) {
+            return null;
+        }
+        $end = CarbonImmutable::parse('2026-10-06', self::TZ);
+        $days = max(1, (int) $car->created_at->diffInDays($end));
+
+        return $car->created_at->lt($end) ? ['n' => $n, 'days' => $days] : null;
     }
 
     /* ---- formatting, shared by the views ---------------------------------- */

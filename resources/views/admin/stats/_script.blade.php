@@ -61,6 +61,11 @@ window.mcStats = window.mcStats || {
       plot.addEventListener('pointerdown', show);
       plot.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') hide(); });
     });
+
+    // the "no contar" link: one tap selects all of it, ready to copy
+    root.querySelectorAll('[data-st-copy]').forEach(function (i) {
+      i.addEventListener('focus', function () { i.select(); });
+    });
   }
 };
 </script>

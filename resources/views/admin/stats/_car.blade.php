@@ -72,12 +72,57 @@
     </section>
   </div>
 
+  {{-- Its photographs, one by one, in the page's order: who saw each, how long, who opened it big. --}}
+  @php $pics = $c['photos']; $maxSec = max(1, max(array_map(fn ($p) => (int) $p['sec'], $pics['list']) ?: [0])); @endphp
+  @if($pics['list'])
+    <section class="ad-st-sec">
+      <h3 class="ad-st-h">Sus fotos</h3>
+      @if($pics['views'])
+        @php
+          $ranked = collect($pics['list'])->filter(fn ($p) => $p['seen'] >= 3)->sortByDesc('sec');
+          $hold = $ranked->first();
+        @endphp
+        @if($hold && $pics['views'] >= 10)
+          <p class="ad-st-say ad-st-say--lead">La que más retiene es la {{ $hold['n'] }}.ª ({{ Stats::dur($hold['sec']) }} de media).</p>
+        @endif
+        <ol class="ad-st-pics">
+          @foreach($pics['list'] as $p)
+            <li class="{{ $p['seen'] ? '' : 'is-none' }}">
+              <span class="ad-st-pics__img"><x-img :src="$p['path']" alt="" sizes="96px" :max="320" :fallback="320" /></span>
+              <span class="ad-st-pics__n">{{ $p['n'] }}</span>
+              <span class="ad-st-pics__v"><b>{{ $p['pct'] !== null ? $p['pct'] . ' %' : '—' }}</b> la ven</span>
+              <span class="ad-st-pics__v">{{ $p['sec'] !== null ? Stats::dur($p['sec']) : '—' }}@if($p['big']) · {{ $p['big'] }} en grande @endif</span>
+              <span class="ad-st-pics__bar"><i style="width: {{ $p['pct'] ?? 0 }}%"></i></span>
+            </li>
+          @endforeach
+        </ol>
+        <p class="ad-st-quiet">De las {{ $n($pics['views']) }} veces que se abrió la ficha: qué parte vio cada foto
+          (0,7 s o más en pantalla), cuánto tiempo de media y cuántas la abrieron en grande.</p>
+      @else
+        <p class="ad-st-quiet">Todavía nadie ha pasado sus fotos en estos días.</p>
+      @endif
+    </section>
+  @endif
+
+  @if($c['places'])
+    <section class="ad-st-sec">
+      <h3 class="ad-st-h">De dónde son</h3>
+      @include('admin.stats._rank', ['rows' => array_map(fn ($r) => $r + ['share' => $r['pct']], array_slice($c['places'], 0, 10))])
+    </section>
+  @endif
+
   <section class="ad-st-sec">
     <h3 class="ad-st-h">Visitas que lo vieron</h3>
     @include('admin.stats._feed', ['feed' => $c['feed']])
   </section>
 
   <p class="ad-st-foot">Se cuenta desde el {{ $since }}, sin cookies y sin guardar la IP de nadie. Una persona que vuelve
-    otro día cuenta otra vez. Tus visitas con el panel abierto no cuentan.</p>
+    otro día cuenta otra vez. Tus visitas no cuentan.</p>
+@endif
+
+@if($c['before'])
+  <p class="ad-st-quiet">En la web anterior, hasta el 6 de octubre, su página se abrió {{ $n($c['before']['n']) }} veces en
+    {{ $c['before']['days'] }} días. Aquel contador sumaba también robots, recargas y tus propias visitas: sirve solo para
+    comparar coches que estuvieron a la venta las mismas semanas.</p>
 @endif
 </div>

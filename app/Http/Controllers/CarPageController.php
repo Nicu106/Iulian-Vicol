@@ -58,6 +58,8 @@ class CarPageController extends Controller
                 'group' => $tags[$path] ?? null,
                 'n'     => $i + 1,
                 'o'     => $at[$path] ?? -1,
+                // what the statistics know it by (App\Support\Stats::photoKey)
+                'k'     => \App\Support\Stats::photoKey($path),
             ];
         }
 

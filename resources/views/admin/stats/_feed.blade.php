@@ -17,7 +17,7 @@
     @foreach($feed as $v)
       <li class="{{ $v['wa'] ? 'is-wa' : '' }}">
         <p class="ad-st-feed__h">
-          <b>{{ $v['who'] }}</b> · {{ $v['source'] === 'Directo' ? 'entró directo' : 'desde ' . $v['source'] }}
+          <b>{{ $v['who'] }}</b>@if(! empty($v['place'])) · {{ $v['place'] }}@endif · {{ $v['source'] === 'Directo' ? 'entró directo' : 'llegó desde ' . $v['source'] }}
           <time datetime="{{ $v['at']->toIso8601String() }}">{{ $when($v['at']) }}</time>
         </p>
         <p class="ad-st-feed__p">
