@@ -1310,12 +1310,24 @@ html.is-ordering body { -webkit-user-select: none; user-select: none; }
   background: var(--mc-surface); color: var(--mc-ink); font: inherit; font-weight: 700; cursor: pointer; }
 .ad-grid--s { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (min-width: 700px) { .ad-grid--s { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+@media (min-width: 700px) { .ad-grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
-/* The price of more warranty years (_form "Precio para ampliar la garantía"):
-   the standard list in one quiet line, or his own prices in a second box.
-   A browser without :has shows both, and the form still saves what was picked. */
+/* "Garantía y mantenimiento" (_form): its own section on the band tone, the brand
+   blue along its top, so it is found at a glance in a long form. The two plans
+   are white panels on it — side by side from 900px, one under the other on a
+   phone. Square, no shadow, like everything else in the panel. */
+.ad-box.ad-plans { background: var(--mc-band); border-color: var(--mc-rule); border-top: 4px solid var(--mc-blue); }
+.ad-plans__grid { display: grid; gap: var(--s-4); }
+@media (min-width: 900px) { .ad-plans__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-5); } }
+.ad-plan { display: grid; align-content: start; gap: var(--s-5); min-width: 0;
+  padding: var(--s-5); background: var(--mc-surface); border: 1px solid var(--mc-hairline); }
+.ad-plan__h { margin: 0; font-size: var(--t-sub); font-weight: 700; letter-spacing: -.01em; color: var(--mc-ink); }
+
+/* A plan's price: the standard list in one quiet line, or his own prices in a
+   second box. A browser without :has shows both, and the form still saves what
+   was picked. */
 .ad-wp__std { margin: 0; font-size: var(--t-small); color: var(--mc-ink-2); }
-.ad-wp__own { margin-top: var(--s-1); }
+.ad-wp__own { margin-top: var(--s-1); grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-4); }
 .ad-wp:has(input[value="own"]:checked) .ad-wp__std,
 .ad-wp:has(input[value="std"]:checked) .ad-wp__own { display: none; }
 

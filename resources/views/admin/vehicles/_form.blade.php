@@ -379,44 +379,11 @@
     {{-- From the coches.net sheet (or typed): what the car page and the placard show
          beside the rest. Kept in the `sheet` column (Admin\SheetController::adopt). --}}
     @php $sh = is_array($v['sheet'] ?? null) ? $v['sheet'] : []; $sv = fn ($k, $in) => old($in, $sh[$k] ?? ''); @endphp
-    <div class="ad-grid ad-grid--s" style="margin-top:var(--s-4)">
+    <div class="ad-grid ad-grid--s ad-grid--4" style="margin-top:var(--s-4)">
       <label class="ad-field"><span>Puertas</span><input class="ad-in" type="text" name="sheet_doors" value="{{ $sv('doors', 'sheet_doors') }}" inputmode="numeric" maxlength="1" autocomplete="off" enterkeyhint="next"></label>
       <label class="ad-field"><span>Plazas</span><input class="ad-in" type="text" name="sheet_seats" value="{{ $sv('seats', 'sheet_seats') }}" inputmode="numeric" maxlength="1" autocomplete="off" enterkeyhint="next"></label>
       <label class="ad-field"><span>Maletero</span><span class="ad-unit"><input class="ad-in" type="text" name="sheet_trunk" value="{{ $sv('trunk', 'sheet_trunk') }}" inputmode="numeric" maxlength="5" autocomplete="off" enterkeyhint="next"><span class="ad-unit__u">l</span></span></label>
       <label class="ad-field"><span>Emisiones</span><span class="ad-unit"><input class="ad-in" type="text" name="sheet_co2" value="{{ $sv('co2', 'sheet_co2') }}" inputmode="numeric" maxlength="3" autocomplete="off" enterkeyhint="next"><span class="ad-unit__u">g/km</span></span></label>
-      <div class="ad-field">
-        <span>Garantía incluida</span>
-        <select class="ad-in" name="sheet_warranty">
-          @foreach(['12' => '1 año', '24' => '2 años', '36' => '3 años'] as $m => $t)
-            <option value="{{ $m }}" @selected((string) $sv('warranty_months', 'sheet_warranty') === (string) $m || ($m === '12' && !$sv('warranty_months', 'sheet_warranty')))>{{ $t }}</option>
-          @endforeach
-        </select>
-      </div>
-    </div>
-
-    {{-- What more years of warranty cost on this car: the standard list
-         (App\Support\Warranty::PRICES) or his own prices, typed in the second box.
-         The box shows only with "Personalizado" (panel.css, :has); it starts with
-         the standard prices so he changes only what differs. --}}
-    @php
-      $wStd = \App\Support\Warranty::PRICES;
-      $wOwn = \App\Support\Warranty::own($sh);
-      $wMode = old('warranty_mode', $wOwn !== null ? 'own' : 'std');
-      $wVal = fn ($m) => old('warranty_' . $m, $wOwn !== null ? ($wOwn[$m] ?? '') : $wStd[$m]);
-      $wEur = fn ($n) => number_format($n, 0, ',', '.') . ' €';
-    @endphp
-    <div class="ad-field ad-wp" style="margin-top:var(--s-4)">
-      <span>Precio para ampliar la garantía</span>
-      <div class="ad-pills">
-        <label class="ad-pill"><input type="radio" name="warranty_mode" value="std" @checked($wMode !== 'own')><span>Estándar</span></label>
-        <label class="ad-pill"><input type="radio" name="warranty_mode" value="own" @checked($wMode === 'own')><span>Personalizado</span></label>
-      </div>
-      <p class="ad-wp__std">2 años {{ $wEur($wStd[24]) }} · 3 años {{ $wEur($wStd[36]) }}</p>
-      <div class="ad-grid ad-grid--s ad-wp__own">
-        @foreach([24 => '2 años', 36 => '3 años'] as $m => $t)
-          <label class="ad-field"><span>{{ $t }}</span><span class="ad-unit"><input class="ad-in" type="text" name="warranty_{{ $m }}" value="{{ $wVal($m) }}" inputmode="numeric" maxlength="6" autocomplete="off" enterkeyhint="next"><span class="ad-unit__u">€</span></span></label>
-        @endforeach
-      </div>
     </div>
 
     <label class="ad-field" style="margin-top:var(--s-5)">
@@ -427,6 +394,72 @@
       <span>Equipamiento <em>— uno por línea</em></span>
       <textarea class="ad-in" name="features" rows="5">{{ $f('features') }}</textarea>
     </label>
+  </fieldset>
+
+  {{-- ------------------------------------------------- warranty & maintenance --}}
+  {{-- What goes with the car and at what price — the "Lo que va con el coche"
+       panels of its page. Its own section on the band tone with the brand blue
+       along its top, so it is found at a glance in a long form. Each plan: the
+       standard prices (App\Support\Warranty / Maintenance::PRICES) or his own,
+       in a second box that shows only with "Personalizado" (panel.css, :has)
+       and starts with the standard prices, so he changes only what differs.
+       Saved in the car's sheet by Admin\SheetController::adopt. --}}
+  @php
+    $plEur = fn ($n) => \App\Support\Warranty::euros((int) $n);
+    $plans = [
+      'warranty' => [
+        'h'    => 'Garantía',
+        'ask'  => 'Precio para ampliarla',
+        'std'  => \App\Support\Warranty::PRICES,
+        'own'  => \App\Support\Warranty::own($sh),
+        'step' => [24 => '2 años', 36 => '3 años'],
+      ],
+      'maintenance' => [
+        'h'    => 'Mantenimiento',
+        'ask'  => 'Precio',
+        'std'  => \App\Support\Maintenance::PRICES,
+        'own'  => \App\Support\Maintenance::own($sh),
+        'step' => [12 => '1 año', 24 => '2 años'],
+      ],
+    ];
+  @endphp
+  <fieldset class="ad-fs ad-box ad-plans">
+    <h2 class="ad-fs__h">Garantía y mantenimiento</h2>
+    <p class="ad-fs__p">Lo que sale en la ficha, en «Lo que va con el coche».</p>
+
+    <div class="ad-plans__grid">
+      @foreach($plans as $k => $pl)
+        @php $mode = old($k . '_mode', $pl['own'] !== null ? 'own' : 'std'); @endphp
+        <section class="ad-plan" aria-labelledby="pl-{{ $k }}">
+          <h3 class="ad-plan__h" id="pl-{{ $k }}">{{ $pl['h'] }}</h3>
+
+          @if($k === 'warranty')
+            <div class="ad-field">
+              <span>Incluida en el precio</span>
+              <select class="ad-in" name="sheet_warranty">
+                @foreach(['12' => '1 año', '24' => '2 años', '36' => '3 años'] as $m => $t)
+                  <option value="{{ $m }}" @selected((string) $sv('warranty_months', 'sheet_warranty') === (string) $m || ($m === '12' && !$sv('warranty_months', 'sheet_warranty')))>{{ $t }}</option>
+                @endforeach
+              </select>
+            </div>
+          @endif
+
+          <div class="ad-field ad-wp">
+            <span>{{ $pl['ask'] }}</span>
+            <div class="ad-pills">
+              <label class="ad-pill"><input type="radio" name="{{ $k }}_mode" value="std" @checked($mode !== 'own')><span>Estándar</span></label>
+              <label class="ad-pill"><input type="radio" name="{{ $k }}_mode" value="own" @checked($mode === 'own')><span>Personalizado</span></label>
+            </div>
+            <p class="ad-wp__std">{{ implode(' · ', array_map(fn ($m, $t) => $t . ' ' . $plEur($pl['std'][$m]), array_keys($pl['step']), $pl['step'])) }}</p>
+            <div class="ad-grid ad-wp__own">
+              @foreach($pl['step'] as $m => $t)
+                <label class="ad-field"><span>{{ $t }}</span><span class="ad-unit"><input class="ad-in" type="text" name="{{ $k }}_{{ $m }}" value="{{ old($k . '_' . $m, $pl['own'] !== null ? ($pl['own'][$m] ?? '') : $pl['std'][$m]) }}" inputmode="numeric" maxlength="6" autocomplete="off" enterkeyhint="next"><span class="ad-unit__u">€</span></span></label>
+              @endforeach
+            </div>
+          </div>
+        </section>
+      @endforeach
+    </div>
   </fieldset>
 
   {{-- ------------------------------------------------------------ video --}}

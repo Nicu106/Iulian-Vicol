@@ -28,17 +28,33 @@ final class Warranty
     /** His own prices for this car, or null when the standard list applies. */
     public static function own(?array $sheet): ?array
     {
-        $p = $sheet['warranty_prices'] ?? null;
+        return self::prices($sheet, 'warranty_prices', self::PRICES);
+    }
+
+    /**
+     * A plan's own prices from the sheet (warranty_prices, maintenance_prices),
+     * keyed by months like its standard list; null when it has none.
+     *
+     * @param array<int,int> $std
+     */
+    public static function prices(?array $sheet, string $key, array $std): ?array
+    {
+        $p = $sheet[$key] ?? null;
         if (!is_array($p)) {
             return null;
         }
         $out = [];
-        foreach (array_keys(self::PRICES) as $m) {
+        foreach (array_keys($std) as $m) {
             $v = $p[$m] ?? $p[(string) $m] ?? null;
             $out[$m] = $v === null || $v === '' ? null : (int) $v;
         }
 
         return $out;
+    }
+
+    public static function euros(int $n): string
+    {
+        return number_format($n, 0, ',', '.') . ' €';
     }
 
     /**
@@ -51,7 +67,7 @@ final class Warranty
     {
         $inc = intdiv(self::months($sheet), 12);
         $own = self::own($sheet);
-        $eur = fn (int $n) => number_format($n, 0, ',', '.') . ' €';
+        $eur = fn (int $n) => self::euros($n);
         $steps = [];
         for ($y = $inc; $y <= 3; $y++) {
             if ($y === $inc) {

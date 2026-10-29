@@ -263,15 +263,14 @@
           <h3 class="car-off__h">Mantenimiento</h3>
           <p class="car-off__say">Aceite, filtros y lo que toque, a precio cerrado.
             Este es opcional.</p>
+          {{-- the standard prices or the ones he set for this car (App\Support\Maintenance) --}}
           <ul class="car-off__steps">
-            <li class="car-off__step">
-              <span class="car-off__t">1 año</span>
-              <span class="car-off__p">200 €</span>
-            </li>
-            <li class="car-off__step">
-              <span class="car-off__t">2 años</span>
-              <span class="car-off__p">400 €</span>
-            </li>
+            @foreach(\App\Support\Maintenance::ladder($car->sheet) as [$y, $cost])
+              <li class="car-off__step">
+                <span class="car-off__t">{{ $y === 1 ? '1 año' : $y . ' años' }}</span>
+                <span class="car-off__p">{{ $cost }}</span>
+              </li>
+            @endforeach
           </ul>
           <p class="car-off__note">Sale más a cuenta que ir suelto al taller cada vez,
             y no tienes que acordarte de nada: te aviso yo cuando toca.</p>
