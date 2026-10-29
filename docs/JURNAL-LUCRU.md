@@ -66,7 +66,8 @@ Timpul tău de gândire și de verificare între prompturi, peste 15 minute, **n
 | 14.10 (2) | — | — | Galería 2.3: „El color que te hace volver a mirarlo.” pe poza 27 (Cabrio bleumarin din spate, din HEIC, aceeași corecție de culoare), în loc de botul mașinii |
 | 14.10 (3) | — | — | Galería 2.3: toate mașinile întregi pe 19 formate de ecran (320 → 3440, plus ecran vertical 1080x1920); layout gândit separat pentru telefon (poze pe toată lățimea, poze mici ieșite din rând, detalii suprapuse); poza 27 pe toată lățimea; finalul cu poza 20; poza de bun venit fără efectul de deschidere pe telefon; prelungirile de asfalt și perete refăcute din blocuri reale (fără dungi) |
 | 28–29.10 | — | 1 | Istoricul proiectului scos din jurnalele Claude Code: prompturile pe 23 de etape, orele estimate pe etapă, iterațiile (brandbook → design → por qué / recenzii → coches.net → statistici → securitate) și ce a rămas; trimis ca fișier .md și ca artifact (nu e în repo) |
-| **Total** | **79,5 h** | **302** | **32 zile** (cu prompturile doar cu capturi și sesiunea video din 29–30.09) |
+| 29–30.10 | 1,3 h | 9 | Garanția pe fiecare mașină: „Estándar” [standard] (600 € / 900 €) sau „Personalizado” [personalizat], cu prețurile tale în a doua casetă. Recenzii prin link: „Añadir opinión” [adaugă recenzie] deschide o fereastră cu două variante (o scriu eu / îi trimit un link); cardul se întoarce, alegi cât e deschis linkul (1 zi – 1 lună) și numele clientului, apoi QR, WhatsApp și copiere; clientul scrie pe /opinion/… (nume, text, o poză întoarsă corect și fără GPS, acord de publicare) și recenzia intră ascunsă până o aprobi; centrare măsurată la 320/390/1400 (migrarea e de rulat). Paginile legale /terminos și /privacidad (datele firmei din .env, prețuri cu REBU, garanție, rezervări, recenzii, reclamații, date personale, cookie-uri) și cele două texte cerute de Junta de Andalucía în subsol; un rând despre date sub formularele de vânzare și recomandare. SEO: pagini pe mărci (/catalogo/bmw…), titluri cu „de segunda mano en Málaga” și prețul, mașinile marcate produs + mașină pentru Google, IndexNow (55 de pagini trimise, Bing/ChatGPT/Copilot), meniul „Por qué nosotros” fără spațiu reparat. Planul și pașii tăi: docs/SEO-AEO.md |
+| **Total** | **80,8 h** | **311** | **33 zile** (cu prompturile doar cu capturi și sesiunea video din 29–30.09) |
 
 
 **Consum de tokeni** (sesiunea principală plus sub-agenți, din 1 septembrie)
@@ -145,7 +146,12 @@ Detaliile sunt în `docs/STRATEGIE-SI-SCHIMBARI.md` §4. Pe scurt:
 ### După lansare (site-ul e live din 06.10)
 - [ ] nginx (25.10, comenzile le rulezi tu): `fastcgi_buffer_size 32k; fastcgi_buffers 16 16k;` în `location ~ \.php$`, opțional brotli; apoi `sudo nginx -t && sudo systemctl reload nginx`
 - [ ] Prima pagină: pozele din carduri încărcate după poza mare (LCP pe telefon −0,6 s), de decis
-- [ ] Politica de confidențialitate și Termenii (link-urile din subsol sunt `#`): obligatorii (RGPD/LSSI), am nevoie de datele firmei
+- [x] Politica de confidențialitate și Termenii (29.10): /terminos, /privacidad, texte în subsol
+- [ ] Datele firmei în `.env` (`LEGAL_HOLDER`, `LEGAL_NIF`, `LEGAL_ADDRESS`, `LEGAL_REGISTRY` doar la S.L.): legea cere numele, NIF-ul și adresa pe /terminos
+- [ ] Migrarea pentru recenziile prin link (comanda în `docs/SEO-AEO.md` §3); până atunci „Añadir opinión” merge ca înainte
+- [ ] SEO, pașii tăi (`docs/SEO-AEO.md` §3): Google Business Profile (zonă de deservire, adresă ascunsă), recenzii Google după fiecare predare, Search Console + Bing Webmaster Tools, Bing Places, Apple Business, aceleași date pe Facebook / Páginas Amarillas / coches.net
+- [ ] Decizii legale (`docs/SEO-AEO.md` §4): cookie-urile de recomandare (banner sau renunțăm la urmărirea paginilor), dreptul de retragere de 14 zile în contractele semnate în afara unui sediu, garanția de 1 an scrisă în contract, înregistrarea în Hoj@ până în mai 2027, o adresă de email cu contract de prelucrare
+- [ ] Numele „BMW 328i Exclsusive Edition” (greșeală de scriere, apare în Google)
 - [ ] Termenii programului de recomandare pe `/recomienda`
 - [ ] `www`: în Hostinger DNS, CNAME www → A 213.199.39.241 (și CDN oprit), apoi `certbot --nginx -d ivmotorclass.com -d www.ivmotorclass.com --expand`
 - [ ] Pagina „Quién soy” (Cine sunt): o facem ca pagină reală sau rămâne scoasă din meniu?

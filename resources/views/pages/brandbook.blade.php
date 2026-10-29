@@ -1973,6 +1973,7 @@
       'cat-hint'    => ['"Ver todos"', 'under the marque’s own count, in the row’s colour reversed out, so it reads as part of the marque rather than as site furniture'],
       'cat-wrap'    => ['the container', 'site-level despite the prefix — every page measures from it'],
       'cat-dock'    => ['the fixed bar', 'site-level despite the prefix. Phone only, with the safe area taken'],
+      'cat-others'  => ['back to every marque', 'one quiet link under the single row of a marque\u{2019}s own page (/catalogo/bmw), where the banner has no photograph (cat-hero--marque: the ink ground it has before its picture loads) — a Panamera under \u{201C}BMW de segunda mano\u{201D} said the wrong thing'],
     ];
 
     /* Read the stylesheets. A block class is .<prefix>-<name>; __elements and
