@@ -1,6 +1,14 @@
 @extends('layouts.site')
 
-@section('title', (\App\Support\Marques::for($car->brand)['name'] ?? $car->brand).' '.$car->model.' '.$car->year.' — IV MOTORCLASS')
+{{-- The title search engines read: what it is, "de segunda mano en Málaga" (what
+     people type) and the price — or that it is sold. A shared link keeps the
+     short name (og_title). --}}
+@php
+  $carName = (\App\Support\Marques::for($car->brand)['name'] ?? $car->brand).' '.$car->model.' '.$car->year;
+  $carTail = ($car->status ?? '') === 'sold' ? 'Vendido' : ($car->price ? number_format((int) $car->price, 0, ',', '.') . ' €' : null);
+@endphp
+@section('title', $carName . ' de segunda mano en Málaga' . ($carTail ? ' · ' . $carTail : '') . ' — IV MOTORCLASS')
+@section('og_title', $carName . ' — IV MOTORCLASS')
 @section('current', '')
 {{-- For search and answer engines (App\Support\Schema): this car and its offer,
      with what the page itself shows — price, the price before, kilometres, the

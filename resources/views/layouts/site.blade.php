@@ -48,7 +48,9 @@
 <meta property="og:type" content="@yield('og_type', 'website')">
 <meta property="og:site_name" content="IV MOTORCLASS">
 <meta property="og:locale" content="es_ES">
-<meta property="og:title" content="@yield('title')">
+{{-- og_title: what a shared link (WhatsApp, Facebook) shows, when a page wants it
+     shorter than the title search engines read. Defaults to the title. --}}
+<meta property="og:title" content="{{ trim($__env->yieldContent('og_title')) ?: trim($__env->yieldContent('title')) }}">
 <meta property="og:description" content="{{ $metaDesc }}">
 <meta property="og:url" content="{{ $metaUrl }}">
 <meta property="og:image" content="{{ $metaImage }}">

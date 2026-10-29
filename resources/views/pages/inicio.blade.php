@@ -1,6 +1,9 @@
 @extends('layouts.site')
 
-@section('title', 'IV MOTORCLASS — Coches alemanes premium en Málaga')
+{{-- The title search engines read names what people type ("de segunda mano en
+     Málaga"); a shared link keeps the words it always had. --}}
+@section('title', 'IV MOTORCLASS — Coches alemanes de segunda mano en Málaga')
+@section('og_title', 'IV MOTORCLASS — Coches alemanes premium en Málaga')
 @section('current', 'inicio')
 @section('body', 'home')
 

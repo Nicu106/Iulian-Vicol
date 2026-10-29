@@ -1,6 +1,7 @@
 @extends('layouts.site')
 
-@section('title', 'Contacto — IV MOTORCLASS')
+@section('title', 'Contacto — IV MOTORCLASS, coches alemanes en Málaga')
+@section('og_title', 'Contacto — IV MOTORCLASS')
 @section('description', 'Escríbeme por WhatsApp, llámame o mándame un email. Contesto yo, normalmente en minutos. Málaga, con cita, donde esté el coche.')
 @section('current', 'contacto')
 @php \App\Support\Schema::page('ContactPage', [['Contacto', '/contacto']]); @endphp

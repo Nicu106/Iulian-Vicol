@@ -198,7 +198,10 @@ final class Schema
         ], fn ($v) => $v !== null && $v !== '');
 
         return array_filter([
-            '@type'       => 'Car',
+            // Product AND Car: Google reads a car for product results only when it is
+            // also typed Product ("Car isn't supported automatically as a subtype of
+            // Product" — its merchant-listing documentation).
+            '@type'       => ['Product', 'Car'],
             '@id'         => $url . '#car',
             'name'        => trim($brand . ' ' . $car->model . ' ' . $car->year),
             'url'         => $url,
@@ -216,6 +219,7 @@ final class Schema
             'color'       => $car->color ?: null,
             'numberOfDoors' => $num($sheet['doors'] ?? null),
             'seatingCapacity' => $num($sheet['seats'] ?? null),
+            'vehicleSeatingCapacity' => $num($sheet['seats'] ?? null),
             'cargoVolume' => ($t = $num($sheet['trunk'] ?? null)) ? ['@type' => 'QuantitativeValue', 'value' => $t, 'unitCode' => 'LTR'] : null,
             'emissionsCO2' => $num($sheet['co2'] ?? null),
             'itemCondition' => 'https://schema.org/UsedCondition',

@@ -57,6 +57,9 @@ Route::post('/inquiries', [App\Http\Controllers\InquiryController::class, 'store
 // A guest is sent to the login and brought back here after it.
 Route::get('/brandbook', [App\Http\Controllers\BrandbookController::class, 'index'])->middleware('auth')->name('brandbook');
 Route::get('/catalogo', [App\Http\Controllers\BrandCatalogController::class, 'index'])->name('catalogo');
+// one marque's page, for "BMW de segunda mano en Málaga" (BrandCatalogController::marque)
+Route::get('/catalogo/{marca}', [App\Http\Controllers\BrandCatalogController::class, 'marque'])
+    ->where('marca', 'volkswagen|audi|bmw|mercedes|porsche')->name('catalogo.marca');
 // /muestras/*: private proposals for the client, behind a 4-digit PIN
 Route::middleware(App\Http\Middleware\MuestrasPin::class)->group(function () {
     Route::get('/muestras/opiniones', [App\Http\Controllers\ReviewShowroomController::class, 'index'])->name('muestras.opiniones');

@@ -29,11 +29,39 @@ class BrandCatalogController extends Controller
 
     public function index()
     {
+        return self::page(null);
+    }
+
+    /**
+     * /catalogo/{marca}: one marque's row under the same banner, for the people
+     * who search "BMW de segunda mano en Málaga". The same cards, the same rail,
+     * the same words; only the headline, the title and the description name the
+     * marque. A marque with nothing for sale and fewer than three delivered is
+     * kept out of the index (an empty shelf is not an answer to a search).
+     */
+    public function marque(string $marca)
+    {
+        abort_unless(collect(self::MARQUES)->contains('key', $marca), 404);
+
+        return self::page($marca);
+    }
+
+    /** Whether a marque's page is worth a search engine's time (also the sitemap's rule). */
+    public static function indexable(int $forSale, int $delivered): bool
+    {
+        return $forSale > 0 || $delivered >= 3;
+    }
+
+    private static function page(?string $only)
+    {
         $available = Vehicle::where('status', 'available')->orderByDesc('price')->get();
         $soldCount = Vehicle::where('status', 'sold')->get();
 
         $rows = [];
         foreach (self::MARQUES as $m) {
+            if ($only && $m['key'] !== $only) {
+                continue;
+            }
             // Brand names drift in the data — "Mercedes", "Mercedes-benz", "Bmw" are all
             // in there. Match on a normalised needle rather than on the stored string.
             $is = fn ($v) => in_array(mb_strtolower(trim((string) $v->brand)), $m['match'], true);
@@ -74,6 +102,8 @@ class BrandCatalogController extends Controller
             'rows'  => $rows,
             'total' => $available->count(),
             'sold'  => $soldCount->count(),
+            // the marque page's row, or null on the whole catalogue
+            'marque' => $only ? $rows[0] : null,
         ]);
     }
 

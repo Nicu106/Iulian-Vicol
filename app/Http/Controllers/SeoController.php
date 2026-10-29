@@ -42,7 +42,7 @@ class SeoController extends Controller
     {
         $cars = Vehicle::whereIn('status', ['available', 'reserved', 'sold'])
             ->orderByRaw("CASE status WHEN 'sold' THEN 1 ELSE 0 END")->orderByDesc('updated_at')
-            ->get(['slug', 'status', 'updated_at', 'cover_image', 'gallery_images']);
+            ->get(['slug', 'brand', 'status', 'updated_at', 'cover_image', 'gallery_images']);
 
         // the home page and the catalogue change whenever a car does
         $stock = $cars->max('updated_at');
@@ -57,6 +57,15 @@ class SeoController extends Controller
                 $at = $stock;
             }
             $xml .= self::url(url($path), $at);
+        }
+
+        // one page per marque, while it has something to show (BrandCatalogController::indexable)
+        foreach (Marques::ALL as $m) {
+            $mine = $cars->filter(fn ($c) => in_array(mb_strtolower(trim((string) $c->brand)), $m['match'], true));
+            $forSale = $mine->where('status', 'available')->count();
+            if (\App\Http\Controllers\BrandCatalogController::indexable($forSale, $mine->where('status', 'sold')->count())) {
+                $xml .= self::url(url('/catalogo/' . $m['key']), $mine->max('updated_at'));
+            }
         }
 
         foreach ($cars as $car) {
@@ -109,11 +118,17 @@ class SeoController extends Controller
         }
 
         $out .= "\n## Páginas\n\n"
-            . "- [Coches](" . $site . "/catalogo)\n"
+            . "- [Coches](" . $site . "/catalogo)\n";
+        foreach (Marques::ALL as $m) {
+            $out .= '- [' . $m['name'] . ' de segunda mano en Málaga](' . $site . '/catalogo/' . $m['key'] . ")\n";
+        }
+        $out .= ""
             . "- [Por qué nosotros](" . $site . "/por-que-nosotros)\n"
             . "- [Contacto](" . $site . "/contacto)\n"
             . "- [Vende tu coche](" . $site . "/vende)\n"
-            . "- [Recomienda a un amigo](" . $site . "/recomienda)\n";
+            . "- [Recomienda a un amigo](" . $site . "/recomienda)\n"
+            . "- [Términos y condiciones](" . $site . "/terminos)\n"
+            . "- [Política de privacidad](" . $site . "/privacidad)\n";
 
         $out .= "\n## Preguntas frecuentes\n";
         foreach (HomePageController::FAQ as [$q, $a]) {

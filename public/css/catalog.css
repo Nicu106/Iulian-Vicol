@@ -61,6 +61,10 @@
 
 /* ---- the marque mark ------------------------------------- */
 .cat-row__name{ margin:0; }
+/* on the whole catalogue the logo is the way to the marque's own page (/catalogo/bmw):
+   the same box, nothing added to it but the focus ring */
+.cat-row__to{ display:block; max-width:14rem; color:inherit; }
+.cat-row__to:focus-visible{ outline:3px solid var(--mc-focus); outline-offset:4px; }
 .cat-row__logo{
   display:block; width:100%; max-width:14rem; aspect-ratio:1;
   background:transparent;                       /* the white copy inside the fill shows through */
@@ -669,6 +673,13 @@
   }
 }
 
+/* A marque's page (/catalogo/bmw): the banner without its photograph — the ink
+   ground it has before the picture loads, as tall as its words. Two classes, so
+   it holds against the ratios the media queries above give the banner. */
+.cat-hero.cat-hero--marque{ aspect-ratio:auto; min-height:0; max-height:none; }
+.cat-hero--marque::after{ display:none; }
+.cat-hero--marque .cat-hero__in{ padding-block:var(--s-9) var(--s-8); }
+
 /* ---- phone pass, 2026-10-05 -------------------------------------------------
    The dock: the label kept to two lines, WhatsApp wide and the call a square
    with its own mark — the pair balanced instead of a long button and a "Tel" stub
@@ -701,6 +712,9 @@
    the page). The logo already goes home, so on a phone "Inicio" steps out, and the
    link is set "Nosotros" there: "Por qué nosotros" in full left 6px between links
    at 390 (measured). Four links on one line from 360 up; below 360 it scrolls. */
+/* The link is an inline-flex box, so its two spans are flex items and the space at
+   the end of "Por qué " was dropped: it read "Por quénosotros" from 1080px up. */
+.mc-head .mc-nav__pre{ white-space:pre; }
 /* where the row is short of room, "Por qué " steps out and the rest reads "Nosotros" */
 @media (max-width:430px), (min-width:900px) and (max-width:1079.98px){
   .mc-head .mc-nav__pre{ display:none; }
@@ -749,3 +763,6 @@ body.is-locked{ position:fixed; left:0; right:0; overflow:hidden; }
 /* "Por qué nosotros": in the header from tablet up; on a phone it lives in the footer and the home page */
 @media (max-width:900px){ .mc-nav__i--desk{ display:none; } }
 .mc-nav__i--desk{ white-space:nowrap; }
+
+/* a marque's page: the way back to all of them, under its one row */
+.cat-others{ padding-block:var(--s-6) var(--s-9); font-size:var(--t-ui); }

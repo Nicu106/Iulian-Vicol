@@ -1,6 +1,7 @@
 @extends('layouts.site')
 
-@section('title', 'Vende tu coche — IV MOTORCLASS')
+@section('title', 'Vende tu coche en Málaga — IV MOTORCLASS')
+@section('og_title', 'Vende tu coche — IV MOTORCLASS')
 @section('description', 'Vende tu coche alemán en Málaga a quien lo va a vender: dime marca, modelo y kilómetros, y te digo qué puedo hacer.')
 @section('current', 'vender')
 @php \App\Support\Schema::page('WebPage', [['Vende tu coche', '/vende']]); @endphp

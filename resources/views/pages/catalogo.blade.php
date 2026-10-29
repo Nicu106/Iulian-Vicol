@@ -1,12 +1,36 @@
 @extends('layouts.site')
 
-@section('title', 'Catálogo — IV MOTORCLASS')
-@section('description', 'Tu próximo capricho, bien elegido: Volkswagen, Audi, BMW, Mercedes-Benz y Porsche en Málaga, seleccionados y revisados. Precio, kilómetros y fotos reales de cada coche.')
+{{-- The whole catalogue, or one marque's page (/catalogo/bmw — $marque is its
+     row; BrandCatalogController::marque). The titles name what people search:
+     "coches de segunda mano en Málaga", "BMW de segunda mano en Málaga". --}}
+@php
+  $euro = fn ($n) => number_format($n, 0, ',', '.') . ' €';
+  if ($marque) {
+      $mN = $marque['name']; $mD = $marque['delivered']->count();
+      $mDesc = $marque['n']
+          ? $marque['n'] . ' ' . $mN . ' de segunda mano a la venta en Málaga, desde ' . $euro($marque['from']) . ($mD ? ', y ' . $mD . ' ya entregados' : '') . '. Seleccionados, revisados y con garantía. Precio, kilómetros y fotos reales de cada coche.'
+          : $mN . ' de segunda mano en Málaga' . ($mD ? ': ' . $mD . ' ya entregados' : '') . '. Ahora no hay ninguno a la venta: te lo busco bajo pedido.';
+  }
+@endphp
+@if($marque)
+  @section('title', $marque['name'] . ' de segunda mano en Málaga — IV MOTORCLASS')
+  @section('description', $mDesc)
+  @unless(\App\Http\Controllers\BrandCatalogController::indexable($marque['n'], $marque['delivered']->count()))
+    @section('robots', 'noindex, follow')
+  @endunless
+@else
+  @section('title', 'Coches de segunda mano en Málaga: Volkswagen, Audi, BMW, Mercedes y Porsche — IV MOTORCLASS')
+  @section('og_title', 'Catálogo — IV MOTORCLASS')
+  @section('description', 'Tu próximo capricho, bien elegido: Volkswagen, Audi, BMW, Mercedes-Benz y Porsche en Málaga, seleccionados y revisados. Precio, kilómetros y fotos reales de cada coche.')
+@endif
 @section('current', 'catalogo')
 @php
   // For search and answer engines (App\Support\Schema): the cars for sale, in the order the rows show them.
-  \App\Support\Schema::page('CollectionPage', [['Coches', '/catalogo']]);
-  \App\Support\Schema::add(\App\Support\Schema::carList(collect($rows)->flatMap(fn ($r) => $r['cars']), 'Coches a la venta'));
+  \App\Support\Schema::page('CollectionPage', $marque
+      ? [['Coches', '/catalogo'], [$marque['name'], '/catalogo/' . $marque['key']]]
+      : [['Coches', '/catalogo']]);
+  \App\Support\Schema::add(\App\Support\Schema::carList(collect($rows)->flatMap(fn ($r) => $r['cars']),
+      $marque ? $marque['name'] . ' a la venta' : 'Coches a la venta'));
 @endphp
 
 @section('content')
@@ -21,15 +45,21 @@
   {{-- The banner. The photograph is atmosphere, not an advert: the words on it are
        about him, not about this car, because he has never had a Panamera. Marked as
        a stock photograph in §10 of the brandbook, to be replaced by one of his own. --}}
-  <header class="cat-hero">
+  {{-- A marque's page has no photograph: a Panamera under "BMW de segunda mano"
+       says the wrong thing. It is the banner as it stands before its photograph
+       arrives — the ink ground, the same words — and the marque's colour starts
+       with its row right below. --}}
+  <header class="cat-hero {{ $marque ? 'cat-hero--marque' : '' }}">
+    @unless($marque)
     {{-- Was the 253 KB JPEG served raw. Full-bleed: 100vw. --}}
     <x-img class="cat-hero__img" src="/img/banner/panamera.jpg" alt=""
            {{-- on a phone the band is portrait and the photo is cropped from its
                 sides: it is drawn ~2.5x the screen's width, so ask for that --}}
            sizes="(max-width:768px) 250vw, 100vw" :max="2000" :fallback="1080" :priority="true" />
+    @endunless
     <div class="cat-hero__in cat-wrap">
       <span class="cat-hero__eyebrow">Málaga</span>
-      <h1 class="cat-hero__h">Tu próximo capricho, bien elegido.</h1>
+      <h1 class="cat-hero__h">{{ $marque ? $marque['name'] . ' de segunda mano' : 'Tu próximo capricho, bien elegido.' }}</h1>
       <p class="cat-hero__p">Modelos y acabados que llaman la atención. Seleccionados, revisados
          y preparados por nuestro equipo para que disfrutes de algo especial.</p>
       <a class="cat-hero__go" href="#cat-first">Encuentra el tuyo <span aria-hidden="true">↓</span></a>
@@ -59,9 +89,17 @@
 
         <div class="cat-row__inner">
           <div class="cat-row__id">
+            {{-- On the whole catalogue the marque's name is the way to its own page. --}}
             <h2 class="cat-row__name" id="marque-{{ $row['key'] }}">
-              <span class="cat-row__logo" style="--logo:url('{{ asset('img/marques/'.$row['key'].'.svg') }}')"></span>
-              <span class="mc-vh">{{ $row['name'] }}</span>
+              @if($marque)
+                <span class="cat-row__logo" style="--logo:url('{{ asset('img/marques/'.$row['key'].'.svg') }}')"></span>
+                <span class="mc-vh">{{ $row['name'] }}</span>
+              @else
+                <a class="cat-row__to" href="/catalogo/{{ $row['key'] }}">
+                  <span class="cat-row__logo" style="--logo:url('{{ asset('img/marques/'.$row['key'].'.svg') }}')"></span>
+                  <span class="mc-vh">{{ $row['name'] }}</span>
+                </a>
+              @endif
             </h2>
             <span class="cat-row__lead">
               @if($row['n'])
@@ -114,6 +152,10 @@
         @endif
       </section>
     @endforeach
+
+  @if($marque)
+    <p class="cat-wrap cat-others"><a class="mc-link" href="/catalogo">Ver todas las marcas</a></p>
+  @endif
 </main>
 @endsection
 
