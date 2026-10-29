@@ -244,6 +244,8 @@
           <button class="mc-btn sl-send__btn" type="submit" id="sl-submit">Enviar</button>
           <p class="sl-send__note">Esto no publica nada. Me llega a mí, lo miro, y
             te escribo.</p>
+          <p class="sl-send__note">{{-- first layer of the privacy notice (LOPDGDD art. 11) --}}Tus datos los trato yo, IV MOTORCLASS, solo para valorar tu coche y contestarte.
+            Puedes verlos, corregirlos o borrarlos cuando quieras: <a class="mc-link" href="/privacidad">privacidad</a>.</p>
         </div>
         </div>
       </section>

@@ -31,6 +31,8 @@ class SeoController extends Controller
         '/contacto'         => 'pages.contacto',
         '/vende'            => 'pages.sell-car',
         '/recomienda'       => 'pages.recomienda',
+        '/terminos'         => 'pages.legal.terminos',
+        '/privacidad'       => 'pages.legal.privacidad',
     ];
 
     /** A car page names at most this many photographs (Google reads up to 1,000). */

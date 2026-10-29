@@ -33,6 +33,8 @@ class BrandbookOnly
         'recomienda',    // ask for a recommendation link — GET the page, POST its form
         'r/*',           // a recommendation link
         'opinion/*',     // a customer writes their opinion — GET the page, POST its form
+        'terminos',      // the legal notice and conditions of use
+        'privacidad',    // personal data and cookies
         's',             // the statistics beacon (POST) — App\Support\Stats
         'img',        // the /img/{w} resize service — vehicle and customer photos
         'img/*',

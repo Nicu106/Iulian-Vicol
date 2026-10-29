@@ -76,8 +76,17 @@
   <div class="mc-foot__legal cat-wrap">
     <span>© {{ date('Y') }} IV MOTORCLASS</span>
     <span class="mc-foot__legal-sep">·</span>
-    <a href="#">Términos y condiciones</a>
+    <a href="/terminos">Términos y condiciones</a>
     <span class="mc-foot__legal-sep">·</span>
-    <a href="#">Política de privacidad</a>
+    <a href="/privacidad">Política de privacidad</a>
   </div>
+  {{-- Two notices the Junta de Andalucía asks of a car dealer's every advert and,
+       without a shop, of its website: Decreto 256/2003 art. 2.4 (the vehicle's
+       own document) and Decreto 82/2022 art. 7.3 (complaint sheets). The words
+       are the decree's; the quiet size is ours. --}}
+  <p class="mc-foot__notice cat-wrap">Existen hojas de quejas y reclamaciones a disposición de las
+    personas consumidoras y usuarias, en papel y en formato electrónico. Este establecimiento
+    comercial posee, a disposición del consumidor que lo solicite, un documento individualizado
+    de cada vehículo expuesto, en el que se indican, entre otros datos, las características del
+    mismo, su titularidad, la garantía que, en su caso, posea y su precio.</p>
 </footer>

@@ -120,6 +120,13 @@
 .mc-foot__legal a:hover{ color:#FFFFFF; text-decoration-color:#FFFFFF; }
 .mc-foot__legal-sep{ opacity:.4; }
 
+/* The two notices Andalucía asks of a dealer's website (foot.blade.php): the
+   legal line's own size and colour, one quiet paragraph under it. */
+.mc-foot__notice{
+  position:relative; z-index:1; margin-block:0; padding-block:0 var(--s-5);
+  max-width:none; font-size:var(--t-label); line-height:1.55; color:rgba(255,255,255,.60);
+}
+
 /* The phone dock sits over the very bottom of the page. The clearance goes on
    the footer itself, under the legal line, as ground — not as padding inside the
    legal block, which made a 12px line 209px tall and pushed the name to a 51px

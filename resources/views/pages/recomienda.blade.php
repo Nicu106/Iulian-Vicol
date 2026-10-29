@@ -76,6 +76,8 @@
           <div class="sl-send">
             <button class="mc-btn sl-send__btn" type="submit">Crear mi enlace</button>
             <p class="sl-send__note">Sólo tus datos. No te pido los de tu amigo: él decide si me escribe.</p>
+            <p class="sl-send__note">{{-- first layer of the privacy notice (LOPDGDD art. 11) --}}Tus datos los trato yo, IV MOTORCLASS, solo para darte tu enlace y saber quién viene de tu parte.
+              Puedes verlos, corregirlos o borrarlos cuando quieras: <a class="mc-link" href="/privacidad">privacidad</a>.</p>
           </div>
         </form>
       @endif

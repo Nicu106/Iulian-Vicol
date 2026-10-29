@@ -1,0 +1,52 @@
+/* ============================================================================
+   LEGAL — /terminos, /privacidad (LegalController)
+   ---------------------------------------------------------------------------
+   Pages to be read, not looked at: one column at the prose measure, the
+   site's h1, section headings a step under the page's h2, the prose size and
+   leading of the rest of the site. The identity and the cookies are lists of
+   term → value that stack on a phone; no tables to scroll sideways.
+   ========================================================================= */
+.lg{ background:var(--mc-bg); }
+.lg-in{ max-width:44rem; padding-block:var(--s-8) var(--s-10); }
+@media (min-width:900px){ .lg-in{ padding-top:var(--s-9); } }
+
+.lg-h1{ margin:0; font-size:var(--t-h1); font-weight:700; line-height:1.06;
+  letter-spacing:-.03em; color:var(--mc-ink); text-wrap:balance; }
+.lg-date{ margin:var(--s-3) 0 0; font-size:var(--t-small); color:var(--mc-ink-3); }
+
+.lg-sec{ margin-top:var(--s-8); }
+.lg-sec h2, .lg-sum h2{ margin:0 0 var(--s-4); font-size:var(--t-km); font-weight:700;
+  line-height:1.15; letter-spacing:-.02em; color:var(--mc-ink); text-wrap:balance; }
+.lg-sec h3{ margin:var(--s-6) 0 var(--s-2); font-size:var(--t-sub); font-weight:700; line-height:1.3; color:var(--mc-ink); }
+.lg-sec p, .lg-sec li{ font-size:var(--t-prose); line-height:1.62; color:var(--mc-ink-2); }
+.lg-sec p{ margin:0 0 var(--s-4); }
+.lg-sec ul{ margin:0 0 var(--s-4); padding-left:1.15em; }
+.lg-sec li{ margin:0 0 var(--s-2); }
+.lg-sec b{ color:var(--mc-ink); font-weight:600; }
+.lg a{ color:var(--mc-blue); text-decoration:underline; text-underline-offset:3px; overflow-wrap:anywhere; }
+
+/* the wording a decree fixes: said as it is, set apart */
+.lg-legend{ padding-left:var(--s-4); border-left:3px solid var(--mc-rule); }
+
+/* the short version, first (privacy) */
+.lg-sum{ margin-top:var(--s-7); padding:var(--s-5); background:var(--mc-surface); border:1px solid var(--mc-hairline); }
+@media (min-width:768px){ .lg-sum{ padding:var(--s-6); } }
+
+/* term → value: stacked on a phone, side by side from 600px */
+.lg-id{ margin:0 0 var(--s-4); }
+.lg-id > div{ display:grid; gap:var(--s-1); padding:var(--s-3) 0; border-bottom:1px solid var(--mc-hairline); }
+.lg-id > div:first-child{ border-top:1px solid var(--mc-hairline); }
+.lg-sum .lg-id{ margin:0; }
+.lg-sum .lg-id > div:first-child{ border-top:0; padding-top:0; }
+.lg-sum .lg-id > div:last-child{ border-bottom:0; padding-bottom:0; }
+@media (min-width:600px){ .lg-id > div{ grid-template-columns:11rem 1fr; gap:var(--s-4); } }
+.lg-id dt{ font-size:var(--t-small); font-weight:600; color:var(--mc-ink); }
+.lg-id dd{ margin:0; font-size:var(--t-prose); line-height:1.55; color:var(--mc-ink-2); }
+
+/* the cookies, one per block */
+.lg-cookies{ margin:0 0 var(--s-4); border-top:1px solid var(--mc-hairline); }
+.lg-cookies dl{ margin:0; padding:var(--s-3) 0; border-bottom:1px solid var(--mc-hairline); }
+.lg-cookies dt{ margin:0 0 var(--s-1); font-size:var(--t-small); font-weight:700; color:var(--mc-ink);
+  font-family:ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap:anywhere; }
+.lg-cookies dd{ margin:0; font-size:var(--t-prose); line-height:1.55; color:var(--mc-ink-2); }
+.lg a[href^="tel:"]{ white-space:nowrap; }

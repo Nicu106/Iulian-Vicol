@@ -192,6 +192,14 @@ require __DIR__.'/auth.php';
 // them. Probed with the lockdown switched off, which is what launch does, all
 // three GETs answered 200 with the real content. Removed 2026-09-08.
 
+// Who is behind the site, the conditions of use, personal data and cookies
+// (LegalController). /aviso-legal and /cookies are the names people look for.
+Route::get('/terminos', [App\Http\Controllers\LegalController::class, 'terms'])->name('legal.terms');
+Route::get('/privacidad', [App\Http\Controllers\LegalController::class, 'privacy'])->name('legal.privacy');
+Route::redirect('/aviso-legal', '/terminos', 301);
+Route::redirect('/politica-de-privacidad', '/privacidad', 301);
+Route::redirect('/cookies', '/privacidad#cookies', 301);
+
 // The sitemap (with every car's photographs) and /llms.txt, from the database, so a
 // car added in the panel is in them the same minute — App\Http\Controllers\SeoController.
 Route::get('/sitemap.xml', [App\Http\Controllers\SeoController::class, 'sitemap'])->name('sitemap');
