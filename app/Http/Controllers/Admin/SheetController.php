@@ -7,6 +7,7 @@ use App\Support\CarPhotos;
 use App\Support\CochesNetSheet;
 use App\Support\Img;
 use App\Support\Marques;
+use App\Support\Warranty;
 use chillerlan\QRCode\Common\EccLevel;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
@@ -169,8 +170,27 @@ class SheetController extends Controller
         // a car without a sheet gets one only for something typed (the warranty
         // select always sends its default, one year)
         $typed = array_filter($edits, fn ($v, $k) => $v !== null && !($k === 'warranty_months' && $v === 12), ARRAY_FILTER_USE_BOTH);
+
+        // what more years of warranty cost (App\Support\Warranty): "Estándar" keeps
+        // no prices on the car, "Personalizado" keeps his, an empty one as null
+        $own = null;
+        if ($request->input('warranty_mode') === 'own') {
+            $own = [];
+            foreach (array_keys(Warranty::PRICES) as $m) {
+                $v = preg_replace('/\D/', '', (string) $request->input('warranty_' . $m));
+                $own[$m] = $v === '' ? null : min((int) $v, 99999);
+            }
+            $typed['warranty_prices'] = $own;
+        }
+        if ($request->has('warranty_mode')) {
+            $edits['warranty_prices'] = $own;
+        }
+
         if ($edits && ($sheet || $typed)) {
             $sheet = array_merge($sheet ?? ['source' => 'manual'], $edits);
+            if (array_key_exists('warranty_prices', $sheet) && $sheet['warranty_prices'] === null) {
+                unset($sheet['warranty_prices']);
+            }
         }
 
         return $sheet;

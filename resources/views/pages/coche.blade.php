@@ -232,19 +232,18 @@
       <div class="car-with__grid">
 
         {{-- One year is included with every car; a car whose sheet says two comes
-             with two, and the ladder starts there (the price of a third year from
-             two is not on the list: he says it). --}}
+             with two, and the ladder starts there. The prices of more years are the
+             standard list or the ones he set for this car (App\Support\Warranty). --}}
         @php $wy = min(3, intdiv($warranty, 12)); @endphp
         <article class="car-off">
           <h3 class="car-off__h">Garantía</h3>
           <p class="car-off__say">{{ $wy > 1 ? 'Con este coche van incluidos ' . ($wy === 2 ? 'dos' : 'tres') . ' años.' : 'Un año va incluido con cada coche que vendo.' }}
             @if($wy < 3) Si quieres más tiempo, se amplía.@endif</p>
           <ul class="car-off__steps">
-            @foreach([1 => '600 €', 2 => '600 €', 3 => '900 €'] as $y => $cost)
-              @continue($y < $wy)
-              <li class="car-off__step {{ $y === $wy ? 'car-off__step--inc' : '' }}">
+            @foreach(\App\Support\Warranty::ladder($car->sheet) as [$y, $cost, $inc])
+              <li class="car-off__step {{ $inc ? 'car-off__step--inc' : '' }}">
                 <span class="car-off__t">{{ $y === 1 ? '1 año' : $y . ' años' }}</span>
-                <span class="car-off__p">{{ $y === $wy ? 'Incluido' : ($wy === 1 ? $cost : 'Pregúntame') }}</span>
+                <span class="car-off__p">{{ $cost }}</span>
               </li>
             @endforeach
           </ul>

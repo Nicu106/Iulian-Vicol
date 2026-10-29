@@ -394,6 +394,31 @@
       </div>
     </div>
 
+    {{-- What more years of warranty cost on this car: the standard list
+         (App\Support\Warranty::PRICES) or his own prices, typed in the second box.
+         The box shows only with "Personalizado" (panel.css, :has); it starts with
+         the standard prices so he changes only what differs. --}}
+    @php
+      $wStd = \App\Support\Warranty::PRICES;
+      $wOwn = \App\Support\Warranty::own($sh);
+      $wMode = old('warranty_mode', $wOwn !== null ? 'own' : 'std');
+      $wVal = fn ($m) => old('warranty_' . $m, $wOwn !== null ? ($wOwn[$m] ?? '') : $wStd[$m]);
+      $wEur = fn ($n) => number_format($n, 0, ',', '.') . ' €';
+    @endphp
+    <div class="ad-field ad-wp" style="margin-top:var(--s-4)">
+      <span>Precio para ampliar la garantía</span>
+      <div class="ad-pills">
+        <label class="ad-pill"><input type="radio" name="warranty_mode" value="std" @checked($wMode !== 'own')><span>Estándar</span></label>
+        <label class="ad-pill"><input type="radio" name="warranty_mode" value="own" @checked($wMode === 'own')><span>Personalizado</span></label>
+      </div>
+      <p class="ad-wp__std">2 años {{ $wEur($wStd[24]) }} · 3 años {{ $wEur($wStd[36]) }}</p>
+      <div class="ad-grid ad-grid--s ad-wp__own">
+        @foreach([24 => '2 años', 36 => '3 años'] as $m => $t)
+          <label class="ad-field"><span>{{ $t }}</span><span class="ad-unit"><input class="ad-in" type="text" name="warranty_{{ $m }}" value="{{ $wVal($m) }}" inputmode="numeric" maxlength="6" autocomplete="off" enterkeyhint="next"><span class="ad-unit__u">€</span></span></label>
+        @endforeach
+      </div>
+    </div>
+
     <label class="ad-field" style="margin-top:var(--s-5)">
       <span>Descripción <em>— como se lo contarías por WhatsApp</em></span>
       <textarea class="ad-in" name="description" rows="8">{{ $f('description') }}</textarea>
