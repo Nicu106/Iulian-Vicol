@@ -2,8 +2,10 @@
 
 namespace App\Observers;
 
+use App\Jobs\IndexNowPing;
 use App\Jobs\WarmVehicleImages;
 use App\Models\Vehicle;
+use App\Support\IndexNow;
 
 /**
  * On the model, not in the admin controller.
@@ -17,6 +19,14 @@ class VehicleObserver
 {
     public function saved(Vehicle $vehicle): void
     {
+        // The search engines that take IndexNow hear about a car on sale, its price,
+        // its photographs, or that it sold — the minute it is saved. A form for a car
+        // someone wants to sell us (offer_type Compra) is not a public page.
+        if (in_array($vehicle->status, ['available', 'reserved', 'sold'], true)
+            && ($vehicle->wasRecentlyCreated || $vehicle->wasChanged(['status', 'price', 'slug', 'cover_image', 'gallery_images', 'description', 'mileage']))) {
+            IndexNowPing::dispatch(IndexNow::forCar($vehicle));
+        }
+
         // Only when the pictures actually changed. Editing a price should not
         // queue a job that rebuilds nothing.
         if (!$vehicle->wasRecentlyCreated
@@ -39,6 +49,14 @@ class VehicleObserver
             // endpoint still answers on demand. Three ways for this to be right,
             // none of which is somebody remembering to run a command.
             WarmVehicleImages::dispatch($paths);
+        }
+    }
+
+    /** A car taken off the site: its address now answers 404, which they want to know too. */
+    public function deleted(Vehicle $vehicle): void
+    {
+        if (in_array($vehicle->status, ['available', 'reserved', 'sold'], true)) {
+            IndexNowPing::dispatch(IndexNow::forCar($vehicle));
         }
     }
 }

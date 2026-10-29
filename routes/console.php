@@ -74,3 +74,13 @@ Artisan::command('stats:history {files?*}', function () {
 Artisan::command('map:render', function () {
     \App\Support\StaticMap::renderAll(fn ($l) => $this->info($l));
 })->purpose('Render the static Málaga map images from OpenStreetMap tiles');
+
+// Every page in the sitemap to IndexNow at once (App\Support\IndexNow) — after
+// a launch or a change that touches many pages. Day to day, saving a car sends
+// its own pages by itself (VehicleObserver).
+Artisan::command('seo:indexnow', function () {
+    $xml = app(\App\Http\Controllers\SeoController::class)->sitemap()->getContent();
+    preg_match_all('~<url><loc>([^<]+)</loc>~', $xml, $m);
+    $urls = array_map('html_entity_decode', $m[1]);
+    $this->info(count($urls) . ' URLs → IndexNow: HTTP ' . \App\Support\IndexNow::send($urls));
+})->purpose('Send every sitemap URL to IndexNow (Bing, Yandex, Seznam, Naver…)');
