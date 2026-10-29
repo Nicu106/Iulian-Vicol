@@ -58,6 +58,16 @@
 .mc-foot__col b{ color:#FFFFFF; font-weight:600; }
 .mc-foot__quiet{ color:rgba(255,255,255,.56) !important; max-width:26ch; }
 
+/* Redes, under Horario: a second heading in the same column, then the three
+   accounts with their own marks (partials/social-mark — home.css is not on
+   every page, so the mark is sized here). The note's white body takes the
+   link's colour; Instagram's square and Facebook's disc keep theirs and clear
+   3:1 on --mc-deep. */
+.mc-foot__h--next{ margin-top:var(--s-6); }
+.mc-foot__soc a{ gap:var(--s-2); }
+.mc-foot__soc .hm-soc__mark{ display:inline-grid; place-items:center; flex:0 0 auto; width:22px; height:22px; }
+.mc-foot__soc .hm-soc__mark svg{ display:block; width:20px; height:20px; overflow:visible; }
+
 /* ---- the signature -------------------------------------------------------
    Not an ornament dropped in a corner: the name set to the exact width of the
    container and cropped by the foot of the page, the way a building carries its
@@ -175,6 +185,9 @@
   .mc-foot__col ul{ display:grid; grid-template-columns:1fr 1fr; gap:0 var(--s-4); }
   .mc-foot__col li:has(a[href^="mailto"]),
   .mc-foot__col li:has(> span){ grid-column:1 / -1; }
+  /* the three accounts side by side, each as wide as its name */
+  .mc-foot__col .mc-foot__soc{ grid-template-columns:repeat(3, auto); justify-content:start; gap:0 var(--s-5); }
+  .mc-foot__h--next{ margin-top:var(--s-5); }
 
   .mc-foot__sign{ height:clamp(3.4rem, 15vw, 6rem); }
   .mc-foot__mark{

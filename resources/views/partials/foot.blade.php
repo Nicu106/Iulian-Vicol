@@ -63,6 +63,18 @@
         <li><span>Todos los días · <b>a convenir</b></span></li>
         <li><span class="mc-foot__quiet">Escríbeme y quedamos a la hora que te venga bien.</span></li>
       </ul>
+
+      {{-- The three accounts (HomePageController::SOCIAL), under the hours, so the
+           footer keeps its four tracks. Each in its platform's own mark — the
+           same drawing as the home page's band (partials/social-mark) — beside
+           its name, in the footer's own list style: not an icon row, which is
+           every footer's. Counted in the panel as "redes" with the platform. --}}
+      <h2 class="mc-foot__h mc-foot__h--next" id="f-soc">Redes</h2>
+      <ul class="mc-foot__soc" aria-labelledby="f-soc">
+        @foreach(\App\Http\Controllers\HomePageController::SOCIAL as $k => $s)
+          <li><a href="{{ $s['url'] }}" target="_blank" rel="noopener" data-stat="redes" data-stat-k="{{ $k }}">@include('partials.social-mark', ['k' => $k]){{ $s['name'] }}</a></li>
+        @endforeach
+      </ul>
     </div>
   </div>
 

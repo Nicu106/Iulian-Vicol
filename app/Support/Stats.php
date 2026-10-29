@@ -144,6 +144,9 @@ final class Stats
         'vende-envia'        => ['Pulsaron Enviar en «Vende tu coche»', 'pulsó Enviar'],
         'recomienda-empieza' => ['Empezaron a pedir su enlace de recomendación', 'empezó «Recomienda»'],
         'recomienda-envia'   => ['Pulsaron «Crear mi enlace»', 'pulsó «Crear mi enlace»'],
+        'redes'              => ['Abrieron TikTok, Instagram o Facebook desde el pie', 'abrió una red social'],
+        'opinion-empieza'    => ['Empezaron a escribir su opinión (enlace)', 'empezó su opinión'],
+        'opinion-envia'      => ['Enviaron su opinión (enlace)', 'envió su opinión'],
     ];
 
     public static function clock(): CarbonImmutable
