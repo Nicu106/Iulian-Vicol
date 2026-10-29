@@ -32,6 +32,7 @@ class BrandbookOnly
         'contacto',      // contact, in design
         'recomienda',    // ask for a recommendation link — GET the page, POST its form
         'r/*',           // a recommendation link
+        'opinion/*',     // a customer writes their opinion — GET the page, POST its form
         's',             // the statistics beacon (POST) — App\Support\Stats
         'img',        // the /img/{w} resize service — vehicle and customer photos
         'img/*',

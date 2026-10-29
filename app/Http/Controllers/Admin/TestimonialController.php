@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ReviewLink;
 use App\Models\Testimonial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -12,7 +13,17 @@ class TestimonialController extends Controller
     public function index()
     {
         $testimonials = Testimonial::orderBy('order_index')->orderByDesc('created_at')->paginate(20);
-        return view('admin.testimonials.index', compact('testimonials'));
+
+        // the links still open, and which opinions came in through one (App\Models\ReviewLink);
+        // nothing before the migration has run
+        $links = collect();
+        $viaLink = [];
+        if (ReviewLink::ready()) {
+            $links = ReviewLink::whereNull('used_at')->where('expires_at', '>', now())->orderBy('expires_at')->get();
+            $viaLink = ReviewLink::whereIn('testimonial_id', $testimonials->pluck('id'))->pluck('testimonial_id')->flip()->all();
+        }
+
+        return view('admin.testimonials.index', compact('testimonials', 'links', 'viaLink'));
     }
 
     public function create()

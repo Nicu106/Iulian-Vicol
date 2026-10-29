@@ -1,0 +1,26 @@
+/* ============================================================================
+   TU OPINIÓN — /opinion/{token}
+   ---------------------------------------------------------------------------
+   The opening, the fields, the photo zone and the "sent" state are contact.css
+   and sell.css, as on /recomienda. New here: one photograph shown whole under
+   the zone, the consent line, and the headline size on a phone.
+   ========================================================================= */
+.op-form{ max-width:34rem; }
+.op-form .mc-field{ margin-bottom:var(--s-5); }
+
+/* /vende's headline size would set "María, cuéntame qué tal" a word a line at 390 */
+@media (max-width:559.98px){ .op-h{ font-size:var(--t-h1); } }
+
+.op-text{ min-height:10rem; }
+.op-text.is-invalid{ border-color:var(--mc-accent); border-left-width:3px; background:var(--mc-accent-tint); }
+
+/* the zone stays centred once a photo is in it; the photo below, whole */
+.op-drop.has-files .sl-drop__label{ flex-direction:column; justify-content:center; margin-bottom:var(--s-4); }
+.op-prev{ margin:0; display:grid; place-items:center; padding:var(--s-3); background:var(--mc-band); }
+.op-prev[hidden]{ display:none; }
+.op-prev img{ display:block; max-width:100%; max-height:24rem; width:auto; height:auto; object-fit:contain; }
+
+.op-ok{ margin:var(--s-2) 0 var(--s-2); }
+.op-ok a{ color:var(--mc-blue); }
+.op-send{ margin-top:var(--s-5); }
+@media (max-width:559.98px){ .op-send .sl-send__btn{ justify-self:stretch; } }

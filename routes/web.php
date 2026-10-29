@@ -85,6 +85,13 @@ Route::get('/no-contar/quitar', [App\Http\Controllers\StatsMeController::class, 
     ->middleware(['signed', 'throttle:20,1'])->name('stats.me.undo');
 Route::get('/r/{code}', [App\Http\Controllers\ReferralController::class, 'visit'])->name('refer.visit');
 Route::get('/recomienda', [App\Http\Controllers\ReferralController::class, 'show'])->name('refer');
+// A customer writes their own opinion through the link the owner sent them
+// (App\Models\ReviewLink): the token is the only key. Not in the sitemap, noindex.
+Route::get('/opinion/{token}', [App\Http\Controllers\OpinionController::class, 'show'])
+    ->where('token', '[A-Za-z0-9]{20}')->name('opinion');
+Route::post('/opinion/{token}', [App\Http\Controllers\OpinionController::class, 'store'])
+    ->where('token', '[A-Za-z0-9]{20}')
+    ->middleware(['throttle:5,60', \App\Http\Middleware\PublicFormLimits::class])->name('opinion.store');
 Route::post('/recomienda', [App\Http\Controllers\ReferralController::class, 'store'])
     ->middleware('throttle:referral')->name('refer.store');
 
@@ -141,6 +148,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/testimonials/{testimonial}/edit', [App\Http\Controllers\Admin\TestimonialController::class, 'edit'])->name('admin.testimonials.edit');
     Route::put('/admin/testimonials/{testimonial}', [App\Http\Controllers\Admin\TestimonialController::class, 'update'])->name('admin.testimonials.update');
     Route::delete('/admin/testimonials/{testimonial}', [App\Http\Controllers\Admin\TestimonialController::class, 'destroy'])->name('admin.testimonials.destroy');
+    // the links a customer writes their own opinion through (Admin\ReviewLinkController)
+    Route::post('/admin/testimonials/enlaces', [App\Http\Controllers\Admin\ReviewLinkController::class, 'store'])->name('admin.review-links.store');
+    Route::get('/admin/testimonials/enlaces/{link}', [App\Http\Controllers\Admin\ReviewLinkController::class, 'show'])->whereNumber('link')->name('admin.review-links.show');
+    Route::post('/admin/testimonials/enlaces/{link}/cerrar', [App\Http\Controllers\Admin\ReviewLinkController::class, 'close'])->whereNumber('link')->name('admin.review-links.close');
 
     // Sell Cars admin routes
     Route::get('/admin/sell-cars', [App\Http\Controllers\Admin\SellCarController::class, 'index'])->name('admin.sell-cars.index');

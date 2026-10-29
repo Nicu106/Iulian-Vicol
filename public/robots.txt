@@ -8,5 +8,6 @@ Disallow: /brandbook
 Disallow: /muestras
 Disallow: /no-contar
 Disallow: /r/
+Disallow: /opinion/
 
 Sitemap: https://ivmotorclass.com/sitemap.xml
