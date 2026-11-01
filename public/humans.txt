@@ -2,7 +2,7 @@
 
 /* TEAM */
 Desarrollador: MOTORCLASS Team
-Contacto: jvmotorclass@gmail.com
+Contacto: ventas@ivmotorclass.com
 Teléfono: +34 614 753 187
 Ubicación: Málaga, España
 
@@ -24,7 +24,7 @@ Abierto cada día
 Consultar disponibilidad
 
 /* CONTACTO */
-Email: jvmotorclass@gmail.com
+Email: ventas@ivmotorclass.com
 Teléfono: +34 614 753 187
 WhatsApp: +34 614 753 187
 Dirección: Málaga, España

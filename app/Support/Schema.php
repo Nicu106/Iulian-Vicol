@@ -29,7 +29,7 @@ use Illuminate\Support\Str;
 final class Schema
 {
     public const PHONE = '+34614753187';
-    public const EMAIL = 'jvmotorclass@gmail.com';
+    public const EMAIL = 'ventas@ivmotorclass.com';
 
     /** @var list<array<string,mixed>> nodes a page added while it rendered */
     private static array $nodes = [];

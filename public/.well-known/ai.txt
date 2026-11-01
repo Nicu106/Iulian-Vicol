@@ -15,7 +15,7 @@ Services: Car Sales, Financing, Extended Warranty, Test Drive, Consultation
 
 ## Contact Information
 Phone: +34 614 753 187
-Email: jvmotorclass@gmail.com
+Email: ventas@ivmotorclass.com
 WhatsApp: +34 614 753 187
 Address: Málaga, España
 

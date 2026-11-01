@@ -33,7 +33,7 @@ class ContactPageController extends Controller
             'reasons'   => self::REASONS,
             'phone'     => '+34 614 753 187',
             'phoneRaw'  => '34614753187',
-            'email'     => 'jvmotorclass@gmail.com',
+            'email'     => 'ventas@ivmotorclass.com',
             'available' => Vehicle::where('status', 'available')->count(),
             'sold'      => Vehicle::where('status', 'sold')->count(),
             'people'    => Testimonial::where('is_active', true)->whereNotNull('image_path')->count(),

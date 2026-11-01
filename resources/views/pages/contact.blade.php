@@ -47,7 +47,7 @@
                   </div>
                   <div>
                     <h6 class="mb-1">Email</h6>
-                    <a href="mailto:jvmotorclass@gmail.com" class="text-decoration-none text-info fw-semibold">jvmotorclass@gmail.com</a>
+                    <a href="mailto:ventas@ivmotorclass.com" class="text-decoration-none text-info fw-semibold">ventas@ivmotorclass.com</a>
                   </div>
                 </div>
                 <div class="d-flex align-items-center">

@@ -80,7 +80,7 @@ Am testat ce completează Google automat când scrii căutarea, pe Spania (volum
 7. **Bing Webmaster Tools.** Import din Search Console, apoi sitemap-ul. IndexNow e deja activ. Raportul „AI Performance” arată când Copilot citează site-ul.
 8. **Bing Places** (import din profilul Google) și **Apple Business** (fișa din Apple Maps).
 9. **O singură dată, aceleași date peste tot** (nume, telefon, link): pagina de Facebook, Páginas Amarillas, QDQ, profilul de dealer de pe coches.net cu link spre site. Nu cumpăra pachete plătite de listări.
-10. **Email:** `jvmotorclass@gmail.com` are „jv”, iar firma e „IV”. Gmail-ul gratuit nu semnează contractul de prelucrare a datelor cerut de RGPD. O adresă `@ivmotorclass.com` pe Google Workspace rezolvă ambele probleme.
+10. **Email:** de la 1.11.2026 site-ul arată peste tot `ventas@ivmotorclass.com` (Google Workspace pe domeniu, cu contract de prelucrare a datelor). Aceeași adresă trebuie pusă și în profilul Google, pe Facebook și în celelalte listări. Contul de intrare în admin rămâne pe adresa veche.
 
 ### Date de corectat în admin
 

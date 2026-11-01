@@ -50,7 +50,7 @@
           <span><i class="bi bi-clock me-1"></i>Lun–Sáb · Consultar horario</span>
         </div>
         <div class="d-flex align-items-center gap-4">
-          <a href="mailto:jvmotorclass@gmail.com"><i class="bi bi-envelope me-1"></i>jvmotorclass@gmail.com</a>
+          <a href="mailto:ventas@ivmotorclass.com"><i class="bi bi-envelope me-1"></i>ventas@ivmotorclass.com</a>
           <a href="https://wa.me/34614753187" target="_blank" rel="noopener"><i class="bi bi-whatsapp me-1"></i>WhatsApp</a>
         </div>
       </div>
@@ -130,7 +130,7 @@
             preparación completa y acompañamiento antes y después de la compra.</p>
             <div class="d-flex gap-2 mt-4">
               <a href="https://wa.me/34614753187" class="v2-social" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="bi bi-whatsapp"></i></a>
-              <a href="mailto:jvmotorclass@gmail.com" class="v2-social" aria-label="Email"><i class="bi bi-envelope"></i></a>
+              <a href="mailto:ventas@ivmotorclass.com" class="v2-social" aria-label="Email"><i class="bi bi-envelope"></i></a>
               <a href="tel:+34614753187" class="v2-social" aria-label="Teléfono"><i class="bi bi-telephone"></i></a>
             </div>
           </div>
@@ -159,7 +159,7 @@
             <ul class="v2-footer__contact">
               <li><i class="bi bi-telephone"></i><a href="tel:+34614753187">+34 614 753 187</a></li>
               <li><i class="bi bi-whatsapp"></i><a href="https://wa.me/34614753187" target="_blank" rel="noopener">Escríbenos por WhatsApp</a></li>
-              <li><i class="bi bi-envelope"></i><a href="mailto:jvmotorclass@gmail.com">jvmotorclass@gmail.com</a></li>
+              <li><i class="bi bi-envelope"></i><a href="mailto:ventas@ivmotorclass.com">ventas@ivmotorclass.com</a></li>
               <li><i class="bi bi-geo-alt"></i><span>Málaga, España</span></li>
             </ul>
             <a href="{{ route('contact') }}" class="v2-btn v2-btn--light mt-3">

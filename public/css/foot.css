@@ -181,7 +181,7 @@
 
   /* Four short labels do not need four rows, and neither do a phone number and
      a WhatsApp link. Two columns; the mail address and the town span both,
-     because "jvmotorclass@gmail.com" is 150 of the 171px a column has. */
+     because "ventas@ivmotorclass.com" is the full 171px a column has. */
   .mc-foot__col ul{ display:grid; grid-template-columns:1fr 1fr; gap:0 var(--s-4); }
   .mc-foot__col li:has(a[href^="mailto"]),
   .mc-foot__col li:has(> span){ grid-column:1 / -1; }

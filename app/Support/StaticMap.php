@@ -221,7 +221,7 @@ final class StaticMap
             $q = '[out:json][timeout:60];(way["natural"="coastline"](36.55,-4.75,36.90,-4.10);'
                . 'way["highway"~"^(motorway|trunk|primary|secondary)$"](36.55,-4.75,36.90,-4.10);'
                . 'way["waterway"="river"](36.55,-4.75,36.90,-4.10););out geom;';
-            $body = Http::asForm()->withHeaders(['User-Agent' => 'ivmotorclass.com map render (jvmotorclass@gmail.com)'])
+            $body = Http::asForm()->withHeaders(['User-Agent' => 'ivmotorclass.com map render (ventas@ivmotorclass.com)'])
                 ->timeout(120)->post('https://overpass-api.de/api/interpreter', ['data' => $q])->throw()->body();
             file_put_contents($file, $body);
         }

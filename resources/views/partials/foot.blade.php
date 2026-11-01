@@ -51,7 +51,7 @@
       <ul>
         <li><a href="tel:+34614753187">+34 614 753 187</a></li>
         <li><a href="https://wa.me/34614753187?text=Hola%2C+vengo+de+la+web+y+busco+un+coche.">WhatsApp</a></li>
-        <li><a href="mailto:jvmotorclass@gmail.com">jvmotorclass@gmail.com</a></li>
+        <li><a href="mailto:ventas@ivmotorclass.com">ventas@ivmotorclass.com</a></li>
         <li><a href="https://www.google.com/maps/search/?api=1&amp;query={{ urlencode('Málaga, España') }}"
                target="_blank" rel="noopener">Málaga, España</a></li>
       </ul>

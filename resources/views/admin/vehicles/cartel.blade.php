@@ -23,7 +23,7 @@
   $title = trim($brand . ' ' . $car->model);
   $years = intdiv($warranty, 12);
   $phone = '614 75 31 87';
-  $mail = 'jvmotorclass@gmail.com';
+  $mail = 'ventas@ivmotorclass.com';
   $lblName = ['0' => 'Cero', 'ECO' => 'ECO', 'C' => 'C', 'B' => 'B'];
 @endphp
 <!doctype html>
