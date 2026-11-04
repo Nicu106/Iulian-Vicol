@@ -39,20 +39,22 @@ const col = await pg.evaluate(() => {
            inColumn: side.contains(wit),
            order: [...side.children].map(c => c.className.split(' ')[0]),
            specsCopies: document.querySelectorAll('.car-specs').length,
-           panels: document.querySelectorAll('.car-off').length,
-           steps: [...document.querySelectorAll('.car-off')].map(o => o.querySelectorAll('.car-off__step').length),
+           panels: document.querySelectorAll('.car-with .car-off').length,
+           steps: [...document.querySelectorAll('.car-with .car-off')].map(o => o.querySelectorAll('.car-off__step').length),
            included: document.querySelectorAll('.car-off__step--inc').length };
 });
 is(col.there && col.inColumn,
    'everything that comes with the car sits in the right-hand column');
-is(col.order.join(' ') === 'car-price mc-specs car-act car-share car-with',   // + "Compartir", 2026-10-06
+// + "Compartir", 2026-10-06; + the instalment under the price and the calculator before the panels, 2026-11-04
+is(col.order.join(' ') === 'car-price car-fin-hint mc-specs car-act car-share car-fin car-with',
    'under the price, the facts and the buttons, in that order', col.order.join(' → '));
 is(col.specsCopies === 1, 'the six facts are rendered exactly once', `${col.specsCopies} copies`);
 is(col.panels === 2 && col.steps.join(',') === '3,2',
    'two panels: three warranty steps and two maintenance steps', JSON.stringify(col.steps));
 is(col.included === 1, 'exactly one step is marked as included');
 
-// The calculator and the "request a viewing / an offer" block were deleted.
+// The old calculator and the "request a viewing / an offer" block were deleted
+// (2026-09-05). The instalment calculator of 2026-11-04 is .car-fin, checked below.
 const gone = await pg.evaluate(() => ({
   calc: !!document.querySelector('.car-calc, .car-ask, #calc-sum'),
   form: !!document.querySelector('#car-form, .car-form'),
@@ -60,17 +62,42 @@ const gone = await pg.evaluate(() => ({
 is(!gone.calc && !gone.form, 'the calculator and the request form are gone',
    `calc:${gone.calc} form:${gone.form}`);
 
+/* --- the instalment calculator (App\Support\Finance), 2026-11-04 ----------- */
+const fin = async () => pg.evaluate(() => {
+  const on = [...document.querySelectorAll('.car-fin__out')].filter(o => getComputedStyle(o).display !== 'none');
+  return { shown: on.map(o => +o.dataset.n), q: on.map(o => o.querySelector('[data-q]').textContent),
+           checked: [...document.querySelectorAll('input[name="fin-n"]:checked')].map(r => +r.value),
+           terms: [...document.querySelectorAll('.car-fin__t')].map(l => l.textContent.trim()),
+           down: !document.querySelector('.car-fin__down').hidden,
+           wa: decodeURIComponent((document.querySelector('.car-fin__go').href.split('text=')[1] || '').replace(/\+/g, ' ')),
+           hint: document.querySelector('.car-fin-hint b')?.textContent };
+});
+let f = await fin();
+is(f.terms.join('|') === '6 meses|1 año|2 años|3 años|4 años|5 años', 'six terms, from six months to five years', f.terms.join(' · '));
+is(f.checked.join() === '60' && f.shown.join() === '60', 'five years is chosen when the page opens, and only its figures show', JSON.stringify(f));
+is(f.hint === f.q[0], 'the line under the price quotes the same instalment', `${f.hint} / ${f.q[0]}`);
+is(f.down, 'with script, the deposit line is there');
+await (await pg.$$('.car-fin__t'))[3].click();
+f = await fin();
+is(f.checked.join() === '36' && f.shown.join() === '36' && / 3 años, sin entrada, /.test(f.wa), 'pressing 3 años shows its figures and the WhatsApp message says so', f.wa);
+await pg.type('#fin-down', '5000');
+const f2 = await fin();
+is(f2.q[0] !== f.q[0] && / con 5\.000 € de entrada, /.test(f2.wa), 'a deposit lowers the instalment and goes into the message', `${f.q[0]} → ${f2.q[0]}`);
+
 // The sidebar spans every row of the left column instead of sitting in row 1. A
 // grid item sizes its row, so with it in row 1 the gallery's row was as tall as
 // the panels beside it and the description began below all of that — ~790px of
 // empty page under the thumbnails. The invariant is that nothing in the left
 // column is separated from the block above it by more than the grid's own gap.
+// Since 2026-11-04 that gap is the blocks' margin (--s-8), not row-gap: the
+// column spans one more, flexible row that takes its surplus (car.css).
 for (const w of [1440, 1200, 1000]) {
   await pg.setViewport({ width: w, height: 1000 });
   await new Promise(r => setTimeout(r, 350));
   const g = await pg.evaluate(() => {
     const grid = document.querySelector('.car-grid');
-    const gap = parseFloat(getComputedStyle(grid).rowGap) || 0;
+    const s8 = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--s-8')) * 16;
+    const gap = Math.max(parseFloat(getComputedStyle(grid).rowGap) || 0, s8);
     const left = [...grid.children].filter(c => !c.classList.contains('car-side'))
       .map(c => c.getBoundingClientRect());
     let worst = 0, at = '';

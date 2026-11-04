@@ -143,6 +143,10 @@ class CarPageController extends Controller
             'sub'    => BrandCatalogController::sub(),
             'km'     => fn ($n) => number_format((int) $n, 0, ',', '.') . ' km',
             'euros'  => fn ($n) => number_format((int) $n, 0, ',', '.') . ' €',
+            // the instalment at every term (App\Support\Finance); none for a car
+            // that is gone or has no price
+            'fin'    => $car->status !== 'sold' && (int) $car->price > 0
+                            ? \App\Support\Finance::plans((int) $car->price) : null,
         ]);
     }
 

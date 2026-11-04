@@ -34,6 +34,18 @@
      second, larger gap on top of it. */
   .car-grid{ row-gap:var(--s-8); }
   .car-grid > .car-sec{ margin-top:0; }
+
+  /* With the calculator (2026-11-04) the column got ~800px taller than the left
+     side of most cars, and a spanning item's height is shared out across the
+     rows it spans: the description and the equipment drifted 150–250px apart.
+     So one more row, flexible, after the left side's: the column spans it too,
+     and an item crossing a flexible row gives its surplus to that row alone
+     (CSS Grid §12.7), so the rows on the left keep the size of what is in them.
+     The gap is spacing on the blocks instead of row-gap, or the empty row would
+     add one more 64px under a left side that is the longer of the two. */
+  .car-grid{ grid-template-rows:repeat(var(--main-rows, 1), auto) 1fr; row-gap:0; }
+  .car-side{ grid-row:1 / -1; }
+  .car-grid > :not(.car-side) ~ :not(.car-side){ margin-top:var(--s-8); }
 }
 
 /* ---- the stage ----------------------------------------------------------
@@ -729,3 +741,113 @@
 .car-past__ex li span:last-child{ flex:0 0 auto; color:var(--mc-ink-2); font-variant-numeric:tabular-nums; }
 .car-past__ex.is-folded [data-more]{ display:none; }
 .car-past .car-more{ margin-top:var(--s-3); }
+
+/* ============================================================================
+   FINANCING (2026-11-04) — the instalment calculator, App\Support\Finance
+   The client: "un calculator simplu ... 6.99% ... butoane 6 luni, un an, doi,
+   3, 4 și 5 ... by default bifa la 5 ani pentru a arăta rata cea mai mică".
+   Same family as the warranty panel under it: a white panel, band steps, and
+   the chosen one the only thing in navy — here the term, as "Incluido" is there.
+   The answer comes first and large; the terms under it; the sums in small type
+   under the figure, because the law wants them next to it, not a click away.
+   ========================================================================= */
+
+/* the line under the price: "o 491 € al mes en 5 años · TAE 7,22 %" */
+/* 44px to press, laid out as its one line: the padding is taken back by the margin */
+.car-fin-hint{
+  display:block; padding-block:.6875rem; margin-block:-.6875rem;
+  font-size:var(--t-ui); line-height:1.4; color:var(--mc-ink);
+  text-decoration:underline; text-decoration-color:var(--mc-rule);
+  text-decoration-thickness:1px; text-underline-offset:.25em;
+}
+.car-fin-hint b{ font-weight:700; font-variant-numeric:tabular-nums; }
+.car-fin-hint span{ font-size:var(--t-small); color:var(--mc-ink-2); white-space:nowrap; }
+.car-fin-hint:hover{ text-decoration-color:currentColor; }
+.car-fin-hint:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:2px; }
+/* on a phone it hangs from the price instead of standing a full gap away */
+@media (max-width:999px){ .car-fin-hint{ margin-top:calc(var(--s-2) - var(--s-5) - .6875rem); } }
+
+.car-fin{ margin-top:var(--s-5); }
+.car-fin__box{ display:flex; flex-direction:column; }
+
+/* the figures of every term are in the page; the checked one shows — by :has
+   without script, by .is-on with it, and the longest when neither can say */
+.car-fin__out{ display:none; }
+.car-fin__out.is-on,
+.car-fin__box:has(input[value="6"]:checked)  .car-fin__out[data-n="6"],
+.car-fin__box:has(input[value="12"]:checked) .car-fin__out[data-n="12"],
+.car-fin__box:has(input[value="24"]:checked) .car-fin__out[data-n="24"],
+.car-fin__box:has(input[value="36"]:checked) .car-fin__out[data-n="36"],
+.car-fin__box:has(input[value="48"]:checked) .car-fin__out[data-n="48"],
+.car-fin__box:has(input[value="60"]:checked) .car-fin__out[data-n="60"]{ display:block; }
+@supports not selector(:has(*)){ .car-fin__out:last-child{ display:block; } .car-fin__outs.is-js .car-fin__out:not(.is-on){ display:none; } }
+
+.car-fin__q{
+  margin:0; font-size:var(--t-ui); line-height:1.1; color:var(--mc-ink-2);
+}
+.car-fin__q b{
+  font-size:var(--t-price); font-weight:700; letter-spacing:-.02em;
+  color:var(--mc-ink); font-variant-numeric:tabular-nums;
+}
+.car-fin__ex{
+  margin:var(--s-2) 0 var(--s-4); max-width:44ch;
+  font-size:var(--t-label); line-height:1.55; color:var(--mc-ink-2);
+}
+
+.car-fin__terms{
+  margin:0 0 var(--s-2); padding:0; border:0; min-width:0;
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--s-2);
+}
+.car-fin__t{
+  position:relative; display:flex; align-items:center; justify-content:center;
+  min-height:var(--mc-tap-pref); padding:0 var(--s-2);
+  background:var(--mc-band); border-radius:var(--mc-r-card);
+  font-size:var(--t-small); font-weight:600; color:var(--mc-ink); white-space:nowrap;
+  cursor:pointer; transition:background-color var(--m-quick) var(--e-out), color var(--m-quick) var(--e-out);
+}
+.car-fin__t input{ position:absolute; inset:0; margin:0; opacity:0; cursor:pointer; }
+.car-fin__t:hover{ box-shadow:inset 0 0 0 1px var(--mc-rule); }
+.car-fin__t:has(input:checked), .car-fin__t.is-on{ background:var(--mc-navy); color:var(--mc-on-navy); box-shadow:none; }
+.car-fin__t:has(input:focus-visible){ outline:3px solid var(--mc-blue); outline-offset:2px; }
+@media (prefers-reduced-motion:reduce){ .car-fin__t{ transition:none; } }
+
+/* the deposit: a band line like a step, the field where the amount would be */
+.car-fin__down{
+  display:flex; align-items:center; justify-content:space-between; gap:var(--s-4);
+  margin:0 0 var(--s-4); padding:var(--s-1) var(--s-1) var(--s-1) var(--s-4);
+  background:var(--mc-band); border-radius:var(--mc-r-card); cursor:text;
+}
+.car-fin__down[hidden]{ display:none; }
+.car-fin__dl{ font-size:var(--t-small); color:var(--mc-ink-2); }
+.car-fin__dv{ display:flex; align-items:center; gap:var(--s-2); padding-right:var(--s-3);
+  font-size:var(--t-value); font-weight:700; color:var(--mc-ink); }
+.car-fin__dv input{
+  width:7.5rem; min-height:var(--mc-tap); padding:0 var(--s-3);
+  border:1px solid var(--mc-rule); border-radius:var(--mc-r-card); background:var(--mc-surface);
+  font:700 var(--t-value)/1 var(--f-ui); color:var(--mc-ink); text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+.car-fin__dv input::placeholder{ color:var(--mc-ink-3); }
+.car-fin__dv input:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:1px; }
+
+.car-fin__note{ margin:0 0 var(--s-4); font-size:var(--t-label); line-height:1.55; color:var(--mc-ink-2); }
+.car-fin__go{ justify-content:center; min-height:var(--mc-tap-pref); }
+
+/* his lenders: one ink, set to the same visual weight rather than the same box */
+.car-banks{ margin-top:var(--s-5); }
+/* 24rem: three to a row as in the 21rem column; at 768 a full-width row spread
+   nine marks 240px apart and they stopped reading as one group */
+.car-banks__list{
+  max-width:24rem; margin:0 0 var(--s-4); padding:0; list-style:none;
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--s-4) var(--s-3);
+  align-items:center;
+}
+/* --w is the mark's width at the shared area (Finance::markWidth); a cell
+   narrower than that (at 320 they are 88px) takes it down to 86% of the cell,
+   so two neighbours never touch */
+.car-banks__b{
+  height:2.25rem; background:var(--mc-ink-2);
+  -webkit-mask:var(--logo) center / min(86%, var(--w)) auto no-repeat;
+          mask:var(--logo) center / min(86%, var(--w)) auto no-repeat;
+}
+.car-banks__say{ margin:0; max-width:44ch; font-size:var(--t-label); line-height:1.55; color:var(--mc-ink-2); }

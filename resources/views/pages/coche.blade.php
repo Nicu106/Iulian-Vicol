@@ -207,6 +207,13 @@
           </span>
         @endif
       </div>
+      {{-- The client: "plata lunară — aici la preț". The lowest instalment, with
+           its TAE, and a jump to the calculator that explains it. Under the
+           price block, not in it: on a desk that block is sized to the wall. --}}
+      @if($fin)
+        <a class="car-fin-hint" href="#financiacion" data-stat="cuota-precio">o <b>{{ \App\Support\Finance::money(end($fin)['monthly'], false) }}</b> al mes
+          <span>en {{ end($fin)['label'] }} · TAE {{ \App\Support\Finance::pct(\App\Support\Finance::tae()) }}</span></a>
+      @endif
 
       @include('partials.car-specs')
 
@@ -227,6 +234,10 @@
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>
         <span>Compartir este coche</span>
       </button>
+
+      @if($fin)
+        @include('partials.car-fin')
+      @endif
 
       {{-- Everything that comes with the car sits in this column, under the price
            and the buttons — the client: "trebuiau toate sa fie sub pret pe
