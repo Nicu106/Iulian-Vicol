@@ -150,6 +150,29 @@ class CarPageController extends Controller
         ]);
     }
 
+    /**
+     * The car as a PDF to keep or send on (App\Support\CarPdf), for a car that
+     * is for sale. The first press after a change builds it (a few seconds);
+     * every other one reads the file. Not for search engines: the page is the
+     * one to find.
+     */
+    public function pdf(string $slug)
+    {
+        $car = Vehicle::where('slug', $slug)->whereIn('status', ['available', 'reserved'])->firstOrFail();
+        abort_unless(\App\Support\CarPdf::eligible($car), 404);
+        $file = \App\Support\CarPdf::file($car);
+        if (!$file) {
+            abort(503, 'No se ha podido crear el PDF. Inténtalo de nuevo en un momento.');
+        }
+
+        return response()->file($file, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . \App\Support\CarPdf::filename($car) . '"',
+            'X-Robots-Tag'        => 'noindex',
+            'Cache-Control'       => 'private, max-age=300',
+        ]);
+    }
+
     /** the "Su historia" block: then against now, the factory extras, the facts */
     public static function past(Vehicle $car): ?array
     {

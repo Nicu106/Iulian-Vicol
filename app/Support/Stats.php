@@ -138,6 +138,7 @@ final class Stats
         'plazo'              => ['Cambiaron el plazo de la financiación', 'cambió el plazo'],
         'entrada'            => ['Movieron la entrada de la financiación', 'puso una entrada'],
         'financiar'          => ['Pulsaron «Quiero financiarlo»', 'quiso financiar'],
+        'pdf'                => ['Descargaron la ficha en PDF', 'descargó el PDF'],
         'extras'             => ['Abrieron la lista de extras', 'miró los extras'],
         'descripcion'        => ['Leyeron la descripción entera', 'leyó la descripción'],
         'marca-abrir'        => ['Abrieron todos los coches de una marca', 'abrió una marca'],

@@ -78,6 +78,26 @@
 .car-tab.is-on span{ color:rgba(255,255,255,.72); }
 .car-tab:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:2px; }
 
+/* The row under the photograph: the filters, then the PDF (2026-11-04). The
+   filters keep their own row and spacing; the PDF is the same 44px chip in
+   ink with a download mark, pushed to the row's far end, so it reads as an
+   action beside the filters rather than as one more of them. */
+.car-tools{ display:flex; flex-wrap:wrap; align-items:flex-start; gap:var(--s-2); margin-top:var(--s-4); }
+.car-tools .car-tabs{ margin-top:0; }
+/* far end only where the whole row fits on one line; on a phone the filters
+   wrap and the PDF starts the next line instead of floating at its right */
+.car-pdf{
+  min-height:44px; padding:0 var(--s-4);
+  display:inline-flex; align-items:center; gap:var(--s-2);
+  border:1px solid var(--mc-ink); border-radius:var(--mc-r); background:var(--mc-surface);
+  color:var(--mc-ink); font:600 var(--t-ui)/1 var(--f-ui); text-decoration:none; white-space:nowrap;
+  transition:background var(--m-quick) var(--e-out), color var(--m-quick) var(--e-out);
+}
+.car-pdf:hover{ background:var(--mc-ink); color:#FFFFFF; }
+.car-pdf:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:2px; }
+@media (min-width:769px){ .car-pdf{ margin-left:auto; } }
+@media (prefers-reduced-motion:reduce){ .car-pdf{ transition:none; } }
+
 /* ---- the strip ----------------------------------------------------------
    Scrolled, never wrapped: 58 thumbnails in a grid is a wall the buyer has to
    read, while a strip is one they can flick through. Edge to edge on a phone,

@@ -62,6 +62,16 @@ const gone = await pg.evaluate(() => ({
 is(!gone.calc && !gone.form, 'the calculator and the request form are gone',
    `calc:${gone.calc} form:${gone.form}`);
 
+/* --- the car as a PDF (App\Support\CarPdf), 2026-11-04 --------------------- */
+const pdf = await pg.evaluate(async () => {
+  const a = document.querySelector('.car-pdf'); if (!a) return null;
+  const r = await fetch(a.href); const b = new Uint8Array(await r.arrayBuffer());
+  return { status: r.status, type: r.headers.get('content-type'), kb: Math.round(b.length / 1024),
+           head: String.fromCharCode(...b.slice(0, 5)), name: a.getAttribute('download') };
+});
+is(!!pdf && pdf.status === 200 && pdf.type === 'application/pdf' && pdf.head === '%PDF-' && pdf.kb > 100,
+   'the PDF button under the photograph gives a PDF of the car', JSON.stringify(pdf));
+
 /* --- the instalment calculator (App\Support\Finance), 2026-11-04 ----------- */
 const fin = async () => pg.evaluate(() => {
   const on = [...document.querySelectorAll('.car-fin__out')].filter(o => getComputedStyle(o).display !== 'none');

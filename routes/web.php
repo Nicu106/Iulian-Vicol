@@ -69,6 +69,8 @@ Route::middleware(App\Http\Middleware\MuestrasPin::class)->group(function () {
 });
 Route::post('/muestras/pin', [App\Http\Middleware\MuestrasPin::class, 'check'])->middleware('throttle:12,1');
 Route::get('/coche/{slug}', [App\Http\Controllers\CarPageController::class, 'show'])->name('coche');
+// the car as a PDF (App\Support\CarPdf): built once per version of the car, then read from disk
+Route::get('/coche/{slug}/ficha.pdf', [App\Http\Controllers\CarPageController::class, 'pdf'])->middleware('throttle:20,1')->name('coche.pdf');
 Route::get('/contacto', [App\Http\Controllers\ContactPageController::class, 'index'])->name('contacto');
 Route::get('/por-que-nosotros', [App\Http\Controllers\WhyUsController::class, 'index'])->name('why');
 // A private showroom for the client: four ways to show the reviews. Not linked, noindex,

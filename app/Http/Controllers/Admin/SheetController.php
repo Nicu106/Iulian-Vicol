@@ -331,7 +331,7 @@ class SheetController extends Controller
      * often starts it with the car's name, the year and the kilometres
      * ("Volkswagen Golf VII 2.0 TDI Lounge", "año 2016", "114.000 km").
      */
-    private static function equipment(Vehicle $car): array
+    public static function equipment(Vehicle $car): array
     {
         $brand = Str::lower((string) (Marques::for($car->brand)['name'] ?? $car->brand));
         $first = Str::lower(strtok($brand, ' -'));
@@ -377,20 +377,21 @@ class SheetController extends Controller
     /**
      * The site's 2000px derivative of a photo (App\Support\Img), built now if it
      * is not yet: upright, 2000px (≈450 dpi at the width it prints) and a
-     * fraction of the bytes. A 3 MB PNG cover made a 3.8 MB PDF.
+     * fraction of the bytes. A 3 MB PNG cover made a 3.8 MB PDF. Another width
+     * of Img::WIDTHS for the smaller photographs of the car's PDF (App\Support\CarPdf).
      */
-    private static function derivative(string $cover): ?string
+    public static function derivative(string $cover, int $w = 2000): ?string
     {
         $path = parse_url($cover, PHP_URL_PATH) ?: '';
         if (!str_starts_with($path, '/storage/')) return null;
         $rel = Img::relativeFor($path);
         $fs = storage_path('app/public/' . $rel);
         if (!is_file($fs)) return null;
-        $out = storage_path('app/public/cache/img_' . Img::cacheKey($rel, 2000, (int) filemtime($fs))
+        $out = storage_path('app/public/cache/img_' . Img::cacheKey($rel, $w, (int) filemtime($fs))
             . '.' . (function_exists('imagewebp') ? 'webp' : 'jpg'));
         if (!is_file($out)) {
             try {
-                app(\App\Http\Controllers\ImageController::class)->resize(Request::create('/img/2000', 'GET', ['p' => $path]), 2000);
+                app(\App\Http\Controllers\ImageController::class)->resize(Request::create('/img/' . $w, 'GET', ['p' => $path]), $w);
             } catch (\Throwable $e) {
                 report($e);
             }
@@ -400,7 +401,7 @@ class SheetController extends Controller
 
     /** Chrome puts a JPEG into the PDF as it is, and anything else (WebP, PNG)
         uncompressed: the derivative as a JPEG keeps the PDF small. */
-    private static function jpeg(?string $file): ?string
+    public static function jpeg(?string $file): ?string
     {
         if (!$file || !function_exists('imagecreatefromwebp')) return null;
         $im = str_ends_with($file, '.webp') ? @imagecreatefromwebp($file) : @imagecreatefromjpeg($file);
@@ -418,7 +419,7 @@ class SheetController extends Controller
     }
 
     /** the description as he wrote it: blank lines part paragraphs, single ones break lines */
-    private static function paragraphs(string $text): array
+    public static function paragraphs(string $text): array
     {
         $text = trim(str_replace(["\r\n", "\r"], "\n", strip_tags(preg_replace('~<br\s*/?>|</p>~i', "\n", $text))));
         if ($text === '') return [];
@@ -459,7 +460,7 @@ class SheetController extends Controller
 
     /** the site's own @font-face rules (public/css/fonts.css), the files inlined, so
         Chrome needs nothing but the HTML file */
-    private static function fontFaces(): string
+    public static function fontFaces(): string
     {
         $css = (string) @file_get_contents(public_path('css/fonts.css'));
         return preg_replace_callback('~url\((/fonts/[^)]+\.woff2)\)~', function ($m) {

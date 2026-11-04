@@ -122,7 +122,17 @@
       {{-- Only once he has sorted some photographs: a row of "Exterior 0 ·
            Interior 0" filters nothing. Then a group with none is left out — except
            Imperfecciones, whose empty state says so honestly. --}}
-      @php $sorted = $counts['exterior'] + $counts['interior'] + $counts['flaw'] > 0; @endphp
+      {{-- And at the end of that row, the one button that is not a filter: the
+           car as a PDF to keep or send on (App\Support\CarPdf) — the client: "în
+           acea linie ... următorul buton să fie descarcă PDF". A plain link, so it
+           works without script; at the row's far end on a desk, so it does not
+           read as a fourth kind of photograph. --}}
+      @php
+        $sorted = $counts['exterior'] + $counts['interior'] + $counts['flaw'] > 0;
+        $pdf = \App\Support\CarPdf::eligible($car);
+      @endphp
+      @if($sorted || $pdf)
+      <div class="car-tools">
       @if($sorted)
       <div class="car-tabs" role="tablist" aria-label="Tipo de fotografía" hidden>
         <button data-stat="fotos-tipo" class="car-tab is-on" type="button" role="tab" aria-selected="true"
@@ -132,6 +142,14 @@
           <button data-stat="fotos-tipo" class="car-tab" type="button" role="tab" aria-selected="false"
                   data-group="{{ $key }}">{{ $label }} <span>{{ $counts[$key] }}</span></button>
         @endforeach
+      </div>
+      @endif
+      @if($pdf)
+        <a class="car-pdf" href="{{ route('coche.pdf', $car->slug) }}" download="{{ \App\Support\CarPdf::filename($car) }}" data-stat="pdf">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 3v12M7 10l5 5 5-5M5 19h14"/></svg>
+          <span>Descargar PDF</span>
+        </a>
+      @endif
       </div>
       @endif
 
