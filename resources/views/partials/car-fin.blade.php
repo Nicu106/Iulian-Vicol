@@ -63,8 +63,8 @@
        Confía, Ibancar y Fintonic. Las opciones dependerán del perfil del
        cliente, las características del coche y los criterios de cada
        financiera. Puedes centralizar las solicitudes conmigo y te acompaño
-       durante todo el proceso." One ink, so nine brands' colours do not shout
-       over the car. --}}
+       durante todo el proceso." In their own colours: the client wanted them to
+       catch the eye (2026-11-04). --}}
   <div class="car-banks">
     <ul class="car-banks__list">
       @foreach(Finance::BANKS as $key => $b)

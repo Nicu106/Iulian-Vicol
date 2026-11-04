@@ -833,7 +833,9 @@
 .car-fin__note{ margin:0 0 var(--s-4); font-size:var(--t-label); line-height:1.55; color:var(--mc-ink-2); }
 .car-fin__go{ justify-content:center; min-height:var(--mc-tap-pref); }
 
-/* his lenders: one ink, set to the same visual weight rather than the same box */
+/* his lenders, in their own colours — the client, 2026-11-04: "colorate pentru
+   a atrage atenția" (they were one ink until then) — at the same visual
+   weight rather than in the same box */
 .car-banks{ margin-top:var(--s-5); }
 /* 24rem: three to a row as in the 21rem column; at 768 a full-width row spread
    nine marks 240px apart and they stopped reading as one group */
@@ -846,8 +848,7 @@
    narrower than that (at 320 they are 88px) takes it down to 86% of the cell,
    so two neighbours never touch */
 .car-banks__b{
-  height:2.25rem; background:var(--mc-ink-2);
-  -webkit-mask:var(--logo) center / min(86%, var(--w)) auto no-repeat;
-          mask:var(--logo) center / min(86%, var(--w)) auto no-repeat;
+  height:2.25rem;
+  background:var(--logo) center / min(86%, var(--w)) auto no-repeat;
 }
 .car-banks__say{ margin:0; max-width:44ch; font-size:var(--t-label); line-height:1.55; color:var(--mc-ink-2); }
