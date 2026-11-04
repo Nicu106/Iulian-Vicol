@@ -46,10 +46,19 @@
       @endforeach
     </fieldset>
 
-    <label class="car-fin__down" hidden>
-      <span class="car-fin__dl">Entrada</span>
+    {{-- The deposit, asked as a question: "Entrada" alone did not say what it
+         was for (the client, 2026-11-04: "nu știu pentru ce este acel input ...
+         vreau opțiunea de a pune avansul"). The amount can be typed, or set with
+         the slider — 0 to 80 % of the price in 500 € steps; typed, it can go up
+         to the whole price. Starts at nothing, and the term stays at five years. --}}
+    @php $finMax = (int) (floor((int) $car->price * 0.8 / 500) * 500); @endphp
+    <div class="car-fin__down" hidden>
+      <label class="car-fin__dl" for="fin-down">¿Cuánto pagas de entrada?</label>
       <span class="car-fin__dv"><input type="text" inputmode="numeric" autocomplete="off" placeholder="0" maxlength="9" id="fin-down"> €</span>
-    </label>
+      <input type="range" class="car-fin__range" id="fin-range" min="0" max="{{ $finMax }}" step="500" value="0"
+             aria-label="Entrada" data-stat="entrada">
+      <span class="car-fin__ends" aria-hidden="true"><span>Sin entrada</span><span>{{ Finance::money($finMax, false) }}</span></span>
+    </div>
 
     <p class="car-fin__note">Cálculo orientativo, sin comisión de apertura. La cuota y
       las condiciones finales las fija la entidad financiera al estudiar tu solicitud.</p>
@@ -89,6 +98,7 @@
   var i = tin / 1200, tae = (Math.pow(1 + i, 12) - 1) * 100;
   var outs = root.querySelectorAll('.car-fin__out'), terms = root.querySelectorAll('input[name="fin-n"]');
   var row = root.querySelector('.car-fin__down'), down = document.getElementById('fin-down'), go = root.querySelector('.car-fin__go');
+  var range = document.getElementById('fin-range'), top = +range.max;
 
   function group(s) { return s.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
   function money(n, cents) { var p = (cents ? n.toFixed(2) : String(Math.round(n))).split('.'); return group(p[0]) + (p[1] ? ',' + p[1] : '') + ' €'; }
@@ -105,7 +115,7 @@
       if (sums) {
         o.querySelector('[data-q]').textContent = money(q);
         o.querySelector('[data-ex]').textContent = a > 0
-          ? m + ' cuotas de ' + money(q, true) + '. TAE ' + pct(tae) + ', TIN ' + pct(tin)
+          ? (d ? 'Con ' + money(d) + ' de entrada: ' : '') + m + ' cuotas de ' + money(q, true) + '. TAE ' + pct(tae) + ', TIN ' + pct(tin)
             + '. Importe financiado ' + money(a) + '; total a pagar ' + money(Math.round(q * m * 100) / 100, true) + '.'
           : 'Con esa entrada pagas el coche entero: no hay nada que financiar.';
       }
@@ -119,10 +129,19 @@
 
   row.hidden = false;
   root.querySelector('.car-fin__outs').classList.add('is-js');
+  // the slider's filled part, for the engines that have no ::-moz-range-progress
+  function fill(v) { range.style.setProperty('--p', (top ? Math.min(100, v / top * 100) : 0) + '%'); }
   terms.forEach(function (r) { r.addEventListener('change', function () { draw(false); }); });
-  down.addEventListener('input', function () { draw(true); });
+  // typed: the slider follows (pinned at its end past 80 %)
+  down.addEventListener('input', function () { range.value = deposit(); fill(+range.value); draw(true); });
+  // slid: the field shows the amount, grouped, since nobody is typing in it
+  range.addEventListener('input', function () { var v = +range.value; down.value = v ? group(String(v)) : ''; fill(v); draw(true); });
+  // the amount is taken whole when the field is entered, so typing replaces it
+  // instead of adding digits to what the slider put there
+  down.addEventListener('focus', function () { setTimeout(function () { down.setSelectionRange(0, down.value.length); }, 0); });
   // 5000 → "5.000" once he leaves the field; never while typing, or the caret jumps
   down.addEventListener('blur', function () { var d = deposit(); down.value = d ? group(String(d)) : ''; });
+  fill(0);
   draw(false);
 })();
 </script>

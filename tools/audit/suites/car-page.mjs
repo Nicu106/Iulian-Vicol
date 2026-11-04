@@ -83,6 +83,12 @@ is(f.checked.join() === '36' && f.shown.join() === '36' && / 3 años, sin entrad
 await pg.type('#fin-down', '5000');
 const f2 = await fin();
 is(f2.q[0] !== f.q[0] && / con 5\.000 € de entrada, /.test(f2.wa), 'a deposit lowers the instalment and goes into the message', `${f.q[0]} → ${f2.q[0]}`);
+// the slider sets the same deposit, and leaves the term alone
+await pg.$eval('#fin-down', e => { e.value = ''; e.dispatchEvent(new Event('input', { bubbles: true })); });
+await pg.$eval('#fin-range', e => { e.value = 5000; e.dispatchEvent(new Event('input', { bubbles: true })); });
+const f3 = await fin();
+const field = await pg.$eval('#fin-down', e => e.value);
+is(f3.q[0] === f2.q[0] && field === '5.000' && f3.checked.join() === '36', 'the slider gives the same instalment, writes 5.000 in the field and keeps the term', `${f3.q[0]}, "${field}", ${f3.checked}`);
 
 // The sidebar spans every row of the left column instead of sitting in row 1. A
 // grid item sizes its row, so with it in row 1 the gallery's row was as tall as

@@ -811,24 +811,49 @@
 .car-fin__t:has(input:focus-visible){ outline:3px solid var(--mc-blue); outline-offset:2px; }
 @media (prefers-reduced-motion:reduce){ .car-fin__t{ transition:none; } }
 
-/* the deposit: a band line like a step, the field where the amount would be */
+/* the deposit: a band block like a step — the question, the amount, a slider */
 .car-fin__down{
-  display:flex; align-items:center; justify-content:space-between; gap:var(--s-4);
-  margin:0 0 var(--s-4); padding:var(--s-1) var(--s-1) var(--s-1) var(--s-4);
-  background:var(--mc-band); border-radius:var(--mc-r-card); cursor:text;
+  display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:var(--s-2) var(--s-3);
+  margin:0 0 var(--s-4); padding:var(--s-3) var(--s-4) var(--s-2);
+  background:var(--mc-band); border-radius:var(--mc-r-card);
 }
 .car-fin__down[hidden]{ display:none; }
-.car-fin__dl{ font-size:var(--t-small); color:var(--mc-ink-2); }
-.car-fin__dv{ display:flex; align-items:center; gap:var(--s-2); padding-right:var(--s-3);
+.car-fin__dl{ font-size:var(--t-small); font-weight:600; line-height:1.3; color:var(--mc-ink); }
+.car-fin__dv{ display:flex; align-items:center; gap:var(--s-2);
   font-size:var(--t-value); font-weight:700; color:var(--mc-ink); }
 .car-fin__dv input{
-  width:7.5rem; min-height:var(--mc-tap); padding:0 var(--s-3);
+  width:6.5rem; min-height:var(--mc-tap); padding:0 var(--s-3);
   border:1px solid var(--mc-rule); border-radius:var(--mc-r-card); background:var(--mc-surface);
   font:700 var(--t-value)/1 var(--f-ui); color:var(--mc-ink); text-align:right;
   font-variant-numeric:tabular-nums;
 }
 .car-fin__dv input::placeholder{ color:var(--mc-ink-3); }
 .car-fin__dv input:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:1px; }
+
+/* The slider: square, like every step and tile here. The track is the rule
+   grey, filled in navy up to the thumb (--p from the script; Firefox draws the
+   fill itself). The input is 44px tall for the thumb, the track 6px inside it. */
+.car-fin__range{
+  --p:0%; grid-column:1 / -1; width:100%; height:var(--mc-tap); margin:0;
+  -webkit-appearance:none; appearance:none; background:transparent; cursor:pointer;
+}
+.car-fin__range::-webkit-slider-runnable-track{
+  height:6px; background:linear-gradient(to right, var(--mc-navy) var(--p), var(--mc-rule) var(--p));
+}
+.car-fin__range::-moz-range-track{ height:6px; background:var(--mc-rule); }
+.car-fin__range::-moz-range-progress{ height:6px; background:var(--mc-navy); }
+.car-fin__range::-webkit-slider-thumb{
+  -webkit-appearance:none; appearance:none; width:24px; height:24px; margin-top:-9px;
+  background:var(--mc-navy); border:3px solid var(--mc-surface); border-radius:0;
+  box-shadow:0 0 0 1px var(--mc-navy);
+}
+.car-fin__range::-moz-range-thumb{
+  width:18px; height:18px; background:var(--mc-navy); border:3px solid var(--mc-surface);
+  border-radius:0; box-shadow:0 0 0 1px var(--mc-navy);
+}
+.car-fin__range:focus-visible{ outline:3px solid var(--mc-blue); outline-offset:2px; }
+.car-fin__ends{ grid-column:1 / -1; display:flex; justify-content:space-between; margin-top:calc(-1 * var(--s-2));
+  font-size:var(--t-label); color:var(--mc-ink-2); font-variant-numeric:tabular-nums; }
 
 .car-fin__note{ margin:0 0 var(--s-4); font-size:var(--t-label); line-height:1.55; color:var(--mc-ink-2); }
 .car-fin__go{ justify-content:center; min-height:var(--mc-tap-pref); }

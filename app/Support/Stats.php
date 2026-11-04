@@ -136,6 +136,7 @@ final class Stats
         'cuota-precio'       => ['Pulsaron la cuota bajo el precio', 'pulsó la cuota'],
         'financiacion'       => ['Vieron la calculadora de financiación', 'vio la financiación'],
         'plazo'              => ['Cambiaron el plazo de la financiación', 'cambió el plazo'],
+        'entrada'            => ['Movieron la entrada de la financiación', 'puso una entrada'],
         'financiar'          => ['Pulsaron «Quiero financiarlo»', 'quiso financiar'],
         'extras'             => ['Abrieron la lista de extras', 'miró los extras'],
         'descripcion'        => ['Leyeron la descripción entera', 'leyó la descripción'],
