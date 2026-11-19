@@ -99,7 +99,7 @@ Route::get('/opinion/{token}', [App\Http\Controllers\OpinionController::class, '
     ->where('token', '[A-Za-z0-9]{20}')->name('opinion');
 Route::post('/opinion/{token}', [App\Http\Controllers\OpinionController::class, 'store'])
     ->where('token', '[A-Za-z0-9]{20}')
-    ->middleware(['throttle:5,60,opinion', \App\Http\Middleware\PublicFormLimits::class])->name('opinion.store');
+    ->middleware(['throttle:opinion', \App\Http\Middleware\PublicFormLimits::class])->name('opinion.store');
 Route::post('/recomienda', [App\Http\Controllers\ReferralController::class, 'store'])
     ->middleware('throttle:referral')->name('refer.store');
 

@@ -10,8 +10,9 @@ use App\Models\Testimonial;
  * partials/reviews.blade.php, public/css/reviews.css, public/js/reviews.js.
  *
  * Everything a pair needs, prepared once so the view only lays it out:
- *  - every active review with a photograph and more than 20 characters of
- *    text (the home page's old floor: one review is a comma), NEWEST FIRST;
+ *  - every active review with a photograph and 20 characters of text or more
+ *    (the home page's old floor: one review is a comma; the opinion form asks
+ *    for 20, so what it publishes is always shown), NEWEST FIRST;
  *  - the text tidied for print, never altered (paragraphs(): CRLF paragraphs,
  *    runs of spaces, a space before a comma, an outer pair of quotation marks)
  *    and the name tidied the same way ("Diego&Paula" -> "Diego & Paula" with a
@@ -48,7 +49,7 @@ final class ReviewRow
             ->whereNotNull('image_path')
             ->orderByDesc('created_at')->orderByDesc('id')
             ->get()
-            ->filter(fn ($t) => mb_strlen(trim((string) $t->quote)) > 20)
+            ->filter(fn ($t) => mb_strlen(trim((string) $t->quote)) >= 20)
             ->values();
         // every photograph's size in one cache read, not one per review
         Img::prime($list->pluck('image_path'));
@@ -107,7 +108,9 @@ final class ReviewRow
         $fit = $crop <= self::COVER ? 'cover' : ($ratio < self::FRAME ? 'tall' : 'wide');
         $small = Img::url($img, 320);
         $path = $small ? storage_path('app/public/cache/' . basename((string) parse_url($small, PHP_URL_PATH))) : null;
+        $measured = false;
         if ($path && is_file($path) && ($im = @imagecreatefromwebp($path))) {
+            $measured = true;
             $w = imagesx($im); $hh = imagesy($im);
             $tw = 64; $th = max(3, (int) round($hh * $tw / max(1, $w)));
             $sm = imagecreatetruecolor($tw, $th);
@@ -157,7 +160,11 @@ final class ReviewRow
             $card = self::hex($n[0] + ($p[0] - $n[0]) * self::MIX, $n[1] + ($p[1] - $n[1]) * self::MIX, $n[2] + ($p[2] - $n[2]) * self::MIX);
         }
         $out = ['card' => $card, 'hue' => round($h), 'chroma' => round($c, 4), 'fit' => $fit, 'crop' => round($crop, 3), 'fx' => $fx, 'fy' => $fy];
-        @file_put_contents($file, json_encode($out));
+        // kept only when the photograph was read: a guess made before its 320px
+        // copy existed would otherwise stay the card's colour for good
+        if ($measured) {
+            @file_put_contents($file, json_encode($out));
+        }
         return $out;
     }
 

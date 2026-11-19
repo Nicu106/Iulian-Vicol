@@ -76,6 +76,17 @@ class AppServiceProvider extends ServiceProvider
             ];
         });
 
+        // A customer's opinion goes through their own link (OpinionController): ten
+        // sends an hour on one link — a photo refused, a word changed — and thirty
+        // from one connection, whoever's links they are. Counted per link, not per
+        // address: two customers on one Wi-Fi do not use up each other's tries.
+        \Illuminate\Support\Facades\RateLimiter::for('opinion', function (\Illuminate\Http\Request $request) {
+            return [
+                \Illuminate\Cache\RateLimiting\Limit::perHour(10)->by('link|' . $request->route('token')),
+                \Illuminate\Cache\RateLimiting\Limit::perHour(30)->by('ip|' . $request->ip()),
+            ];
+        });
+
         // Force PHP settings for file uploads - ABSOLUTELY NO LIMITS
         if (function_exists('ini_set')) {
             // These settings cannot be changed at runtime, but we can try

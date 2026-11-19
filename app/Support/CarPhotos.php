@@ -129,8 +129,9 @@ final class CarPhotos
         }
     }
 
-    /** heif-convert ships with libheif-examples (1.17 on this box). */
-    private static function heicToJpeg(string $src): ?string
+    /** heif-convert ships with libheif-examples (1.17 on this box). Also the
+     *  customer's photo on /opinion (OpinionController::keep). */
+    public static function heicToJpeg(string $src): ?string
     {
         $bin = '/usr/bin/heif-convert';
         if (!is_executable($bin)) {

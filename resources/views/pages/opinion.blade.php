@@ -28,7 +28,7 @@
     <div class="sl-open__say">
       <h1 class="ct-open__h op-h" id="op-h">{{ $name ? $name . ', cuéntame' : 'Cuéntame' }} qué&nbsp;tal</h1>
       <p class="ct-say sl-open__lead">Lo que escribas sale en la web, con tu nombre y tu foto,
-        junto a las opiniones de otros clientes. Lo leo yo antes de publicarlo.</p>
+        junto a las opiniones de otros clientes.</p>
     </div>
   </section>
 
@@ -51,13 +51,14 @@
         @error('quote')<span class="mc-err">{{ $message }}</span>@enderror
       </label>
 
-      {{-- One photograph, shown whole as it will be on the site. The explicit
-           types make an iPhone send a JPEG rather than its HEIC. --}}
+      {{-- One photograph, shown whole as it will be on the site. Any picture:
+           an iPhone hands over a JPEG, and a HEIC, AVIF or TIFF that arrives as
+           it is gets converted on the server (OpinionController::keep). --}}
       <div class="mc-field">
         <span class="mc-field__label">Una foto <span class="mc-field__opt">— si quieres, con el coche</span></span>
         <div class="sl-drop op-drop" id="op-drop">
           <label class="sl-drop__label">
-            <input class="sl-drop__in" type="file" name="photo" id="op-file" accept="image/jpeg,image/png,image/webp">
+            <input class="sl-drop__in" type="file" name="photo" id="op-file" accept="image/*,.heic,.heif,.avif">
             <span class="sl-drop__big" id="op-pick">Elegir una foto</span>
             <span class="sl-drop__small" id="op-small">Sale entera, sin recortar</span>
           </label>
@@ -86,7 +87,11 @@
     <div class="sl-done__in">
       @if($state === 'gracias')
         <h1 class="ct-open__h" id="op-h">Gracias{{ $name ? ', ' . $name : '' }}.</h1>
-        <p class="ct-say">La leo y la publico en unos días, junto a las demás.</p>
+        @if($live)
+          <p class="ct-say">Ya está <a class="mc-link" href="/#reviews">en la web</a>, junto a las demás.</p>
+        @else
+          <p class="ct-say">La leo y la publico en unos días, junto a las demás.</p>
+        @endif
         <p class="sl-done__note">Si quieres cambiar algo, escríbeme por WhatsApp.</p>
       @elseif($state === 'recibida')
         <h1 class="ct-open__h" id="op-h">Tu opinión ya me&nbsp;llegó.</h1>
@@ -113,16 +118,54 @@
   var input = document.getElementById('op-file'), drop = document.getElementById('op-drop');
   var prev = document.getElementById('op-prev'), img = document.getElementById('op-prev-i');
   var pick = document.getElementById('op-pick'), small = document.getElementById('op-small');
-  var shown = null;
+  var shown = null, turn = 0;
+
+  // A phone's photograph is 3 to 12 MB, sometimes more. It goes up as the
+  // 2400px JPEG the server keeps anyway: seconds instead of a minute on a
+  // phone's data, and never refused for its weight. Drawn the way the phone
+  // held it (browsers apply the EXIF turn to an <img>). Anything this browser
+  // cannot do, the original goes as it is and the server does the same work.
+  function shrink(f, done) {
+    if (f.size < 1500000 || !window.DataTransfer || !HTMLCanvasElement.prototype.toBlob) return done(f);
+    var u = URL.createObjectURL(f), im = new Image();
+    im.onload = function () {
+      var k = Math.min(1, 2400 / Math.max(im.naturalWidth, im.naturalHeight));
+      var c = document.createElement('canvas');
+      c.width = Math.round(im.naturalWidth * k); c.height = Math.round(im.naturalHeight * k);
+      var x = c.getContext('2d');
+      x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height);
+      x.drawImage(im, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(u);
+      c.toBlob(function (b) {
+        done(b && b.size > 10000 && b.size < f.size ? new File([b], 'foto.jpg', { type: 'image/jpeg' }) : f);
+      }, 'image/jpeg', 0.9);
+    };
+    im.onerror = function () { URL.revokeObjectURL(u); done(f); };
+    im.src = u;
+  }
+
   input.addEventListener('change', function () {
-    var f = input.files && input.files[0];
+    var f = input.files && input.files[0], mine = ++turn;
+    // the server's word on the photo sent before is about that one, not this
+    var said = drop.parentNode.querySelector('.mc-err');
+    if (said) said.hidden = true;
     if (shown) { URL.revokeObjectURL(shown); shown = null; }
     if (!f) { prev.hidden = true; drop.classList.remove('has-files'); pick.textContent = 'Elegir una foto'; return; }
     shown = URL.createObjectURL(f);
+    // a HEIC in a browser that cannot draw one: no preview, the name instead,
+    // and the server converts it
+    img.onerror = function () { prev.hidden = true; small.textContent = f.name; };
     img.src = shown; prev.hidden = false;
     drop.classList.add('has-files');
     pick.textContent = 'Cambiar la foto';
-    small.textContent = f.size > {{ $maxKb }} * 1024 ? 'Pesa demasiado: como mucho 12 MB.' : 'Así saldrá: entera.';
+    small.textContent = 'Así saldrá: entera.';
+    shrink(f, function (g) {
+      if (mine !== turn) return;   // another photo was chosen meanwhile
+      if (g !== f) {
+        try { var dt = new DataTransfer(); dt.items.add(g); input.files = dt.files; } catch (e) { g = f; }
+      }
+      if (g.size > {{ $maxKb }} * 1024) small.textContent = 'Pesa demasiado: como mucho 12 MB.';
+    });
   });
   // one press: the button does not send twice while a photo is going up
   document.querySelector('.op-form').addEventListener('submit', function (e) {

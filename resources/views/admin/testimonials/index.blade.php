@@ -52,11 +52,13 @@
           <div class="ad-say__b">
             <div class="ad-msg__h">
               <span class="ad-msg__who">{{ $t->author_name }}</span>
-              {{-- one the customer wrote through a link waits for him to read it --}}
+              {{-- one the customer wrote through a link: with a photo it went straight
+                   onto the home page, without one it waits for him --}}
               @if(!$t->is_active && isset($viaLink[$t->id]))
                 <span class="ad-chip ad-chip--wait">Nueva · la escribió el cliente</span>
               @else
                 <span class="ad-chip {{ $t->is_active ? 'ad-chip--live' : '' }}">{{ $t->is_active ? 'En la portada' : 'Oculta' }}</span>
+                @if(isset($viaLink[$t->id]))<span class="ad-chip">La escribió el cliente</span>@endif
               @endif
               <span class="ad-msg__when">Orden {{ $t->order_index }}</span>
             </div>

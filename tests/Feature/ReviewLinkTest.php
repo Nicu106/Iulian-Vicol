@@ -115,9 +115,11 @@ class ReviewLinkTest extends TestCase
             'photo' => $this->phonePhoto(), 'consent' => '1',
         ])->assertRedirect(route('opinion', $link->token))->assertSessionHasNoErrors();
 
+        // with a photo it is on the home page at once (2026-11-19), first in the row
         $t = Testimonial::firstOrFail();
-        $this->assertFalse($t->is_active);
+        $this->assertTrue($t->is_active);
         $this->assertSame('María G.', $t->author_name);
+        $this->assertSame($t->id, \App\Support\ReviewRow::rows()->first()->id);
         $link->refresh();
         $this->assertNotNull($link->used_at);
         $this->assertSame($t->id, $link->testimonial_id);
@@ -130,6 +132,7 @@ class ReviewLinkTest extends TestCase
 
         $thanks = $this->get(route('opinion', $link->token))->assertOk()->getContent();
         $this->assertStringContainsString('Gracias, María G.', $thanks);
+        $this->assertStringContainsString('Ya está <a class="mc-link" href="/#reviews">en la web</a>', $thanks);
         $this->dump('opinion-gracias', $thanks);
 
         // the same link again, from another browser: no second opinion
@@ -139,8 +142,9 @@ class ReviewLinkTest extends TestCase
         $this->assertSame(1, Testimonial::count());
         $this->assertStringContainsString('ya me&nbsp;llegó', $this->get(route('opinion', $link->token))->getContent());
 
-        // the panel marks it as new
-        $this->actingAs($this->admin())->get(route('admin.testimonials.index'))->assertSee('Nueva · la escribió el cliente');
+        // the panel says where it came from
+        $this->actingAs($this->admin())->get(route('admin.testimonials.index'))
+            ->assertSee('En la portada')->assertSee('La escribió el cliente')->assertDontSee('Nueva · la escribió el cliente');
     }
 
     public function test_what_the_form_refuses(): void
@@ -157,9 +161,68 @@ class ReviewLinkTest extends TestCase
         $this->assertSame(0, Testimonial::count());
         $this->assertTrue($link->fresh()->isOpen());
 
-        // without a photo is fine
+        // without a photo is fine, and waits in the panel: the row shows only photographs
         $go(['name' => 'Ana', 'quote' => 'Muy bien todo, repetiría sin duda.', 'consent' => '1'])->assertSessionHasNoErrors();
-        $this->assertNull(Testimonial::firstOrFail()->image_path);
+        $t = Testimonial::firstOrFail();
+        $this->assertNull($t->image_path);
+        $this->assertFalse($t->is_active);
+        $this->assertStringContainsString('La leo y la publico en unos días', $this->get(route('opinion', $link->token))->getContent());
+        $this->actingAs($this->admin())->get(route('admin.testimonials.index'))->assertSee('Nueva · la escribió el cliente');
+    }
+
+    public function test_the_words_are_kept_and_only_markup_goes(): void
+    {
+        $link = ReviewLink::open(7, null);
+        $this->post(route('opinion.store', $link->token), [
+            'name' => 'Ana <b>G.</b>', 'quote' => "Muy bien <3 y 5<6 km.\n<script>alert(1)</script>Repetiría.", 'consent' => '1',
+        ])->assertSessionHasNoErrors();
+        $t = Testimonial::firstOrFail();
+        $this->assertSame('Ana G.', $t->author_name);
+        $this->assertSame("Muy bien <3 y 5<6 km.\nalert(1)Repetiría.", $t->quote);
+    }
+
+    public function test_any_picture_a_phone_or_a_computer_keeps(): void
+    {
+        // 2026-11-19, the client: "orice tip de imagine ... formatele de la Apple".
+        // HEIC itself has no encoder on this box; AVIF goes the same way (heif-convert).
+        Storage::fake('public');
+        $dir = sys_get_temp_dir() . '/op-fmt-' . bin2hex(random_bytes(4));
+        mkdir($dir);
+        $im = imagecreatetruecolor(400, 300);
+        imagefill($im, 0, 0, imagecolorallocate($im, 30, 90, 200));
+        imagepng($im, "$dir/a.png");
+        imagegif($im, "$dir/foto.gif");
+        imagebmp($im, "$dir/foto.bmp");
+        $files = ['foto.gif' => "$dir/foto.gif", 'foto.bmp' => "$dir/foto.bmp"];
+        if (is_executable('/usr/bin/heif-enc') && \Illuminate\Support\Facades\Process::run(['/usr/bin/heif-enc', '-A', '-o', "$dir/foto.avif", "$dir/a.png"])->successful()) {
+            $files['IMG_0002.avif'] = "$dir/foto.avif";
+        }
+        if (is_executable('/usr/bin/ffmpeg') && \Illuminate\Support\Facades\Process::run(['/usr/bin/ffmpeg', '-loglevel', 'error', '-i', "$dir/a.png", "$dir/foto.tiff"])->successful()) {
+            $files['escaner.tiff'] = "$dir/foto.tiff";
+        }
+        $this->assertGreaterThanOrEqual(4, count($files), 'heif-enc and ffmpeg are on this box');
+
+        foreach ($files as $name => $path) {
+            $link = ReviewLink::open(7, null);
+            $this->post(route('opinion.store', $link->token), [
+                'name' => 'Ana', 'quote' => 'Muy bien todo, repetiría sin duda.', 'consent' => '1',
+                'photo' => new UploadedFile($path, $name, null, null, true),
+            ])->assertSessionHasNoErrors();
+            $t = Testimonial::latest('id')->firstOrFail();
+            $this->assertTrue($t->is_active, $name);
+            $info = getimagesize(Storage::disk('public')->path(str_replace('/storage/', '', $t->image_path)));
+            $this->assertSame([400, 300, IMAGETYPE_JPEG], [$info[0], $info[1], $info[2]], $name);
+        }
+
+        // a document is not a photo, whatever it is called
+        file_put_contents("$dir/x.svg", '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"/>');
+        $link = ReviewLink::open(7, null);
+        $this->from(route('opinion', $link->token))->post(route('opinion.store', $link->token), [
+            'name' => 'Ana', 'quote' => 'Muy bien todo, repetiría sin duda.', 'consent' => '1',
+            'photo' => new UploadedFile("$dir/x.svg", 'foto.jpg', null, null, true),
+        ])->assertSessionHasErrors(['photo' => 'Ese archivo no es una foto. Prueba con otra.']);
+        array_map('unlink', glob("$dir/*"));
+        rmdir($dir);
     }
 
     public function test_the_page_beacons_do_not_use_up_the_form(): void
@@ -175,6 +238,20 @@ class ReviewLinkTest extends TestCase
         $this->post(route('opinion.store', $link->token), ['name' => 'Ana', 'quote' => 'Muy bien todo, repetiría sin duda.', 'consent' => '1'])
             ->assertRedirect(route('opinion', $link->token));
         $this->assertSame(1, Testimonial::count());
+    }
+
+    public function test_the_limit_is_per_link_not_per_connection(): void
+    {
+        // the 5-an-hour per address stopped a sixth send from one Wi-Fi, whoever's link
+        $send = fn ($link) => $this->from(route('opinion', $link->token))
+            ->post(route('opinion.store', $link->token), ['name' => 'Ana', 'quote' => 'Bien', 'consent' => '1']);
+        $one = ReviewLink::open(7, null);
+        $two = ReviewLink::open(7, null);
+        for ($i = 0; $i < 10; $i++) {
+            $send($one)->assertSessionHasErrors('quote');
+        }
+        $send($one)->assertStatus(429);
+        $send($two)->assertSessionHasErrors('quote');
     }
 
     public function test_a_closed_or_unknown_link(): void

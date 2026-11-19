@@ -13,10 +13,11 @@ use Illuminate\Support\Str;
  *
  * One link is one opinion. It is open until expires_at or until an opinion is
  * sent through it, whichever comes first; he can also close it by hand (which
- * sets expires_at to now). What comes in is a Testimonial with is_active false:
- * nothing reaches the home page until he has read it and ticked "Se enseña en
- * la portada". The customer ticks a consent box before sending, so used_at is
- * also the moment they agreed to their name, words and photo being published.
+ * sets expires_at to now). What comes in is a Testimonial: with a photograph it
+ * is on the home page at once, without one it waits hidden in the panel
+ * (OpinionController). The customer ticks a consent box before sending, so
+ * used_at is also the moment they agreed to their name, words and photo being
+ * published.
  *
  * The token is the only key: no name or phone in the address.
  */
