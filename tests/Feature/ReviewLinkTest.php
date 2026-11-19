@@ -240,6 +240,35 @@ class ReviewLinkTest extends TestCase
         $this->assertSame(1, Testimonial::count());
     }
 
+    public function test_he_can_hide_or_publish_what_came_through_a_link(): void
+    {
+        Storage::fake('public');
+        $admin = $this->admin();
+        $link = ReviewLink::open(7, null);
+        $this->post(route('opinion.store', $link->token), [
+            'name' => 'Ana', 'quote' => 'Muy bien todo, repetiría sin duda.', 'photo' => $this->phonePhoto(), 'consent' => '1',
+        ])->assertSessionHasNoErrors();
+        $t = Testimonial::firstOrFail();
+        $photo = $t->image_path;
+
+        // "Editar" opens with the box ticked; unticked and saved, it leaves the home page
+        // and is not "Nueva" any more: he hid it himself
+        $this->travel(5)->minutes();
+        $form = $this->actingAs($admin)->get(route('admin.testimonials.edit', $t))->assertOk()->getContent();
+        $this->assertMatchesRegularExpression('/name="is_active" value="1" checked/', $form);
+        $this->put(route('admin.testimonials.update', $t), ['author_name' => 'Ana', 'quote' => $t->quote, 'order_index' => 0])
+            ->assertRedirect(route('admin.testimonials.index'));
+        $t->refresh();
+        $this->assertFalse($t->is_active);
+        $this->assertSame($photo, $t->image_path);
+        $this->assertTrue(\App\Support\ReviewRow::rows()->isEmpty());
+        $this->get(route('admin.testimonials.index'))->assertSee('Oculta')->assertSee('La escribió el cliente')->assertDontSee('Nueva · la escribió el cliente');
+
+        // and back
+        $this->put(route('admin.testimonials.update', $t), ['author_name' => 'Ana', 'quote' => $t->quote, 'order_index' => 0, 'is_active' => '1']);
+        $this->assertSame($t->id, \App\Support\ReviewRow::rows()->first()->id);
+    }
+
     public function test_the_limit_is_per_link_not_per_connection(): void
     {
         // the 5-an-hour per address stopped a sixth send from one Wi-Fi, whoever's link

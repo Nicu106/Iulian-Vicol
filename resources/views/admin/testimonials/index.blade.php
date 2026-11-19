@@ -53,8 +53,9 @@
             <div class="ad-msg__h">
               <span class="ad-msg__who">{{ $t->author_name }}</span>
               {{-- one the customer wrote through a link: with a photo it went straight
-                   onto the home page, without one it waits for him --}}
-              @if(!$t->is_active && isset($viaLink[$t->id]))
+                   onto the home page, without one it waits for him. "Nueva" until he
+                   has saved it once: one he hid himself is not new --}}
+              @if(!$t->is_active && isset($viaLink[$t->id]) && $t->updated_at?->eq($t->created_at))
                 <span class="ad-chip ad-chip--wait">Nueva · la escribió el cliente</span>
               @else
                 <span class="ad-chip {{ $t->is_active ? 'ad-chip--live' : '' }}">{{ $t->is_active ? 'En la portada' : 'Oculta' }}</span>
