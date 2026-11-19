@@ -14,7 +14,7 @@ Route::redirect('/despre', '/contacto', 301)->name('about');
 Route::redirect('/contact', '/contacto', 301)->name('contact');
 Route::redirect('/catalog', '/catalogo', 301)->name('catalog');
 // old site's form, kept for any cached page; rate-limited like the others
-Route::post('/contact/send', [App\Http\Controllers\ContactController::class, 'store'])->middleware('throttle:5,60')->name('contact.send');
+Route::post('/contact/send', [App\Http\Controllers\ContactController::class, 'store'])->middleware('throttle:5,60,contact')->name('contact.send');
 
 // Lightweight image resize with caching (local files only)
 // No session, no cookies, no CSRF token: this route answers with an image and
@@ -50,7 +50,7 @@ Route::post('/vende', [App\Http\Controllers\SellCarController::class, 'store'])
 
 // Detaliu vehicul (din baza de date)
 Route::get('/vehicles/{slug}', fn (string $slug) => redirect('/coche/' . $slug, 301))->name('vehicle.show');
-Route::post('/inquiries', [App\Http\Controllers\InquiryController::class, 'store'])->middleware('throttle:5,60')->name('inquiries.store');
+Route::post('/inquiries', [App\Http\Controllers\InquiryController::class, 'store'])->middleware('throttle:5,60,inquiry')->name('inquiries.store');
 
 // Pagina mașini salvate (doar frontend, fără backend)
 // The design system is internal: signed-in only, reached from the panel's menu.
@@ -67,10 +67,10 @@ Route::middleware(App\Http\Middleware\MuestrasPin::class)->group(function () {
     Route::get('/muestras/por-que', [App\Http\Controllers\WhyShowroomController::class, 'index'])->name('muestras.porque');
     Route::get('/muestras/por-que/{v}', [App\Http\Controllers\WhyShowroomController::class, 'show'])->where('v', '[0-9]+(\.[0-9]+)?')->name('muestras.porque.show');
 });
-Route::post('/muestras/pin', [App\Http\Middleware\MuestrasPin::class, 'check'])->middleware('throttle:12,1');
+Route::post('/muestras/pin', [App\Http\Middleware\MuestrasPin::class, 'check'])->middleware('throttle:12,1,pin');
 Route::get('/coche/{slug}', [App\Http\Controllers\CarPageController::class, 'show'])->name('coche');
 // the car as a PDF (App\Support\CarPdf): built once per version of the car, then read from disk
-Route::get('/coche/{slug}/ficha.pdf', [App\Http\Controllers\CarPageController::class, 'pdf'])->middleware('throttle:20,1')->name('coche.pdf');
+Route::get('/coche/{slug}/ficha.pdf', [App\Http\Controllers\CarPageController::class, 'pdf'])->middleware('throttle:20,1,pdf')->name('coche.pdf');
 Route::get('/contacto', [App\Http\Controllers\ContactPageController::class, 'index'])->name('contacto');
 Route::get('/por-que-nosotros', [App\Http\Controllers\WhyUsController::class, 'index'])->name('why');
 // A private showroom for the client: four ways to show the reviews. Not linked, noindex,
@@ -79,15 +79,18 @@ Route::get('/por-que-nosotros', [App\Http\Controllers\WhyUsController::class, 'i
 // Recommendations without accounts — App\Support\Referral has the rules.
 // What the page script reports as a WhatsApp or e-mail press leaves the site.
 Route::post('/r/e', [App\Http\Controllers\ReferralController::class, 'event'])
-    ->middleware('throttle:120,1')->name('refer.event');
+    ->middleware('throttle:120,1,refer')->name('refer.event');
 // The panel's statistics: one anonymous beacon per page and press — App\Support\Stats.
-Route::post('/s', [App\Http\Controllers\BeaconController::class, 'hit'])
-    ->middleware('throttle:120,1')->name('stats.hit');
+// Every throttle here names its own counter (the third word). Without one they all
+// share a single counter per visitor, and these beacons used up a form's five: the
+// opinion form answered 429 a minute after it was opened (2026-11-19).
+Route::post('/s',[App\Http\Controllers\BeaconController::class, 'hit'])
+    ->middleware('throttle:120,1,beacon')->name('stats.hit');
 // "No contar este dispositivo": a signed link that keeps a phone of the team out of them.
 Route::get('/no-contar', [App\Http\Controllers\StatsMeController::class, 'show'])
-    ->middleware(['signed', 'throttle:20,1'])->name('stats.me');
+    ->middleware(['signed', 'throttle:20,1,no-contar'])->name('stats.me');
 Route::get('/no-contar/quitar', [App\Http\Controllers\StatsMeController::class, 'undo'])
-    ->middleware(['signed', 'throttle:20,1'])->name('stats.me.undo');
+    ->middleware(['signed', 'throttle:20,1,no-contar'])->name('stats.me.undo');
 Route::get('/r/{code}', [App\Http\Controllers\ReferralController::class, 'visit'])->name('refer.visit');
 Route::get('/recomienda', [App\Http\Controllers\ReferralController::class, 'show'])->name('refer');
 // A customer writes their own opinion through the link the owner sent them
@@ -96,7 +99,7 @@ Route::get('/opinion/{token}', [App\Http\Controllers\OpinionController::class, '
     ->where('token', '[A-Za-z0-9]{20}')->name('opinion');
 Route::post('/opinion/{token}', [App\Http\Controllers\OpinionController::class, 'store'])
     ->where('token', '[A-Za-z0-9]{20}')
-    ->middleware(['throttle:5,60', \App\Http\Middleware\PublicFormLimits::class])->name('opinion.store');
+    ->middleware(['throttle:5,60,opinion', \App\Http\Middleware\PublicFormLimits::class])->name('opinion.store');
 Route::post('/recomienda', [App\Http\Controllers\ReferralController::class, 'store'])
     ->middleware('throttle:referral')->name('refer.store');
 

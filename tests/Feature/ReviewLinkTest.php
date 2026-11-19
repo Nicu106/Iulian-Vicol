@@ -162,6 +162,21 @@ class ReviewLinkTest extends TestCase
         $this->assertNull(Testimonial::firstOrFail()->image_path);
     }
 
+    public function test_the_page_beacons_do_not_use_up_the_form(): void
+    {
+        // 2026-11-19: the page sent its beacons, the first "Enviar" came back with
+        // an error, and the second answered 429 — every throttle shared one counter
+        $link = ReviewLink::open(7, null);
+        for ($i = 0; $i < 8; $i++) {
+            $this->post(route('stats.hit'))->assertNoContent();
+        }
+        $this->from(route('opinion', $link->token))->post(route('opinion.store', $link->token), ['name' => 'Ana', 'quote' => 'Bien', 'consent' => '1'])
+            ->assertSessionHasErrors('quote');
+        $this->post(route('opinion.store', $link->token), ['name' => 'Ana', 'quote' => 'Muy bien todo, repetiría sin duda.', 'consent' => '1'])
+            ->assertRedirect(route('opinion', $link->token));
+        $this->assertSame(1, Testimonial::count());
+    }
+
     public function test_a_closed_or_unknown_link(): void
     {
         $link = ReviewLink::open(1, 'Pepe');
