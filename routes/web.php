@@ -66,6 +66,10 @@ Route::middleware(App\Http\Middleware\MuestrasPin::class)->group(function () {
     Route::get('/muestras/opiniones/{v}', [App\Http\Controllers\ReviewShowroomController::class, 'show'])->where('v', '[0-9]+(\.[0-9]+)?')->name('muestras.opiniones.show');
     Route::get('/muestras/por-que', [App\Http\Controllers\WhyShowroomController::class, 'index'])->name('muestras.porque');
     Route::get('/muestras/por-que/{v}', [App\Http\Controllers\WhyShowroomController::class, 'show'])->where('v', '[0-9]+(\.[0-9]+)?')->name('muestras.porque.show');
+    // every text of the site, with a box for the new wording that saves itself (SiteTextController)
+    Route::get('/muestras/textos', [App\Http\Controllers\SiteTextController::class, 'index'])->name('muestras.textos');
+    Route::post('/muestras/textos/{text}', [App\Http\Controllers\SiteTextController::class, 'update'])
+        ->whereNumber('text')->middleware('throttle:300,1,textos')->name('muestras.textos.update');
 });
 Route::post('/muestras/pin', [App\Http\Middleware\MuestrasPin::class, 'check'])->middleware('throttle:12,1,pin');
 Route::get('/coche/{slug}', [App\Http\Controllers\CarPageController::class, 'show'])->name('coche');
